@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salary ↔ Hourly — Free Online Calculator | Wealth Arrays</title>
+<meta name="description" content="Switch either direction — see what an annual salary works out to per hour, or what an hourly rate adds up to per year.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.wealtharrays.com/salary-to-hourly-calculator.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Salary ↔ Hourly — Wealth Arrays">
+<meta property="og:description" content="Switch either direction — see what an annual salary works out to per hour, or what an hourly rate adds up to per year.">
+<meta property="og:url" content="https://www.wealtharrays.com/salary-to-hourly-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Why 48 weeks and not 52?","acceptedAnswer":{"@type":"Answer","text":"52 weeks minus a typical 2–4 weeks of unpaid time off (holidays, sick days not covered by salary) gives a more realistic working-weeks figure. Adjust it to match your actual situation — salaried roles with full paid leave might use 52."}},{"@type":"Question","name":"Does this include overtime?","acceptedAnswer":{"@type":"Answer","text":"No — this is a straight-line conversion based on regular hours. If you regularly work overtime, your effective hourly rate for salaried work will be lower than shown here."}},{"@type":"Question","name":"Are taxes included?","acceptedAnswer":{"@type":"Answer","text":"No, both figures are gross (pre-tax) amounts."}}]}</script>
+</head>
+<body>
+<header class="masthead">
+  <div class="masthead-inner">
+    <a href="index.html" class="wordmark">Wealth Arrays</a>
+    <div class="masthead-controls">
+      <label class="control">
+        <span>Currency</span>
+        <select id="currency-select"></select>
+      </label>
+      <button id="theme-toggle" class="control theme-toggle" type="button" aria-pressed="false">
+        <span id="theme-toggle-label">Dark</span>
+      </button>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="calc-page">
+    <a class="calc-back" href="index.html">← Index</a>
+    <a class="calc-category-tag" href="category-salary.html">Salary & Income</a>
+    <h1 class="calc-title">Salary ↔ Hourly</h1>
+    <p class="calc-desc">Switch either direction — see what an annual salary works out to per hour, or what an hourly rate adds up to per year.</p>
+    <div class="calc-body">
+      <div class="calc-main">
+        <div id="calc-widget"></div>
+      </div>
+      <aside class="calc-sidebar">
+        <div class="tool-info">
+          <div class="related-heading">Tool info</div>
+          <div class="tool-info-row"><span>Category</span><a href="category-salary.html">Salary & Income</a></div>
+          <div class="tool-info-row"><span>Access</span><span>Free — no sign-up</span></div>
+          <div class="tool-info-row"><span>Runs</span><span>In your browser</span></div>
+        </div>
+        
+      </aside>
+    </div>
+
+    <article class="tool-article">
+      <h2>How it's calculated</h2>
+      <p>Hourly rate = Annual salary ÷ (Hours per week × Working weeks per year). To go the other way: Annual salary = Hourly rate × Hours per week × Working weeks per year.</p>
+      <h2>Worked example</h2>
+      <p>With convert of salary → hourly, amount of 60000, hours per week of 40, working weeks per year of 48, this works out to a working hours / year of 1,920, hourly rate of $31.25. Try it yourself in the calculator above with your own numbers.</p>
+      <h2>Frequently asked questions</h2>
+      
+      <div class="faq-item">
+        <h3>Why 48 weeks and not 52?</h3>
+        <p>52 weeks minus a typical 2–4 weeks of unpaid time off (holidays, sick days not covered by salary) gives a more realistic working-weeks figure. Adjust it to match your actual situation — salaried roles with full paid leave might use 52.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Does this include overtime?</h3>
+        <p>No — this is a straight-line conversion based on regular hours. If you regularly work overtime, your effective hourly rate for salaried work will be lower than shown here.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Are taxes included?</h3>
+        <p>No, both figures are gross (pre-tax) amounts.</p>
+      </div>
+    </article>
+  </div>
+</main>
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <p>Wealth Arrays gives free, unbiased calculators — no advisor referrals, no data selling. Results are estimates for planning purposes, not financial advice.</p>
+    <nav class="footer-links">
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms &amp; Conditions</a>
+    </nav>
+  </div>
+</footer>
+<script src="calculators.js"></script>
+<script src="widget.js"></script>
+<script>mountCalculator(CALCULATORS.find(c => c.id === "salary-hourly"), "calc-widget");</script>
+</body>
+</html>

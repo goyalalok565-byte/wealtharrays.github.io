@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mortgage / Loan EMI — Free Online Calculator | Wealth Arrays</title>
+<meta name="description" content="Calculate the equal monthly instalment for a mortgage, car loan, or personal loan, and the total interest paid over its term.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.wealtharrays.com/mortgage-emi-calculator.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Mortgage / Loan EMI — Wealth Arrays">
+<meta property="og:description" content="Calculate the equal monthly instalment for a mortgage, car loan, or personal loan, and the total interest paid over its term.">
+<meta property="og:url" content="https://www.wealtharrays.com/mortgage-emi-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Why is so much of my early payment interest?","acceptedAnswer":{"@type":"Answer","text":"Loans amortize: early payments are weighted toward interest because the outstanding balance is highest at the start. As the balance shrinks, more of each payment goes toward principal."}},{"@type":"Question","name":"Does paying extra toward principal help?","acceptedAnswer":{"@type":"Answer","text":"Yes — extra payments reduce the outstanding balance, which reduces future interest and can shorten the loan term. This calculator doesn't model extra payments directly; recompute with a shorter term to approximate the effect."}},{"@type":"Question","name":"Fixed-rate or adjustable-rate — does this handle both?","acceptedAnswer":{"@type":"Answer","text":"This calculator assumes a fixed rate for the full term. For an adjustable-rate loan, rerun the calculation with the new rate once it changes."}}]}</script>
+</head>
+<body>
+<header class="masthead">
+  <div class="masthead-inner">
+    <a href="index.html" class="wordmark">Wealth Arrays</a>
+    <div class="masthead-controls">
+      <label class="control">
+        <span>Currency</span>
+        <select id="currency-select"></select>
+      </label>
+      <button id="theme-toggle" class="control theme-toggle" type="button" aria-pressed="false">
+        <span id="theme-toggle-label">Dark</span>
+      </button>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="calc-page">
+    <a class="calc-back" href="index.html">← Index</a>
+    <a class="calc-category-tag" href="category-loan.html">Loan Calculators</a>
+    <h1 class="calc-title">Mortgage / Loan EMI</h1>
+    <p class="calc-desc">Calculate the equal monthly instalment for a mortgage, car loan, or personal loan, and the total interest paid over its term.</p>
+    <div class="calc-body">
+      <div class="calc-main">
+        <div id="calc-widget"></div>
+      </div>
+      <aside class="calc-sidebar">
+        <div class="tool-info">
+          <div class="related-heading">Tool info</div>
+          <div class="tool-info-row"><span>Category</span><a href="category-loan.html">Loan Calculators</a></div>
+          <div class="tool-info-row"><span>Access</span><span>Free — no sign-up</span></div>
+          <div class="tool-info-row"><span>Runs</span><span>In your browser</span></div>
+        </div>
+        
+      </aside>
+    </div>
+
+    <article class="tool-article">
+      <h2>How it's calculated</h2>
+      <p>EMI = [P × r × (1+r)^n] / [(1+r)^n − 1], where P is the loan amount, r is the monthly interest rate (annual rate ÷ 12), and n is the number of monthly payments.</p>
+      <h2>Worked example</h2>
+      <p>With loan amount of 250000, annual interest rate of 6.5%, loan term of 25yrs, this works out to a monthly payment of $1,688.02, total repayment of $506,405.37, total interest of $256,405.37. Try it yourself in the calculator above with your own numbers.</p>
+      <h2>Frequently asked questions</h2>
+      
+      <div class="faq-item">
+        <h3>Why is so much of my early payment interest?</h3>
+        <p>Loans amortize: early payments are weighted toward interest because the outstanding balance is highest at the start. As the balance shrinks, more of each payment goes toward principal.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Does paying extra toward principal help?</h3>
+        <p>Yes — extra payments reduce the outstanding balance, which reduces future interest and can shorten the loan term. This calculator doesn't model extra payments directly; recompute with a shorter term to approximate the effect.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Fixed-rate or adjustable-rate — does this handle both?</h3>
+        <p>This calculator assumes a fixed rate for the full term. For an adjustable-rate loan, rerun the calculation with the new rate once it changes.</p>
+      </div>
+    </article>
+  </div>
+</main>
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <p>Wealth Arrays gives free, unbiased calculators — no advisor referrals, no data selling. Results are estimates for planning purposes, not financial advice.</p>
+    <nav class="footer-links">
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms &amp; Conditions</a>
+    </nav>
+  </div>
+</footer>
+<script src="calculators.js"></script>
+<script src="widget.js"></script>
+<script>mountCalculator(CALCULATORS.find(c => c.id === "mortgage"), "calc-widget");</script>
+</body>
+</html>

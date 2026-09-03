@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROI Calculator — Free Online Calculator | Wealth Arrays</title>
+<meta name="description" content="Compare what you put in against what you got back, as a total and annualised percentage return.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.wealtharrays.com/roi-calculator.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ROI Calculator — Wealth Arrays">
+<meta property="og:description" content="Compare what you put in against what you got back, as a total and annualised percentage return.">
+<meta property="og:url" content="https://www.wealtharrays.com/roi-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What's the difference between ROI and CAGR?","acceptedAnswer":{"@type":"Answer","text":"Annualized ROI here is calculated the same way as CAGR (Compound Annual Growth Rate) — both express a multi-year return as an equivalent constant yearly rate."}},{"@type":"Question","name":"Does ROI include fees or taxes?","acceptedAnswer":{"@type":"Answer","text":"Only if you build them into your cost or final value inputs. The formula itself is agnostic — it just compares two numbers."}},{"@type":"Question","name":"What does a negative ROI mean?","acceptedAnswer":{"@type":"Answer","text":"It means the final value was lower than what you put in — you lost money on the investment or purchase over that period."}}]}</script>
+</head>
+<body>
+<header class="masthead">
+  <div class="masthead-inner">
+    <a href="index.html" class="wordmark">Wealth Arrays</a>
+    <div class="masthead-controls">
+      <label class="control">
+        <span>Currency</span>
+        <select id="currency-select"></select>
+      </label>
+      <button id="theme-toggle" class="control theme-toggle" type="button" aria-pressed="false">
+        <span id="theme-toggle-label">Dark</span>
+      </button>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="calc-page">
+    <a class="calc-back" href="index.html">← Index</a>
+    <a class="calc-category-tag" href="category-investment.html">Investment Calculators</a>
+    <h1 class="calc-title">ROI Calculator</h1>
+    <p class="calc-desc">Compare what you put in against what you got back, as a total and annualised percentage return.</p>
+    <div class="calc-body">
+      <div class="calc-main">
+        <div id="calc-widget"></div>
+      </div>
+      <aside class="calc-sidebar">
+        <div class="tool-info">
+          <div class="related-heading">Tool info</div>
+          <div class="tool-info-row"><span>Category</span><a href="category-investment.html">Investment Calculators</a></div>
+          <div class="tool-info-row"><span>Access</span><span>Free — no sign-up</span></div>
+          <div class="tool-info-row"><span>Runs</span><span>In your browser</span></div>
+        </div>
+        
+        <div class="related-tools">
+          <div class="related-heading">Related tools</div>
+          <a class="related-link" href="sip-calculator.html">SIP Calculator</a>
+        </div>
+      </aside>
+    </div>
+
+    <article class="tool-article">
+      <h2>How it's calculated</h2>
+      <p>Total ROI = (Final value − Cost) / Cost × 100. Annualized ROI = [(Final value / Cost)^(1/years) − 1] × 100 — this spreads the total return evenly across each year, so investments held for different lengths of time can be compared fairly.</p>
+      <h2>Worked example</h2>
+      <p>With amount invested of 10000, current / final value of 14500, holding period of 3yrs, this works out to a net gain of $4,500.00, total roi of 45.00%, annualized roi of 13.19%. Try it yourself in the calculator above with your own numbers.</p>
+      <h2>Frequently asked questions</h2>
+      
+      <div class="faq-item">
+        <h3>What's the difference between ROI and CAGR?</h3>
+        <p>Annualized ROI here is calculated the same way as CAGR (Compound Annual Growth Rate) — both express a multi-year return as an equivalent constant yearly rate.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Does ROI include fees or taxes?</h3>
+        <p>Only if you build them into your cost or final value inputs. The formula itself is agnostic — it just compares two numbers.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What does a negative ROI mean?</h3>
+        <p>It means the final value was lower than what you put in — you lost money on the investment or purchase over that period.</p>
+      </div>
+    </article>
+  </div>
+</main>
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <p>Wealth Arrays gives free, unbiased calculators — no advisor referrals, no data selling. Results are estimates for planning purposes, not financial advice.</p>
+    <nav class="footer-links">
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms &amp; Conditions</a>
+    </nav>
+  </div>
+</footer>
+<script src="calculators.js"></script>
+<script src="widget.js"></script>
+<script>mountCalculator(CALCULATORS.find(c => c.id === "roi"), "calc-widget");</script>
+</body>
+</html>

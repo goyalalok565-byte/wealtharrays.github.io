@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profit Margin — Free Online Calculator | Wealth Arrays</title>
+<meta name="description" content="Calculate gross margin (revenue minus cost of goods) and net margin (after all expenses) as percentages of revenue.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.wealtharrays.com/profit-margin-calculator.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Profit Margin — Wealth Arrays">
+<meta property="og:description" content="Calculate gross margin (revenue minus cost of goods) and net margin (after all expenses) as percentages of revenue.">
+<meta property="og:url" content="https://www.wealtharrays.com/profit-margin-calculator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What's the difference between gross and net margin?","acceptedAnswer":{"@type":"Answer","text":"Gross margin only subtracts the direct cost of producing what you sold. Net margin also subtracts everything else — rent, salaries, marketing, and other operating expenses — giving a fuller picture of profitability."}},{"@type":"Question","name":"What's a 'good' profit margin?","acceptedAnswer":{"@type":"Answer","text":"It varies enormously by industry — grocery retail often runs on margins under 5%, while software businesses can see 70%+ gross margins. Compare against others in your specific industry rather than a universal benchmark."}},{"@type":"Question","name":"How can I improve my margin?","acceptedAnswer":{"@type":"Answer","text":"Broadly: raise prices, reduce the cost of goods sold, or cut operating expenses — each has trade-offs specific to your business that this calculator can't account for."}}]}</script>
+</head>
+<body>
+<header class="masthead">
+  <div class="masthead-inner">
+    <a href="index.html" class="wordmark">Wealth Arrays</a>
+    <div class="masthead-controls">
+      <label class="control">
+        <span>Currency</span>
+        <select id="currency-select"></select>
+      </label>
+      <button id="theme-toggle" class="control theme-toggle" type="button" aria-pressed="false">
+        <span id="theme-toggle-label">Dark</span>
+      </button>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="calc-page">
+    <a class="calc-back" href="index.html">← Index</a>
+    <a class="calc-category-tag" href="category-business.html">Business Calculators</a>
+    <h1 class="calc-title">Profit Margin</h1>
+    <p class="calc-desc">Calculate gross margin (revenue minus cost of goods) and net margin (after all expenses) as percentages of revenue.</p>
+    <div class="calc-body">
+      <div class="calc-main">
+        <div id="calc-widget"></div>
+      </div>
+      <aside class="calc-sidebar">
+        <div class="tool-info">
+          <div class="related-heading">Tool info</div>
+          <div class="tool-info-row"><span>Category</span><a href="category-business.html">Business Calculators</a></div>
+          <div class="tool-info-row"><span>Access</span><span>Free — no sign-up</span></div>
+          <div class="tool-info-row"><span>Runs</span><span>In your browser</span></div>
+        </div>
+        
+      </aside>
+    </div>
+
+    <article class="tool-article">
+      <h2>How it's calculated</h2>
+      <p>Gross margin = (Revenue − Cost of goods sold) ÷ Revenue × 100. Net margin = (Revenue − Cost of goods sold − Other expenses) ÷ Revenue × 100.</p>
+      <h2>Worked example</h2>
+      <p>With revenue of 50000, cost of goods sold of 28000, other operating expenses of 9000, this works out to a gross profit of $22,000.00, gross margin of 44.00%, net profit of $13,000.00, net margin of 26.00%. Try it yourself in the calculator above with your own numbers.</p>
+      <h2>Frequently asked questions</h2>
+      
+      <div class="faq-item">
+        <h3>What's the difference between gross and net margin?</h3>
+        <p>Gross margin only subtracts the direct cost of producing what you sold. Net margin also subtracts everything else — rent, salaries, marketing, and other operating expenses — giving a fuller picture of profitability.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What's a 'good' profit margin?</h3>
+        <p>It varies enormously by industry — grocery retail often runs on margins under 5%, while software businesses can see 70%+ gross margins. Compare against others in your specific industry rather than a universal benchmark.</p>
+      </div>
+      <div class="faq-item">
+        <h3>How can I improve my margin?</h3>
+        <p>Broadly: raise prices, reduce the cost of goods sold, or cut operating expenses — each has trade-offs specific to your business that this calculator can't account for.</p>
+      </div>
+    </article>
+  </div>
+</main>
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <p>Wealth Arrays gives free, unbiased calculators — no advisor referrals, no data selling. Results are estimates for planning purposes, not financial advice.</p>
+    <nav class="footer-links">
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms &amp; Conditions</a>
+    </nav>
+  </div>
+</footer>
+<script src="calculators.js"></script>
+<script src="widget.js"></script>
+<script>mountCalculator(CALCULATORS.find(c => c.id === "profit-margin"), "calc-widget");</script>
+</body>
+</html>
