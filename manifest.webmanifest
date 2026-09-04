@@ -1,9 +1,9 @@
 {
-  "name": "Wealth Arrays",
-  "short_name": "Wealth Arrays",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#0B0F19",
-  "theme_color": "#0D9488",
-  "description": "Fast, free financial calculators."
+  "name":"Wealth Arrays",
+  "short_name":"Wealth Arrays",
+  "start_url":"/",
+  "display":"standalone",
+  "background_color":"#f7f8fb",
+  "theme_color":"#f7f8fb",
+  "description":"Fast, free financial calculators and original money guides."
 }
