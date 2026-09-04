@@ -1,15 +1,81 @@
-/* Wealth Arrays — lightweight calculator UI */
+/* Wealth Arrays — calculator UI */
 const safeStorage={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 const currencyList=()=>window.WA?.currencies||[['USD','$','US Dollar'],['EUR','€','Euro'],['GBP','£','British Pound'],['INR','₹','Indian Rupee'],['JPY','¥','Japanese Yen'],['CNY','¥','Chinese Yuan'],['AUD','A$','Australian Dollar'],['CAD','C$','Canadian Dollar'],['CHF','CHF','Swiss Franc'],['AED','د.إ','UAE Dirham'],['SAR','﷼','Saudi Riyal'],['SGD','S$','Singapore Dollar'],['NZD','NZ$','New Zealand Dollar'],['ZAR','R','South African Rand'],['BRL','R$','Brazilian Real'],['MXN','$','Mexican Peso'],['SEK','kr','Swedish Krona'],['NOK','kr','Norwegian Krone'],['DKK','kr','Danish Krone'],['PLN','zł','Polish Zloty'],['TRY','₺','Turkish Lira'],['RUB','₽','Russian Ruble'],['ILS','₪','Israeli Shekel'],['EGP','E£','Egyptian Pound'],['NGN','₦','Nigerian Naira'],['KES','KSh','Kenyan Shilling'],['GHS','₵','Ghanaian Cedi'],['THB','฿','Thai Baht'],['VND','₫','Vietnamese Dong'],['IDR','Rp','Indonesian Rupiah'],['MYR','RM','Malaysian Ringgit'],['PHP','₱','Philippine Peso'],['KRW','₩','South Korean Won'],['BDT','৳','Bangladeshi Taka'],['PKR','₨','Pakistani Rupee'],['LKR','Rs','Sri Lankan Rupee'],['NPR','₨','Nepalese Rupee'],['UAH','₴','Ukrainian Hryvnia'],['CZK','Kč','Czech Koruna'],['HUF','Ft','Hungarian Forint'],['RON','lei','Romanian Leu'],['BGN','лв','Bulgarian Lev'],['RSD','дин','Serbian Dinar'],['KZT','₸','Kazakhstani Tenge'],['GEL','₾','Georgian Lari'],['MAD','د.م.','Moroccan Dirham'],['DZD','دج','Algerian Dinar'],['TND','د.ت','Tunisian Dinar'],['MUR','₨','Mauritian Rupee'],['XOF','CFA','West African CFA'],['XAF','FCFA','Central African CFA'],['CDF','FC','Congolese Franc'],['ETB','Br','Ethiopian Birr'],['UGX','USh','Ugandan Shilling'],['TZS','TSh','Tanzanian Shilling'],['ZMW','ZK','Zambian Kwacha'],['BWP','P','Botswana Pula'],['NAD','N$','Namibian Dollar'],['MZN','MT','Mozambican Metical'],['AOA','Kz','Angolan Kwanza'],['MWK','MK','Malawian Kwacha'],['SLE','Le','Sierra Leonean Leone'],['GMD','D','Gambian Dalasi'],['GNF','FG','Guinean Franc'],['MVR','Rf','Maldivian Rufiyaa'],['AFN','؋','Afghan Afghani'],['IQD','ع.د','Iraqi Dinar'],['YER','﷼','Yemeni Rial']];
 const waState={currency:safeStorage.get('waCurrency')||'INR',theme:safeStorage.get('waTheme')||'light'};
+function injectCalculatorPolish(){if(document.getElementById('wa-calculator-polish'))return;const s=document.createElement('style');s.id='wa-calculator-polish';s.textContent=`
+.calc-page{width:min(1080px,100%);padding:28px 22px 72px}
+.calc-body{grid-template-columns:minmax(0,1fr) 280px;gap:24px;margin-top:34px;align-items:start}
+.calc-widget{border-radius:24px;overflow:hidden}
+.calc-widget-body{padding:26px}
+.calc-grid{gap:16px}
+.field label{font-size:12px;margin-bottom:8px}
+.field input,.field select{height:50px;border-radius:14px;padding:0 14px;font-size:15px}
+.calc-result{margin-top:22px;border-radius:18px}
+.calc-result-row{padding:16px 17px}
+.calc-result-label{font-size:12px}
+.calc-result-value{font-size:18px}
+.tool-actions{gap:9px;margin-top:16px}
+.tool-action{min-height:44px;border-radius:13px;font-size:11px}
+.tool-article{margin-top:48px;padding-top:34px}
+.tool-article h2{margin-top:34px;font-size:26px}
+.tool-article p{font-size:14px;line-height:1.75}
+.faq-item{padding:19px;margin:12px 0;border-radius:17px}
+.faq-item h3{font-size:15px}
+.faq-item p{font-size:13px;line-height:1.7}
+.site-footer{width:100%;max-width:1080px;padding:38px 22px 58px;font-size:11px}
+.site-footer-inner{gap:20px}
+.site-footer-inner>p{max-width:720px;line-height:1.75;margin:0}
+.footer-category-links,.footer-links{gap:10px 22px}
+.footer-category-links a,.footer-links a{font-size:12px;padding:4px 0}
+.footer-links{padding-top:18px;border-top:1px solid var(--line)}
+@media(max-width:760px){
+ body{width:100%;min-width:0}
+ .masthead-inner{padding:9px 14px 0;gap:8px}
+ .masthead-controls{gap:6px}
+ .calc-page{width:100%;padding:16px 12px 48px}
+ .calc-body{display:block;margin-top:24px}
+ .calc-main{width:100%;min-width:0}
+ .calc-sidebar{margin-top:16px;display:grid;grid-template-columns:1fr;gap:12px}
+ .calc-widget{width:100%;border-radius:20px}
+ .calc-widget-body{padding:17px}
+ .calc-grid{grid-template-columns:1fr;gap:13px}
+ .field input,.field select{height:48px;width:100%;font-size:16px}
+ .calc-result{margin-top:18px}
+ .calc-result-row{padding:14px 13px;gap:10px}
+ .calc-result-value{font-size:16px;max-width:58%;overflow-wrap:anywhere}
+ .tool-actions{grid-template-columns:1fr 1fr;gap:8px}
+ .tool-action{min-height:46px;font-size:11px}
+ .compare-panel{max-width:100%;overflow-x:auto}
+ .compare-inner{min-width:430px}
+ .tool-info,.related-tools{padding:16px;border-radius:17px}
+ .tool-article{margin-top:34px;padding-top:28px}
+ .tool-article h2{font-size:22px;margin-top:27px}
+ .tool-article p{font-size:14px;line-height:1.72}
+ .site-footer{padding:32px 16px 46px}
+ .site-footer-inner{gap:18px}
+ .footer-category-links,.footer-links{display:grid;grid-template-columns:1fr 1fr;gap:2px 18px}
+ .footer-category-links a,.footer-links a{padding:8px 0;font-size:12px}
+ .footer-links{padding-top:16px}
+}
+@media(max-width:430px){
+ .calc-title{font-size:clamp(34px,11vw,46px);overflow-wrap:anywhere}
+ .calc-desc{font-size:14px;line-height:1.55}
+ .breadcrumbs{font-size:10px}
+ .tool-actions{grid-template-columns:1fr 1fr}
+ .tool-action{font-size:10px;padding:0 6px}
+ .calc-result-label{font-size:11px}
+ .calc-result-value{font-size:15px}
+ .footer-category-links,.footer-links{grid-template-columns:1fr 1fr}
+}
+`;document.head.appendChild(s)}
 function waCurrencySymbol(){const c=currencyList().find(c=>c[0]===waState.currency);return c?c[1]:'₹'}
 function waFormatValue(value,format){if(!Number.isFinite(value))return'—';if(format==='percent')return value.toFixed(2)+'%';if(format==='number')return Math.round(value).toLocaleString();if(format==='years')return value.toFixed(1)+' yrs';const rounded=Math.round(value*100)/100;return waCurrencySymbol()+rounded.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function esc(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function applyGlobalTheme(){document.documentElement.dataset.theme=waState.theme;const b=document.getElementById('theme-toggle'),s=b?.querySelector('[data-theme-label]')||document.getElementById('theme-toggle-label');if(s)s.textContent=waState.theme==='dark'?'Light mode':'Dark mode';if(b)b.setAttribute('aria-pressed',String(waState.theme==='dark'))}
-function initMasthead(onChange){const select=document.getElementById('currency-select'),toggle=document.getElementById('theme-toggle');if(select){select.innerHTML=currencyList().map(c=>`<option value="${c[0]}">${c[0]} (${c[1]})</option>`).join('');select.value=waState.currency;select.addEventListener('change',()=>{waState.currency=select.value;safeStorage.set('waCurrency',waState.currency);document.documentElement.dataset.currency=waState.currency;onChange?.()})}toggle?.addEventListener('click',()=>{waState.theme=waState.theme==='dark'?'light':'dark';safeStorage.set('waTheme',waState.theme);applyGlobalTheme()});applyGlobalTheme()}
+function initMasthead(onChange){injectCalculatorPolish();const select=document.getElementById('currency-select'),toggle=document.getElementById('theme-toggle');if(select){select.innerHTML=currencyList().map(c=>`<option value="${c[0]}">${c[0]} (${c[1]})</option>`).join('');select.value=waState.currency;select.addEventListener('change',()=>{waState.currency=select.value;safeStorage.set('waCurrency',waState.currency);document.documentElement.dataset.currency=waState.currency;onChange?.()})}toggle?.addEventListener('click',()=>{waState.theme=waState.theme==='dark'?'light':'dark';safeStorage.set('waTheme',waState.theme);applyGlobalTheme()});applyGlobalTheme()}
 async function waShare(title,text,url){if(navigator.share){try{await navigator.share({title,text,url});return}catch(e){}}try{await navigator.clipboard.writeText(url);alert('Link copied.')}catch(e){}}
 function waOpenPrintReport(calc,values,results){const rows=results.map(r=>`<tr><td>${esc(r.label)}</td><td>${esc(waFormatValue(r.value,r.format))}</td></tr>`).join('');const inputs=calc.fields.map(f=>`<tr><td>${esc(f.label)}</td><td>${esc(values[f.id])}</td></tr>`).join('');const w=window.open('','_blank','noopener,noreferrer,width=900,height=900');if(!w){alert('Please allow pop-ups to export the report.');return}w.document.write(`<!doctype html><html><head><title>${esc(calc.title)}</title><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:system-ui,sans-serif;max-width:760px;margin:40px auto;padding:0 20px;color:#111}table{width:100%;border-collapse:collapse}td{padding:10px;border-bottom:1px solid #ddd}</style></head><body><h1>${esc(calc.title)}</h1><h2>Inputs</h2><table>${inputs}</table><h2>Calculated output</h2><table>${rows}</table><p>For planning purposes only. Not financial, tax, legal or investment advice.</p><script>window.onload=()=>window.print()<\/script></body></html>`);w.document.close()}
 async function waCopyEmbed(calc){const src=new URL(`widget.html?calc=${encodeURIComponent(calc.id)}`,document.baseURI).href;const code=`<iframe title="${esc(calc.title)} — Wealth Arrays" src="${src}" width="100%" height="620" loading="lazy" style="border:0;border-radius:16px;max-width:900px"></iframe>`;try{await navigator.clipboard.writeText(code);alert('Embed code copied.')}catch(e){prompt('Copy this embed code:',code)}}
 function buildComparePanel(id,calc,currentValues,currentResults){const panel=document.getElementById(`${id}-compare-panel`);if(!panel)return;const example=calc.article?.exampleInputs;if(!example){panel.innerHTML='<div style="padding:14px">No reference scenario is available.</div>';return}let ex=[];try{ex=calc.compute(example)||[]}catch(e){}const a=Object.fromEntries(currentResults.map(r=>[r.label,r])),b=Object.fromEntries(ex.map(r=>[r.label,r]));const labels=[...new Set([...Object.keys(a),...Object.keys(b)])];panel.innerHTML=`<div class="compare-inner"><p>Compared with this calculator's worked example.</p><div class="compare-table"><table><thead><tr><th>Metric</th><th>Your scenario</th><th>Example</th></tr></thead><tbody>${labels.map(l=>`<tr><td>${esc(l)}</td><td>${a[l]?esc(waFormatValue(a[l].value,a[l].format)):'—'}</td><td>${b[l]?esc(waFormatValue(b[l].value,b[l].format)):'—'}</td></tr>`).join('')}</tbody></table></div></div>`}
-function mountCalculator(calc,id){const container=document.getElementById(id);if(!container||!calc)return;const fields=calc.fields.map(f=>f.type==='select'?`<div class="field"><label for="f-${esc(f.id)}">${esc(f.label)}</label><select id="f-${esc(f.id)}" data-field="${esc(f.id)}">${f.options.map(o=>`<option value="${esc(o.value)}">${esc(o.label)}</option>`).join('')}</select></div>`:`<div class="field"><label for="f-${esc(f.id)}">${esc(f.label)}${f.suffix?` <span class="hint">(${esc(f.suffix)})</span>`:''}</label><input id="f-${esc(f.id)}" data-field="${esc(f.id)}" type="number" inputmode="decimal" value="${esc(f.default)}" ${f.min!==undefined?`min="${f.min}"`:''} ${f.max!==undefined?`max="${f.max}"`:''} ${f.step!==undefined?`step="${f.step}"`:''}></div>`).join('');container.innerHTML=`<div class="calc-widget-body"><div class="calc-grid">${fields}</div><div class="calc-result" id="${id}-result" aria-live="polite"></div><div class="tool-actions"><button type="button" class="tool-action primary" id="${id}-share">Share</button><button type="button" class="tool-action" id="${id}-export">Export report</button><button type="button" class="tool-action" id="${id}-embed">Copy embed</button><button type="button" class="tool-action" id="${id}-compare" aria-expanded="false">Compare</button></div><div class="compare-panel" id="${id}-compare-panel" hidden></div><p class="calc-note">Estimates only, for planning purposes — not financial, tax or investment advice.</p></div>`;let latest=[],latestValues={};function recompute(){latestValues={};calc.fields.forEach(f=>{const e=document.getElementById(`f-${f.id}`);latestValues[f.id]=f.type==='select'?e.value:(parseFloat(e.value)||0)});try{latest=calc.compute(latestValues)||[]}catch(e){latest=[]}document.getElementById(`${id}-result`).innerHTML=latest.map(r=>`<div class="calc-result-row"><span class="calc-result-label">${esc(r.label)}</span><span class="calc-result-value ${esc(r.emphasis||'')}">${esc(waFormatValue(r.value,r.format))}</span></div>`).join('')};calc.fields.forEach(f=>{const e=document.getElementById(`f-${f.id}`);if(f.type==='select')e.value=f.default;e.addEventListener('input',recompute);e.addEventListener('change',recompute)});document.getElementById(`${id}-share`)?.addEventListener('click',()=>waShare(calc.title,latest.map(r=>`${r.label} ${waFormatValue(r.value,r.format)}`).join(' • '),location.href));document.getElementById(`${id}-export`)?.addEventListener('click',()=>waOpenPrintReport(calc,latestValues,latest));document.getElementById(`${id}-embed`)?.addEventListener('click',()=>waCopyEmbed(calc));document.getElementById(`${id}-compare`)?.addEventListener('click',e=>{const p=document.getElementById(`${id}-compare-panel`);p.hidden=!p.hidden;e.currentTarget.setAttribute('aria-expanded',String(!p.hidden));if(!p.hidden)buildComparePanel(id,calc,latestValues,latest)});initMasthead(recompute);recompute()}
+function mountCalculator(calc,id){const container=document.getElementById(id);if(!container||!calc)return;injectCalculatorPolish();const fields=calc.fields.map(f=>f.type==='select'?`<div class="field"><label for="f-${esc(f.id)}">${esc(f.label)}</label><select id="f-${esc(f.id)}" data-field="${esc(f.id)}">${f.options.map(o=>`<option value="${esc(o.value)}">${esc(o.label)}</option>`).join('')}</select></div>`:`<div class="field"><label for="f-${esc(f.id)}">${esc(f.label)}${f.suffix?` <span class="hint">(${esc(f.suffix)})</span>`:''}</label><input id="f-${esc(f.id)}" data-field="${esc(f.id)}" type="number" inputmode="decimal" value="${esc(f.default)}" ${f.min!==undefined?`min="${f.min}"`:''} ${f.max!==undefined?`max="${f.max}"`:''} ${f.step!==undefined?`step="${f.step}"`:''}></div>`).join('');container.innerHTML=`<div class="calc-widget-body"><div class="calc-grid">${fields}</div><div class="calc-result" id="${id}-result" aria-live="polite"></div><div class="tool-actions"><button type="button" class="tool-action primary" id="${id}-share">Share</button><button type="button" class="tool-action" id="${id}-export">Export report</button><button type="button" class="tool-action" id="${id}-embed">Copy embed</button><button type="button" class="tool-action" id="${id}-compare" aria-expanded="false">Compare</button></div><div class="compare-panel" id="${id}-compare-panel" hidden></div><p class="calc-note">Estimates only, for planning purposes — not financial, tax or investment advice.</p></div>`;let latest=[],latestValues={};function recompute(){latestValues={};calc.fields.forEach(f=>{const e=document.getElementById(`f-${f.id}`);latestValues[f.id]=f.type==='select'?e.value:(parseFloat(e.value)||0)});try{latest=calc.compute(latestValues)||[]}catch(e){latest=[]}document.getElementById(`${id}-result`).innerHTML=latest.map(r=>`<div class="calc-result-row"><span class="calc-result-label">${esc(r.label)}</span><span class="calc-result-value ${esc(r.emphasis||'')}">${esc(waFormatValue(r.value,r.format))}</span></div>`).join('')};calc.fields.forEach(f=>{const e=document.getElementById(`f-${f.id}`);if(f.type==='select')e.value=f.default;e.addEventListener('input',recompute);e.addEventListener('change',recompute)});document.getElementById(`${id}-share`)?.addEventListener('click',()=>waShare(calc.title,latest.map(r=>`${r.label} ${waFormatValue(r.value,r.format)}`).join(' • '),location.href));document.getElementById(`${id}-export`)?.addEventListener('click',()=>waOpenPrintReport(calc,latestValues,latest));document.getElementById(`${id}-embed`)?.addEventListener('click',()=>waCopyEmbed(calc));document.getElementById(`${id}-compare`)?.addEventListener('click',e=>{const p=document.getElementById(`${id}-compare-panel`);p.hidden=!p.hidden;e.currentTarget.setAttribute('aria-expanded',String(!p.hidden));if(!p.hidden)buildComparePanel(id,calc,latestValues,latest)});initMasthead(recompute);recompute()}
 function initSearch(inputId,listSelector,headingId,totalLabel){const input=document.getElementById(inputId);if(!input)return;input.addEventListener('input',()=>{const q=input.value.trim().toLowerCase();let n=0;document.querySelectorAll(listSelector).forEach(el=>{const ok=(el.dataset.search||'').toLowerCase().includes(q);el.hidden=!ok;if(ok)n++});const h=document.getElementById(headingId);if(h)h.textContent=q?`${n} RESULT${n===1?'':'S'} FOR "${q.toUpperCase()}"`:totalLabel})}
