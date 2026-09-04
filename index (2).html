@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wealth Arrays — Free Financial Calculators (SIP, EMI, Compound Interest & More)</title>
+<meta name="description" content="Free, unbiased financial calculators — SIP, compound interest, mortgage EMI, ROI, retirement and more. No sign-up, no advisor referrals. Results computed instantly in any currency.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.wealtharrays.com/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Wealth Arrays — Free Financial Calculators">
+<meta property="og:description" content="Free, unbiased financial calculators — SIP, compound interest, mortgage EMI, ROI, retirement and more. No sign-up required.">
+<meta property="og:url" content="https://www.wealtharrays.com/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Wealth Arrays","url":"https://www.wealtharrays.com/","applicationCategory":"FinanceApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"description":"Free financial calculators including SIP, compound interest, mortgage EMI, ROI and retirement planning tools."}</script>
+</head>
+<body>
+<header class="masthead">
+  <div class="masthead-inner">
+    <a href="index.html" class="wordmark">Wealth Arrays</a>
+    <div class="masthead-controls">
+      <label class="control">
+        <span>Currency</span>
+        <select id="currency-select"></select>
+      </label>
+      <button id="theme-toggle" class="control theme-toggle" type="button" aria-pressed="false">
+        <span id="theme-toggle-label">Dark</span>
+      </button>
+    </div>
+  </div>
+</header>
+<main>
+  <section class="ledger-hero">
+    <h1>Financial calculators, kept honest.</h1>
+    <p>No advisor referrals, no lead-selling, no signup wall — every tool works instantly, no account needed. Results are computed in your browser, in the currency you choose.</p>
+    <div class="search-bar">
+      <input type="search" id="tool-search" placeholder="Search calculators — e.g. mortgage, SIP, margin" aria-label="Search calculators">
+    </div>
+  </section>
+  <section class="cat-grid-section">
+    <div class="ledger-index-heading">BROWSE BY CATEGORY</div>
+    <div class="cat-grid">
+      <a class="cat-card" href="category-investment.html" style="--cat-color:#0D9488">
+        <span class="cat-card-icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 24 12 16 17 20 27 8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 8h7v7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="cat-card-title">Investment Calculators</span>
+        <span class="cat-card-desc">Grow your money — projections for recurring and lump-sum investing.</span>
+        <span class="cat-card-count">2 tools →</span>
+      </a>
+      <a class="cat-card" href="category-loan.html" style="--cat-color:#D97706">
+        <span class="cat-card-icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 15 16 6l10 9" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 14v11h14V14" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 25v-6h4v6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="cat-card-title">Loan Calculators</span>
+        <span class="cat-card-desc">Mortgages, personal loans, and what they really cost.</span>
+        <span class="cat-card-count">1 tool →</span>
+      </a>
+      <a class="cat-card" href="category-banking.html" style="--cat-color:#2563EB">
+        <span class="cat-card-icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 13 16 6l11 7" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 13h20v3H6z" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 16v9M13 16v9M19 16v9M24 16v9" stroke-linecap="round"/><path d="M5 25h22" stroke-linecap="round"/></svg></span>
+        <span class="cat-card-title">Banking Calculators</span>
+        <span class="cat-card-desc">Interest on savings and deposits, simple and compound.</span>
+        <span class="cat-card-count">2 tools →</span>
+      </a>
+      <a class="cat-card" href="category-retirement.html" style="--cat-color:#7C3AED">
+        <span class="cat-card-icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 4v4M6 22a10 10 0 0 1 20 0" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 22h24" stroke-linecap="round"/><path d="M9 9.5 11.5 12M23 9.5 20.5 12" stroke-linecap="round"/></svg></span>
+        <span class="cat-card-title">Retirement Calculators</span>
+        <span class="cat-card-desc">How much you need, and how close you are.</span>
+        <span class="cat-card-count">1 tool →</span>
+      </a>
+      <a class="cat-card" href="category-salary.html" style="--cat-color:#DB2777">
+        <span class="cat-card-icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="9" width="22" height="16" rx="2"/><path d="M5 13h22" /><circle cx="22" cy="19" r="1.6" fill="currentColor" stroke="none"/></svg></span>
+        <span class="cat-card-title">Salary & Income</span>
+        <span class="cat-card-desc">Convert and compare how you're paid.</span>
+        <span class="cat-card-count">1 tool →</span>
+      </a>
+      <a class="cat-card" href="category-business.html" style="--cat-color:#0891B2">
+        <span class="cat-card-icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="22" height="14" rx="2"/><path d="M12 11V8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 17h22" /></svg></span>
+        <span class="cat-card-title">Business Calculators</span>
+        <span class="cat-card-desc">Margins, returns, and the health of a small business.</span>
+        <span class="cat-card-count">1 tool →</span>
+      </a></div>
+  </section>
+  <section class="ledger-index">
+    <div class="ledger-index-heading" id="index-heading">FULL INDEX — 8 CALCULATORS</div>
+    <div id="index-list">
+      <a class="ledger-row" href="sip-calculator.html" data-search="sip calculator project the future value of monthly investments.">
+        <span class="ledger-row-num">01</span>
+        <span class="ledger-row-text">
+          <span class="ledger-row-title">SIP Calculator</span>
+          <span class="ledger-row-desc">Project the future value of monthly investments.</span>
+        </span>
+        <span class="ledger-row-arrow">open →</span>
+      </a>
+      <a class="ledger-row" href="compound-interest-calculator.html" data-search="compound interest see how a lump sum grows with compounding.">
+        <span class="ledger-row-num">02</span>
+        <span class="ledger-row-text">
+          <span class="ledger-row-title">Compound Interest</span>
+          <span class="ledger-row-desc">See how a lump sum grows with compounding.</span>
+        </span>
+        <span class="ledger-row-arrow">open →</span>
+      </a>
+      <a class="ledger-row" href="mortgage-emi-calculator.html" data-search="mortgage / loan emi work out fixed monthly payments on any loan.">
+        <span class="ledger-row-num">03</span>
+        <span class="ledger-row-text">
+          <span class="ledger-row-title">Mortgage / Loan EMI</span>
+          <span class="ledger-row-desc">Work out fixed monthly payments on any loan.</span>
+        </span>
+        <span class="ledger-row-arrow">open →</span>
+      </a>
+      <a class="ledger-row" href="roi-calculator.html" data-search="roi calculator measure the return on an investment or purchase.">
+        <span class="ledger-row-num">04</span>
+        <span class="ledger-row-text">
+          <span class="ledger-row-title">ROI Calculator</span>
+          <span class="ledger-row-desc">Measure the return on an investment or purchase.</span>
+        </span>
+        <span class="ledger-row-arrow">open →</span>
+      </a>
+      <a class="ledger-row" href="simple-interest-calculator.html" data-search="simple interest flat, non-compounding interest on a loan or deposit.">
+        <span class="ledger-row-num">05</span>
+        <span class="ledger-row-text">
+          <span class="ledger-row-title">Simple Interest</span>
+          <span class="ledger-row-desc">Flat, non-compounding interest on a loan or deposit.</span>
+        </span>
+        <span class="ledger-row-arrow">open →</span>
+      </a>
+      <a class="ledger-row" href="retirement-calculator.html" data-search="freedom milestone estimate the nest egg needed to cover your expenses indefinitely.">
+        <span class="ledger-row-num">06</span>
+        <span class="ledger-row-text">
+          <span class="ledger-row-title">Freedom Milestone</span>
+          <span class="ledger-row-desc">Estimate the nest egg needed to cover your expenses indefinitely.</span>
+        </span>
+        <span class="ledger-row-arrow">open →</span>
+      </a>
+      <a class="ledger-row" href="salary-to-hourly-calculator.html" data-search="salary ↔ hourly convert between an annual salary and an hourly rate.">
+        <span class="ledger-row-num">07</span>
+        <span class="ledger-row-text">
+          <span class="ledger-row-title">Salary ↔ Hourly</span>
+          <span class="ledger-row-desc">Convert between an annual salary and an hourly rate.</span>
+        </span>
+        <span class="ledger-row-arrow">open →</span>
+      </a>
+      <a class="ledger-row" href="profit-margin-calculator.html" data-search="profit margin find gross and net margin from revenue and costs.">
+        <span class="ledger-row-num">08</span>
+        <span class="ledger-row-text">
+          <span class="ledger-row-title">Profit Margin</span>
+          <span class="ledger-row-desc">Find gross and net margin from revenue and costs.</span>
+        </span>
+        <span class="ledger-row-arrow">open →</span>
+      </a></div>
+    <p class="no-results" id="no-results" hidden>No calculators match that search yet — try a different term.</p>
+  </section>
+  <section class="how-it-works">
+    <div class="how-step"><span class="how-num">1</span><h3>Choose a tool</h3><p>Search, or browse by category.</p></div>
+    <div class="how-step"><span class="how-num">2</span><h3>Enter your numbers</h3><p>Adjust the fields — results update as you type.</p></div>
+    <div class="how-step"><span class="how-num">3</span><h3>Read the result</h3><p>Every figure is computed locally, in your chosen currency.</p></div>
+  </section>
+</main>
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <p>Wealth Arrays gives free, unbiased calculators — no advisor referrals, no data selling. Results are estimates for planning purposes, not financial advice.</p>
+    <nav class="footer-links">
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms &amp; Conditions</a>
+    </nav>
+  </div>
+</footer>
+<script src="calculators.js"></script>
+<script src="widget.js"></script>
+<script>
+initMasthead();
+initSearch("tool-search", "#index-list .ledger-row", "index-heading", "FULL INDEX — 8 CALCULATORS");
+</script>
+</body>
+</html>
