@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0B0F19">
+<meta name="format-detection" content="telephone=no">
 <title>ROI Calculator — Free Online Calculator | Wealth Arrays</title>
 <meta name="description" content="Compare what you put in against what you got back, as a total and annualised percentage return.">
 <meta name="robots" content="index, follow">
@@ -11,17 +13,24 @@
 <meta property="og:title" content="ROI Calculator — Wealth Arrays">
 <meta property="og:description" content="Compare what you put in against what you got back, as a total and annualised percentage return.">
 <meta property="og:url" content="https://www.wealtharrays.com/roi-calculator.html">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What's the difference between ROI and CAGR?","acceptedAnswer":{"@type":"Answer","text":"Annualized ROI here is calculated the same way as CAGR (Compound Annual Growth Rate) — both express a multi-year return as an equivalent constant yearly rate."}},{"@type":"Question","name":"Does ROI include fees or taxes?","acceptedAnswer":{"@type":"Answer","text":"Only if you build them into your cost or final value inputs. The formula itself is agnostic — it just compares two numbers."}},{"@type":"Question","name":"What does a negative ROI mean?","acceptedAnswer":{"@type":"Answer","text":"It means the final value was lower than what you put in — you lost money on the investment or purchase over that period."}}]}</script>
+<meta property="og:site_name" content="Wealth Arrays">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://www.wealtharrays.com/og-card.svg">
+<meta property="og:image:alt" content="Wealth Arrays financial calculators">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ROI Calculator — Free Online Calculator | Wealth Arrays">
+<meta name="twitter:image" content="https://www.wealtharrays.com/og-card.svg">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"ROI Calculator","applicationCategory":"FinanceApplication","operatingSystem":"Any","isAccessibleForFree":true,"description":"Compare what you put in against what you got back, as a total and annualised percentage return.","url":"https://www.wealtharrays.com/roi-calculator.html"}</script>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
 </head>
 <body>
 <header class="masthead">
   <div class="masthead-inner">
     <a href="index.html" class="wordmark">Wealth Arrays</a>
-    <div class="masthead-controls">
+    <nav class="site-nav" aria-label="Primary"><a href="index.html">Calculators</a><a href="about.html">About</a></nav><div class="masthead-controls">
       <label class="control">
         <span>Currency</span>
         <select id="currency-select"></select>
@@ -32,6 +41,7 @@
     </div>
   </div>
 </header>
+<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="index.html">Calculators</a><span aria-hidden="true"> / </span><span>Current calculator</span></nav>
 <main>
   <div class="calc-page">
     <a class="calc-back" href="index.html">← Index</a>
@@ -82,6 +92,14 @@
 <footer class="site-footer">
   <div class="site-footer-inner">
     <p>Wealth Arrays gives free, unbiased calculators — no advisor referrals, no data selling. Results are estimates for planning purposes, not financial advice.</p>
+    <div class="footer-category-links" aria-label="Calculator categories">
+      <a href="category-investment.html">Investment</a>
+      <a href="category-loan.html">Loans</a>
+      <a href="category-banking.html">Banking</a>
+      <a href="category-retirement.html">Retirement</a>
+      <a href="category-salary.html">Salary</a>
+      <a href="category-business.html">Business</a>
+    </div>
     <nav class="footer-links">
       <a href="about.html">About</a>
       <a href="contact.html">Contact</a>
@@ -90,8 +108,8 @@
     </nav>
   </div>
 </footer>
-<script src="calculators.js"></script>
-<script src="widget.js"></script>
-<script>mountCalculator(CALCULATORS.find(c => c.id === "roi"), "calc-widget");</script>
+<script src="calculators.js" defer></script>
+<script src="widget.js" defer></script>
+<script>document.addEventListener("DOMContentLoaded", () => {mountCalculator(CALCULATORS.find(c => c.id === "roi"), "calc-widget");});</script>
 </body>
 </html>

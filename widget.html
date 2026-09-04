@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wealth Arrays Calculator Widget</title>
+<meta name="robots" content="noindex,follow">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main style="max-width:900px;margin:0 auto;padding:18px">
+  <div id="calc-widget" aria-label="Wealth Arrays calculator widget"></div>
+</main>
+<script src="calculators.js" defer></script>
+<script src="widget.js" defer></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const id = new URLSearchParams(location.search).get("calc") || "sip";
+  const calc = window.CALCULATORS?.find(c => c.id === id) || CALCULATORS.find(c => c.id === "sip");
+  mountCalculator(calc, "calc-widget");
+});
+</script>
+</body>
+</html>

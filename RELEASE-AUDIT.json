@@ -1,0 +1,40 @@
+{
+  "release": "01",
+  "files": 29,
+  "html_pages": 20,
+  "calculators_tested": 8,
+  "local_link_errors": 0,
+  "html_parse_errors": 0,
+  "duplicate_files_removed": [
+    "index (1).html",
+    "index (2).html",
+    "sip-calculator (1).html",
+    "styles (1).css",
+    "widget (1).js"
+  ],
+  "seo_changes": [
+    "canonical URLs",
+    "meta descriptions",
+    "robots directives",
+    "absolute sitemap URLs + lastmod",
+    "Open Graph/Twitter metadata",
+    "WebSite/WebApplication JSON-LD",
+    "favicon",
+    "web manifest",
+    "internal category links",
+    "semantic/accessibility improvements"
+  ],
+  "performance_changes": [
+    "removed Google Fonts network dependency",
+    "deferred JS",
+    "reduced render-blocking dependencies",
+    "mobile responsive action UI"
+  ],
+  "product_changes": [
+    "share",
+    "export report",
+    "copy embed",
+    "worked-example comparison",
+    "embeddable widget.html?calc=<id>"
+  ]
+}

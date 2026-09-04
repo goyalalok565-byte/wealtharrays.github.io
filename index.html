@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0B0F19">
+<meta name="format-detection" content="telephone=no">
 <title>Wealth Arrays — Free Financial Calculators (SIP, EMI, Compound Interest & More)</title>
 <meta name="description" content="Free, unbiased financial calculators — SIP, compound interest, mortgage EMI, ROI, retirement and more. No sign-up, no advisor referrals. Results computed instantly in any currency.">
 <meta name="robots" content="index, follow">
@@ -11,17 +13,23 @@
 <meta property="og:title" content="Wealth Arrays — Free Financial Calculators">
 <meta property="og:description" content="Free, unbiased financial calculators — SIP, compound interest, mortgage EMI, ROI, retirement and more. No sign-up required.">
 <meta property="og:url" content="https://www.wealtharrays.com/">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Wealth Arrays","url":"https://www.wealtharrays.com/","applicationCategory":"FinanceApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"description":"Free financial calculators including SIP, compound interest, mortgage EMI, ROI and retirement planning tools."}</script>
+<meta property="og:site_name" content="Wealth Arrays">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://www.wealtharrays.com/og-card.svg">
+<meta property="og:image:alt" content="Wealth Arrays financial calculators">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Wealth Arrays — Free Financial Calculators (SIP, EMI, Compound Interest &amp; More)">
+<meta name="twitter:image" content="https://www.wealtharrays.com/og-card.svg">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
 </head>
 <body>
 <header class="masthead">
   <div class="masthead-inner">
     <a href="index.html" class="wordmark">Wealth Arrays</a>
-    <div class="masthead-controls">
+    <nav class="site-nav" aria-label="Primary"><a href="index.html">Calculators</a><a href="about.html">About</a></nav><div class="masthead-controls">
       <label class="control">
         <span>Currency</span>
         <select id="currency-select"></select>
@@ -34,8 +42,8 @@
 </header>
 <main>
   <section class="ledger-hero">
-    <h1>Financial calculators, kept honest.</h1>
-    <p>No advisor referrals, no lead-selling, no signup wall — every tool works instantly, no account needed. Results are computed in your browser, in the currency you choose.</p>
+    <h1>Free financial calculators for smarter money decisions.</h1>
+    <p>Calculate SIP returns, compound interest, loan EMI, ROI, retirement targets, salary rates and business margins in seconds. No signup wall. Calculations run in your browser, with clear assumptions and no financial-product referrals.</p>
     <div class="search-bar">
       <input type="search" id="tool-search" placeholder="Search calculators — e.g. mortgage, SIP, margin" aria-label="Search calculators">
     </div>
@@ -149,6 +157,13 @@
       </a></div>
     <p class="no-results" id="no-results" hidden>No calculators match that search yet — try a different term.</p>
   </section>
+
+  <section class="seo-callout" aria-labelledby="why-heading">
+    <h2 id="why-heading">Finance tools built for clear answers</h2>
+    <p>Use Wealth Arrays to compare common financial scenarios without creating an account. Each calculator explains its assumptions, shows the inputs used, and updates results instantly in your browser.</p>
+    <p><strong>Popular searches:</strong> SIP calculator, compound interest calculator, EMI calculator, ROI calculator, retirement calculator, salary-to-hourly calculator and profit margin calculator.</p>
+  </section>
+
   <section class="how-it-works">
     <div class="how-step"><span class="how-num">1</span><h3>Choose a tool</h3><p>Search, or browse by category.</p></div>
     <div class="how-step"><span class="how-num">2</span><h3>Enter your numbers</h3><p>Adjust the fields — results update as you type.</p></div>
@@ -158,6 +173,14 @@
 <footer class="site-footer">
   <div class="site-footer-inner">
     <p>Wealth Arrays gives free, unbiased calculators — no advisor referrals, no data selling. Results are estimates for planning purposes, not financial advice.</p>
+    <div class="footer-category-links" aria-label="Calculator categories">
+      <a href="category-investment.html">Investment</a>
+      <a href="category-loan.html">Loans</a>
+      <a href="category-banking.html">Banking</a>
+      <a href="category-retirement.html">Retirement</a>
+      <a href="category-salary.html">Salary</a>
+      <a href="category-business.html">Business</a>
+    </div>
     <nav class="footer-links">
       <a href="about.html">About</a>
       <a href="contact.html">Contact</a>
@@ -166,11 +189,13 @@
     </nav>
   </div>
 </footer>
-<script src="calculators.js"></script>
-<script src="widget.js"></script>
+<script src="calculators.js" defer></script>
+<script src="widget.js" defer></script>
 <script>
-initMasthead();
-initSearch("tool-search", "#index-list .ledger-row", "index-heading", "FULL INDEX — 8 CALCULATORS");
+document.addEventListener("DOMContentLoaded", () => {
+  initMasthead();
+  initSearch("tool-search", "#index-list .ledger-row", "index-heading", "FULL INDEX — 8 CALCULATORS");
+});
 </script>
 </body>
 </html>
