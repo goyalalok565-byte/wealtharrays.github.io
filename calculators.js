@@ -323,7 +323,79 @@ const CURRENCIES = [
   { code: "CAD", symbol: "C$" },
   { code: "CHF", symbol: "Fr" },
   { code: "CNY", symbol: "¥" },
-  { code: "AED", symbol: "د.إ" },
+  { code: "AED", symbol: "د.إ" },,
+  {
+    id:"fixed-deposit",slug:"fixed-deposit-calculator",title:"Fixed Deposit Calculator",category:"banking",
+    short:"Estimate fixed-deposit maturity and interest.",desc:"Project a one-time deposit using an annual rate, term and compounding frequency.",
+    fields:[{id:"principal",label:"Deposit amount",type:"number",min:0,step:100},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:50,step:.1,suffix:"%"},{id:"years",label:"Term",type:"number",min:.1,max:50,step:.1,suffix:"yrs"},{id:"freq",label:"Compounding",type:"select",default:"4",options:[{value:"1",label:"Annually"},{value:"4",label:"Quarterly"},{value:"12",label:"Monthly"}]}],
+    compute(v){const n=Number(v.freq),A=v.principal*Math.pow(1+v.rate/100/n,n*v.years);return[{label:"Deposit",value:v.principal,format:"currency"},{label:"Interest earned",value:A-v.principal,format:"currency",emphasis:"positive"},{label:"Maturity value",value:A,format:"currency",emphasis:"neutral"}]}
+  },
+  {
+    id:"recurring-deposit",slug:"recurring-deposit-calculator",title:"Recurring Deposit Calculator",category:"banking",
+    short:"Project monthly deposits and their maturity value.",desc:"Estimate the future value of equal monthly deposits at an assumed annual rate.",
+    fields:[{id:"monthly",label:"Monthly deposit",type:"number",min:0,step:100},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:50,step:.1,suffix:"%"},{id:"years",label:"Deposit term",type:"number",min:1,max:50,step:.1,suffix:"yrs"}],
+    compute(v){const n=v.years*12,i=v.rate/1200,A=i===0?v.monthly*n:v.monthly*((Math.pow(1+i,n)-1)/i)*(1+i);return[{label:"Total deposits",value:v.monthly*n,format:"currency"},{label:"Interest earned",value:A-v.monthly*n,format:"currency",emphasis:"positive"},{label:"Estimated maturity",value:A,format:"currency",emphasis:"neutral"}]}
+  },
+  {
+    id:"lumpsum",slug:"lumpsum-calculator",title:"Lumpsum Calculator",category:"investment",
+    short:"Project a one-time investment over time.",desc:"Estimate how a lump-sum investment could grow at an assumed annual return.",
+    fields:[{id:"principal",label:"Investment amount",type:"number",min:0,step:100},{id:"rate",label:"Expected annual return",type:"number",min:0,max:50,step:.1,suffix:"%"},{id:"years",label:"Investment period",type:"number",min:.1,max:60,step:.1,suffix:"yrs"}],
+    compute(v){const A=v.principal*Math.pow(1+v.rate/100,v.years);return[{label:"Amount invested",value:v.principal,format:"currency"},{label:"Estimated gain",value:A-v.principal,format:"currency",emphasis:"positive"},{label:"Projected value",value:A,format:"currency",emphasis:"neutral"}]}
+  },
+  {
+    id:"cagr",slug:"cagr-calculator",title:"CAGR Calculator",category:"investment",
+    short:"Find the compound annual growth rate.",desc:"Calculate the annualized growth rate between a starting value and an ending value.",
+    fields:[{id:"start",label:"Starting value",type:"number",min:0.01,step:100},{id:"end",label:"Ending value",type:"number",min:0,step:100},{id:"years",label:"Years",type:"number",min:.01,max:100,step:.1,suffix:"yrs"}],
+    compute(v){const cagr=(Math.pow(v.end/v.start,1/v.years)-1)*100,gain=v.end-v.start;return[{label:"Absolute gain",value:gain,format:"currency",emphasis:gain>=0?"positive":"negative"},{label:"Total growth",value:(v.end/v.start-1)*100,format:"percent"},{label:"CAGR",value:cagr,format:"percent",emphasis:"neutral"}]}
+  },
+  {
+    id:"car-loan",slug:"car-loan-calculator",title:"Car Loan EMI Calculator",category:"loan",
+    short:"Estimate a vehicle loan payment and total cost.",desc:"Calculate equal monthly payments and interest for a car or vehicle loan.",
+    fields:[{id:"price",label:"Vehicle price",type:"number",min:0,step:1000},{id:"down",label:"Down payment",type:"number",min:0,step:1000},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:40,step:.05,suffix:"%"},{id:"years",label:"Loan term",type:"number",min:1,max:15,step:1,suffix:"yrs"}],
+    compute(v){const P=Math.max(v.price-v.down,0),n=v.years*12,r=v.rate/1200,emi=r===0?P/n:P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1),total=emi*n;return[{label:"Loan amount",value:P,format:"currency"},{label:"Monthly payment",value:emi,format:"currency",emphasis:"neutral"},{label:"Total interest",value:total-P,format:"currency",emphasis:"negative"}]}
+  },
+  {
+    id:"personal-loan",slug:"personal-loan-calculator",title:"Personal Loan Calculator",category:"loan",
+    short:"Estimate personal-loan EMI and interest.",desc:"Calculate a fixed monthly payment and total repayment for a personal loan.",
+    fields:[{id:"principal",label:"Loan amount",type:"number",min:0,step:1000},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:60,step:.05,suffix:"%"},{id:"years",label:"Repayment term",type:"number",min:.1,max:20,step:.1,suffix:"yrs"}],
+    compute(v){const n=Math.round(v.years*12),r=v.rate/1200,emi=r===0?v.principal/n:v.principal*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1),total=emi*n;return[{label:"Monthly payment",value:emi,format:"currency",emphasis:"neutral"},{label:"Total repayment",value:total,format:"currency"},{label:"Total interest",value:total-v.principal,format:"currency",emphasis:"negative"}]}
+  },
+  {
+    id:"debt-payoff",slug:"debt-payoff-calculator",title:"Debt Payoff Calculator",category:"loan",
+    short:"Estimate how long a fixed payment takes to clear debt.",desc:"Model a single debt balance with a fixed monthly payment and interest rate.",
+    fields:[{id:"balance",label:"Current balance",type:"number",min:0,step:100},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:100,step:.1,suffix:"%"},{id:"payment",label:"Monthly payment",type:"number",min:.01,step:10}],
+    compute(v){const r=v.rate/1200;if(v.payment<=v.balance*r)return[{label:"Status",value:0,format:"number"},{label:"Minimum required payment",value:v.balance*r,format:"currency",emphasis:"negative"},{label:"Months to payoff",value:Infinity,format:"number",emphasis:"negative"}];const n=r===0?v.balance/v.payment:-Math.log(1-r*v.balance/v.payment)/Math.log(1+r),total=v.payment*Math.ceil(n);return[{label:"Months to payoff",value:Math.ceil(n),format:"number",emphasis:"neutral"},{label:"Estimated years",value:n/12,format:"years"},{label:"Estimated interest",value:Math.max(total-v.balance,0),format:"currency",emphasis:"negative"}]}
+  },
+  {
+    id:"inflation",slug:"inflation-calculator",title:"Inflation Calculator",category:"retirement",
+    short:"Estimate future prices and purchasing power.",desc:"See how an assumed annual inflation rate changes the future cost and real value of money.",
+    fields:[{id:"amount",label:"Today's amount",type:"number",min:0,step:100},{id:"rate",label:"Annual inflation rate",type:"number",min:0,max:50,step:.1,suffix:"%"},{id:"years",label:"Years",type:"number",min:0,max:100,step:.1,suffix:"yrs"}],
+    compute(v){const future=v.amount*Math.pow(1+v.rate/100,v.years),power=future===0?0:v.amount/future*v.amount;return[{label:"Future equivalent cost",value:future,format:"currency",emphasis:"negative"},{label:"Price increase",value:future-v.amount,format:"currency"},{label:"Purchasing power of today's amount",value:v.amount/Math.pow(1+v.rate/100,v.years),format:"currency",emphasis:"neutral"}]}
+  },
+  {
+    id:"net-worth",slug:"net-worth-calculator",title:"Net Worth Calculator",category:"retirement",
+    short:"Calculate assets minus liabilities.",desc:"Add what you own and subtract what you owe to estimate your personal net worth.",
+    fields:[{id:"cash",label:"Cash & savings",type:"number",min:0,step:100},{id:"investments",label:"Investments",type:"number",min:0,step:100},{id:"property",label:"Property value",type:"number",min:0,step:1000},{id:"debt",label:"Total liabilities",type:"number",min:0,step:100}],
+    compute(v){const assets=v.cash+v.investments+v.property,net=assets-v.debt;return[{label:"Total assets",value:assets,format:"currency",emphasis:"positive"},{label:"Total liabilities",value:v.debt,format:"currency",emphasis:"negative"},{label:"Net worth",value:net,format:"currency",emphasis:net>=0?"positive":"negative"}]}
+  },
+  {
+    id:"overtime",slug:"overtime-pay-calculator",title:"Overtime Pay Calculator",category:"salary",
+    short:"Estimate overtime earnings and gross pay.",desc:"Calculate additional pay from an hourly rate, overtime hours and overtime multiplier.",
+    fields:[{id:"hourly",label:"Base hourly rate",type:"number",min:0,step:.01},{id:"regular",label:"Regular hours",type:"number",min:0,max:744,step:.5},{id:"overtime",label:"Overtime hours",type:"number",min:0,max:744,step:.5},{id:"multiplier",label:"Overtime multiplier",type:"number",min:1,max:5,step:.1,suffix:"×"}],
+    compute(v){const reg=v.hourly*v.regular,ot=v.hourly*v.overtime*v.multiplier;return[{label:"Regular pay",value:reg,format:"currency"},{label:"Overtime pay",value:ot,format:"currency",emphasis:"positive"},{label:"Total gross pay",value:reg+ot,format:"currency",emphasis:"neutral"}]}
+  },
+  {
+    id:"freelance-rate",slug:"freelance-rate-calculator",title:"Freelance Rate Calculator",category:"business",
+    short:"Turn a target income into an hourly freelance rate.",desc:"Estimate the billable hourly rate needed to cover income goals, expenses and non-billable time.",
+    fields:[{id:"income",label:"Target annual income",type:"number",min:0,step:1000},{id:"expenses",label:"Annual business expenses",type:"number",min:0,step:100},{id:"hours",label:"Billable hours per week",type:"number",min:.1,max:100,step:.5},{id:"weeks",label:"Working weeks per year",type:"number",min:1,max:52,step:1}],
+    compute(v){const billable=v.hours*v.weeks,needed=v.income+v.expenses,rate=billable?needed/billable:0;return[{label:"Annual amount to cover",value:needed,format:"currency"},{label:"Billable hours / year",value:billable,format:"number"},{label:"Target hourly rate",value:rate,format:"currency",emphasis:"neutral"}]}
+  },
+  {
+    id:"income-tax-planner",slug:"income-tax-planner",title:"Income Tax Planner",category:"business",
+    short:"Estimate an effective tax rate from a planning assumption.",desc:"A simple jurisdiction-neutral planning tool; it is not a country-specific tax filing calculator.",
+    fields:[{id:"income",label:"Annual gross income",type:"number",min:0,step:1000},{id:"deductions",label:"Estimated deductions",type:"number",min:0,step:100},{id:"rate",label:"Estimated effective tax rate",type:"number",min:0,max:100,step:.1,suffix:"%"}],
+    compute(v){const taxable=Math.max(v.income-v.deductions,0),tax=taxable*v.rate/100;return[{label:"Estimated taxable income",value:taxable,format:"currency"},{label:"Estimated tax",value:tax,format:"currency",emphasis:"negative"},{label:"Estimated after-tax income",value:v.income-tax,format:"currency",emphasis:"neutral"}]}
+  }
 ];
 
 /* Node-only export, used by the build script that generates static pages.
