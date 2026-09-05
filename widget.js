@@ -37,7 +37,7 @@ function svgLine(points,w,h,pad,min,max){return points.map((p,i)=>{const x=pad+(
 function updatePremiumChart(id,calc,scenarioA,scenarioB){
   const root=document.getElementById(id+'-chart');if(!root)return;
   const a=chartSeries(calc,scenarioA),b=chartSeries(calc,scenarioB);
-  if(a.length<2&&!b.length<2){root.innerHTML='<div class="chart-empty">Add values to unlock your visual result.</div>';return}
+  if(a.length<2&&b.length<2){root.innerHTML='<div class="chart-empty">Add values to unlock your visual result.</div>';return}
   const all=[...a,...b].map(p=>p.y).filter(Number.isFinite);if(!all.length){root.innerHTML='<div class="chart-empty">Add valid values to unlock your visual result.</div>';return}
   let min=Math.min(...all),max=Math.max(...all);if(min===max){min=0;max=Math.max(1,max)}else{const gap=(max-min)*.12;min=Math.max(0,min-gap);max+=gap}
   const W=640,H=280,P=28,pa=svgLine(a,W,H,P,min,max),pb=svgLine(b,W,H,P,min,max);
