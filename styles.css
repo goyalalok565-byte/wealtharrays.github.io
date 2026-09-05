@@ -13,3 +13,99 @@
 
 /* World-class projection line chart */
 .wa-line-chart-wrap{position:relative;isolation:isolate;padding:4px 0 0}.wa-line-chart{display:block;width:100%;height:auto;min-height:210px;overflow:visible}.wa-chart-grid line{stroke:color-mix(in srgb,var(--text) 10%,transparent);stroke-width:1}.wa-chart-line{fill:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 8px 10px color-mix(in srgb,var(--accent) 20%,transparent));stroke-dasharray:1800;stroke-dashoffset:1800;animation:waDrawLine .9s cubic-bezier(.2,.8,.2,1) forwards}.wa-chart-line.a{stroke:var(--accent)}.wa-chart-line.b{stroke:var(--accent2);animation-delay:.08s}.wa-chart-area{opacity:0;animation:waFadeArea .65s .35s ease forwards}.wa-chart-dot{stroke:var(--surface);stroke-width:4;filter:drop-shadow(0 5px 10px color-mix(in srgb,var(--text) 22%,transparent));opacity:0;animation:waDot .35s .72s ease forwards}.wa-chart-dot.a{fill:var(--accent)}.wa-chart-dot.b{fill:var(--accent2)}.wa-chart-axis{display:flex;justify-content:space-between;padding:4px 8px 0;color:var(--muted);font-size:10px;font-weight:750}.wa-chart-top{position:absolute;top:2px;right:6px;font-size:9px;color:var(--muted);background:color-mix(in srgb,var(--surface) 76%,transparent);padding:5px 7px;border-radius:999px;backdrop-filter:blur(8px)}@keyframes waDrawLine{to{stroke-dashoffset:0}}@keyframes waFadeArea{to{opacity:1}}@keyframes waDot{to{opacity:1}}@media(max-width:760px){.wa-line-chart{min-height:180px}.wa-chart-line{stroke-width:3.5}}
+
+
+/* Phase 2 — mobile-first UX audit fixes */
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{min-width:320px;padding-bottom:env(safe-area-inset-bottom)}
+:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 55%,transparent);outline-offset:3px}
+button,a,input,select{touch-action:manipulation}
+.site-nav a,.theme-toggle,.masthead-controls select{min-height:38px}
+.masthead{padding-top:env(safe-area-inset-top)}
+.masthead-controls{flex-shrink:0}
+.calc-widget,.scenario-card,.scenario-summary,.calc-chart{min-width:0}
+.calc-result-row{align-items:center}
+.calc-result-label{min-width:0}
+.calc-result-value{overflow-wrap:anywhere}
+.compare-panel[hidden]{display:none!important}
+@media(max-width:760px){
+  .masthead-inner{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    grid-template-areas:"brand controls" "nav nav";
+    align-items:center;
+    width:100%;
+    padding:8px 12px;
+    gap:8px 10px;
+  }
+  .wordmark{grid-area:brand;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .masthead-controls{
+    grid-area:controls;
+    width:auto!important;
+    margin:0!important;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:6px;
+    min-width:0;
+  }
+  .masthead-controls select{
+    width:82px!important;
+    max-width:82px!important;
+    min-width:0;
+    padding:0 5px;
+    font-size:10px;
+  }
+  .theme-toggle{
+    width:42px!important;
+    min-width:42px!important;
+    height:38px!important;
+    padding:0!important;
+    overflow:hidden;
+  }
+  .site-nav{
+    grid-area:nav;
+    width:100%!important;
+    display:flex;
+    gap:3px;
+    overflow-x:auto;
+    overscroll-behavior-x:contain;
+    padding:1px 0 2px;
+  }
+  .site-nav a{flex:0 0 auto;min-height:36px;display:grid;place-items:center}
+  .calc-page{padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}
+  .calc-tools-bar{position:relative;z-index:2}
+  .calc-mini-btn{min-height:44px}
+  .field label{font-size:12px}
+  .field input,.field select{min-height:52px}
+  .calc-result-row{gap:10px}
+  .calc-result-value{font-size:16px}
+  .calc-chart{padding:15px;border-radius:20px}
+  .wa-line-chart{min-height:170px}
+  .tool-actions{gap:8px}
+  .tool-action{min-height:48px;font-size:11px}
+  .scenario-result{padding:13px 14px}
+  .compare-field input,.compare-field select{min-height:48px;font-size:16px}
+  .site-footer-inner{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+}
+@media(max-width:430px){
+  .wordmark{font-size:12px}
+  .wordmark:before{width:30px;height:30px;flex:0 0 30px}
+  .masthead-controls{gap:4px}
+  .masthead-controls select{width:72px!important;max-width:72px!important;font-size:9px}
+  .theme-toggle{width:40px!important;min-width:40px!important}
+  .site-nav a{font-size:10px;padding:6px 8px}
+  .calc-tools-bar{grid-template-columns:1fr 1fr}
+  .calc-mini-btn{font-size:9px}
+  .tool-actions{grid-template-columns:1fr 1fr}
+  .footer-columns,.site-footer-inner>.footer-category-links,.site-footer-inner>.footer-links{gap:8px 20px}
+}
+@media(max-width:350px){
+  .masthead-controls select{width:64px!important;max-width:64px!important}
+  .wordmark{font-size:0}
+  .wordmark:before{margin:0}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
