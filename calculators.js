@@ -310,21 +310,8 @@ const CALCULATORS = [
         { label: "Net margin", value: netMargin, format: "percent", emphasis: netProfit >= 0 ? "positive" : "negative" },
       ];
     },
-  },
-];
-
-const CURRENCIES = [
-  { code: "USD", symbol: "$" },
-  { code: "EUR", symbol: "€" },
-  { code: "GBP", symbol: "£" },
-  { code: "INR", symbol: "₹" },
-  { code: "JPY", symbol: "¥" },
-  { code: "AUD", symbol: "A$" },
-  { code: "CAD", symbol: "C$" },
-  { code: "CHF", symbol: "Fr" },
-  { code: "CNY", symbol: "¥" },
-  { code: "AED", symbol: "د.إ" },,
-  {
+  },,
+{
     id:"fixed-deposit",slug:"fixed-deposit-calculator",title:"Fixed Deposit Calculator",category:"banking",
     short:"Estimate fixed-deposit maturity and interest.",desc:"Project a one-time deposit using an annual rate, term and compounding frequency.",
     fields:[{id:"principal",label:"Deposit amount",type:"number",min:0,step:100},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:50,step:.1,suffix:"%"},{id:"years",label:"Term",type:"number",min:.1,max:50,step:.1,suffix:"yrs"},{id:"freq",label:"Compounding",type:"select",default:"4",options:[{value:"1",label:"Annually"},{value:"4",label:"Quarterly"},{value:"12",label:"Monthly"}]}],
@@ -396,6 +383,19 @@ const CURRENCIES = [
     fields:[{id:"income",label:"Annual gross income",type:"number",min:0,step:1000},{id:"deductions",label:"Estimated deductions",type:"number",min:0,step:100},{id:"rate",label:"Estimated effective tax rate",type:"number",min:0,max:100,step:.1,suffix:"%"}],
     compute(v){const taxable=Math.max(v.income-v.deductions,0),tax=taxable*v.rate/100;return[{label:"Estimated taxable income",value:taxable,format:"currency"},{label:"Estimated tax",value:tax,format:"currency",emphasis:"negative"},{label:"Estimated after-tax income",value:v.income-tax,format:"currency",emphasis:"neutral"}]}
   }
+];
+
+const CURRENCIES = [
+  { code: "USD", symbol: "$" },
+  { code: "EUR", symbol: "€" },
+  { code: "GBP", symbol: "£" },
+  { code: "INR", symbol: "₹" },
+  { code: "JPY", symbol: "¥" },
+  { code: "AUD", symbol: "A$" },
+  { code: "CAD", symbol: "C$" },
+  { code: "CHF", symbol: "Fr" },
+  { code: "CNY", symbol: "¥" },
+  { code: "AED", symbol: "د.إ" }
 ];
 
 /* Node-only export, used by the build script that generates static pages.
