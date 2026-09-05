@@ -310,8 +310,8 @@ const CALCULATORS = [
         { label: "Net margin", value: netMargin, format: "percent", emphasis: netProfit >= 0 ? "positive" : "negative" },
       ];
     },
-  },,
-{
+  },
+  {
     id:"fixed-deposit",slug:"fixed-deposit-calculator",title:"Fixed Deposit Calculator",category:"banking",
     short:"Estimate fixed-deposit maturity and interest.",desc:"Project a one-time deposit using an annual rate, term and compounding frequency.",
     fields:[{id:"principal",label:"Deposit amount",type:"number",min:0,step:100},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:50,step:.1,suffix:"%"},{id:"years",label:"Term",type:"number",min:.1,max:50,step:.1,suffix:"yrs"},{id:"freq",label:"Compounding",type:"select",default:"4",options:[{value:"1",label:"Annually"},{value:"4",label:"Quarterly"},{value:"12",label:"Monthly"}]}],
