@@ -344,9 +344,9 @@ const CALCULATORS = [
   },
   {
     id:"personal-loan",slug:"personal-loan-calculator",title:"Personal Loan Calculator",category:"loan",
-    short:"Estimate personal-loan EMI and interest.",desc:"Calculate a fixed monthly payment and total repayment for a personal loan.",
-    fields:[{id:"principal",label:"Loan amount",type:"number",min:0,step:1000},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:60,step:.05,suffix:"%"},{id:"years",label:"Repayment term",type:"number",min:.1,max:20,step:.1,suffix:"yrs"}],
-    compute(v){const n=Math.round(v.years*12),r=v.rate/1200,emi=r===0?v.principal/n:v.principal*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1),total=emi*n;return[{label:"Monthly payment",value:emi,format:"currency",emphasis:"neutral"},{label:"Total repayment",value:total,format:"currency"},{label:"Total interest",value:total-v.principal,format:"currency",emphasis:"negative"}]}
+    short:"Estimate monthly payments and the cost of a personal loan.",desc:"Calculate an estimated monthly payment from the loan amount, annual rate and repayment term.",
+    fields:[{id:"principal",label:"Loan amount",type:"number",min:0,step:1000},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:60,step:.05,suffix:"%"},{id:"years",label:"Repayment term",type:"number",min:0.0833333333,max:20,step:0.0833333333,suffix:"yrs"}],
+    compute(v){const n=Math.max(1,Math.round(v.years*12)),r=v.rate/1200,emi=r===0?v.principal/n:v.principal*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1),total=emi*n;return[{label:"Loan months",value:n,format:"number"},{label:"Monthly payment",value:emi,format:"currency",emphasis:"neutral"},{label:"Total repayment",value:total,format:"currency"},{label:"Total interest",value:total-v.principal,format:"currency",emphasis:"negative"}]}
   },
   {
     id:"debt-payoff",slug:"debt-payoff-calculator",title:"Debt Payoff Calculator",category:"loan",
@@ -358,7 +358,7 @@ const CALCULATORS = [
     id:"inflation",slug:"inflation-calculator",title:"Inflation Calculator",category:"retirement",
     short:"Estimate future prices and purchasing power.",desc:"See how an assumed annual inflation rate changes the future cost and real value of money.",
     fields:[{id:"amount",label:"Today's amount",type:"number",min:0,step:100},{id:"rate",label:"Annual inflation rate",type:"number",min:0,max:50,step:.1,suffix:"%"},{id:"years",label:"Years",type:"number",min:0,max:100,step:.1,suffix:"yrs"}],
-    compute(v){const future=v.amount*Math.pow(1+v.rate/100,v.years),power=future===0?0:v.amount/future*v.amount;return[{label:"Future equivalent cost",value:future,format:"currency",emphasis:"negative"},{label:"Price increase",value:future-v.amount,format:"currency"},{label:"Purchasing power of today's amount",value:v.amount/Math.pow(1+v.rate/100,v.years),format:"currency",emphasis:"neutral"}]}
+    compute(v){const factor=Math.pow(1+v.rate/100,v.years),future=v.amount*factor,purchasingPower=factor===0?0:v.amount/factor;return[{label:"Future equivalent cost",value:future,format:"currency",emphasis:"negative"},{label:"Price increase",value:future-v.amount,format:"currency"},{label:"Purchasing power of today's amount",value:purchasingPower,format:"currency",emphasis:"neutral"}]}
   },
   {
     id:"net-worth",slug:"net-worth-calculator",title:"Net Worth Calculator",category:"retirement",
@@ -382,7 +382,7 @@ const CALCULATORS = [
     id:"income-tax-planner",slug:"income-tax-planner",title:"Income Tax Planner",category:"business",
     short:"Estimate an effective tax rate from a planning assumption.",desc:"A simple jurisdiction-neutral planning tool; it is not a country-specific tax filing calculator.",
     fields:[{id:"income",label:"Annual gross income",type:"number",min:0,step:1000},{id:"deductions",label:"Estimated deductions",type:"number",min:0,step:100},{id:"rate",label:"Estimated effective tax rate",type:"number",min:0,max:100,step:.1,suffix:"%"}],
-    compute(v){const taxable=Math.max(v.income-v.deductions,0),tax=taxable*v.rate/100;return[{label:"Estimated taxable income",value:taxable,format:"currency"},{label:"Estimated tax",value:tax,format:"currency",emphasis:"negative"},{label:"Estimated after-tax income",value:v.income-tax,format:"currency",emphasis:"neutral"}]}
+    compute(v){const deductions=Math.min(v.deductions,v.income),taxable=Math.max(v.income-deductions,0),tax=taxable*v.rate/100,effective=v.income>0?tax/v.income*100:0;return[{label:"Estimated taxable income",value:taxable,format:"currency"},{label:"Estimated tax",value:tax,format:"currency",emphasis:"negative"},{label:"Effective tax on gross income",value:effective,format:"percent"},{label:"Estimated after-tax income",value:v.income-tax,format:"currency",emphasis:"neutral"}]}
   }
 ];
 
