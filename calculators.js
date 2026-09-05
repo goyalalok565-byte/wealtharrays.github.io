@@ -196,7 +196,7 @@ const CALCULATORS = [
       const si = (v.principal * v.rate * v.years) / 100;
       return [
         { label: "Interest", value: si, format: "currency", emphasis: "positive" },
-        { label: "Total payable", value: v.principal + si, format: "currency", emphasis: "neutral" },
+        { label: "Total amount", value: v.principal + si, format: "currency", emphasis: "neutral" },
       ];
     },
   },
@@ -319,9 +319,10 @@ const CALCULATORS = [
   },
   {
     id:"recurring-deposit",slug:"recurring-deposit-calculator",title:"Recurring Deposit Calculator",category:"banking",
-    short:"Project monthly deposits and their maturity value.",desc:"Estimate the future value of equal monthly deposits at an assumed annual rate.",
-    fields:[{id:"monthly",label:"Monthly deposit",type:"number",min:0,step:100},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:50,step:.1,suffix:"%"},{id:"years",label:"Deposit term",type:"number",min:1,max:50,step:.1,suffix:"yrs"}],
-    compute(v){const n=v.years*12,i=v.rate/1200,A=i===0?v.monthly*n:v.monthly*((Math.pow(1+i,n)-1)/i)*(1+i);return[{label:"Total deposits",value:v.monthly*n,format:"currency"},{label:"Interest earned",value:A-v.monthly*n,format:"currency",emphasis:"positive"},{label:"Estimated maturity",value:A,format:"currency",emphasis:"neutral"}]}
+    short:"Project monthly deposits and their maturity value.",desc:"Estimate the future value of equal monthly deposits using monthly compounding and end-of-month deposits.",
+    article:{formula:"Future value = P × [((1 + i)^n − 1) ÷ i], where P is the monthly deposit, i is the monthly rate and n is the whole number of monthly deposits. This model assumes each deposit is made at the end of the month and compounds monthly.",exampleInputs:{monthly:1000,rate:7,years:5},faqs:[{q:"Does every bank calculate RD interest this way?",a:"No. Banks and countries can use different compounding conventions and installment timing. This is a transparent planning estimate, not a bank maturity quote."},{q:"Why is the term converted to months?",a:"Because deposits occur monthly. The calculator rounds the selected term to a whole number of monthly deposits so it does not pretend that a fraction of a deposit period exists."}]},
+    fields:[{id:"monthly",label:"Monthly deposit",type:"number",min:0,step:100},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:50,step:.1,suffix:"%"},{id:"years",label:"Deposit term",type:"number",min:1,max:50,step:0.0833333333,suffix:"yrs"}],
+    compute(v){const n=Math.max(0,Math.round(v.years*12)),i=v.rate/1200,A=i===0?v.monthly*n:v.monthly*((Math.pow(1+i,n)-1)/i);return[{label:"Monthly deposits",value:n,format:"number"},{label:"Total deposits",value:v.monthly*n,format:"currency"},{label:"Interest earned",value:A-v.monthly*n,format:"currency",emphasis:"positive"},{label:"Estimated maturity",value:A,format:"currency",emphasis:"neutral"}]}
   },
   {
     id:"lumpsum",slug:"lumpsum-calculator",title:"Lumpsum Calculator",category:"investment",
@@ -339,7 +340,7 @@ const CALCULATORS = [
     id:"car-loan",slug:"car-loan-calculator",title:"Car Loan EMI Calculator",category:"loan",
     short:"Estimate a vehicle loan payment and total cost.",desc:"Calculate equal monthly payments and interest for a car or vehicle loan.",
     fields:[{id:"price",label:"Vehicle price",type:"number",min:0,step:1000},{id:"down",label:"Down payment",type:"number",min:0,step:1000},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:40,step:.05,suffix:"%"},{id:"years",label:"Loan term",type:"number",min:1,max:15,step:1,suffix:"yrs"}],
-    compute(v){const P=Math.max(v.price-v.down,0),n=v.years*12,r=v.rate/1200,emi=r===0?P/n:P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1),total=emi*n;return[{label:"Loan amount",value:P,format:"currency"},{label:"Monthly payment",value:emi,format:"currency",emphasis:"neutral"},{label:"Total interest",value:total-P,format:"currency",emphasis:"negative"}]}
+    compute(v){const P=Math.max(v.price-v.down,0),n=v.years*12,r=v.rate/1200,emi=r===0?P/n:P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1),total=emi*n;return[{label:"Loan amount",value:P,format:"currency"},{label:"Monthly payment",value:emi,format:"currency",emphasis:"neutral"},{label:"Total repayment",value:total,format:"currency"},{label:"Total interest",value:total-P,format:"currency",emphasis:"negative"},{label:"Total cost including down payment",value:total+Math.min(v.down,v.price),format:"currency"}]}
   },
   {
     id:"personal-loan",slug:"personal-loan-calculator",title:"Personal Loan Calculator",category:"loan",
