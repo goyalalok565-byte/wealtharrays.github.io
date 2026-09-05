@@ -10,7 +10,25 @@ function waCurrencySymbol(){const c=currencyList().find(c=>c[0]===waState.curren
 function waFormatValue(value,format){if(!Number.isFinite(value))return'—';if(format==='percent')return value.toFixed(2)+'%';if(format==='number')return Math.round(value).toLocaleString();if(format==='years')return value.toFixed(1)+' yrs';const rounded=Math.round(value*100)/100;return waCurrencySymbol()+rounded.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function esc(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function applyGlobalTheme(){document.documentElement.dataset.theme=waState.theme;const b=document.getElementById('theme-toggle'),s=b?.querySelector('[data-theme-label]')||document.getElementById('theme-toggle-label');if(s)s.textContent=waState.theme==='dark'?'Light mode':'Dark mode';if(b){b.setAttribute('aria-pressed',String(waState.theme==='dark'));b.setAttribute('title',waState.theme==='dark'?'Switch to light mode':'Switch to dark mode');b.setAttribute('aria-label',waState.theme==='dark'?'Switch to light mode':'Switch to dark mode')}}
-function initMasthead(onChange){injectCalculatorPolish();const select=document.getElementById('currency-select'),toggle=document.getElementById('theme-toggle');if(select){select.innerHTML=currencyList().map(c=>`<option value="${c[0]}">${c[0]} (${c[1]})</option>`).join('');select.value=waState.currency;select.addEventListener('change',()=>{waState.currency=select.value;safeStorage.set('waCurrency',waState.currency);document.documentElement.dataset.currency=waState.currency;onChange?.()})}toggle?.addEventListener('click',()=>{waState.theme=waState.theme==='dark'?'light':'dark';safeStorage.set('waTheme',waState.theme);applyGlobalTheme()});applyGlobalTheme()}
+function initMasthead(onChange){
+  injectCalculatorPolish();
+  const select=document.getElementById('currency-select');
+  const language=document.getElementById('language-select');
+  const toggle=document.getElementById('theme-toggle');
+  if(select){
+    select.innerHTML=currencyList().map(c=>`<option value="${c[0]}">${c[0]} (${c[1]})</option>`).join('');
+    select.value=waState.currency;
+    select.addEventListener('change',()=>{waState.currency=select.value;safeStorage.set('waCurrency',waState.currency);document.documentElement.dataset.currency=waState.currency;onChange?.()})
+  }
+  if(language){
+    language.innerHTML='<option value="en">English</option>';
+    language.value='en';
+    language.title='English is currently the published language. Additional languages will only be added with reviewed translations.';
+    language.setAttribute('aria-label','Published language: English');
+  }
+  toggle?.addEventListener('click',()=>{waState.theme=waState.theme==='dark'?'light':'dark';safeStorage.set('waTheme',waState.theme);applyGlobalTheme()});
+  applyGlobalTheme()
+}
 function soundTick(){if(!waState.sound)return;try{const A=window.AudioContext||window.webkitAudioContext;if(!A)return;const a=window.__waAudio||(window.__waAudio=new A());if(a.state==='suspended')a.resume();const o=a.createOscillator(),g=a.createGain(),t=a.currentTime;o.type='sine';o.frequency.setValueAtTime(620,t);o.frequency.exponentialRampToValueAtTime(820,t+.035);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.028,t+.006);g.gain.exponentialRampToValueAtTime(.0001,t+.045);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+.05)}catch(e){}}
 function waShare(title,text,url){if(navigator.share){navigator.share({title,text,url}).catch(()=>{})}else{navigator.clipboard?.writeText(url).then(()=>alert('Link copied.')).catch(()=>{})}}
 function waOpenPrintReport(calc,values,results){const rows=results.map(r=>`<tr><td>${esc(r.label)}</td><td>${esc(waFormatValue(r.value,r.format))}</td></tr>`).join('');const inputs=calc.fields.map(f=>`<tr><td>${esc(f.label)}</td><td>${esc(values[f.id])}</td></tr>`).join('');const w=window.open('','_blank','noopener,noreferrer,width=900,height=900');if(!w){alert('Please allow pop-ups to export the report.');return}w.document.write(`<!doctype html><html><head><title>${esc(calc.title)}</title><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:system-ui,sans-serif;max-width:760px;margin:40px auto;padding:0 20px;color:#111}table{width:100%;border-collapse:collapse}td{padding:10px;border-bottom:1px solid #ddd}</style></head><body><h1>${esc(calc.title)}</h1><h2>Inputs</h2><table>${inputs}</table><h2>Calculated output</h2><table>${rows}</table><p>For planning purposes only. Not financial, tax, legal or investment advice.</p><script>window.onload=()=>window.print()<\/script></body></html>`);w.document.close()}
