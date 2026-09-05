@@ -22,7 +22,13 @@ function buildComparePanel(id,calc,scenarioA,scenarioB){const panel=document.get
 panel.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',()=>{const target=el.dataset.scenario==='a'?scenarioA:scenarioB;const field=calc.fields.find(f=>f.id===el.dataset.key);target[el.dataset.key]=el.type==='number'?(el.value===''?'':normalizeCalcField(field,el.value)):el.value;buildComparePanel(id,calc,scenarioA,scenarioB);updatePremiumChart(id,calc,scenarioA,scenarioB)}));
 panel.querySelectorAll('select').forEach(el=>el.addEventListener('change',()=>el.dispatchEvent(new Event('input'))))}
 function chartSeries(calc,v){
-  const id=calc.id,years=Math.max(0,Number(v.years||0)),points=Math.max(2,Math.min(61,Math.ceil(years)+1));
+  const id=calc.id;
+  let years=Math.max(0,Number(v.years||0));
+  if(id==='debt-payoff'){
+    const P=Math.max(0,Number(v.balance||0)),r=Math.max(0,Number(v.rate||0))/1200,pay=Math.max(0,Number(v.payment||0));
+    if(P>0&&pay>P*r){const months=r===0?P/pay:-Math.log(1-r*P/pay)/Math.log(1+r);years=Math.max(1/12,Math.min(50,months/12))}
+  }
+  const points=Math.max(2,Math.min(61,Math.ceil(years)+1));
   const out=[],push=(x,y)=>out.push({x,y:Number.isFinite(y)?y:0});
   if(id==='sip'||id==='recurring-deposit'){const P=Number(v.monthly||0),i=Number(v.rate||0)/1200;for(let k=0;k<points;k++){const t=years*k/(points-1),n=Math.max(0,Math.round(t*12));const y=i===0?P*n:P*((Math.pow(1+i,n)-1)/i)*(id==='sip'?(1+i):1);push(t,y)}return out}
   if(['compound-interest','fixed-deposit'].includes(id)){const P=Number(v.principal||0),r=Number(v.rate||0)/100,n=id==='compound-interest'?Number(v.freq||12):Number(v.freq||4);for(let k=0;k<points;k++){const t=years*k/(points-1);push(t,P*Math.pow(1+r/n,n*t))}return out}
