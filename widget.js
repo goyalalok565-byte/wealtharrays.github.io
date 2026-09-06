@@ -48,9 +48,9 @@ function chartSeries(calc,v){
   }
   const points=Math.max(2,Math.min(61,Math.ceil(years)+1));
   const out=[],push=(x,y)=>out.push({x,y:Number.isFinite(y)?y:0});
-  if(id==='sip'||id==='recurring-deposit'){const P=Number(v.monthly||0),i=Number(v.rate||0)/1200;for(let k=0;k<points;k++){const t=years*k/(points-1),n=Math.max(0,Math.round(t*12));const y=i===0?P*n:P*((Math.pow(1+i,n)-1)/i)*(id==='sip'?(1+i):1);push(t,y)}return out}
-  if(['compound-interest','fixed-deposit'].includes(id)){const P=Number(v.principal||0),r=Number(v.rate||0)/100,n=id==='compound-interest'?Number(v.freq||12):Number(v.freq||4);for(let k=0;k<points;k++){const t=years*k/(points-1);push(t,P*Math.pow(1+r/n,n*t))}return out}
-  if(id==='lumpsum'){const P=Number(v.principal||0),r=Number(v.rate||0)/100;for(let k=0;k<points;k++){const t=years*k/(points-1);push(t,P*Math.pow(1+r,t))}return out}
+  if(id==='sip'||id==='recurring-deposit'){const P=Math.max(0,Number(v.monthly||0)),i=Math.max(0,Number(v.rate||0))/1200;for(let k=0;k<points;k++){const t=years*k/(points-1),n=Math.max(0,Math.round(t*12));const y=i===0?P*n:P*((Math.pow(1+i,n)-1)/i)*(id==='sip'?(1+i):1);push(t,y)}return out}
+  if(['compound-interest','fixed-deposit'].includes(id)){const P=Math.max(0,Number(v.principal||0)),r=Math.max(0,Number(v.rate||0))/100,n=id==='compound-interest'?Number(v.freq||12):Number(v.freq||4);for(let k=0;k<points;k++){const t=years*k/(points-1);push(t,P*Math.pow(1+r/n,n*t))}return out}
+  if(id==='lumpsum'){const P=Math.max(0,Number(v.principal||0)),r=Math.max(0,Number(v.rate||0))/100;for(let k=0;k<points;k++){const t=years*k/(points-1);push(t,P*Math.pow(1+r,t))}return out}
   if(id==='simple-interest'){const P=Number(v.principal||0),r=Number(v.rate||0)/100;for(let k=0;k<points;k++){const t=years*k/(points-1);push(t,P*(1+r*t))}return out}
   if(id==='roi'){const P=Number(v.cost||0),F=Number(v.finalValue||0),r=P>0&&F>=0?(F/P):0;for(let k=0;k<points;k++){const t=years*k/(points-1);push(t,years?P*Math.pow(r,t/years):P)}return out}
   if(id==='cagr'){const P=Number(v.start||0),F=Number(v.end||0);for(let k=0;k<points;k++){const t=years*k/(points-1);push(t,years&&P>0?P*Math.pow(F/P,t/years):P)}return out}
@@ -62,7 +62,6 @@ function svgLine(points,w,h,pad,min,max){return points.map((p,i)=>{const x=pad+(
 function inflationAdjustedSeries(calc,v,series){
   if(!['sip','compound-interest','fixed-deposit','recurring-deposit','lumpsum'].includes(calc.id))return [];
   const inflation=Math.max(0,Number(v.inflation||0))/100;
-  if(!inflation)return [];
   return series.map(p=>({x:p.x,y:p.y/Math.pow(1+inflation,p.x)}));
 }
 function pathFrom(points){return points.map((q,i)=>(i?'L':'M')+q[0]+' '+q[1]).join(' ')}
