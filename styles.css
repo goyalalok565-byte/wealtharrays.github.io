@@ -115,3 +115,15 @@ button,a,input,select{touch-action:manipulation}
 .site-footer{overflow:hidden}.site-footer-inner{padding-top:58px;padding-bottom:28px}.footer-category-links a,.footer-links a{min-height:38px;display:flex;align-items:center}@media(max-width:760px){.site-footer{margin-top:18px}.site-footer-inner{padding-top:42px;padding-bottom:calc(26px + env(safe-area-inset-bottom))}.site-footer-inner>p{font-size:13px;line-height:1.75}.site-footer-inner>.footer-category-links,.site-footer-inner>.footer-links{gap:8px 24px}.footer-category-links a,.footer-links a{min-height:40px}}
 /* Phase 2E visual QA */
 img,svg,canvas{max-width:100%}.calc-widget,.calc-chart,.scenario-card{backface-visibility:hidden}@media(max-width:760px){.page-shell,.hero,.content-wrap,.calc-page,.site-footer-inner{max-width:100%;box-sizing:border-box}.hero{padding-top:30px;padding-bottom:26px}.hero h1{line-height:1.08;text-wrap:balance}.field{min-width:0}.field input,.field select{width:100%;box-sizing:border-box}.wa-line-chart-wrap{overflow:hidden}.chart-empty{min-height:150px;display:grid;place-items:center;text-align:center;padding:20px}.scenario-summary{overflow-x:auto;-webkit-overflow-scrolling:touch}.scenario-summary>*{min-width:110px}.footer-columns>div{min-width:0}.footer-columns a{overflow-wrap:anywhere}}@media(max-width:390px){.masthead-inner{padding-left:10px;padding-right:10px}.calc-page{padding-left:10px;padding-right:10px}.hero{padding-left:14px;padding-right:14px}}
+
+/* Phase 2E — inflation-adjusted projection visual */
+.wa-chart-line.real{fill:none;stroke:var(--text);stroke-width:2.25;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:7 7;opacity:.72}
+.wa-chart-dot.real{fill:var(--surface);stroke:var(--text);stroke-width:2.5}
+.chart-legend{flex-wrap:wrap}
+.chart-legend span.real{font-weight:600}
+.chart-legend span.real i{background:var(--text);opacity:.72}
+.chart-legend span.real i{border-radius:2px;width:14px;height:2px}
+@media(max-width:480px){
+ .chart-legend{gap:9px 13px;font-size:10px}
+ .chart-legend span.real{width:100%}
+}
