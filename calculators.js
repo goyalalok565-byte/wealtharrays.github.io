@@ -356,9 +356,10 @@ const CALCULATORS = [
   },
   {
     id:"inflation",slug:"inflation-calculator",title:"Inflation Calculator",category:"retirement",
-    short:"Estimate future prices and purchasing power.",desc:"See how an assumed annual inflation rate changes the future cost and real value of money.",
-    fields:[{id:"amount",label:"Today's amount",type:"number",min:0,step:100},{id:"rate",label:"Annual inflation rate",type:"number",min:0,max:50,step:.1,suffix:"%"},{id:"years",label:"Years",type:"number",min:0,max:100,step:.1,suffix:"yrs"}],
-    compute(v){const factor=Math.pow(1+v.rate/100,v.years),future=v.amount*factor,purchasingPower=factor===0?0:v.amount/factor;return[{label:"Future equivalent cost",value:future,format:"currency",emphasis:"negative"},{label:"Price increase",value:future-v.amount,format:"currency"},{label:"Purchasing power of today's amount",value:purchasingPower,format:"currency",emphasis:"neutral"}]}
+    short:"Estimate future prices, purchasing power and what you may need later.",desc:"See how an assumed annual inflation rate changes future costs, real purchasing power and the nominal amount you may need later to buy something that costs a certain amount today.",
+    article:{formula:"Future cost = today's cost × (1 + inflation rate)^years.",exampleInputs:{amount:100000,rate:6,years:20},faqs:[{q:"How much money may I need in the future?",a:"Enter what something costs today, an assumed inflation rate and the number of years. The calculator estimates the nominal amount you may need later to buy the same thing."},{q:"Does this predict actual inflation?",a:"No. The inflation rate is an assumption for planning, not a forecast or guarantee."}]},
+    fields:[{id:"amount",label:"Today's amount / current cost",type:"number",min:0,step:100},{id:"rate",label:"Annual inflation rate",type:"number",min:0,max:50,step:.1,suffix:"%"},{id:"years",label:"Years from now",type:"number",min:0,max:100,step:.1,suffix:"yrs"}],
+    compute(v){const factor=Math.pow(1+v.rate/100,v.years),future=v.amount*factor,purchasingPower=v.amount/factor;return[{label:"Future amount needed to buy the same thing",value:future,format:"currency",emphasis:"negative"},{label:"Price increase",value:future-v.amount,format:"currency"},{label:"Purchasing power of today's amount",value:purchasingPower,format:"currency",emphasis:"neutral"}]}
   },
   {
     id:"net-worth",slug:"net-worth-calculator",title:"Net Worth Calculator",category:"retirement",
