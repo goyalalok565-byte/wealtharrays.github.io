@@ -54,16 +54,19 @@ const CALCULATORS = [
       { id: "monthly", label: "Monthly investment", type: "number", default: 200, min: 0, step: 10 },
       { id: "rate", label: "Expected annual return", type: "number", default: 10, min: 0, max: 50, step: 0.1, suffix: "%" },
       { id: "years", label: "Investment period", type: "number", default: 15, min: 1, max: 60, step: 1, suffix: "yrs" },
+      { id: "inflation", label: "Expected annual inflation", type: "number", default: 6, min: 0, max: 30, step: 0.1, suffix: "%" },
     ],
     compute(v) {
       const P = v.monthly, i = v.rate / 100 / 12, n = v.years * 12;
       const fv = i === 0 ? P * n : P * ((Math.pow(1 + i, n) - 1) / i) * (1 + i);
       const invested = P * n;
       const gains = fv - invested;
+      const realValue = fv / Math.pow(1 + v.inflation / 100, v.years);
       return [
         { label: "Total invested", value: invested, format: "currency" },
         { label: "Wealth gained", value: gains, format: "currency", emphasis: "positive" },
-        { label: "Projected value", value: fv, format: "currency", emphasis: "neutral" },
+        { label: "Projected value (future money)", value: fv, format: "currency", emphasis: "neutral" },
+        { label: "Value in today's purchasing power", value: realValue, format: "currency", emphasis: "neutral" },
       ];
     },
   },
@@ -87,6 +90,7 @@ const CALCULATORS = [
       { id: "principal", label: "Initial amount", type: "number", default: 5000, min: 0, step: 100 },
       { id: "rate", label: "Annual interest rate", type: "number", default: 6, min: 0, max: 50, step: 0.1, suffix: "%" },
       { id: "years", label: "Time period", type: "number", default: 10, min: 1, max: 60, step: 1, suffix: "yrs" },
+      { id: "inflation", label: "Expected annual inflation", type: "number", default: 6, min: 0, max: 30, step: 0.1, suffix: "%" },
       {
         id: "freq", label: "Compounding frequency", type: "select", default: "12",
         options: [
@@ -100,10 +104,12 @@ const CALCULATORS = [
     compute(v) {
       const P = v.principal, r = v.rate / 100, t = v.years, n = Number(v.freq);
       const A = P * Math.pow(1 + r / n, n * t);
+      const realValue = A / Math.pow(1 + v.inflation / 100, t);
       return [
         { label: "Principal", value: P, format: "currency" },
         { label: "Interest earned", value: A - P, format: "currency", emphasis: "positive" },
-        { label: "Final amount", value: A, format: "currency", emphasis: "neutral" },
+        { label: "Final amount (future money)", value: A, format: "currency", emphasis: "neutral" },
+        { label: "Value in today's purchasing power", value: realValue, format: "currency", emphasis: "neutral" },
       ];
     },
   },
@@ -314,21 +320,21 @@ const CALCULATORS = [
   {
     id:"fixed-deposit",slug:"fixed-deposit-calculator",title:"Fixed Deposit Calculator",category:"banking",
     short:"Estimate fixed-deposit maturity and interest.",desc:"Project a one-time deposit using an annual rate, term and compounding frequency.",
-    fields:[{id:"principal",label:"Deposit amount",type:"number",min:0,step:100},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:50,step:.1,suffix:"%"},{id:"years",label:"Term",type:"number",min:.1,max:50,step:.1,suffix:"yrs"},{id:"freq",label:"Compounding",type:"select",default:"4",options:[{value:"1",label:"Annually"},{value:"4",label:"Quarterly"},{value:"12",label:"Monthly"}]}],
-    compute(v){const n=Number(v.freq),A=v.principal*Math.pow(1+v.rate/100/n,n*v.years);return[{label:"Deposit",value:v.principal,format:"currency"},{label:"Interest earned",value:A-v.principal,format:"currency",emphasis:"positive"},{label:"Maturity value",value:A,format:"currency",emphasis:"neutral"}]}
+    fields:[{id:"principal",label:"Deposit amount",type:"number",min:0,step:100},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:50,step:.1,suffix:"%"},{id:"years",label:"Term",type:"number",min:.1,max:50,step:.1,suffix:"yrs"},{id:"inflation",label:"Expected annual inflation",type:"number",default:6,min:0,max:30,step:.1,suffix:"%"},{id:"freq",label:"Compounding",type:"select",default:"4",options:[{value:"1",label:"Annually"},{value:"4",label:"Quarterly"},{value:"12",label:"Monthly"}]}],
+    compute(v){const n=Number(v.freq),A=v.principal*Math.pow(1+v.rate/100/n,n*v.years),real=A/Math.pow(1+v.inflation/100,v.years);return[{label:"Deposit",value:v.principal,format:"currency"},{label:"Interest earned",value:A-v.principal,format:"currency",emphasis:"positive"},{label:"Maturity value (future money)",value:A,format:"currency",emphasis:"neutral"},{label:"Value in today's purchasing power",value:real,format:"currency",emphasis:"neutral"}]}
   },
   {
     id:"recurring-deposit",slug:"recurring-deposit-calculator",title:"Recurring Deposit Calculator",category:"banking",
     short:"Project monthly deposits and their maturity value.",desc:"Estimate the future value of equal monthly deposits using monthly compounding and end-of-month deposits.",
     article:{formula:"Future value = P × [((1 + i)^n − 1) ÷ i], where P is the monthly deposit, i is the monthly rate and n is the whole number of monthly deposits. This model assumes each deposit is made at the end of the month and compounds monthly.",exampleInputs:{monthly:1000,rate:7,years:5},faqs:[{q:"Does every bank calculate RD interest this way?",a:"No. Banks and countries can use different compounding conventions and installment timing. This is a transparent planning estimate, not a bank maturity quote."},{q:"Why is the term converted to months?",a:"Because deposits occur monthly. The calculator rounds the selected term to a whole number of monthly deposits so it does not pretend that a fraction of a deposit period exists."}]},
-    fields:[{id:"monthly",label:"Monthly deposit",type:"number",min:0,step:100},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:50,step:.1,suffix:"%"},{id:"years",label:"Deposit term",type:"number",min:1,max:50,step:0.0833333333,suffix:"yrs"}],
-    compute(v){const n=Math.max(0,Math.round(v.years*12)),i=v.rate/1200,A=i===0?v.monthly*n:v.monthly*((Math.pow(1+i,n)-1)/i);return[{label:"Monthly deposits",value:n,format:"number"},{label:"Total deposits",value:v.monthly*n,format:"currency"},{label:"Interest earned",value:A-v.monthly*n,format:"currency",emphasis:"positive"},{label:"Estimated maturity",value:A,format:"currency",emphasis:"neutral"}]}
+    fields:[{id:"monthly",label:"Monthly deposit",type:"number",min:0,step:100},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:50,step:.1,suffix:"%"},{id:"years",label:"Deposit term",type:"number",min:1,max:50,step:0.0833333333,suffix:"yrs"},{id:"inflation",label:"Expected annual inflation",type:"number",default:6,min:0,max:30,step:.1,suffix:"%"}],
+    compute(v){const n=Math.max(0,Math.round(v.years*12)),i=v.rate/1200,A=i===0?v.monthly*n:v.monthly*((Math.pow(1+i,n)-1)/i),real=A/Math.pow(1+v.inflation/100,v.years);return[{label:"Monthly deposits",value:n,format:"number"},{label:"Total deposits",value:v.monthly*n,format:"currency"},{label:"Interest earned",value:A-v.monthly*n,format:"currency",emphasis:"positive"},{label:"Estimated maturity (future money)",value:A,format:"currency",emphasis:"neutral"},{label:"Value in today's purchasing power",value:real,format:"currency",emphasis:"neutral"}]}
   },
   {
     id:"lumpsum",slug:"lumpsum-calculator",title:"Lumpsum Calculator",category:"investment",
     short:"Project a one-time investment over time.",desc:"Estimate how a lump-sum investment could grow at an assumed annual return.",
-    fields:[{id:"principal",label:"Investment amount",type:"number",min:0,step:100},{id:"rate",label:"Expected annual return",type:"number",min:0,max:50,step:.1,suffix:"%"},{id:"years",label:"Investment period",type:"number",min:.1,max:60,step:.1,suffix:"yrs"}],
-    compute(v){const A=v.principal*Math.pow(1+v.rate/100,v.years);return[{label:"Amount invested",value:v.principal,format:"currency"},{label:"Estimated gain",value:A-v.principal,format:"currency",emphasis:"positive"},{label:"Projected value",value:A,format:"currency",emphasis:"neutral"}]}
+    fields:[{id:"principal",label:"Investment amount",type:"number",min:0,step:100},{id:"rate",label:"Expected annual return",type:"number",min:0,max:50,step:.1,suffix:"%"},{id:"years",label:"Investment period",type:"number",min:.1,max:60,step:.1,suffix:"yrs"},{id:"inflation",label:"Expected annual inflation",type:"number",default:6,min:0,max:30,step:.1,suffix:"%"}],
+    compute(v){const A=v.principal*Math.pow(1+v.rate/100,v.years),real=A/Math.pow(1+v.inflation/100,v.years);return[{label:"Amount invested",value:v.principal,format:"currency"},{label:"Estimated gain",value:A-v.principal,format:"currency",emphasis:"positive"},{label:"Projected value (future money)",value:A,format:"currency",emphasis:"neutral"},{label:"Value in today's purchasing power",value:real,format:"currency",emphasis:"neutral"}]}
   },
   {
     id:"cagr",slug:"cagr-calculator",title:"CAGR Calculator",category:"investment",
