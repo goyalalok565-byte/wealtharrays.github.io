@@ -127,3 +127,6 @@ img,svg,canvas{max-width:100%}.calc-widget,.calc-chart,.scenario-card{backface-v
  .chart-legend{gap:9px 13px;font-size:10px}
  .chart-legend span.real{width:100%}
 }
+
+/* Phase 2E comparison QA */
+.chart-legend span.scenario-b-real i{background:var(--accent2);opacity:.78}.scenario-summary-title{position:sticky;left:0}.scenario-result{min-width:0}.scenario-result strong{font-variant-numeric:tabular-nums}@media(max-width:760px){.scenario-compare{grid-template-columns:1fr;gap:12px}.scenario-card{padding:16px}.scenario-summary{border-radius:20px}.scenario-result{grid-template-columns:minmax(120px,1fr) minmax(100px,1fr) minmax(100px,1fr) minmax(80px,.8fr);min-width:500px}.scenario-summary{overflow-x:auto}.scenario-summary-title{min-width:500px}}
