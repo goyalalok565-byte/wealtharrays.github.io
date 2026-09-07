@@ -328,3 +328,22 @@ img,svg,canvas{max-width:100%}.calc-widget,.calc-chart,.scenario-card{backface-v
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+/***** Phase 5 Smart Assist *****/
+.calc-smart{margin-top:16px;border:1px solid color-mix(in srgb,var(--accent) 26%,var(--line));border-radius:24px;background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 7%,var(--surface)),var(--surface));overflow:hidden}
+.wa-smart-placeholder{padding:20px;color:var(--muted);font-size:12px;text-align:center}
+.wa-smart-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:17px 19px;border-bottom:1px solid color-mix(in srgb,var(--accent) 16%,var(--line))}
+.wa-smart-head span{display:block;font-size:9px;letter-spacing:.15em;font-weight:900;color:var(--accent)}
+.wa-smart-head h3{margin:3px 0 0;font-size:17px;letter-spacing:-.03em}
+.wa-smart-collapse{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:12px;padding:7px 10px;font-size:10px;font-weight:850;cursor:pointer}
+.wa-smart-body{padding:18px}
+.wa-smart-summary{margin:0;color:var(--text);font-size:13px;line-height:1.55}
+.wa-smart-tips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:14px}
+.wa-smart-tips article{padding:13px;border:1px solid var(--line);border-radius:17px;background:var(--surface)}
+.wa-smart-tips b{font-size:10px;color:var(--accent)}
+.wa-smart-tips p{margin:6px 0 0;font-size:11px;line-height:1.5;color:var(--muted)}
+.wa-smart-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.wa-smart-actions button{min-height:39px;padding:0 12px;border:1px solid var(--line);border-radius:13px;background:var(--surface);color:var(--text);font-size:10px;font-weight:850;cursor:pointer}
+.wa-smart-actions button:first-child{border-color:var(--accent);color:var(--accent)}
+.wa-smart-body small{display:block;margin-top:13px;color:var(--muted);font-size:9px;line-height:1.45}
+@media(max-width:760px){.calc-smart{border-radius:21px}.wa-smart-head{padding:15px}.wa-smart-body{padding:15px}.wa-smart-tips{grid-template-columns:1fr}.wa-smart-actions{display:grid;grid-template-columns:1fr 1fr}.wa-smart-actions button{width:100%}}
