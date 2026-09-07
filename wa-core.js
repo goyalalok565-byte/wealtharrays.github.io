@@ -46,5 +46,4 @@ if(q){
   document.addEventListener('click',e=>{if(!box.contains(e.target)&&e.target!==q)box.hidden=true});
 }
 
-window.WA={currencies:C,languages:[]}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();window.WA={currencies:C,languages:L}})();
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();window.WA={currencies:C,languages:[]}})();
