@@ -84,21 +84,21 @@ function inflationAdjustedSeries(calc,v,series){
 function pathFrom(points){return points.map((q,i)=>(i?'L':'M')+q[0]+' '+q[1]).join(' ')}
 function updatePremiumChart(id,calc,scenarioA,scenarioB){
   const root=document.getElementById(id+'-chart');if(!root)return;
-  const a=chartSeries(calc,scenarioA),b=chartSeries(calc,scenarioB);
-  const realA=inflationAdjustedSeries(calc,scenarioA,a);
-  const realB=inflationAdjustedSeries(calc,scenarioB,b);
-  if(a.length<2&&b.length<2){root.innerHTML='<div class="chart-empty">Enter values to see how your money changes over time.</div>';return}
-  const all=[...a,...b,...realA,...realB].map(p=>p.y).filter(Number.isFinite);
-  if(!all.length){root.innerHTML='<div class="chart-empty">Enter valid values to see a real projection.</div>';return}
-  let min=Math.min(...all),max=Math.max(...all);if(min===max){min=0;max=Math.max(1,max)}else{const gap=(max-min)*.12;min=Math.max(0,min-gap);max+=gap}
-  const W=640,H=280,P=28,pa=svgLine(a,W,H,P,min,max),pb=svgLine(b,W,H,P,min,max),pr=svgLine(realA,W,H,P,min,max),prs=svgLine(realB,W,H,P,min,max);
-  const lineA=pathFrom(pa),lineB=pathFrom(pb),lineR=pathFrom(pr),lineRB=pathFrom(prs);
-  const area=(pts,line)=>pts.length?line+' L '+pts[pts.length-1][0]+' '+(H-P)+' L '+pts[0][0]+' '+(H-P)+' Z':'';
-  const xEnd=Math.max(a[a.length-1]?.x||0,b[b.length-1]?.x||0),yLabel=waFormatValue(max,'currency');
-  const inflationLegend=realA.length?'<span class="real"><i></i> Value after inflation</span>':'';const inflationLegendB=realB.length&&b.length?'<span class="real scenario-b-real"><i></i> B purchasing power</span>':'';
-  root.innerHTML=`<div class="wa-line-chart-wrap"><svg class="wa-line-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Live financial projection chart"><defs><linearGradient id="${id}-areaA" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".22"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient><linearGradient id="${id}-areaB" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="var(--accent2)" stop-opacity=".16"/><stop offset="100%" stop-color="var(--accent2)" stop-opacity="0"/></linearGradient></defs><g class="wa-chart-grid">${[.15,.38,.61,.84].map(n=>'<line x1="'+P+'" x2="'+(W-P)+'" y1="'+(P+(H-P*2)*n)+'" y2="'+(P+(H-P*2)*n)+'"/>').join('')}</g>${area(pa,lineA)?'<path class="wa-chart-area a" d="'+area(pa,lineA)+'" fill="url(#'+id+'-areaA)"/>':''}${area(pb,lineB)?'<path class="wa-chart-area b" d="'+area(pb,lineB)+'" fill="url(#'+id+'-areaB)"/>':''}${lineA?'<path class="wa-chart-line a" d="'+lineA+'"/>':''}${lineB?'<path class="wa-chart-line b" d="'+lineB+'"/>':''}${lineR?'<path class="wa-chart-line real" d="'+lineR+'"/>':''}${pa.length?'<circle class="wa-chart-dot a" cx="'+pa[pa.length-1][0]+'" cy="'+pa[pa.length-1][1]+'" r="5"/>':''}${pr.length?'<circle class="wa-chart-dot real" cx="'+pr[pr.length-1][0]+'" cy="'+pr[pr.length-1][1]+'" r="4"/>':''}</svg><div class="wa-chart-axis"><span>Today</span><span>${xEnd?Number(xEnd.toFixed(1))+' years later':'Result'}</span></div><div class="wa-chart-top">${esc(yLabel)} highest value</div></div><div class="chart-legend"><span><i></i> Your projected money</span>${b.length?'<span class="scenario-b"><i></i> Comparison</span>':''}${inflationLegend}</div>`;
-}
-function smartPrimary(results){
+  const results=(()=>{try{return calc.compute(scenarioA)||[]}catch(e){return[]}})();
+  const money=results.filter(r=>r&&Number.isFinite(Number(r.value))&&r.format==='currency');
+  const clean=money.map(r=>({label:String(r.label||'Result'),value:Number(r.value),format:r.format})).filter(r=>r.value>=0);
+  if(clean.length<2){root.innerHTML='<div class="chart-empty">Calculate first to see a simple money breakdown.</div>';return}
+  clean.sort((x,y)=>y.value-x.value);
+  const top=clean.slice(0,4),total=top.reduce((n,x)=>n+x.value,0);
+  if(!(total>0)){root.innerHTML='<div class="chart-empty">Enter values to see your money breakdown.</div>';return}
+  const size=220,cx=110,cy=110,radius=76,stroke=24,circ=2*Math.PI*radius,gap=.018;
+  let offset=0;
+  const palette=['var(--accent2)','var(--accent)','var(--danger)','var(--muted)'];
+  const arcs=top.map((item,i)=>{const fraction=item.value/total;const usable=Math.max(0,fraction-gap);const dash=usable*circ;const node='<circle cx="'+cx+'" cy="'+cy+'" r="'+radius+'" fill="none" stroke="'+palette[i]+'" stroke-width="'+stroke+'" stroke-linecap="round" stroke-dasharray="'+dash+' '+(circ-dash)+'" stroke-dashoffset="'+(-offset*circ)+'" transform="rotate(-90 '+cx+' '+cy+')"/>';offset+=fraction;return node}).join('');
+  const primary=top[0],primaryPct=Math.round(primary.value/total*100);
+  const legend=top.map((item,i)=>'<div class="wa-donut-item"><span class="wa-donut-dot" style="background:'+palette[i]+'"></span><span>'+esc(simpleResultLabel(item.label))+'</span><strong>'+esc(waFormatValue(item.value,item.format))+'</strong></div>').join('');
+  root.innerHTML='<div class="wa-donut-card"><div class="wa-donut"><svg viewBox="0 0 '+size+' '+size+'" role="img" aria-label="Financial result breakdown"><circle cx="'+cx+'" cy="'+cy+'" r="'+radius+'" fill="none" stroke="var(--line)" stroke-width="'+stroke+'"/>'+arcs+'</svg><div class="wa-donut-center"><strong>'+primaryPct+'%</strong><span>largest result</span></div></div><div class="wa-donut-list">'+legend+'</div></div>';
+}function smartPrimary(results){
   return (results||[]).find(x=>x.format==='currency'&&Number.isFinite(Number(x.value)))||(results||[]).find(x=>Number.isFinite(Number(x.value)))||null;
 }
 function smartScenario(calc,v,delta){
