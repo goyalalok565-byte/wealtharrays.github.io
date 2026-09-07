@@ -264,3 +264,8 @@ img,svg,canvas{max-width:100%}.calc-widget,.calc-chart,.scenario-card{backface-v
 .hero+.home-library{padding-top:28px}
 .hero+.home-library .section-head{margin-bottom:16px}
 @media(max-width:760px){.tool-search-results{border-radius:17px;top:calc(100% + 8px)}.tool-search-results a{padding:12px}.tool-search-results a span{font-size:13px}.hero+.home-library{padding-top:18px}}
+
+/***** Pass 4 internal-link pathways *****/
+.calc-next-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.calc-next-links a{flex:1 1 180px;min-height:46px;display:flex;align-items:center;justify-content:center;padding:10px 14px;border:1px solid var(--line);border-radius:15px;background:var(--surface);font-size:11px;font-weight:850;text-align:center;transition:transform .18s,border-color .18s}
+.calc-next-links a:hover{transform:translateY(-2px);border-color:var(--accent)}
