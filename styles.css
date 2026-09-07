@@ -249,3 +249,18 @@ img,svg,canvas{max-width:100%}.calc-widget,.calc-chart,.scenario-card{backface-v
 .related-tools.wa-related a:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 45%,var(--line));box-shadow:0 14px 28px rgba(15,23,42,.07)}
 .related-tools.wa-related a span{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 10%,transparent);font-size:16px!important}
 @media(max-width:620px){.related-tools.wa-related{padding:17px!important;border-radius:22px!important}.related-tools.wa-related .related-list{grid-template-columns:1fr!important}.related-tools.wa-related a{min-height:56px!important}}
+
+
+/***** Phase 3 search reliability + discovery *****/
+.tool-search-shell{position:relative;z-index:20}
+.tool-search-results{position:absolute;top:calc(100% + 10px);left:0;right:0;max-height:min(520px,60vh);overflow:auto;padding:8px;border:1px solid var(--line);border-radius:20px;background:color-mix(in srgb,var(--surface) 96%,transparent);backdrop-filter:blur(20px);box-shadow:0 24px 70px rgba(15,23,42,.16)}
+.tool-search-results[hidden]{display:none!important}
+.tool-search-results a{display:grid;grid-template-columns:minmax(0,1fr) 26px;gap:2px 12px;align-items:center;padding:13px 14px;border-radius:14px;color:var(--text);transition:background .16s,transform .16s}
+.tool-search-results a:hover{background:color-mix(in srgb,var(--accent) 8%,var(--surface));transform:translateX(2px)}
+.tool-search-results a span{font-size:14px;font-weight:850;line-height:1.2}
+.tool-search-results a small{grid-column:1;color:var(--muted);font-size:11px;line-height:1.35}
+.tool-search-results a b{grid-column:2;grid-row:1/3;color:var(--accent);font-size:18px}
+.tool-search-empty{padding:18px 16px;color:var(--muted);font-size:12px;line-height:1.5}
+.hero+.home-library{padding-top:28px}
+.hero+.home-library .section-head{margin-bottom:16px}
+@media(max-width:760px){.tool-search-results{border-radius:17px;top:calc(100% + 8px)}.tool-search-results a{padding:12px}.tool-search-results a span{font-size:13px}.hero+.home-library{padding-top:18px}}
