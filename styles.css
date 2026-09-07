@@ -366,3 +366,14 @@ img,svg,canvas{max-width:100%}.calc-widget,.calc-chart,.scenario-card{backface-v
 /***** Phase 6: trust and correction workflow *****/
 .contact-trust{display:grid;gap:6px;margin:22px 0;padding:17px 19px;border:1px solid var(--line);border-radius:18px;background:color-mix(in srgb,var(--accent) 6%,var(--surface))}
 .contact-trust strong{font-size:13px;letter-spacing:-.01em}.contact-trust span{font-size:12px;line-height:1.55;color:var(--muted)}
+
+/* Phase 6 final mobile + financial meaning audit */
+@media(max-width:760px){
+  .home-tool-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px}
+  .home-tool-card{min-height:132px!important;padding:12px!important;border-radius:18px!important;gap:8px}
+  .home-tool-card:after{width:70px;height:70px;right:-28px;top:-28px}
+  .home-tool-index{font-size:8px}.home-tool-card small{font-size:8px;margin-bottom:3px}.home-tool-card b{font-size:12px;line-height:1.12}.home-tool-card p{display:none}.home-tool-card>strong{font-size:16px}
+}
+@media(max-width:360px){.home-tool-grid{gap:7px}.home-tool-card{min-height:122px!important;padding:10px!important}.home-tool-card b{font-size:11px}}
+.calc-result-value.positive,.calc-result-row .positive{color:var(--accent2)!important}.calc-result-value.negative,.calc-result-row .negative{color:var(--danger)!important}
+.calc-result-row:has(.positive){border-left:3px solid var(--accent2)}.calc-result-row:has(.negative){border-left:3px solid var(--danger)}
