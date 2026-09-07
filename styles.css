@@ -269,3 +269,12 @@ img,svg,canvas{max-width:100%}.calc-widget,.calc-chart,.scenario-card{backface-v
 .calc-next-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
 .calc-next-links a{flex:1 1 180px;min-height:46px;display:flex;align-items:center;justify-content:center;padding:10px 14px;border:1px solid var(--line);border-radius:15px;background:var(--surface);font-size:11px;font-weight:850;text-align:center;transition:transform .18s,border-color .18s}
 .calc-next-links a:hover{transform:translateY(-2px);border-color:var(--accent)}
+
+/***** Pass 5 visible trust signals *****/
+.wa-trust-signals{margin-top:18px;padding:20px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(145deg,var(--surface),var(--surface2));display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.wa-trust-signals div{display:grid;gap:5px}
+.wa-trust-signals strong{font-size:12px;letter-spacing:-.01em}
+.wa-trust-signals span{font-size:11px;line-height:1.55;color:var(--muted)}
+.wa-trust-signals p{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:14px;margin:2px 0 0;padding-top:14px;border-top:1px solid var(--line)}
+.wa-trust-signals a{font-size:11px;font-weight:850;color:var(--accent)}
+@media(max-width:700px){.wa-trust-signals{grid-template-columns:1fr;padding:17px;border-radius:21px}.wa-trust-signals p{gap:12px}}
