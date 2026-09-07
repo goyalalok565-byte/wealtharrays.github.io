@@ -347,3 +347,7 @@ img,svg,canvas{max-width:100%}.calc-widget,.calc-chart,.scenario-card{backface-v
 .wa-smart-actions button:first-child{border-color:var(--accent);color:var(--accent)}
 .wa-smart-body small{display:block;margin-top:13px;color:var(--muted);font-size:9px;line-height:1.45}
 @media(max-width:760px){.calc-smart{border-radius:21px}.wa-smart-head{padding:15px}.wa-smart-body{padding:15px}.wa-smart-tips{grid-template-columns:1fr}.wa-smart-actions{display:grid;grid-template-columns:1fr 1fr}.wa-smart-actions button{width:100%}}
+
+/***** Phase 5 advanced financial intelligence *****/
+.wa-smart-scenarios{margin-top:15px}.wa-smart-scenarios>b{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.wa-smart-scenarios>div{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}.wa-smart-scenarios span{padding:11px;border:1px solid var(--line);border-radius:15px;background:var(--surface);display:grid;gap:4px}.wa-smart-scenarios em{font-style:normal;font-size:9px;color:var(--muted)}.wa-smart-scenarios strong{font-size:13px}.wa-smart-scenarios small{font-size:9px;color:var(--accent)}.wa-risk-flags{margin-top:12px;display:grid;gap:7px}.wa-risk-flags p{margin:0;padding:10px 12px;border-radius:13px;background:color-mix(in srgb,#f59e0b 9%,var(--surface));font-size:10px;line-height:1.45;color:var(--text)}
+@media(max-width:760px){.wa-smart-scenarios>div{grid-template-columns:1fr}.wa-smart-scenarios span{grid-template-columns:1fr auto;align-items:center}.wa-smart-scenarios small{grid-column:1/-1}}
