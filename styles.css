@@ -238,3 +238,14 @@ img,svg,canvas{max-width:100%}.calc-widget,.calc-chart,.scenario-card{backface-v
   .category-tool-card b{font-size:15px}.category-tool-card p{font-size:11px}
 }
 @media(max-width:390px){.home-tool-grid{grid-template-columns:1fr}.home-tool-card{min-height:132px}.category-section-head>a{font-size:10px}}
+
+
+/***** Premium related calculators *****/
+.related-tools.wa-related{position:relative;margin-top:34px!important;padding:22px!important;border-radius:26px!important;background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 6%,var(--surface)),var(--surface2))!important;border:1px solid var(--line)!important;overflow:hidden}
+.related-tools.wa-related:before{content:"KEEP EXPLORING";display:block;font-size:9px;letter-spacing:.16em;font-weight:900;color:var(--accent);margin-bottom:7px}
+.related-tools.wa-related .related-heading{font-size:20px!important;letter-spacing:-.04em;margin-bottom:15px!important}
+.related-tools.wa-related .related-list{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+.related-tools.wa-related a{min-height:64px!important;padding:14px 15px!important;border-radius:17px!important;background:color-mix(in srgb,var(--surface) 92%,transparent)!important;border:1px solid var(--line)!important;font-size:12px!important;font-weight:850!important;box-shadow:0 8px 20px rgba(15,23,42,.035);transition:transform .2s,border-color .2s,box-shadow .2s!important}
+.related-tools.wa-related a:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 45%,var(--line));box-shadow:0 14px 28px rgba(15,23,42,.07)}
+.related-tools.wa-related a span{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 10%,transparent);font-size:16px!important}
+@media(max-width:620px){.related-tools.wa-related{padding:17px!important;border-radius:22px!important}.related-tools.wa-related .related-list{grid-template-columns:1fr!important}.related-tools.wa-related a{min-height:56px!important}}
