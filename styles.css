@@ -353,3 +353,12 @@ img,svg,canvas{max-width:100%}.calc-widget,.calc-chart,.scenario-card{backface-v
 @media(max-width:760px){.wa-smart-scenarios>div{grid-template-columns:1fr}.wa-smart-scenarios span{grid-template-columns:1fr auto;align-items:center}.wa-smart-scenarios small{grid-column:1/-1}}
 
 .wa-goal-card{margin-top:12px;padding:13px 14px;border:1px solid color-mix(in srgb,var(--accent) 22%,var(--line));border-radius:16px;background:color-mix(in srgb,var(--accent) 5%,var(--surface))}.wa-goal-card b{font-size:10px;color:var(--accent)}.wa-goal-card p{margin:6px 0 0;font-size:11px;line-height:1.5;color:var(--muted)}
+
+/***** Phase 5 completion: decision intelligence *****/
+.wa-smart-status{font-size:9px;font-weight:900;letter-spacing:.12em;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line));padding:6px 8px;border-radius:999px}
+.wa-sensitivity{margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:18px;background:color-mix(in srgb,var(--surface) 82%,var(--accent))}
+.wa-sensitivity>b{display:block;font-size:10px;letter-spacing:.04em;margin-bottom:10px}
+.wa-sensitivity>div{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;align-items:center}
+.wa-sensitivity span{font-size:9px;color:var(--muted);font-weight:800}
+.wa-sensitivity strong{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:760px){.wa-sensitivity>div{grid-template-columns:1fr 1fr}.wa-sensitivity strong{font-size:12px}.wa-smart-actions{grid-template-columns:1fr}.wa-smart-actions button{min-height:44px}}
