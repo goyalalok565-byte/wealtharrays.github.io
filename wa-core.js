@@ -8,6 +8,7 @@ const cur=document.querySelector('#currency-select');
 if(cur){cur.innerHTML=C.map(x=>`<option value="${x[0]}">${x[0]} · ${x[1]} · ${x[2]}</option>`).join('');cur.value=localStorage.waCurrency||'INR';document.documentElement.dataset.currency=cur.value;cur.onchange=()=>{localStorage.waCurrency=cur.value;document.documentElement.dataset.currency=cur.value;window.dispatchEvent(new Event('wa-currency'))}}
 
 document.querySelectorAll('#language-select').forEach(el=>el.remove());
+document.querySelectorAll('a[href="#"]').forEach(a=>{if(!a.dataset.allowHash){a.addEventListener('click',e=>e.preventDefault())}});
 
 const b=document.querySelector('#theme-toggle');
 const apply=t=>{document.documentElement.dataset.theme=t;localStorage.waTheme=t;if(b){b.setAttribute('aria-label',`Switch to ${t==='dark'?'light':'dark'} mode`);const label=b.querySelector('[data-theme-label]');if(label)label.textContent=t==='dark'?'Light mode':'Dark mode'}};
