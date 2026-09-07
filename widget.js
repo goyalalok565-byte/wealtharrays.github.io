@@ -21,10 +21,17 @@ function initMasthead(onChange){
     select.addEventListener('change',()=>{waState.currency=select.value;safeStorage.set('waCurrency',waState.currency);document.documentElement.dataset.currency=waState.currency;onChange?.()})
   }
   if(language){
-    language.innerHTML='<option value="en">English</option>';
-    language.value='en';
-    language.title='English is currently the published language. Additional languages will only be added with reviewed translations.';
-    language.setAttribute('aria-label','Published language: English');
+    const languages=(window.WA&&window.WA.languages)||[['en','English'],['hi','हिन्दी'],['es','Español'],['fr','Français'],['de','Deutsch'],['pt','Português'],['it','Italiano'],['nl','Nederlands'],['tr','Türkçe'],['ar','العربية'],['bn','বাংলা'],['ta','தமிழ்'],['te','తెలుగు'],['mr','मराठी'],['gu','ગુજરાતી'],['pa','ਪੰਜਾਬੀ'],['ja','日本語'],['ko','한국어'],['zh','中文'],['ru','Русский'],['id','Bahasa Indonesia'],['ms','Bahasa Melayu'],['th','ไทย'],['vi','Tiếng Việt'],['ur','اردو']];
+    language.innerHTML=languages.map(x=>'<option value="'+x[0]+'">'+x[1]+'</option>').join('');
+    language.value=safeStorage.get('waLang')||'en';
+    language.addEventListener('change',()=>{
+      const code=language.value;
+      safeStorage.set('waLang',code);
+      document.documentElement.lang=code;
+      if(code==='en'){location.href=location.href.replace(/^https?:\/\/translate\.google\.com\/translate\?.*?u=([^&]+).*$/,'$1');return}
+      const target=encodeURIComponent(location.href);
+      location.href='https://translate.google.com/translate?sl=auto&tl='+encodeURIComponent(code)+'&hl='+encodeURIComponent(code)+'&u='+target+'&op=translate';
+    });
   }
   toggle?.addEventListener('click',()=>{waState.theme=waState.theme==='dark'?'light':'dark';safeStorage.set('waTheme',waState.theme);applyGlobalTheme()});
   applyGlobalTheme()
