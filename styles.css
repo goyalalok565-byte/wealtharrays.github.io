@@ -313,3 +313,18 @@ img,svg,canvas{max-width:100%}.calc-widget,.calc-chart,.scenario-card{backface-v
   .cat-grid{grid-template-columns:1fr!important}
   .hero-pills b{font-size:8px;padding:7px 8px}
 }
+
+/***** Phase 4 Pass 2 calculator interaction audit *****/
+@media(max-width:760px){
+  .calc-page{width:100%;max-width:100%;overflow-x:clip}
+  .calc-widget{width:100%;max-width:100%}
+  .calc-result-row{padding:16px}
+  .calc-result-value{font-size:clamp(18px,6vw,25px);overflow-wrap:anywhere}
+  .premium-chart{gap:13px}
+  .premium-bar-track{height:12px}
+  .chart-legend{flex-wrap:wrap}
+  .calc-mini-btn,.tool-action{min-height:48px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
