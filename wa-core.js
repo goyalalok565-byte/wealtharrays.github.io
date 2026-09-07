@@ -27,5 +27,8 @@ qs.forEach(q=>{
   q.addEventListener('keydown',e=>{if(e.key==='Enter'){const first=box.querySelector('a');if(first){e.preventDefault();location.href=first.href}}if(e.key==='Escape'){box.hidden=true;q.blur()}});
   document.addEventListener('click',e=>{if(!box.contains(e.target)&&e.target!==q)box.hidden=true});
 });
+}
 
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();window.WA={currencies:C,languages:[]}})();
+window.WA={currencies:C,languages:L};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
