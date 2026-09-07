@@ -121,6 +121,28 @@ function waSmartInsights(calc,v,results){
   if(!tips.length&&primary)tips.push({k:'Smart summary',v:'Based on your inputs, the key result is '+fmt(primary)+'. Change one assumption at a time to understand what drives it.'});
   return tips.slice(0,3);
 }
+function waSmartScenarios(calc,v,results){
+  const rateField=calc.fields.find(f=>f.id==='rate');const yearsField=calc.fields.find(f=>/year|term/.test(f.id));
+  const scenarios=[];
+  if(rateField&&Number(v.rate)>0){const base=Number(v.rate);[Math.max(0,base-2),base,base+2].forEach((rate,i)=>{const values={...v,rate};try{const out=calc.compute(values)||[];const main=out.find(x=>x.format==='currency')||out[0];scenarios.push({name:['Conservative','Expected','Optimistic'][i],rate,main})}catch(e){}})}
+  return scenarios;
+}
+function waGoalSolver(calc,v){
+  if(!['sip','lumpsum','compound-interest','retirement'].includes(calc.id))return null;
+  const amount=Number(v.monthly||v.investment||v.principal||v.currentSavings||0);
+  const rate=Number(v.rate||0)/100;
+  const years=Number(v.years||v.term||0);
+  if(!(amount>0&&years>0))return null;
+  return {amount,rate,years};
+}
+function waRiskFlags(calc,v,results){
+  const flags=[];
+  if(Number(v.rate)>=15)flags.push('High return assumption: test lower-return scenarios.');
+  if(Number(v.inflation)===0&&['sip','compound-interest','lumpsum','retirement'].includes(calc.id))flags.push('Inflation is not included. Future purchasing power may be lower than the headline amount.');
+  if(['mortgage','car-loan','personal-loan'].includes(calc.id)&&Number(v.years||v.term)>30)flags.push('Very long loan term: a lower monthly payment can mean substantially more interest overall.');
+  if(['mortgage','car-loan','personal-loan'].includes(calc.id)&&Number(v.rate)>=12)flags.push('High borrowing rate: compare lenders and shorter-term scenarios before deciding.');
+  return flags;
+}
 function waSmartPrompt(calc,v,results){
   const tips=waSmartInsights(calc,v,results);
   return tips.map(t=>t.k+': '+t.v).join(' ');
@@ -128,7 +150,7 @@ function waSmartPrompt(calc,v,results){
 function waRenderSmartAssistant(id,calc,v,results){
   const root=document.getElementById(id+'-smart');if(!root)return;
   const tips=waSmartInsights(calc,v,results);
-  root.innerHTML='<div class="wa-smart-head"><div><span>SMART ASSIST</span><h3>Your calculation, explained</h3></div><button type="button" class="wa-smart-collapse" aria-expanded="true">Hide</button></div><div class="wa-smart-body"><p class="wa-smart-summary">'+esc(waSmartPrompt(calc,v,results))+'</p><div class="wa-smart-tips">'+tips.map(t=>'<article><b>'+esc(t.k)+'</b><p>'+esc(t.v)+'</p></article>').join('')+'</div><div class="wa-smart-actions"><button type="button" data-smart="conservative">Try conservative</button><button type="button" data-smart="compare">Compare scenarios</button><button type="button" data-smart="copy">Copy insight</button></div><small>Smart Assist uses transparent rule-based analysis from your calculator inputs. It does not provide personalised financial advice or make market predictions.</small></div>';
+  root.innerHTML='<div class="wa-smart-head"><div><span>SMART ASSIST</span><h3>Your calculation, explained</h3></div><button type="button" class="wa-smart-collapse" aria-expanded="true">Hide</button></div><div class="wa-smart-body"><p class="wa-smart-summary">'+esc(waSmartPrompt(calc,v,results))+'</p><div class="wa-smart-tips">'+tips.map(t=>'<article><b>'+esc(t.k)+'</b><p>'+esc(t.v)+'</p></article>').join('')+'</div><div class="wa-smart-scenarios">${(()=>{const scenarios=waSmartScenarios(calc,v,results);return scenarios.length?'<b>What-if scenarios</b><div>'+scenarios.map(x=>'<span><em>'+x.name+'</em><strong>'+esc(x.main?waFormatValue(x.main.value,x.main.format):'—')+'</strong><small>'+x.rate.toFixed(1)+'% assumption</small></span>').join('')+'</div>':''})()}</div>${(()=>{const flags=waRiskFlags(calc,v,results);return flags.length?'<div class="wa-risk-flags">'+flags.map(x=>'<p>⚠ '+esc(x)+'</p>').join('')+'</div>':''})()}<div class="wa-smart-actions"><button type="button" data-smart="conservative">Try conservative</button><button type="button" data-smart="compare">Compare scenarios</button><button type="button" data-smart="copy">Copy insight</button></div><small>Smart Assist uses transparent rule-based analysis from your calculator inputs. It does not provide personalised financial advice or make market predictions.</small></div>';
   const body=root.querySelector('.wa-smart-body'),collapse=root.querySelector('.wa-smart-collapse');
   collapse.onclick=()=>{const hidden=body.hidden=!body.hidden;collapse.textContent=hidden?'Show':'Hide';collapse.setAttribute('aria-expanded',String(!hidden))};
   root.querySelector('[data-smart="compare"]').onclick=()=>document.getElementById(id+'-compare')?.click();
