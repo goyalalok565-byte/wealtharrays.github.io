@@ -377,3 +377,11 @@ img,svg,canvas{max-width:100%}.calc-widget,.calc-chart,.scenario-card{backface-v
 @media(max-width:360px){.home-tool-grid{gap:7px}.home-tool-card{min-height:122px!important;padding:10px!important}.home-tool-card b{font-size:11px}}
 .calc-result-value.positive,.calc-result-row .positive{color:var(--accent2)!important}.calc-result-value.negative,.calc-result-row .negative{color:var(--danger)!important}
 .calc-result-row:has(.positive){border-left:3px solid var(--accent2)}.calc-result-row:has(.negative){border-left:3px solid var(--danger)}
+
+/* Phase 6 financial meaning colors */
+.wa-line-chart-line-negative{stroke:var(--danger)}
+.wa-chart-line.real{stroke:var(--danger)!important;opacity:.82}
+.chart-legend span.real{color:var(--danger)}
+.chart-legend span.real i{background:var(--danger)!important}
+.calc-result-row:has(.negative){background:color-mix(in srgb,var(--danger) 5%,transparent)}
+.calc-result-row:has(.positive){background:color-mix(in srgb,var(--accent2) 5%,transparent)}
