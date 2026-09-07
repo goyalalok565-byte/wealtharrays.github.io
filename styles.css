@@ -134,3 +134,46 @@ img,svg,canvas{max-width:100%}.calc-widget,.calc-chart,.scenario-card{backface-v
 /* Wealth Arrays brand mark + premium footer */
 .wordmark:before{content:"";width:38px;height:38px;border-radius:12px;background:url("favicon.svg") center/contain no-repeat;flex:0 0 38px;box-shadow:0 8px 24px rgba(18,32,49,.18)}
 .site-footer{width:min(1240px,calc(100% - 40px));margin:54px auto 28px;padding:0;border:1px solid var(--line);border-radius:30px;background:linear-gradient(145deg,color-mix(in srgb,var(--surface) 96%,var(--accent) 4%),var(--surface));box-shadow:var(--shadow);overflow:hidden;position:relative}.site-footer:before{content:"";position:absolute;inset:0 0 auto;height:1px;background:linear-gradient(90deg,transparent,var(--accent),var(--accent2),transparent);opacity:.55}.site-footer-inner{padding:32px}.footer-brand-row{display:flex;align-items:flex-start;justify-content:space-between;gap:28px;padding-bottom:28px;border-bottom:1px solid var(--line)}.footer-mark{display:flex;align-items:center;gap:12px;font-size:20px;font-weight:850;letter-spacing:-.05em}.footer-mark:before{content:"";width:44px;height:44px;background:url("favicon.svg") center/contain no-repeat;flex:0 0 44px}.footer-brand-copy{max-width:560px;color:var(--muted);font-size:13px;margin:0}.footer-nav-box{margin-top:26px;padding:18px;border:1px solid var(--line);border-radius:22px;background:color-mix(in srgb,var(--surface2) 65%,var(--surface));display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.footer-link{min-height:64px;display:flex;align-items:center;justify-content:center;text-align:center;padding:12px;border:1px solid var(--line);border-radius:17px;background:var(--surface);font-weight:750;font-size:14px;transition:transform .18s,border-color .18s,box-shadow .18s}.footer-link:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 45%,var(--line));box-shadow:0 12px 28px rgba(16,20,27,.08);color:var(--accent)}.footer-bottom{margin-top:22px;padding-top:20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;color:var(--muted);font-size:11px}.footer-bottom a{color:var(--accent);font-weight:750}.site-footer a:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 30%,transparent);outline-offset:3px}@media(max-width:700px){.site-footer{width:calc(100% - 24px);margin:34px auto 16px;border-radius:24px}.site-footer-inner{padding:20px}.footer-brand-row{display:block;padding-bottom:20px}.footer-brand-copy{margin-top:12px}.footer-nav-box{grid-template-columns:1fr 1fr;gap:10px;padding:10px;margin-top:18px}.footer-link{min-height:58px;font-size:13px;border-radius:15px}.footer-bottom{display:block;line-height:1.7}.footer-bottom span+span{display:block;margin-top:4px}}
+
+
+/***** Phase 3 final mobile hardening *****/
+.masthead-controls{min-width:0}.masthead-controls select{max-width:118px}.masthead-controls #language-select{max-width:108px}
+.related-tools.wa-related{margin-top:28px;padding:18px;border-radius:18px;background:var(--surface2);border:1px solid var(--line)}
+.related-tools.wa-related .related-heading{font-size:13px;font-weight:850;margin-bottom:10px}
+.related-tools.wa-related .related-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.related-tools.wa-related a{min-height:46px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:12px;font-weight:750}
+.related-tools.wa-related a span{color:var(--accent);font-size:16px}
+@media (max-width:760px){
+  .masthead{position:sticky}
+  .masthead-inner{padding:8px 12px;gap:8px;min-height:58px;flex-wrap:wrap}
+  .wordmark{font-size:14px;min-width:0}
+  .wordmark:before{width:30px;height:30px;border-radius:9px}
+  .site-nav{order:3;width:100%;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+  .site-nav::-webkit-scrollbar{display:none}
+  .site-nav a{white-space:nowrap;padding:7px 9px;font-size:12px}
+  .masthead-controls{margin-left:auto;gap:5px;flex:1;justify-content:flex-end}
+  .masthead-controls select,.theme-toggle{height:34px;padding:0 7px;font-size:10px;min-width:0}
+  .masthead-controls #currency-select{max-width:72px}
+  .masthead-controls #language-select{max-width:82px}
+  .theme-toggle{max-width:42px;overflow:hidden;white-space:nowrap}
+  .theme-toggle [data-theme-label],#theme-toggle-label{font-size:0}
+  .theme-toggle:after{content:'◐';font-size:16px}
+  .calc-page,.static-page,.tools-page,.article-page{padding-left:14px;padding-right:14px}
+  .calc-body{grid-template-columns:minmax(0,1fr);gap:14px;margin-top:20px}
+  .calc-sidebar{order:2}
+  .calc-grid{grid-template-columns:1fr}
+  .tool-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .scenario-compare{grid-template-columns:1fr}
+  .related-tools.wa-related .related-list{grid-template-columns:1fr}
+  .calc-title{font-size:clamp(36px,11vw,52px)}
+  .calc-desc{font-size:14px}
+  .site-footer-inner{padding-left:14px;padding-right:14px}
+  .footer-nav-box{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .footer-link{min-height:52px;padding:10px;font-size:12px}
+}
+@media (max-width:390px){
+  .masthead-controls #currency-select{max-width:58px}
+  .masthead-controls #language-select{max-width:66px}
+  .wordmark{font-size:12px}
+  .wordmark:before{width:27px;height:27px}
+}
