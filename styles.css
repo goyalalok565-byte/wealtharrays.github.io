@@ -385,3 +385,11 @@ img,svg,canvas{max-width:100%}.calc-widget,.calc-chart,.scenario-card{backface-v
 .chart-legend span.real i{background:var(--danger)!important}
 .calc-result-row:has(.negative){background:color-mix(in srgb,var(--danger) 5%,transparent)}
 .calc-result-row:has(.positive){background:color-mix(in srgb,var(--accent2) 5%,transparent)}
+
+/* Phase 6 mobile information density */
+@media(max-width:760px){
+ .cat-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px}
+ .cat-card{min-height:118px!important;padding:12px!important;border-radius:18px!important}
+ .cat-card em{font-size:17px}.cat-card b{font-size:12px}.cat-card small{display:none}.cat-card strong{font-size:8px;margin-top:auto}
+ .home-library{padding-top:18px}.home-library .section-head{margin-bottom:12px}
+}
