@@ -362,3 +362,7 @@ img,svg,canvas{max-width:100%}.calc-widget,.calc-chart,.scenario-card{backface-v
 .wa-sensitivity span{font-size:9px;color:var(--muted);font-weight:800}
 .wa-sensitivity strong{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:760px){.wa-sensitivity>div{grid-template-columns:1fr 1fr}.wa-sensitivity strong{font-size:12px}.wa-smart-actions{grid-template-columns:1fr}.wa-smart-actions button{min-height:44px}}
+
+/***** Phase 6: trust and correction workflow *****/
+.contact-trust{display:grid;gap:6px;margin:22px 0;padding:17px 19px;border:1px solid var(--line);border-radius:18px;background:color-mix(in srgb,var(--accent) 6%,var(--surface))}
+.contact-trust strong{font-size:13px;letter-spacing:-.01em}.contact-trust span{font-size:12px;line-height:1.55;color:var(--muted)}
