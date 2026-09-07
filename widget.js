@@ -13,28 +13,36 @@ function applyGlobalTheme(){document.documentElement.dataset.theme=waState.theme
 function initMasthead(onChange){
   injectCalculatorPolish();
   const select=document.getElementById('currency-select');
-  const language=document.getElementById('language-select');
   const toggle=document.getElementById('theme-toggle');
+  const setTheme=t=>{
+    waState.theme=t==='dark'?'dark':'light';
+    safeStorage.set('waTheme',waState.theme);
+    document.documentElement.dataset.theme=waState.theme;
+    if(toggle){
+      toggle.setAttribute('aria-pressed',String(waState.theme==='dark'));
+      const label=toggle.querySelector('[data-theme-label],#theme-toggle-label');
+      if(label)label.textContent=waState.theme==='dark'?'Light mode':'Dark mode';
+    }
+  };
   if(select){
-    select.innerHTML=currencyList().map(c=>`<option value="${c[0]}">${c[0]} (${c[1]})</option>`).join('');
+    const list=currencyList();
+    select.innerHTML=list.map(c=>'<option value="'+c[0]+'">'+c[0]+' · '+c[1]+' · '+c[2]+'</option>').join('');
+    if(!list.some(c=>c[0]===waState.currency))waState.currency='INR';
     select.value=waState.currency;
-    select.addEventListener('change',()=>{waState.currency=select.value;safeStorage.set('waCurrency',waState.currency);document.documentElement.dataset.currency=waState.currency;onChange?.()})
+    select.onchange=()=>{
+      waState.currency=select.value;
+      safeStorage.set('waCurrency',waState.currency);
+      document.documentElement.dataset.currency=waState.currency;
+      window.dispatchEvent(new CustomEvent('wa-currency',{detail:{currency:waState.currency}}));
+      onChange?.();
+    };
   }
-  if(language){
-    const languages=(window.WA&&window.WA.languages)||[['en','English'],['hi','हिन्दी'],['es','Español'],['fr','Français'],['de','Deutsch'],['pt','Português'],['it','Italiano'],['nl','Nederlands'],['tr','Türkçe'],['ar','العربية'],['bn','বাংলা'],['ta','தமிழ்'],['te','తెలుగు'],['mr','मराठी'],['gu','ગુજરાતી'],['pa','ਪੰਜਾਬੀ'],['ja','日本語'],['ko','한국어'],['zh','中文'],['ru','Русский'],['id','Bahasa Indonesia'],['ms','Bahasa Melayu'],['th','ไทย'],['vi','Tiếng Việt'],['ur','اردو']];
-    language.innerHTML=languages.map(x=>'<option value="'+x[0]+'">'+x[1]+'</option>').join('');
-    language.value=safeStorage.get('waLang')||'en';
-    language.addEventListener('change',()=>{
-      const code=language.value;
-      safeStorage.set('waLang',code);
-      document.documentElement.lang=code;
-      if(code==='en'){location.href=location.href.replace(/^https?:\/\/translate\.google\.com\/translate\?.*?u=([^&]+).*$/,'$1');return}
-      const target=encodeURIComponent(location.href);
-      location.href='https://translate.google.com/translate?sl=auto&tl='+encodeURIComponent(code)+'&hl='+encodeURIComponent(code)+'&u='+target+'&op=translate';
-    });
-  }
-  toggle?.addEventListener('click',()=>{waState.theme=waState.theme==='dark'?'light':'dark';safeStorage.set('waTheme',waState.theme);applyGlobalTheme()});
-  applyGlobalTheme()
+  toggle?.addEventListener('click',()=>setTheme(waState.theme==='dark'?'light':'dark'));
+  window.addEventListener('wa-currency',e=>{
+    const next=e.detail?.currency||safeStorage.get('waCurrency');
+    if(next&&next!==waState.currency){waState.currency=next;if(select)select.value=next;onChange?.();}
+  });
+  setTheme(safeStorage.get('waTheme')||document.documentElement.dataset.theme||'light');
 }
 function soundTick(){if(!waState.sound)return;try{const A=window.AudioContext||window.webkitAudioContext;if(!A)return;const a=window.__waAudio||(window.__waAudio=new A());if(a.state==='suspended')a.resume();const o=a.createOscillator(),g=a.createGain(),t=a.currentTime;o.type='sine';o.frequency.setValueAtTime(620,t);o.frequency.exponentialRampToValueAtTime(820,t+.035);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.028,t+.006);g.gain.exponentialRampToValueAtTime(.0001,t+.045);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+.05)}catch(e){}}
 function waShare(title,text,url){if(navigator.share){navigator.share({title,text,url}).catch(()=>{})}else{navigator.clipboard?.writeText(url).then(()=>alert('Link copied.')).catch(()=>{})}}
