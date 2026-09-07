@@ -111,6 +111,8 @@ function waSmartInsights(calc,v,results){
     if(gain&&final&&final.value>0)tips.push({k:'Growth insight',v:fmt(gain)+' is the estimated gain inside a projected '+fmt(final)+'.'});
     if(Number(v.inflation)>0&&pick(["today's purchasing power"]))tips.push({k:'Inflation check',v:'Compare future money with purchasing power before treating the projection as real wealth.'});
     if(Number(v.rate)>=15)tips.push({k:'Assumption check',v:'A '+Number(v.rate).toFixed(1)+'% annual assumption is aggressive. Test a lower scenario before relying on this plan.'});
+    const contribution=Number(v.monthly||v.principal||v.investment||0);
+    if(contribution>0&&Number(v.years||0)>=10)tips.push({k:'Sensitivity',v:'Small changes to contribution or return can compound materially over a '+Number(v.years)+'-year horizon. Test one assumption at a time.'});
   }else if(['mortgage','car-loan','personal-loan','debt-payoff'].includes(calc.id)){
     const interest=pick(['total interest','interest paid','interest']);
     const payment=pick(['monthly payment','monthly emi','payment']);
