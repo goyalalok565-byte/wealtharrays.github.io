@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0B0F19">
+<meta name="theme-color" content="#f7f8fb">
 <meta name="format-detection" content="telephone=no">
 <title>Loan Calculators — Free Calculators | Wealth Arrays</title>
 <meta name="description" content="Mortgages, personal loans, and what they really cost.">
@@ -23,7 +23,7 @@
 <meta name="twitter:image" content="https://www.wealtharrays.com/og-card.svg">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="manifest" href="manifest.webmanifest">
-</head>
+<script>document.documentElement.dataset.theme=localStorage.waTheme||'light'</script></head>
 <body>
 <header class="masthead">
   <div class="masthead-inner">
@@ -80,5 +80,5 @@
 <script src="calculators.js" defer></script>
 <script src="widget.js" defer></script>
 <script>initMasthead();</script>
-</body>
+<script src="wa-core.js" defer></script></body>
 </html>
