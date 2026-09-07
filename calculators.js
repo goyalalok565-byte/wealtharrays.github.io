@@ -162,14 +162,14 @@ const CALCULATORS = [
       ],
     },
     fields: [
-      { id: "cost", label: "Amount invested", type: "number", default: 10000, min: 0, step: 100 },
+      { id: "cost", label: "Amount invested", type: "number", default: 10000, min: 0.01, step: 100 },
       { id: "finalValue", label: "Current / final value", type: "number", default: 14500, min: 0, step: 100 },
       { id: "years", label: "Holding period", type: "number", default: 3, min: 0.1, max: 60, step: 0.1, suffix: "yrs" },
     ],
     compute(v) {
       const gain = v.finalValue - v.cost;
       const roi = v.cost === 0 ? 0 : (gain / v.cost) * 100;
-      const annualized = v.cost === 0 || v.finalValue <= 0 ? 0 : (Math.pow(v.finalValue / v.cost, 1 / v.years) - 1) * 100;
+      const annualized = v.cost <= 0 ? 0 : (Math.pow(Math.max(v.finalValue,0) / v.cost, 1 / v.years) - 1) * 100;
       return [
         { label: "Net gain", value: gain, format: "currency", emphasis: gain >= 0 ? "positive" : "negative" },
         { label: "Total ROI", value: roi, format: "percent", emphasis: roi >= 0 ? "positive" : "negative" },
