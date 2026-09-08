@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.wealtharrays.com/sitemap.xml
+Sitemap: https://wealtharrays.com/sitemap.xml
