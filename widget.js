@@ -88,14 +88,15 @@ function updatePremiumChart(id,calc,scenarioA,scenarioB,knownResults){
  const rows=results.filter(r=>r&&Number.isFinite(Number(r.value))).map(r=>({label:String(r.label||'Result'),value:Math.abs(Number(r.value)),format:r.format||'number'})).filter(r=>r.value>0);
  if(!rows.length){root.innerHTML='<div class="chart-empty">Enter valid values to see your visual breakdown.</div>';return}
  const component=rows.filter(r=>/(invest|principal|deposit|contribution|interest|profit|gain|growth|cost|expense|debt|tax|fee)/i.test(r.label));
- let slices=(component.length>=2?component:rows).slice(0,4);
+ let slices=(component.length>=2?component:rows).slice(0,5);
  const total=slices.reduce((n,x)=>n+x.value,0)||1;
- const colors=['#2563eb','#22c55e','#ef4444','#8b5cf6'];
+ const colors=['#2563eb','#22c55e','#f59e0b','#ef4444','#8b5cf6'];
  const C=2*Math.PI*76;let offset=0;
- const arcs=slices.map((x,n)=>{const f=x.value/total,d=Math.max(3,f*C-5),o=-offset*C;offset+=f;return '<circle cx="110" cy="110" r="76" fill="none" stroke="'+colors[n]+'" stroke-width="24" stroke-linecap="round" stroke-dasharray="'+d+' '+(C-d)+'" stroke-dashoffset="'+o+'" transform="rotate(-90 110 110)"/>'}).join('');
- const legend=slices.map((x,n)=>'<div class="wa-donut-item"><span class="wa-donut-dot" style="background:'+colors[n]+'"></span><span>'+esc(x.label)+'</span><strong>'+esc(waFormatValue(x.value,x.format))+'</strong></div>').join('');
- root.style.display='block';root.style.minHeight='220px';
- root.innerHTML='<div class="wa-donut-card"><div class="wa-donut"><svg width="220" height="220" viewBox="0 0 220 220" aria-label="Financial breakdown"><circle cx="110" cy="110" r="76" fill="none" stroke="#e5e7eb" stroke-width="24"/>'+arcs+'</svg><div class="wa-donut-center"><strong>'+Math.round(slices[0].value/total*100)+'%</strong><span>largest part</span></div></div><div class="wa-donut-list">'+legend+'</div></div>';
+ const arcs=slices.map((x,n)=>{const f=x.value/total,d=Math.max(3,f*C-5),o=-offset*C;offset+=f;return '<circle cx="110" cy="110" r="76" fill="none" stroke="'+colors[n]+'" stroke-width="24" stroke-linecap="round" stroke-dasharray="'+d+' '+(C-d)+'" stroke-dashoffset="'+o+'" transform="rotate(-90 110 110)"><title>'+esc(x.label)+': '+esc(waFormatValue(x.value,x.format))+'</title></circle>'}).join('');
+ const legend=slices.map((x,n)=>{const pct=Math.round(x.value/total*100);return '<div class="wa-donut-item"><span class="wa-donut-dot" style="background:'+colors[n]+'"></span><div class="wa-donut-copy"><span>'+esc(x.label)+'</span><small>'+pct+'% of breakdown</small></div><strong>'+esc(waFormatValue(x.value,x.format))+'</strong></div>'}).join('');
+ const top=slices[0],topPct=Math.round(top.value/total*100);
+ root.style.display='block';root.style.minHeight='250px';
+ root.innerHTML='<div class="wa-chart-heading"><strong>Where your money goes</strong><span>Each color shows a different part of your result</span></div><div class="wa-donut-card"><div class="wa-donut"><svg width="220" height="220" viewBox="0 0 220 220" aria-label="Financial breakdown by portion"><circle cx="110" cy="110" r="76" fill="none" stroke="#e5e7eb" stroke-width="24"/>'+arcs+'</svg><div class="wa-donut-center"><strong>'+topPct+'%</strong><span>'+esc(top.label)+'</span></div></div><div class="wa-donut-list">'+legend+'</div></div>';
 }function smartPrimary(results){
   return (results||[]).find(x=>x.format==='currency'&&Number.isFinite(Number(x.value)))||(results||[]).find(x=>Number.isFinite(Number(x.value)))||null;
 }
