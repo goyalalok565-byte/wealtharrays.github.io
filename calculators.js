@@ -228,9 +228,12 @@ const CALCULATORS = [
       { id: "current", label: "Current savings", type: "number", default: 20000, min: 0, step: 500 },
     ],
     compute(v) {
-      const target = v.expenses / (v.withdrawal / 100);
-      const remaining = Math.max(target - v.current, 0);
-      const progress = target === 0 ? 0 : Math.min((v.current / target) * 100, 100);
+      const expenses = Math.max(Number(v.expenses) || 0, 0);
+      const withdrawal = Math.max(Number(v.withdrawal) || 0, 0);
+      const current = Math.max(Number(v.current) || 0, 0);
+      const target = withdrawal > 0 ? expenses / (withdrawal / 100) : 0;
+      const remaining = Math.max(target - current, 0);
+      const progress = target > 0 ? Math.min((current / target) * 100, 100) : 0;
       return [
         { label: "Target corpus", value: target, format: "currency", emphasis: "neutral" },
         { label: "Still needed", value: remaining, format: "currency", emphasis: remaining > 0 ? "negative" : "positive" },
