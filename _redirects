@@ -1,0 +1,5 @@
+# Legacy URL redirects
+/p/disclaimer.html /disclaimer.html 301
+/p/privacy.html /privacy.html 301
+/p/terms.html /terms.html 301
+/www/* https://wealtharrays.com/:splat 301
