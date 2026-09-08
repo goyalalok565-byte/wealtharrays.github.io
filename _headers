@@ -1,0 +1,20 @@
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  X-Frame-Options: SAMEORIGIN
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/styles.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/wa-core.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/widget.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/calculators.js
+  Cache-Control: public, max-age=31536000, immutable
