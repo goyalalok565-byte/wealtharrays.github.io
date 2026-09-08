@@ -408,3 +408,6 @@ button:active,.home-tool-card:active,.cat-card:active{transform:scale(.975);tran
 .wa-donut-card{visibility:visible!important;opacity:1!important;min-height:220px}
 .wa-donut svg{display:block!important;width:220px!important;height:220px!important;max-width:100%;margin:auto;overflow:visible}
 @media(max-width:560px){.calc-chart>div[id$="-chart"]{min-height:200px}.wa-donut-card{min-height:200px}}
+
+/* Audit pass: clearer at-a-glance financial graph */
+.wa-chart-heading{padding:4px 4px 12px}.wa-chart-heading strong{display:block;font-size:15px;letter-spacing:-.02em}.wa-chart-heading span{display:block;margin-top:3px;font-size:12px;color:var(--muted)}.wa-donut-copy{min-width:0;display:grid;gap:2px}.wa-donut-copy span{font-size:12px;color:var(--text)}.wa-donut-copy small{font-size:10px;color:var(--muted)}.wa-donut-item{grid-template-columns:10px minmax(0,1fr) auto}.wa-donut-item strong{font-variant-numeric:tabular-nums}.wa-donut-center span{max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:none;letter-spacing:0;font-size:10px}@media(max-width:560px){.wa-chart-heading{padding:2px 0 9px}.wa-donut-list{gap:7px}.wa-donut-item{padding:9px}.wa-donut-copy span{font-size:12px}.wa-donut-item strong{font-size:12px}}
