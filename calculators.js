@@ -136,7 +136,7 @@ const CALCULATORS = [
     ],
     compute(v) {
       const P = v.principal, r = v.rate / 100 / 12, n = v.years * 12;
-      const emi = r === 0 ? P / n : (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+      const emi = P === 0 ? 0 : n <= 0 ? 0 : r === 0 ? P / n : (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
       const total = emi * n;
       return [
         { label: "Monthly payment", value: emi, format: "currency", emphasis: "neutral" },
@@ -169,7 +169,7 @@ const CALCULATORS = [
     compute(v) {
       const gain = v.finalValue - v.cost;
       const roi = v.cost === 0 ? 0 : (gain / v.cost) * 100;
-      const annualized = v.cost <= 0 ? 0 : (Math.pow(Math.max(v.finalValue,0) / v.cost, 1 / v.years) - 1) * 100;
+      const annualized = v.cost <= 0 || v.finalValue < 0 || v.years <= 0 ? 0 : (Math.pow(v.finalValue / v.cost, 1 / v.years) - 1) * 100;
       return [
         { label: "Net gain", value: gain, format: "currency", emphasis: gain >= 0 ? "positive" : "negative" },
         { label: "Total ROI", value: roi, format: "percent", emphasis: roi >= 0 ? "positive" : "negative" },
@@ -340,7 +340,7 @@ const CALCULATORS = [
     id:"cagr",slug:"cagr-calculator",title:"CAGR Calculator",category:"investment",
     short:"Find the compound annual growth rate.",desc:"Calculate the annualized growth rate between a starting value and an ending value.",
     fields:[{id:"start",label:"Starting value",type:"number",min:0.01,step:100},{id:"end",label:"Ending value",type:"number",min:0,step:100},{id:"years",label:"Years",type:"number",min:.01,max:100,step:.1,suffix:"yrs"}],
-    compute(v){const cagr=(Math.pow(v.end/v.start,1/v.years)-1)*100,gain=v.end-v.start;return[{label:"Absolute gain",value:gain,format:"currency",emphasis:gain>=0?"positive":"negative"},{label:"Total growth",value:(v.end/v.start-1)*100,format:"percent"},{label:"CAGR",value:cagr,format:"percent",emphasis:"neutral"}]}
+    compute(v){const start=Math.max(v.start,0),end=Math.max(v.end,0),years=Math.max(v.years,0),gain=end-start,totalGrowth=start>0?(end/start-1)*100:0,cagr=start>0&&end>=0&&years>0?(Math.pow(end/start,1/years)-1)*100:0;return[{label:"Absolute gain",value:gain,format:"currency",emphasis:gain>=0?"positive":"negative"},{label:"Total growth",value:totalGrowth,format:"percent"},{label:"CAGR",value:cagr,format:"percent",emphasis:"neutral"}]}
   },
   {
     id:"car-loan",slug:"car-loan-calculator",title:"Car Loan EMI Calculator",category:"loan",
@@ -365,7 +365,7 @@ const CALCULATORS = [
     short:"Estimate future prices, purchasing power and what you may need later.",desc:"See how an assumed annual inflation rate changes future costs, real purchasing power and the nominal amount you may need later to buy something that costs a certain amount today.",
     article:{formula:"Future cost = today's cost × (1 + inflation rate)^years.",exampleInputs:{amount:100000,rate:6,years:20},faqs:[{q:"How much money may I need in the future?",a:"Enter what something costs today, an assumed inflation rate and the number of years. The calculator estimates the nominal amount you may need later to buy the same thing."},{q:"Does this predict actual inflation?",a:"No. The inflation rate is an assumption for planning, not a forecast or guarantee."}]},
     fields:[{id:"amount",label:"Today's amount / current cost",type:"number",min:0,step:100},{id:"rate",label:"Annual inflation rate",type:"number",min:0,max:50,step:.1,suffix:"%"},{id:"years",label:"Years from now",type:"number",min:0,max:100,step:.1,suffix:"yrs"}],
-    compute(v){const factor=Math.pow(1+v.rate/100,v.years),future=v.amount*factor,purchasingPower=future/factor;return[{label:"Future amount needed to buy the same thing",value:future,format:"currency",emphasis:"negative"},{label:"Price increase",value:future-v.amount,format:"currency"},{label:"Purchasing power of today's amount",value:purchasingPower,format:"currency",emphasis:"neutral"}]}
+    compute(v){const amount=Math.max(v.amount,0),rate=Math.max(v.rate,0),years=Math.max(v.years,0),factor=Math.pow(1+rate/100,years),future=amount*factor,purchasingPower=amount/factor;return[{label:"Future amount needed to buy the same thing",value:future,format:"currency",emphasis:"negative"},{label:"Price increase",value:future-amount,format:"currency"},{label:"Today's amount worth after inflation",value:purchasingPower,format:"currency",emphasis:"negative"}]}
   },
   {
     id:"net-worth",slug:"net-worth-calculator",title:"Net Worth Calculator",category:"retirement",
