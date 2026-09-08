@@ -29,6 +29,52 @@ qs.forEach(q=>{
 });
 }
 
+
+// Google Analytics 4 + privacy-friendly consent controls
+const WA_GA_ID='G-GYN4W5VYF';
+window.dataLayer=window.dataLayer||[];
+function gtag(){window.dataLayer.push(arguments)}
+gtag('consent','default',{
+  analytics_storage:'denied',
+  ad_storage:'denied',
+  ad_user_data:'denied',
+  ad_personalization:'denied',
+  wait_for_update:500
+});
+gtag('js',new Date());
+gtag('config',WA_GA_ID,{anonymize_ip:true});
+(()=>{
+  const s=document.createElement('script');
+  s.async=true;
+  s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(WA_GA_ID);
+  document.head.appendChild(s);
+})();
+const waConsent=()=>{try{return localStorage.getItem('waAnalyticsConsent')}catch(e){return null}};
+const waSetConsent=value=>{
+  try{localStorage.setItem('waAnalyticsConsent',value)}catch(e){}
+  gtag('consent','update',{
+    analytics_storage:value==='granted'?'granted':'denied',
+    ad_storage:'denied',
+    ad_user_data:'denied',
+    ad_personalization:'denied'
+  });
+};
+if(waConsent())waSetConsent(waConsent());
+const waConsentBanner=()=>{
+  if(waConsent())return;
+  const box=document.createElement('div');
+  box.id='wa-consent';
+  box.setAttribute('role','dialog');
+  box.setAttribute('aria-label','Privacy choices');
+  box.innerHTML='<div><strong>Privacy choices</strong><p>We use analytics to understand which pages and tools are useful. Calculator numbers stay in your browser.</p></div><div class="wa-consent-actions"><button type="button" data-wa-consent="reject">Reject</button><button type="button" data-wa-consent="granted">Accept analytics</button></div>';
+  const style=document.createElement('style');
+  style.textContent='#wa-consent{position:fixed;z-index:99999;left:max(16px,env(safe-area-inset-left));right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));margin:auto;max-width:720px;padding:16px 18px;border:1px solid rgba(120,130,150,.28);border-radius:20px;background:rgba(20,25,35,.96);color:#f7f8fb;box-shadow:0 18px 60px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:space-between;gap:18px;font:500 14px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}#wa-consent strong{font-size:15px}#wa-consent p{margin:4px 0 0;color:#c7ceda}.wa-consent-actions{display:flex;gap:8px;flex:none}.wa-consent-actions button{border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:10px 14px;background:transparent;color:#fff;font:inherit;cursor:pointer}.wa-consent-actions button[data-wa-consent="granted"]{background:#fff;color:#111827;border-color:#fff}@media(max-width:620px){#wa-consent{display:block}.wa-consent-actions{margin-top:12px}.wa-consent-actions button{flex:1}}';
+  document.head.appendChild(style);
+  document.body.appendChild(box);
+  box.querySelectorAll('[data-wa-consent]').forEach(btn=>btn.onclick=()=>{waSetConsent(btn.dataset.waConsent);box.remove();style.remove()});
+};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',waConsentBanner);else waConsentBanner();
+
 window.WA={currencies:C,languages:L};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
