@@ -83,25 +83,19 @@ function inflationAdjustedSeries(calc,v,series){
 }
 function pathFrom(points){return points.map((q,i)=>(i?'L':'M')+q[0]+' '+q[1]).join(' ')}
 function updatePremiumChart(id,calc,scenarioA,scenarioB,knownResults){
-  const root=document.getElementById(id+'-chart');if(!root)return;
-  const results=Array.isArray(knownResults)&&knownResults.length?knownResults:(()=>{try{return calc.compute(scenarioA)||[]}catch(e){return[]}})();
-  const rows=results.filter(r=>r&&Number.isFinite(Number(r.value))&&r.format==='currency'&&Number(r.value)>=0).map(r=>({label:String(r.label||'Result'),value:Number(r.value),format:r.format}));
-  if(!rows.length){root.innerHTML='<div class="chart-empty">Calculate first to see a simple money breakdown.</div>';return}
-  const componentWords=/(invested|investment|principal|deposit|contribution|interest|profit|gain|growth|cost|expense|debt|tax|fees)/i;
-  const totalWords=/(future value|maturity value|final value|total amount|you will have)/i;
-  let slices=rows.filter(r=>componentWords.test(r.label));
-  if(slices.length<2)slices=rows.filter(r=>!totalWords.test(r.label)).slice(0,4);
-  if(!slices.length){const candidate=rows.find(r=>r.value>0)||rows[0];slices=[candidate]}
-  const dedup=[];for(const item of slices){if(!dedup.some(x=>x.label===item.label))dedup.push(item)}
-  slices=dedup.slice(0,4);
-  let total=slices.reduce((n,x)=>n+x.value,0);
-  if(!(total>0)){slices=[rows[0]];total=Math.max(1,rows[0].value)}
-  const size=220,cx=110,cy=110,radius=76,stroke=24,circ=2*Math.PI*radius,gap=slices.length>1?.018:0;
-  let offset=0;const palette=['var(--accent2)','var(--accent)','var(--danger)','var(--muted)'];
-  const arcs=slices.map((item,i)=>{const fraction=item.value/total,usable=Math.max(.002,fraction-gap);const dash=usable*circ,node='<circle cx="'+cx+'" cy="'+cy+'" r="'+radius+'" fill="none" stroke="'+palette[i]+'" stroke-width="'+stroke+'" stroke-linecap="round" stroke-dasharray="'+dash+' '+(circ-dash)+'" stroke-dashoffset="'+(-offset*circ)+'" transform="rotate(-90 '+cx+' '+cy+')"/>';offset+=fraction;return node}).join('');
-  const primary=slices[0],primaryPct=Math.round(primary.value/total*100);
-  const legend=slices.map((item,i)=>'<div class="wa-donut-item"><span class="wa-donut-dot" style="background:'+palette[i]+'"></span><span>'+esc(simpleResultLabel(item.label))+'</span><strong>'+esc(waFormatValue(item.value,item.format))+'</strong></div>').join('');
-  const safeArcs=arcs.replaceAll('stroke="var(--accent2)"','stroke="#22c55e"').replaceAll('stroke="var(--accent)"','stroke="#2563eb"').replaceAll('stroke="var(--danger)"','stroke="#ef4444"').replaceAll('stroke="var(--muted)"','stroke="#94a3b8"');root.innerHTML='<div class="wa-donut-card"><div class="wa-donut"><svg viewBox="0 0 '+size+' '+size+'" role="img" aria-label="Simple financial breakdown"><circle cx="'+cx+'" cy="'+cy+'" r="'+radius+'" fill="none" stroke="#d9dee8" stroke-width="'+stroke+'"/>'+safeArcs+'</svg><div class="wa-donut-center"><strong>'+primaryPct+'%</strong><span>of this breakdown</span></div></div><div class="wa-donut-list">'+legend+'</div></div>';
+ const root=document.getElementById(id+'-chart');if(!root)return;
+ const results=Array.isArray(knownResults)&&knownResults.length?knownResults:[];
+ const rows=results.filter(r=>r&&Number.isFinite(Number(r.value))).map(r=>({label:String(r.label||'Result'),value:Math.abs(Number(r.value)),format:r.format||'number'})).filter(r=>r.value>0);
+ if(!rows.length){root.innerHTML='<div class="chart-empty">Enter valid values to see your visual breakdown.</div>';return}
+ const component=rows.filter(r=>/(invest|principal|deposit|contribution|interest|profit|gain|growth|cost|expense|debt|tax|fee)/i.test(r.label));
+ let slices=(component.length>=2?component:rows).slice(0,4);
+ const total=slices.reduce((n,x)=>n+x.value,0)||1;
+ const colors=['#2563eb','#22c55e','#ef4444','#8b5cf6'];
+ const C=2*Math.PI*76;let offset=0;
+ const arcs=slices.map((x,n)=>{const f=x.value/total,d=Math.max(3,f*C-5),o=-offset*C;offset+=f;return '<circle cx="110" cy="110" r="76" fill="none" stroke="'+colors[n]+'" stroke-width="24" stroke-linecap="round" stroke-dasharray="'+d+' '+(C-d)+'" stroke-dashoffset="'+o+'" transform="rotate(-90 110 110)"/>'}).join('');
+ const legend=slices.map((x,n)=>'<div class="wa-donut-item"><span class="wa-donut-dot" style="background:'+colors[n]+'"></span><span>'+esc(simpleResultLabel(x.label))+'</span><strong>'+esc(waFormatValue(x.value,x.format))+'</strong></div>').join('');
+ root.style.display='block';root.style.minHeight='220px';
+ root.innerHTML='<div class="wa-donut-card"><div class="wa-donut"><svg width="220" height="220" viewBox="0 0 220 220" aria-label="Financial breakdown"><circle cx="110" cy="110" r="76" fill="none" stroke="#e5e7eb" stroke-width="24"/>'+arcs+'</svg><div class="wa-donut-center"><strong>'+Math.round(slices[0].value/total*100)+'%</strong><span>largest part</span></div></div><div class="wa-donut-list">'+legend+'</div></div>';
 }function smartPrimary(results){
   return (results||[]).find(x=>x.format==='currency'&&Number.isFinite(Number(x.value)))||(results||[]).find(x=>Number.isFinite(Number(x.value)))||null;
 }
