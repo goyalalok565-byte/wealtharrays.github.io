@@ -93,7 +93,7 @@ function updatePremiumChart(id,calc,scenarioA,scenarioB,knownResults){
  const colors=['#2563eb','#22c55e','#ef4444','#8b5cf6'];
  const C=2*Math.PI*76;let offset=0;
  const arcs=slices.map((x,n)=>{const f=x.value/total,d=Math.max(3,f*C-5),o=-offset*C;offset+=f;return '<circle cx="110" cy="110" r="76" fill="none" stroke="'+colors[n]+'" stroke-width="24" stroke-linecap="round" stroke-dasharray="'+d+' '+(C-d)+'" stroke-dashoffset="'+o+'" transform="rotate(-90 110 110)"/>'}).join('');
- const legend=slices.map((x,n)=>'<div class="wa-donut-item"><span class="wa-donut-dot" style="background:'+colors[n]+'"></span><span>'+esc(simpleResultLabel(x.label))+'</span><strong>'+esc(waFormatValue(x.value,x.format))+'</strong></div>').join('');
+ const legend=slices.map((x,n)=>'<div class="wa-donut-item"><span class="wa-donut-dot" style="background:'+colors[n]+'"></span><span>'+esc(x.label)+'</span><strong>'+esc(waFormatValue(x.value,x.format))+'</strong></div>').join('');
  root.style.display='block';root.style.minHeight='220px';
  root.innerHTML='<div class="wa-donut-card"><div class="wa-donut"><svg width="220" height="220" viewBox="0 0 220 220" aria-label="Financial breakdown"><circle cx="110" cy="110" r="76" fill="none" stroke="#e5e7eb" stroke-width="24"/>'+arcs+'</svg><div class="wa-donut-center"><strong>'+Math.round(slices[0].value/total*100)+'%</strong><span>largest part</span></div></div><div class="wa-donut-list">'+legend+'</div></div>';
 }function smartPrimary(results){
