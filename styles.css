@@ -530,3 +530,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 
 /* Final overlap fix for pie chart labels */
 .wa-donut{position:relative;display:flex;align-items:center;justify-content:center;min-width:0}.wa-donut svg{display:block!important;overflow:visible}.wa-pie-total,.wa-pie-caption{transform:none!important;transform-box:fill-box!important;transform-origin:center!important}.wa-pie-total{font-size:12px!important;fill:var(--text)!important;font-weight:900}.wa-pie-caption{font-size:4px!important;fill:var(--muted)!important;font-weight:800;letter-spacing:.35px}.wa-portfolio-row{min-width:0}.wa-portfolio-row span{overflow:hidden;text-overflow:ellipsis}.wa-smart{margin-top:16px;border:1px solid var(--line);border-radius:18px;background:var(--surface)}.wa-smart-head{display:flex;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line);font-size:12px}.wa-smart-head span{font-size:9px;color:var(--accent);font-weight:800}.wa-smart-body{padding:12px}.wa-smart-card{padding:12px;border:1px solid var(--line);border-radius:12px}.wa-smart-card p{margin:6px 0 0;font-size:12px;line-height:1.5}.wa-smart-ask{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-top:10px}.wa-smart-ask input{min-width:0;padding:11px;border:1px solid var(--line);border-radius:10px}.wa-smart-ask button{border:0;border-radius:10px;padding:0 13px;background:var(--accent);color:#fff;font-weight:800}@media(max-width:520px){.wa-smart-ask{grid-template-columns:1fr auto}.wa-smart-ask input{grid-column:1/-1}}
+
+/* Phase 9 authoritative graph layout: percentages cannot rotate or overlap. */
+.wa-portfolio-card .wa-donut svg{width:190px!important;height:190px!important;transform:none!important;overflow:visible}
+.wa-portfolio-card .wa-donut path{stroke:var(--surface);stroke-width:.8}
+.wa-portfolio-card .wa-slice-pct{fill:#fff;font-size:7px;font-weight:900;pointer-events:none}
+.wa-portfolio-card .wa-pie-total{transform:none!important;fill:var(--text)!important;font-size:9px!important;font-weight:900}
+.wa-portfolio-card .wa-pie-caption{transform:none!important;fill:var(--muted)!important;font-size:3.5px!important;font-weight:800}
+.wa-portfolio-card .wa-portfolio-layout{align-items:center}
+.wa-portfolio-card .wa-portfolio-row{grid-template-columns:10px minmax(0,1fr) auto!important}
+.wa-portfolio-card .wa-portfolio-row em{grid-column:2/-1}
