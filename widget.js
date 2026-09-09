@@ -37,3 +37,73 @@ function initSearch(inputId,listSelector,headingId,totalLabel){const input=docum
   window.addEventListener('load',function(){setTimeout(boot,0);});
   setTimeout(boot,0);
 })();
+
+
+/* Wealth Arrays production calculator renderer — hardened for all calculator pages. */
+function waFormatValue(value,format){
+  if(!Number.isFinite(Number(value))) return '—';
+  value=Number(value);
+  if(format==='percent') return value.toFixed(2)+'%';
+  if(format==='number') return Math.round(value).toLocaleString('en-IN');
+  if(format==='years') return value.toFixed(1)+' yrs';
+  return waCurrencySymbol()+value.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function waCalcGraphPoints(results){
+  var nums=(results||[]).filter(function(r){return Number.isFinite(Number(r.value));}).map(function(r){return Math.max(0,Number(r.value));});
+  if(!nums.length) return '';
+  var max=Math.max.apply(null,nums)||1, w=640,h=190,p=18;
+  var step=(w-p*2)/Math.max(1,nums.length-1);
+  return nums.map(function(v,i){var x=p+i*step,y=h-p-(v/max)*(h-p*2);return x.toFixed(1)+','+y.toFixed(1);}).join(' ');
+}
+function waRenderGraph(id,results){
+  var host=document.getElementById(id+'-graph'); if(!host) return;
+  var nums=(results||[]).filter(function(r){return Number.isFinite(Number(r.value));});
+  if(!nums.length){host.innerHTML='';return;}
+  var labels=nums.map(function(r){return '<span>'+esc(r.label)+'</span>';}).join('');
+  host.innerHTML='<div class="wa-graph-head"><b>Result snapshot</b><small>Visual comparison of your current calculation</small></div><svg viewBox="0 0 640 190" role="img" aria-label="Calculator result graph" preserveAspectRatio="none"><defs><linearGradient id="waGraphFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="currentColor" stop-opacity=".28"/><stop offset="100%" stop-color="currentColor" stop-opacity=".02"/></linearGradient></defs><polyline class="wa-graph-area" points="18,172 '+waCalcGraphPoints(results)+' 622,172" fill="url(#waGraphFill)"></polyline><polyline class="wa-graph-line" points="'+waCalcGraphPoints(results)+'" fill="none"></polyline></svg><div class="wa-graph-labels">'+labels+'</div>';
+}
+function mountCalculator(calc,id){
+  var container=document.getElementById(id);
+  if(!container||!calc||!Array.isArray(calc.fields)||typeof calc.compute!=='function') return false;
+  var fields=calc.fields.map(function(f){
+    var def=f.default!==undefined&&f.default!==null?f.default:(f.type==='select'&&f.options&&f.options[0]?f.options[0].value:0);
+    if(f.type==='select'){
+      return '<div class="field"><label for="f-'+esc(f.id)+'">'+esc(f.label)+'</label><select id="f-'+esc(f.id)+'" data-field="'+esc(f.id)+'">'+(f.options||[]).map(function(o){return '<option value="'+esc(o.value)+'">'+esc(o.label)+'</option>';}).join('')+'</select></div>';
+    }
+    return '<div class="field"><label for="f-'+esc(f.id)+'">'+esc(f.label)+(f.suffix?' <span class="hint">('+esc(f.suffix)+')</span>':'')+'</label><input id="f-'+esc(f.id)+'" data-field="'+esc(f.id)+'" type="number" inputmode="decimal" value="'+esc(def)+'" '+(f.min!==undefined?'min="'+f.min+'"':'')+' '+(f.max!==undefined?'max="'+f.max+'"':'')+' '+(f.step!==undefined?'step="'+f.step+'"':'')+'></div>';
+  }).join('');
+  container.innerHTML='<div class="calc-widget calc-widget-live"><div class="calc-widget-body"><div class="calc-grid">'+fields+'</div><div class="calc-result" id="'+id+'-result" aria-live="polite"></div><div class="wa-graph-card" id="'+id+'-graph"></div><div class="tool-actions"><button type="button" class="tool-action primary" id="'+id+'-share">Share</button><button type="button" class="tool-action" id="'+id+'-export">Export report</button><button type="button" class="tool-action" id="'+id+'-embed">Copy embed</button><button type="button" class="tool-action" id="'+id+'-compare" aria-expanded="false">Compare</button></div><div class="compare-panel" id="'+id+'-compare-panel" hidden></div><p class="calc-note">Estimates only, for planning purposes — not financial, tax or investment advice.</p></div></div>';
+  var latest=[],latestValues={};
+  function recompute(){
+    latestValues={};
+    calc.fields.forEach(function(f){
+      var e=document.getElementById('f-'+f.id); if(!e)return;
+      latestValues[f.id]=f.type==='select'?e.value:Number.isFinite(parseFloat(e.value))?parseFloat(e.value):0;
+    });
+    try{latest=calc.compute(latestValues)||[];}catch(err){
+      latest=[{label:'Calculation error',value:NaN,format:'number'}]; console.error('Calculator compute failed:',calc.id,err);
+    }
+    var result=document.getElementById(id+'-result');
+    if(result) result.innerHTML=latest.map(function(r){return '<div class="calc-result-row"><span class="calc-result-label">'+esc(r.label)+'</span><span class="calc-result-value '+esc(r.emphasis||'')+'">'+esc(waFormatValue(r.value,r.format))+'</span></div>';}).join('');
+    waRenderGraph(id,latest);
+  }
+  calc.fields.forEach(function(f){var e=document.getElementById('f-'+f.id);if(!e)return;e.addEventListener('input',recompute);e.addEventListener('change',recompute);});
+  document.getElementById(id+'-share').addEventListener('click',function(){waShare(calc.title,latest.map(function(r){return r.label+' '+waFormatValue(r.value,r.format);}).join(' • '),location.href);});
+  document.getElementById(id+'-export').addEventListener('click',function(){waOpenPrintReport(calc,latestValues,latest);});
+  document.getElementById(id+'-embed').addEventListener('click',function(){waCopyEmbed(calc);});
+  document.getElementById(id+'-compare').addEventListener('click',function(e){var p=document.getElementById(id+'-compare-panel');p.hidden=!p.hidden;e.currentTarget.setAttribute('aria-expanded',String(!p.hidden));if(!p.hidden)buildComparePanel(id,calc,latestValues,latest);});
+  initMasthead(recompute); recompute(); container.dataset.waMounted='1'; return true;
+}
+/* Final deterministic page bootstrap: retries until calculator definitions are available. */
+(function(){
+  function boot(){
+    var target=document.getElementById('calc-widget'); if(!target||target.dataset.waMounted==='1')return;
+    if(typeof CALCULATORS==='undefined')return;
+    var slug=(location.pathname.split('/').pop()||'').replace(/\.html$/,'');
+    var calc=CALCULATORS.find(function(c){return c.slug===slug;});
+    if(calc) mountCalculator(calc,'calc-widget');
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
+  else boot();
+  setTimeout(boot,100); setTimeout(boot,500);
+})();
