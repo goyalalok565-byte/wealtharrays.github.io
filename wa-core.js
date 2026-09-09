@@ -31,7 +31,7 @@ qs.forEach(q=>{
 
 
 // Google Analytics 4 + privacy-friendly consent controls
-const WA_GA_ID='G-GYN4W5VYF';
+const WA_GA_ID='G-GYN4W5VFEY';
 window.dataLayer=window.dataLayer||[];
 function gtag(){window.dataLayer.push(arguments)}
 gtag('consent','default',{
