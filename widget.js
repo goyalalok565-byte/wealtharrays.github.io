@@ -13,3 +13,27 @@ async function waCopyEmbed(calc){const src=new URL(`widget.html?calc=${encodeURI
 function buildComparePanel(id,calc,currentValues,currentResults){const panel=document.getElementById(`${id}-compare-panel`);if(!panel)return;const example=calc.article?.exampleInputs;if(!example){panel.innerHTML='<div style="padding:14px">No reference scenario is available.</div>';return}let ex=[];try{ex=calc.compute(example)||[]}catch(e){}const a=Object.fromEntries(currentResults.map(r=>[r.label,r])),b=Object.fromEntries(ex.map(r=>[r.label,r]));const labels=[...new Set([...Object.keys(a),...Object.keys(b)])];panel.innerHTML=`<div class="compare-inner"><p>Compared with this calculator's worked example.</p><div class="compare-table"><table><thead><tr><th>Metric</th><th>Your scenario</th><th>Example</th></tr></thead><tbody>${labels.map(l=>`<tr><td>${esc(l)}</td><td>${a[l]?esc(waFormatValue(a[l].value,a[l].format)):'—'}</td><td>${b[l]?esc(waFormatValue(b[l].value,b[l].format)):'—'}</td></tr>`).join('')}</tbody></table></div></div>`}
 function mountCalculator(calc,id){const container=document.getElementById(id);if(!container||!calc)return;const fields=calc.fields.map(f=>f.type==='select'?`<div class="field"><label for="f-${esc(f.id)}">${esc(f.label)}</label><select id="f-${esc(f.id)}" data-field="${esc(f.id)}">${f.options.map(o=>`<option value="${esc(o.value)}">${esc(o.label)}</option>`).join('')}</select></div>`:`<div class="field"><label for="f-${esc(f.id)}">${esc(f.label)}${f.suffix?` <span class="hint">(${esc(f.suffix)})</span>`:''}</label><input id="f-${esc(f.id)}" data-field="${esc(f.id)}" type="number" inputmode="decimal" value="${esc(f.default)}" ${f.min!==undefined?`min="${f.min}"`:''} ${f.max!==undefined?`max="${f.max}"`:''} ${f.step!==undefined?`step="${f.step}"`:''}></div>`).join('');container.innerHTML=`<div class="calc-widget-body"><div class="calc-grid">${fields}</div><div class="calc-result" id="${id}-result" aria-live="polite"></div><div class="tool-actions"><button type="button" class="tool-action primary" id="${id}-share">Share</button><button type="button" class="tool-action" id="${id}-export">Export report</button><button type="button" class="tool-action" id="${id}-embed">Copy embed</button><button type="button" class="tool-action" id="${id}-compare" aria-expanded="false">Compare</button></div><div class="compare-panel" id="${id}-compare-panel" hidden></div><p class="calc-note">Estimates only, for planning purposes — not financial, tax or investment advice.</p></div>`;let latest=[],latestValues={};function recompute(){latestValues={};calc.fields.forEach(f=>{const e=document.getElementById(`f-${f.id}`);latestValues[f.id]=f.type==='select'?e.value:(parseFloat(e.value)||0)});try{latest=calc.compute(latestValues)||[]}catch(e){latest=[]}document.getElementById(`${id}-result`).innerHTML=latest.map(r=>`<div class="calc-result-row"><span class="calc-result-label">${esc(r.label)}</span><span class="calc-result-value ${esc(r.emphasis||'')}">${esc(waFormatValue(r.value,r.format))}</span></div>`).join('')};calc.fields.forEach(f=>{const e=document.getElementById(`f-${f.id}`);if(f.type==='select')e.value=f.default;e.addEventListener('input',recompute);e.addEventListener('change',recompute)});document.getElementById(`${id}-share`)?.addEventListener('click',()=>waShare(calc.title,latest.map(r=>`${r.label} ${waFormatValue(r.value,r.format)}`).join(' • '),location.href));document.getElementById(`${id}-export`)?.addEventListener('click',()=>waOpenPrintReport(calc,latestValues,latest));document.getElementById(`${id}-embed`)?.addEventListener('click',()=>waCopyEmbed(calc));document.getElementById(`${id}-compare`)?.addEventListener('click',e=>{const p=document.getElementById(`${id}-compare-panel`);p.hidden=!p.hidden;e.currentTarget.setAttribute('aria-expanded',String(!p.hidden));if(!p.hidden)buildComparePanel(id,calc,latestValues,latest)});initMasthead(recompute);recompute()}
 function initSearch(inputId,listSelector,headingId,totalLabel){const input=document.getElementById(inputId);if(!input)return;input.addEventListener('input',()=>{const q=input.value.trim().toLowerCase();let n=0;document.querySelectorAll(listSelector).forEach(el=>{const ok=(el.dataset.search||'').toLowerCase().includes(q);el.hidden=!ok;if(ok)n++});const h=document.getElementById(headingId);if(h)h.textContent=q?`${n} RESULT${n===1?'':'S'} FOR "${q.toUpperCase()}"`:totalLabel})}
+
+
+/* Emergency production mount guard: runs independently of page inline listeners. */
+(function(){
+  function boot(){
+    var target=document.getElementById('calc-widget');
+    if(!target || target.dataset.waBooted==='1' || target.children.length) return;
+    if(typeof mountCalculator!=='function' || typeof CALCULATORS==='undefined') return;
+    var file=(location.pathname.split('/').pop()||'').replace(/\.html$/,'');
+    var calc=CALCULATORS.find(function(c){return c.slug===file;});
+    if(!calc){
+      var h=document.querySelector('.calc-title');
+      var title=h?h.textContent.trim().toLowerCase():'';
+      calc=CALCULATORS.find(function(c){return c.title.toLowerCase()===title;});
+    }
+    if(calc){
+      target.dataset.waBooted='1';
+      try{mountCalculator(calc,'calc-widget');}catch(err){target.dataset.waBooted='';console.error('Calculator mount failed',err);}
+    }
+  }
+  document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,0);});
+  window.addEventListener('load',function(){setTimeout(boot,0);});
+  setTimeout(boot,0);
+})();
