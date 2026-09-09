@@ -63,10 +63,10 @@ const CALCULATORS = [
       const gains = fv - invested;
       const realValue = fv / Math.pow(1 + v.inflation / 100, v.years);
       return [
-        { label: "Total invested", value: invested, format: "currency" },
-        { label: "Wealth gained", value: gains, format: "currency", emphasis: "positive" },
-        { label: "Projected value (future money)", value: fv, format: "currency", emphasis: "neutral" },
-        { label: "Value in today's purchasing power", value: realValue, format: "currency", emphasis: "neutral" },
+        { label: "You put in", value: invested, format: "currency" },
+        { label: "Your growth / profit", value: gains, format: "currency", emphasis: "positive" },
+        { label: "You could have in the future", value: fv, format: "currency", emphasis: "neutral" },
+        { label: "What that future money is worth in today's money", value: realValue, format: "currency", emphasis: "neutral" },
       ];
     },
   },
