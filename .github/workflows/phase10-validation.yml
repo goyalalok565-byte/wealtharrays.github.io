@@ -1,0 +1,58 @@
+name: Phase 10 Production Validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  production-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate calculator math and definitions
+        run: node scripts/phase10-qa.mjs
+
+      - name: Validate calculator page coverage
+        shell: bash
+        run: |
+          set -euo pipefail
+          count=$(find . -maxdepth 1 -type f -name '*-calculator.html' | wc -l)
+          test "$count" -eq 19 || { echo "Expected 19 *-calculator.html pages, found $count"; exit 1; }
+          test -f income-tax-planner.html
+          test "$(grep -l 'calculators.js' *-calculator.html | wc -l)" -eq 19
+          grep -q 'calculators.js' income-tax-planner.html
+          grep -q 'smart.js' income-tax-planner.html
+
+      - name: Validate privacy-sensitive client code
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! grep -RniE 'fetch\(|XMLHttpRequest|navigator\.sendBeacon' --include='smart.js' .
+          ! grep -RniE 'monthly|principal|balance|income|salary|net worth|investment' --include='*analytics*.js' . || true
+
+      - name: Validate production security policy source
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'X-Content-Type-Options: nosniff' _headers
+          grep -q 'Referrer-Policy: strict-origin-when-cross-origin' _headers
+          grep -q 'Permissions-Policy:' _headers
+          grep -q 'X-Frame-Options: SAMEORIGIN' _headers
+          grep -q 'Cache-Control:' _headers
+
+      - name: Validate no obvious debug output in production JS
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -RniE 'console\.log\(|debugger;' --include='*.js' --exclude-dir=node_modules .; then
+            echo 'Debug statements found in production JavaScript.'
+            exit 1
+          fi
