@@ -311,3 +311,47 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, {once:true});
   else init();
 })();
+
+
+/* Phase 9 Pass 6–8 enhancement: voice input + interactive scenarios + mobile resilience */
+(function(){
+  'use strict';
+  function addEnhancements(){
+    const box=document.getElementById('wa-smart');
+    if(!box||box.dataset.phase9Enhanced)return;
+    box.dataset.phase9Enhanced='1';
+    const ask=box.querySelector('.wa-smart-ask');
+    const input=box.querySelector('#wa-smart-question');
+    const explainBtn=box.querySelector('#wa-smart-ask');
+    if(!ask||!input||!explainBtn)return;
+
+    const voice=document.createElement('button');
+    voice.type='button'; voice.className='wa-smart-voice'; voice.setAttribute('aria-label','Speak your question'); voice.setAttribute('aria-pressed','false'); voice.textContent='🎙';
+    const status=document.createElement('div'); status.className='wa-smart-status'; status.setAttribute('aria-live','polite');
+    ask.insertBefore(voice,explainBtn); ask.insertAdjacentElement('afterend',status);
+
+    const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!Speech){ voice.hidden=true; status.textContent='Voice input is unavailable in this browser. You can still type your question.'; }
+    else {
+      let recognition=null;
+      voice.addEventListener('click',()=>{
+        if(recognition){recognition.stop();return;}
+        recognition=new Speech(); recognition.lang=document.documentElement.lang||'en-IN'; recognition.interimResults=false; recognition.maxAlternatives=1;
+        recognition.onstart=()=>{voice.setAttribute('aria-pressed','true');voice.textContent='●';status.textContent='Listening… speak your question.';};
+        recognition.onresult=e=>{const text=e.results[0][0].transcript||'';input.value=text;status.textContent='Voice captured. Explaining your question…';explainBtn.click();};
+        recognition.onerror=e=>{status.textContent=e.error==='not-allowed'?'Microphone permission was not granted. Type your question instead.':'Voice input could not be completed. Try again or type your question.';};
+        recognition.onend=()=>{recognition=null;voice.setAttribute('aria-pressed','false');voice.textContent='🎙';};
+        try{recognition.start();}catch(e){recognition=null;}
+      });
+    }
+
+    const scenarios=document.createElement('div'); scenarios.className='wa-smart-scenarios'; scenarios.setAttribute('aria-label','Quick scenario suggestions');
+    const presets=['Explain result','Conservative case','What changes most?'];
+    presets.forEach(label=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.addEventListener('click',()=>{input.value=label==='Explain result'?'What does this result mean?':label==='Conservative case'?'Show me how to think about a conservative scenario': 'What assumption changes this result the most?';explainBtn.click();});scenarios.appendChild(b);});
+    status.insertAdjacentElement('afterend',scenarios);
+
+    // Keep focus visible and prevent assistant UI from being clipped on narrow screens.
+    input.addEventListener('focus',()=>setTimeout(()=>input.scrollIntoView({block:'nearest',behavior:'smooth'}),50));
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addEnhancements,{once:true});else setTimeout(addEnhancements,0);
+})();
