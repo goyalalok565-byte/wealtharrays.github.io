@@ -355,3 +355,28 @@
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addEnhancements,{once:true});else setTimeout(addEnhancements,0);
 })();
+
+
+/* Production fix: Smart Assistant answer handler must survive calculator re-renders. */
+(function(){
+  function respond(){
+    var q=document.getElementById('wa-smart-question');
+    var out=document.getElementById('wa-smart-live');
+    if(!q||!out)return;
+    var question=q.value.trim();
+    if(!question){out.innerHTML='<div class="wa-smart-card info"><b>Ask a question</b><p>For example: What does this result mean? Is this a good scenario? What changes if I invest more?</p></div>';return;}
+    var x=question.toLowerCase(), answer='';
+    try{
+      if(x.includes('what')&&x.includes('mean')) answer=(typeof explain==='function'?explain():'This result is an estimate based on the numbers you entered.');
+      else if(x.includes('result')||x.includes('explain')) answer=(typeof explain==='function'?explain():'This result is based on your current inputs.');
+      else if(x.includes('scenario')||x.includes('more')||x.includes('change')) answer=(typeof scenarioTip==='function'?scenarioTip():'Try changing one number at a time and compare the result.');
+      else if(x.includes('risk')||x.includes('safe')) answer='No calculator can guarantee a safe investment or outcome. Use realistic assumptions and compare a conservative case.';
+      else if(x.includes('best')||x.includes('should')) answer='There is no single best answer without your goals and constraints. Compare affordability, cost and realistic scenarios.';
+      else answer=(typeof explain==='function'?explain():'Based on the numbers you entered, this is a mathematical estimate, not a guarantee.');
+      out.innerHTML='<div class="wa-smart-card"><b>Assistant answer</b><p>'+String(answer).replace(/[<>&]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c];})+'</p></div>';
+    }catch(err){console.error('Smart assistant response failed',err);out.innerHTML='<div class="wa-smart-card warn"><b>Try again</b><p>The calculator is working, but the assistant could not interpret that question. Try: “What does this result mean?”</p></div>';}
+  }
+  document.addEventListener('click',function(e){if(e.target&&e.target.id==='wa-smart-ask'){e.preventDefault();respond();}});
+  document.addEventListener('keydown',function(e){if(e.target&&e.target.id==='wa-smart-question'&&e.key==='Enter'){e.preventDefault();respond();}});
+  window.waSmartRespond=respond;
+})();
