@@ -181,3 +181,22 @@ function mountCalculator(calc,id){
   document.getElementById(id+'-compare').addEventListener('click',function(e){if(!compute(false))return;var p=document.getElementById(id+'-compare-panel');p.hidden=!p.hidden;e.currentTarget.setAttribute('aria-expanded',String(!p.hidden));if(!p.hidden)buildComparePanel(id,calc,latestValues,latest);});
   initMasthead(function(){if(latest.length)compute(false);});container.dataset.waMounted='1';return true;
 }
+
+
+/* Portfolio pie chart upgrade: show percentage share inside the chart and beside every item. */
+function waRenderPortfolio(id,results){
+  var host=document.getElementById(id+'-graph'); if(!host)return;
+  var rows=(results||[]).filter(function(r){return Number.isFinite(Number(r.value))&&Number(r.value)>=0;});
+  if(!rows.length){host.innerHTML='<div class="wa-portfolio-empty">Your visual summary will appear here after you calculate.</div>';return;}
+  var vals=rows.map(function(r){return Number(r.value);});
+  var total=vals.reduce(function(a,b){return a+b;},0);
+  if(total<=0){host.innerHTML='<div class="wa-portfolio-empty">There is no positive value available to show as a percentage breakdown.</div>';return;}
+  var colors=['#2563eb','#14b8a6','#7c3aed','#f59e0b','#ec4899','#0891b2','#22c55e','#ef4444'];
+  var offset=0;
+  var segments=vals.map(function(v,i){
+    var pct=(v/total)*100, dash=Math.max(pct-0.9,0);
+    var seg='<circle cx="50" cy="50" r="40" fill="none" stroke="'+colors[i%colors.length]+'" stroke-width="13" stroke-linecap="butt" stroke-dasharray="'+dash+' '+(100-dash)+'" stroke-dashoffset="'+(-offset)+'" pathLength="100"></circle>';
+    offset+=pct;return seg;
+  }).join('');
+  host.innerHTML='<div class="wa-portfolio-head"><div><span>YOUR MONEY AT A GLANCE</span><h3>Portfolio breakdown</h3><p>Each section shows how much of the displayed total it represents.</p></div></div><div class="wa-portfolio-layout"><div class="wa-donut"><svg viewBox="0 0 100 100" role="img" aria-label="Percentage breakdown of your results">'+segments+'<text x="50" y="47" text-anchor="middle" class="wa-pie-total">100%</text><text x="50" y="57" text-anchor="middle" class="wa-pie-caption">TOTAL</text></svg></div><div class="wa-portfolio-list">'+rows.map(function(r,i){var pct=(Number(r.value)/total)*100;return '<div class="wa-portfolio-row"><i style="background:'+colors[i%colors.length]+'"></i><span>'+esc(waSimpleLabel(r.label))+'</span><b>'+esc(pct.toFixed(pct<10?1:0))+'%</b><em>'+esc(waFormatValue(r.value,r.format))+'</em></div>';}).join('')+'</div></div>';
+}
