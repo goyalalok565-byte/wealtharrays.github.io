@@ -488,3 +488,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 .wa-smart-status{min-height:18px;font-size:10px;color:var(--muted);line-height:1.45}
 .wa-smart-scenarios{display:flex;flex-wrap:wrap;gap:7px}.wa-smart-scenarios button{min-height:36px;padding:7px 10px;border:2px solid var(--line);border-radius:999px;background:var(--surface);color:var(--text);font-size:10px;font-weight:800;cursor:pointer}.wa-smart-scenarios button:hover{border-color:var(--accent);color:var(--accent)}
 @media(max-width:560px){.wa-smart-ask{display:grid!important;grid-template-columns:minmax(0,1fr) 42px 70px!important}.wa-smart-ask input{grid-column:1/-1}.wa-smart-voice{grid-column:2}.wa-smart-ask button{grid-column:3}.wa-smart-links{grid-template-columns:1fr!important}.wa-smart-scenarios{display:grid;grid-template-columns:1fr 1fr}.wa-smart-scenarios button{width:100%;min-height:42px}}
+
+
+/* Homepage calculator library production guard */
+#home-calculators{display:block!important;visibility:visible!important;opacity:1!important}
+#home-calculators .home-tool-grid{display:grid!important;visibility:visible!important;opacity:1!important}
+#home-calculators .home-tool-card{visibility:visible;opacity:1}
