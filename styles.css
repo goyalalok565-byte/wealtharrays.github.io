@@ -469,3 +469,22 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
   input,select{max-width:100%}
   html,body{max-width:100%;overflow-x:hidden}
 }
+
+
+/* Phase 9 recovery: calculator library must always render as a consistent, strong grid */
+.home-tool-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:14px!important;visibility:visible!important;opacity:1!important}
+.home-tool-card,.tool-card{display:flex!important;visibility:visible!important;opacity:1!important;border:2px solid color-mix(in srgb,var(--cat,#6657e8) 72%,var(--line))!important;box-shadow:inset 4px 0 0 var(--cat,#6657e8),0 12px 30px color-mix(in srgb,var(--cat,#6657e8) 10%,transparent)!important}
+.home-tool-card{min-height:158px!important}
+.home-tool-card:hover,.tool-card:hover{border-width:2px!important;border-color:var(--cat,#6657e8)!important}
+.home-tool-index{border:2px solid color-mix(in srgb,var(--cat,#6657e8) 55%,var(--line))!important}
+.tools-grid{gap:14px!important}
+@media(max-width:900px){.home-tool-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:560px){.home-tool-grid{grid-template-columns:1fr 1fr!important;gap:10px!important}.home-tool-card{min-height:138px!important;border-width:2px!important}}
+
+/* Phase 9 Pass 7/8: smart assistant and calculator controls on mobile */
+.wa-smart{border:2px solid var(--line)!important;box-shadow:0 12px 30px rgba(15,23,42,.06)}
+.wa-smart-voice{display:inline-flex;align-items:center;justify-content:center;min-height:40px;min-width:42px;border:2px solid var(--line);border-radius:12px;background:var(--surface);color:var(--text);font-size:16px;cursor:pointer}
+.wa-smart-voice[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 14%,transparent)}
+.wa-smart-status{min-height:18px;font-size:10px;color:var(--muted);line-height:1.45}
+.wa-smart-scenarios{display:flex;flex-wrap:wrap;gap:7px}.wa-smart-scenarios button{min-height:36px;padding:7px 10px;border:2px solid var(--line);border-radius:999px;background:var(--surface);color:var(--text);font-size:10px;font-weight:800;cursor:pointer}.wa-smart-scenarios button:hover{border-color:var(--accent);color:var(--accent)}
+@media(max-width:560px){.wa-smart-ask{display:grid!important;grid-template-columns:minmax(0,1fr) 42px 70px!important}.wa-smart-ask input{grid-column:1/-1}.wa-smart-voice{grid-column:2}.wa-smart-ask button{grid-column:3}.wa-smart-links{grid-template-columns:1fr!important}.wa-smart-scenarios{display:grid;grid-template-columns:1fr 1fr}.wa-smart-scenarios button{width:100%;min-height:42px}}
