@@ -494,3 +494,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 #home-calculators{display:block!important;visibility:visible!important;opacity:1!important}
 #home-calculators .home-tool-grid{display:grid!important;visibility:visible!important;opacity:1!important}
 #home-calculators .home-tool-card{visibility:visible;opacity:1}
+
+
+/* Restored calculator visualization layer */
+.calc-widget-live{display:block!important;border:2px solid var(--line)!important;border-radius:20px;background:var(--surface);overflow:hidden}
+.wa-graph-card{margin-top:16px;border:2px solid var(--line);border-radius:16px;background:var(--surface);padding:14px;color:var(--accent);min-height:230px}
+.wa-graph-head{display:flex;justify-content:space-between;gap:14px;align-items:baseline;margin-bottom:8px;color:var(--text)}
+.wa-graph-head b{font-size:13px}.wa-graph-head small{font-size:10px;color:var(--muted)}
+.wa-graph-card svg{display:block;width:100%;height:165px;background:linear-gradient(to bottom,transparent 24%,color-mix(in srgb,var(--line) 65%,transparent) 25%,transparent 26%,transparent 49%,color-mix(in srgb,var(--line) 65%,transparent) 50%,transparent 51%,transparent 74%,color-mix(in srgb,var(--line) 65%,transparent) 75%,transparent 76%)}
+.wa-graph-line{stroke:currentColor;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.wa-graph-labels{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.wa-graph-labels span{font-size:9px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 7px}
+@media(max-width:620px){.calc-grid{grid-template-columns:1fr}.wa-graph-card{min-height:210px}.wa-graph-head{display:block}.wa-graph-head small{display:block;margin-top:3px}.tool-actions{grid-template-columns:1fr 1fr}}
