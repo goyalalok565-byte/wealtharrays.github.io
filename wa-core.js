@@ -24,7 +24,7 @@ const hero=document.querySelector('.ledger-hero,.hero');
 if(homeLibrary&&hero&&hero.nextElementSibling!==homeLibrary)hero.insertAdjacentElement('afterend',homeLibrary);
 
 const cur=document.querySelector('#currency-select');
-if(cur){cur.innerHTML=C.map(x=>`<option value="${x[0]}">${x[0]} · ${x[1]} · ${x[2]}</option>`).join('');cur.value=localStorage.waCurrency||'INR';document.documentElement.dataset.currency=cur.value;cur.onchange=()=>{localStorage.waCurrency=cur.value;document.documentElement.dataset.currency=cur.value;window.dispatchEvent(new Event('wa-currency'))}}
+if(cur){cur.innerHTML=C.map(x=>`<option value="${x[0]}">${x[0]} · ${x[1]} · ${x[2]}</option>`).join('');cur.value=localStorage.waCurrency||'INR';document.documentElement.dataset.currency=cur.value;cur.onchange=()=>{localStorage.waCurrency=cur.value;document.documentElement.dataset.currency=cur.value;window.waTrack?.('currency_change',{currency:cur.value});window.dispatchEvent(new Event('wa-currency'))}}
 
 document.querySelectorAll('#language-select').forEach(el=>el.remove());
 document.querySelectorAll('a[href="#"]').forEach(a=>{if(!a.dataset.allowHash){a.addEventListener('click',e=>e.preventDefault())}});
@@ -32,7 +32,7 @@ document.querySelectorAll('a[href="#"]').forEach(a=>{if(!a.dataset.allowHash){a.
 const b=document.querySelector('#theme-toggle');
 const apply=t=>{document.documentElement.dataset.theme=t;localStorage.waTheme=t;if(b){b.setAttribute('aria-label',`Switch to ${t==='dark'?'light':'dark'} mode`);const label=b.querySelector('[data-theme-label]');if(label)label.textContent=t==='dark'?'Light mode':'Dark mode'}};
 apply(localStorage.waTheme||'light');
-if(b)b.onclick=()=>apply(document.documentElement.dataset.theme==='dark'?'light':'dark');
+if(b)b.onclick=()=>{const next=document.documentElement.dataset.theme==='dark'?'light':'dark';apply(next);window.waTrack?.('theme_change',{theme:next})};
 
 const qs=[...document.querySelectorAll('#tool-search')];
 qs.forEach(q=>{
@@ -43,7 +43,7 @@ qs.forEach(q=>{
   const findMatches=value=>{const raw=value.toLowerCase().trim(),terms=raw.split(/\s+/).filter(Boolean),extra=aliases[raw]||[],seen=new Set();return searchable().filter(el=>{const hay=(el.dataset.search+' '+el.textContent).toLowerCase();const ok=!raw||terms.every(t=>hay.includes(t))||extra.some(t=>hay.includes(t));const key=el.getAttribute('href')||el.textContent;if(!ok||seen.has(key))return false;seen.add(key);return true})};
   const render=matches=>{if(!q.value.trim()){box.hidden=true;box.innerHTML='';return}box.innerHTML=matches.length?matches.slice(0,8).map(el=>{const title=(el.querySelector('b,h2,h3')||{}).textContent||el.textContent.trim(),href=el.getAttribute('href'),desc=(el.querySelector('p')||{}).textContent||'';return '<a href="'+href+'"><span>'+title.trim()+'</span><small>'+desc.trim()+'</small><b>→</b></a>'}).join(''):'<div class="tool-search-empty">No calculator found. Try SIP, EMI, FD, RD, loan, tax, salary or ROI.</div>';box.hidden=false};
   q.addEventListener('input',()=>{const matches=findMatches(q.value);const set=new Set(matches);searchable().forEach(el=>{el.hidden=!!q.value.trim()&&!set.has(el)});render(matches)});
-  q.addEventListener('keydown',e=>{if(e.key==='Enter'){const first=box.querySelector('a');if(first){e.preventDefault();location.href=first.href}}if(e.key==='Escape'){box.hidden=true;q.blur()}});
+  q.addEventListener('keydown',e=>{if(e.key==='Enter'){const first=box.querySelector('a');if(first){e.preventDefault();window.waTrack?.('tool_search_select',{query:q.value.trim().slice(0,80),tool:first.getAttribute('href')||''});location.href=first.href}}if(e.key==='Escape'){box.hidden=true;q.blur()}});
   document.addEventListener('click',e=>{if(!box.contains(e.target)&&e.target!==q)box.hidden=true});
 });
 }
@@ -68,6 +68,14 @@ gtag('config',WA_GA_ID,{anonymize_ip:true});
   s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(WA_GA_ID);
   document.head.appendChild(s);
 })();
+
+// GA4 interaction events — only sent after the visitor explicitly accepts analytics.
+window.waTrack=function(name,params={}){
+  try{
+    if(localStorage.getItem('waAnalyticsConsent')!=='granted')return;
+    if(typeof window.gtag==='function')window.gtag('event',name,params);
+  }catch(e){}
+};
 const waConsent=()=>{try{return localStorage.getItem('waAnalyticsConsent')}catch(e){return null}};
 const waSetConsent=value=>{
   try{localStorage.setItem('waAnalyticsConsent',value)}catch(e){}
