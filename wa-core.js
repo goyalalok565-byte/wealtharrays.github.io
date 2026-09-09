@@ -19,6 +19,11 @@ document.querySelectorAll('.cat-card').forEach(card=>{
   card.dataset.category=map;
 });
 
+// Home calculator library recovery guard: the homepage must always expose all 20 tools unless the user is actively searching.
+document.querySelectorAll('#home-calculators .home-tool-card').forEach(card=>{card.hidden=false;card.removeAttribute('aria-hidden');});
+const recoverySearch=document.querySelector('#tool-search');
+if(recoverySearch&&recoverySearch.value.trim()==='')document.querySelectorAll('#home-calculators .home-tool-card').forEach(card=>card.hidden=false);
+
 const homeLibrary=document.querySelector('#home-calculators');
 const hero=document.querySelector('.ledger-hero,.hero');
 if(homeLibrary&&hero&&hero.nextElementSibling!==homeLibrary)hero.insertAdjacentElement('afterend',homeLibrary);
