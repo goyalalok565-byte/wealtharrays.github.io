@@ -1,0 +1,41 @@
+name: Phase 9 Smart Layer Validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'smart.js'
+      - '*-calculator.html'
+      - 'income-tax-planner.html'
+      - '.github/workflows/phase9-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check smart layer syntax
+        run: node --check smart.js
+      - name: Check every calculator loads smart layer
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          pages = sorted(Path('.').glob('*-calculator.html'))
+          pages.append(Path('income-tax-planner.html'))
+          missing = [str(p) for p in pages if 'src="smart.js"' not in p.read_text(encoding='utf-8')]
+          if missing:
+              raise SystemExit('Smart layer missing from: ' + ', '.join(missing))
+          if len(pages) != 20:
+              raise SystemExit(f'Expected 20 calculator pages, found {len(pages)}')
+          print(f'Validated {len(pages)} calculator pages.')
+          PY
+      - name: Check local-only smart boundary
+        run: |
+          if grep -nE '\b(fetch|XMLHttpRequest|sendBeacon)\b' smart.js; then
+            echo 'smart.js must remain local-only and must not send calculator inputs over the network.'
+            exit 1
+          fi
