@@ -5,8 +5,13 @@ const WA_CATEGORY_COLORS={
   'Planning':'planning','Income':'income','Business':'business','Tax':'tax'
 };
 document.querySelectorAll('.home-tool-card,.tool-card').forEach(card=>{
-  const label=card.querySelector('small')?.textContent.trim();
-  if(label&&WA_CATEGORY_COLORS[label])card.dataset.category=WA_CATEGORY_COLORS[label];
+  const label=(card.querySelector('small')?.textContent||card.querySelector('.tool-num')?.textContent||'').trim();
+  let key=Object.keys(WA_CATEGORY_COLORS).find(k=>label.toLowerCase().includes(k.toLowerCase()));
+  if(!key){
+    const x=label.toLowerCase();
+    if(x.includes('invest'))key='Investing';else if(x.includes('loan'))key='Loans';else if(x.includes('bank'))key='Banking';else if(x.includes('retire'))key='Retirement';else if(x.includes('salary')||x.includes('income'))key='Income';else if(x.includes('business'))key='Business';else if(x.includes('tax'))key='Tax';else if(x.includes('planning'))key='Planning';
+  }
+  if(key&&WA_CATEGORY_COLORS[key])card.dataset.category=WA_CATEGORY_COLORS[key];
 });
 document.querySelectorAll('.cat-card').forEach(card=>{
   const href=card.getAttribute('href')||'';
