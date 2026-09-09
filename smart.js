@@ -380,3 +380,60 @@
   document.addEventListener('keydown',function(e){if(e.target&&e.target.id==='wa-smart-question'&&e.key==='Enter'){e.preventDefault();respond();}});
   window.waSmartRespond=respond;
 })();
+
+
+/* FINAL assistant wiring: one delegated handler, independent of init timing and DOM replacement. */
+(function(){
+  function getContext(){
+    var title=(document.querySelector('h1')||{}).textContent||document.title||'this calculator';
+    var rows=[].slice.call(document.querySelectorAll('.calc-result-row')).map(function(r){return {
+      label:(r.querySelector('.calc-result-label')||{}).textContent||'',
+      value:(r.querySelector('.calc-result-value')||{}).textContent||''
+    };});
+    return {title:title.trim(),rows:rows};
+  }
+  function answer(question){
+    var q=String(question||'').trim().toLowerCase(),ctx=getContext(), primary=ctx.rows[0];
+    if(!q)return 'Ask something like “What does this result mean?” or “What should I look at first?”';
+    if(q.includes('hello')||q.includes('hi'))return 'Hi. Ask me anything about the result shown by this calculator.';
+    if(q.includes('what')||q.includes('meaning')||q.includes('explain')||q.includes('result')){
+      return primary&&primary.value ? 'The main result is '+primary.label+': '+primary.value+'. This is an estimate based on the numbers you entered. Change one input at a time to see what affects it most.' : 'Enter your calculator values and press Calculate my result first. Then I can explain the numbers.';
+    }
+    if(q.includes('more')||q.includes('less')||q.includes('change')||q.includes('scenario'))return 'A simple way to compare scenarios is to change one value at a time. Start with the amount, then the time period, and finally the rate. This makes it clear which assumption has the biggest effect.';
+    if(q.includes('safe')||q.includes('risk'))return 'This calculator can estimate numbers, but it cannot guarantee safety or returns. Use realistic assumptions and compare a conservative scenario before making a financial decision.';
+    if(q.includes('best')||q.includes('should'))return 'There is no universal best answer. The useful choice depends on your goal, time period, affordability and how much uncertainty you can accept.';
+    return primary&&primary.value ? 'Based on your current calculation, '+primary.label+' is '+primary.value+'. Ask “what does this result mean?” for a simpler explanation or ask what changes if you increase an input.' : 'Please enter your values and calculate first. Then ask me about the result.';
+  }
+  function show(question){
+    var out=document.getElementById('wa-smart-live');
+    if(!out)return;
+    var a=answer(question).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});
+    out.innerHTML='<div class="wa-smart-card"><b>Assistant answer</b><p>'+a+'</p></div>';
+  }
+  document.addEventListener('click',function(e){
+    var btn=e.target&&e.target.closest&&e.target.closest('#wa-smart-ask');
+    if(btn){e.preventDefault();e.stopImmediatePropagation();var input=document.getElementById('wa-smart-question');show(input?input.value:'');}
+  },true);
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Enter'&&e.target&&e.target.id==='wa-smart-question'){e.preventDefault();show(e.target.value);}
+  },true);
+  window.waSmartAsk=function(text){show(text||((document.getElementById('wa-smart-question')||{}).value||''));};
+  document.addEventListener('DOMContentLoaded',function(){
+    var box=document.getElementById('wa-smart'); if(!box)return;
+    var input=document.getElementById('wa-smart-question');
+    if(input)input.setAttribute('data-wa-ready','true');
+  });
+})();
+
+
+/* Voice response bridge: always call the same public assistant function after speech recognition. */
+(function(){
+ document.addEventListener('click',function(e){
+   var b=e.target&&e.target.closest&&e.target.closest('.wa-smart-voice');
+   if(!b)return;
+   // Existing recognizer handles listening. This listener intentionally leaves recognition untouched.
+ },true);
+ document.addEventListener('wa-smart-voice-question',function(e){
+   if(window.waSmartAsk)window.waSmartAsk(e.detail||'');
+ });
+})();
