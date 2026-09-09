@@ -219,3 +219,45 @@ function waRenderPortfolio(id,results){
  var offset=0,segs=components.map(function(r,i){var p=Number(r.value)/total*100,d=Math.max(p-.6,0),s='<circle cx="50" cy="50" r="40" fill="none" stroke="'+colors[i]+'" stroke-width="13" pathLength="100" stroke-dasharray="'+d+' '+(100-d)+'" stroke-dashoffset="'+(-offset)+'"/>';offset+=p;return s;}).join('');
  host.innerHTML='<div class="wa-portfolio-head"><div><span>YOUR BREAKDOWN</span><h3>Where the total comes from</h3><p>Percentages use only the parts that add up to the total.</p></div></div><div class="wa-portfolio-layout"><div class="wa-donut"><svg viewBox="0 0 100 100">'+segs+'<circle cx="50" cy="50" r="30" fill="var(--surface)"/><text x="50" y="48" text-anchor="middle" class="wa-pie-total">100%</text><text x="50" y="57" text-anchor="middle" class="wa-pie-caption">BREAKDOWN</text></svg></div><div class="wa-portfolio-list">'+components.map(function(r,i){var p=Number(r.value)/total*100;return '<div class="wa-portfolio-row"><i style="background:'+colors[i]+'"></i><span>'+esc(waSimpleLabel(r.label))+'</span><b>'+p.toFixed(p<10?1:0)+'%</b><em>'+esc(waFormatValue(r.value,r.format))+'</em></div>';}).join('')+'</div></div>';
 }
+
+/* Phase 9 authoritative graph engine — replaces all earlier graph renderers.
+   Never mixes totals with their components. */
+function waGraphBreakdown(results){
+  var rs=(results||[]).filter(function(r){return Number.isFinite(Number(r.value));});
+  function find(rx){return rs.find(function(r){return rx.test(String(r.label));});}
+  var a,b;
+  a=find(/^(Total Investment|Total Contributions|Amount invested|Principal|Loan amount|Total assets|Regular pay|Today's amount|Cash & savings)$/i);
+  b=find(/^(Interest Earned|Estimated gain|Total interest|Interest paid|Total liabilities|Overtime pay|Price increase)$/i);
+  if(a&&b&&Number(a.value)>=0&&Number(b.value)>=0)return[a,b];
+  // Explicit additive fallbacks only. Never chart derived totals together with components.
+  var regular=find(/^Regular pay$/i), overtime=find(/^Overtime pay$/i);
+  if(regular&&overtime)return[regular,overtime];
+  return null;
+}
+function waRenderPortfolio(id,results){
+  var host=document.getElementById(id+'-graph');if(!host)return;
+  var parts=waGraphBreakdown(results);
+  if(!parts||parts.length<2){
+    host.innerHTML='<div class="wa-portfolio-empty"><b>No misleading chart here.</b><br>This calculator result does not contain two or more values that form one real total.</div>';
+    return;
+  }
+  var total=parts.reduce(function(s,r){return s+Math.max(0,Number(r.value));},0);
+  if(!(total>0)){host.innerHTML='<div class="wa-portfolio-empty">Enter values that produce a positive breakdown to see the chart.</div>';return;}
+  var colors=['#2563eb','#14b8a6','#7c3aed','#f59e0b'];
+  var cx=50,cy=50,r=42,start=-90;
+  function point(angle,rad){var q=angle*Math.PI/180;return[cx+rad*Math.cos(q),cy+rad*Math.sin(q)];}
+  function slicePath(from,to){
+    var p1=point(from,r),p2=point(to,r),large=to-from>180?1:0;
+    return 'M '+cx+' '+cy+' L '+p1[0].toFixed(3)+' '+p1[1].toFixed(3)+' A '+r+' '+r+' 0 '+large+' 1 '+p2[0].toFixed(3)+' '+p2[1].toFixed(3)+' Z';
+  }
+  var paths='',labels='',legend='';
+  parts.forEach(function(item,i){
+    var pct=Number(item.value)/total*100,end=start+pct*3.6,mid=(start+end)/2;
+    paths+='<path d="'+slicePath(start,end)+'" fill="'+colors[i%colors.length]+'"></path>';
+    // Percentage goes inside its own slice when there is enough room.
+    if(pct>=8){var lp=point(mid,25);labels+='<text x="'+lp[0].toFixed(2)+'" y="'+(lp[1]+2).toFixed(2)+'" text-anchor="middle" class="wa-slice-pct">'+(pct<10?pct.toFixed(1):pct.toFixed(0))+'%</text>';}
+    legend+='<div class="wa-portfolio-row"><i style="background:'+colors[i%colors.length]+'"></i><span>'+esc(waSimpleLabel(item.label))+'</span><b>'+ (pct<10?pct.toFixed(1):pct.toFixed(0))+'%</b><em>'+esc(waFormatValue(item.value,item.format))+'</em></div>';
+    start=end;
+  });
+  host.innerHTML='<div class="wa-portfolio-head"><div><span>YOUR BREAKDOWN</span><h3>Where the result comes from</h3><p>Percentages are calculated only from values that genuinely add up together.</p></div></div><div class="wa-portfolio-layout"><div class="wa-donut"><svg viewBox="0 0 100 100" role="img" aria-label="Accurate percentage breakdown">'+paths+labels+'<circle cx="50" cy="50" r="14" fill="var(--surface)"></circle><text x="50" y="49" text-anchor="middle" class="wa-pie-total">100%</text><text x="50" y="56" text-anchor="middle" class="wa-pie-caption">TOTAL</text></svg></div><div class="wa-portfolio-list">'+legend+'</div></div>';
+}
