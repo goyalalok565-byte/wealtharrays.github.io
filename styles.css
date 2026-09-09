@@ -522,3 +522,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 .wa-portfolio-list{display:grid;gap:9px}.wa-portfolio-row{display:grid;grid-template-columns:10px 1fr auto;gap:9px;align-items:center;padding:10px 0;border-bottom:1px solid color-mix(in srgb,var(--line) 70%,transparent)}.wa-portfolio-row:last-child{border-bottom:0}.wa-portfolio-row i{width:9px;height:9px;border-radius:50%}.wa-portfolio-row span{font-size:12px;color:var(--muted)}.wa-portfolio-row b{font-size:13px;color:var(--text)}
 .wa-portfolio-empty{padding:26px 12px;text-align:center;color:var(--muted);font-size:12px}
 @media(max-width:620px){.wa-portfolio-layout{grid-template-columns:1fr}.wa-donut{display:flex;justify-content:center}.wa-portfolio-card{padding:16px}.wa-calculate-btn{min-height:56px}}
+
+
+/* Portfolio percentages */
+.wa-pie-total{fill:var(--text);font-size:13px;font-weight:900;transform:rotate(90deg);transform-origin:50px 50px}.wa-pie-caption{fill:var(--muted);font-size:5px;font-weight:800;letter-spacing:.8px;transform:rotate(90deg);transform-origin:50px 50px}
+.wa-portfolio-row{grid-template-columns:10px minmax(0,1fr) auto!important}.wa-portfolio-row b{font-size:14px;color:var(--text);font-weight:900}.wa-portfolio-row em{grid-column:2/-1;font-style:normal;color:var(--muted);font-size:11px;margin-top:-4px}
