@@ -456,3 +456,16 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 .cat-card em{background:var(--cat-soft)!important;color:var(--cat)!important}
 .cat-card strong{color:var(--cat)!important}
 @media(max-width:760px){.home-tool-card,.tool-card{box-shadow:inset 2px 0 0 var(--cat),0 8px 24px color-mix(in srgb,var(--cat) 6%,transparent)}}
+
+
+/* Phase 10 production QA: accessibility, touch and motion resilience */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+button,a,input,select{touch-action:manipulation}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 55%,transparent);outline-offset:3px}
+@media(max-width:760px){
+  button,.btn,.tool-action,.calc-mini-btn{min-height:44px}
+  input,select{max-width:100%}
+  html,body{max-width:100%;overflow-x:hidden}
+}
