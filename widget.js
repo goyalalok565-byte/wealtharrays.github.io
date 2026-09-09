@@ -186,3 +186,24 @@ if(!Speech){voiceBtn.disabled=true;voiceBtn.title='Voice input is not supported 
 else{let recognition=null;voiceBtn.addEventListener('click',()=>{if(recognition){recognition.stop();return}const active=document.activeElement;const target=active&&active.matches&&active.matches('input[data-field]')?active:container.querySelector('input[data-field]');if(!target){voiceStatus.textContent='Select a number field first.';return}recognition=new Speech();recognition.lang=navigator.language||'en-US';recognition.interimResults=true;recognition.maxAlternatives=1;voiceBtn.classList.add('listening');voiceBtn.textContent='● Listening';voiceStatus.classList.add('live');voiceStatus.textContent='Listening… say a number.';recognition.onresult=e=>{const transcript=Array.from(e.results).map(x=>x[0].transcript).join(' ');voiceStatus.textContent='Heard: '+transcript;if(e.results[e.results.length-1].isFinal){const n=waParseVoiceNumber(transcript);if(Number.isFinite(n)){target.value=n;target.dispatchEvent(new Event('input',{bubbles:true}));voiceStatus.textContent='Added '+n+'. Calculation updated automatically.';setTimeout(()=>waSpeakCalculatorResult(latest),120)}else voiceStatus.textContent='No clear number found. Try again.'}};recognition.onerror=e=>{voiceStatus.textContent=e.error==='not-allowed'?'Microphone permission is blocked. Allow it and try again.':'Voice input stopped: '+e.error};recognition.onend=()=>{recognition=null;voiceBtn.classList.remove('listening');voiceBtn.textContent='🎙 Voice input';voiceStatus.classList.remove('live')};try{recognition.start()}catch(e){recognition=null;voiceBtn.classList.remove('listening');voiceBtn.textContent='🎙 Voice input';voiceStatus.textContent='Could not start voice input. Try again.'}})}
 document.getElementById(id+'-sound').addEventListener('click',e=>{waState.sound=!waState.sound;safeStorage.set('waCalcSound',waState.sound?'on':'off');e.currentTarget.innerHTML=`<i class="calc-sound-dot"></i>${waState.sound?'Sound on':'Sound off'}`;if(waState.sound)soundTick()});initMasthead(recompute);recompute()}
 function initSearch(inputId,listSelector,headingId,totalLabel){const input=document.getElementById(inputId);if(!input)return;input.addEventListener('input',()=>{const q=input.value.trim().toLowerCase();let n=0;document.querySelectorAll(listSelector).forEach(el=>{const ok=(el.dataset.search||'').toLowerCase().includes(q);el.hidden=!ok;if(ok)n++});const h=document.getElementById(headingId);if(h)h.textContent=q?`${n} RESULT${n===1?'':'S'} FOR "${q.toUpperCase()}"`:totalLabel})}
+
+
+// Production recovery bootstrap: guarantees every calculator page mounts even if an individual page listener fires at the wrong lifecycle moment.
+(function(){
+  function autoMount(){
+    try{
+      const target=document.getElementById('calc-widget');
+      if(!target||target.dataset.waMounted||target.children.length)return;
+      const file=(location.pathname.split('/').pop()||'').replace(/\.html$/,'');
+      const calc=(typeof CALCULATORS!=='undefined'?CALCULATORS:[]).find(c=>c.slug===file||c.id===file);
+      if(calc){target.dataset.waMounted='1';mountCalculator(calc,'calc-widget');}
+    }catch(e){
+      const t=document.getElementById('calc-widget');
+      if(t&&!t.children.length)t.innerHTML='<div class="calc-recovery-error">Calculator could not initialize. Please refresh the page.</div>';
+      console.error('Wealth Arrays calculator bootstrap failed',e);
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',autoMount,{once:true});
+  else autoMount();
+  window.addEventListener('load',autoMount,{once:true});
+})();
