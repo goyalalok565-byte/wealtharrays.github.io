@@ -200,3 +200,22 @@ function waRenderPortfolio(id,results){
   }).join('');
   host.innerHTML='<div class="wa-portfolio-head"><div><span>YOUR MONEY AT A GLANCE</span><h3>Portfolio breakdown</h3><p>Each section shows how much of the displayed total it represents.</p></div></div><div class="wa-portfolio-layout"><div class="wa-donut"><svg viewBox="0 0 100 100" role="img" aria-label="Percentage breakdown of your results">'+segments+'<text x="50" y="47" text-anchor="middle" class="wa-pie-total">100%</text><text x="50" y="57" text-anchor="middle" class="wa-pie-caption">TOTAL</text></svg></div><div class="wa-portfolio-list">'+rows.map(function(r,i){var pct=(Number(r.value)/total)*100;return '<div class="wa-portfolio-row"><i style="background:'+colors[i%colors.length]+'"></i><span>'+esc(waSimpleLabel(r.label))+'</span><b>'+esc(pct.toFixed(pct<10?1:0))+'%</b><em>'+esc(waFormatValue(r.value,r.format))+'</em></div>';}).join('')+'</div></div>';
 }
+
+/* Accurate calculator visualizer: only charts non-overlapping result components. */
+function waRenderPortfolio(id,results){
+ var host=document.getElementById(id+'-graph');if(!host)return;
+ var rs=(results||[]).filter(function(r){return Number.isFinite(Number(r.value))&&Number(r.value)>=0;});
+ var pick=function(words){return rs.find(function(r){var l=String(r.label).toLowerCase();return words.some(function(w){return l.indexOf(w)>-1;});});};
+ var components=[];
+ var contribution=pick(['total investment','total contributions','principal','amount borrowed','starting amount','cost']);
+ var gain=pick(['interest earned','total interest','interest paid','profit','gain','extra money']);
+ if(contribution&&gain&&Number(contribution.value)+Number(gain.value)>0)components=[contribution,gain];
+ else {
+   var positive=rs.filter(function(r){return !/future value|maturity amount|total payment|total amount|monthly payment|emi/i.test(r.label);});
+   if(positive.length>=2)components=positive.slice(0,4);
+ }
+ if(components.length<2){host.innerHTML='<div class="wa-portfolio-empty">A visual breakdown is not available for this result because the numbers would overlap and make the chart misleading.</div>';return;}
+ var total=components.reduce(function(a,r){return a+Number(r.value);},0),colors=['#2563eb','#14b8a6','#7c3aed','#f59e0b'];
+ var offset=0,segs=components.map(function(r,i){var p=Number(r.value)/total*100,d=Math.max(p-.6,0),s='<circle cx="50" cy="50" r="40" fill="none" stroke="'+colors[i]+'" stroke-width="13" pathLength="100" stroke-dasharray="'+d+' '+(100-d)+'" stroke-dashoffset="'+(-offset)+'"/>';offset+=p;return s;}).join('');
+ host.innerHTML='<div class="wa-portfolio-head"><div><span>YOUR BREAKDOWN</span><h3>Where the total comes from</h3><p>Percentages use only the parts that add up to the total.</p></div></div><div class="wa-portfolio-layout"><div class="wa-donut"><svg viewBox="0 0 100 100">'+segs+'<circle cx="50" cy="50" r="30" fill="var(--surface)"/><text x="50" y="48" text-anchor="middle" class="wa-pie-total">100%</text><text x="50" y="57" text-anchor="middle" class="wa-pie-caption">BREAKDOWN</text></svg></div><div class="wa-portfolio-list">'+components.map(function(r,i){var p=Number(r.value)/total*100;return '<div class="wa-portfolio-row"><i style="background:'+colors[i]+'"></i><span>'+esc(waSimpleLabel(r.label))+'</span><b>'+p.toFixed(p<10?1:0)+'%</b><em>'+esc(waFormatValue(r.value,r.format))+'</em></div>';}).join('')+'</div></div>';
+}
