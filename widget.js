@@ -107,3 +107,77 @@ function mountCalculator(calc,id){
   else boot();
   setTimeout(boot,100); setTimeout(boot,500);
 })();
+
+
+/* Universal user-first calculator UX: empty inputs, calculate only when the user provides values. */
+function waSimpleLabel(label){
+  var map={
+    'Future Value':'Your money could grow to',
+    'Maturity Amount':'You could receive',
+    'Total Investment':'You would put in',
+    'Total Contributions':'You would put in',
+    'Total Interest':'Extra money earned',
+    'Interest Earned':'Extra money earned',
+    'Monthly Payment':'Your monthly payment could be',
+    'EMI':'Your monthly payment could be',
+    'Total Payment':'Total amount you may pay',
+    'Total Amount Paid':'Total amount you may pay',
+    'Total Interest Paid':'Extra cost paid as interest',
+    'Monthly Investment':'You may need to invest each month',
+    'Required Monthly Investment':'You may need to invest each month',
+    'Retirement Corpus':'Money you may need for retirement',
+    'Monthly Income':'Estimated monthly income',
+    'Net Worth':'What you own minus what you owe',
+    'Inflation Adjusted Value':'What your money may be worth in today’s buying power',
+    'Purchasing Power':'What your money can buy',
+    'Profit':'Money left after costs',
+    'Profit Margin':'Profit from each ₹100 of sales',
+    'Return on Investment':'Your gain or loss compared with what you invested',
+    'CAGR':'Average yearly growth',
+    'Tax Payable':'Estimated tax to pay',
+    'Take-home Pay':'Estimated money you keep',
+    'Hourly Rate':'What you earn per hour'
+  };
+  return map[label]||label;
+}
+function waResultSummary(calc,results){
+  if(!results||!results.length)return 'Enter your details to see a clear estimate.';
+  var primary=results.find(function(r){return r.emphasis==='positive'||/Future Value|Maturity Amount|Monthly Payment|EMI|Net Worth|Tax Payable|Retirement Corpus|Profit/.test(r.label);})||results[0];
+  return '<div class="wa-result-summary"><span class="wa-result-kicker">YOUR ESTIMATE</span><strong>'+esc(waSimpleLabel(primary.label))+'</strong><b>'+esc(waFormatValue(primary.value,primary.format))+'</b><p>Change any value above to instantly see how your estimate changes.</p></div>';
+}
+function waRenderPortfolio(id,results){
+  var host=document.getElementById(id+'-graph'); if(!host)return;
+  var rows=(results||[]).filter(function(r){return Number.isFinite(Number(r.value));});
+  if(!rows.length){host.innerHTML='<div class="wa-portfolio-empty">Your visual summary will appear here after you enter your details.</div>';return;}
+  var positive=rows.map(function(r){return Math.max(0,Number(r.value));});
+  var total=positive.reduce(function(a,b){return a+b;},0)||1;
+  var colors=['#2563eb','#14b8a6','#7c3aed','#f59e0b','#ec4899','#0891b2'];
+  var offset=0;
+  var segments=positive.map(function(v,i){var pct=(v/total)*100;var seg='<circle cx="50" cy="50" r="40" fill="none" stroke="'+colors[i%colors.length]+'" stroke-width="12" stroke-linecap="round" stroke-dasharray="'+pct+' '+(100-pct)+'" stroke-dashoffset="'+(-offset)+'" pathLength="100"></circle>';offset+=pct;return seg;}).join('');
+  host.innerHTML='<div class="wa-portfolio-head"><div><span>YOUR MONEY AT A GLANCE</span><h3>Simple visual summary</h3><p>See the biggest parts of your result without reading complex charts.</p></div></div><div class="wa-portfolio-layout"><div class="wa-donut"><svg viewBox="0 0 100 100" role="img" aria-label="Visual breakdown of your results">'+segments+'</svg></div><div class="wa-portfolio-list">'+rows.map(function(r,i){return '<div class="wa-portfolio-row"><i style="background:'+colors[i%colors.length]+'"></i><span>'+esc(waSimpleLabel(r.label))+'</span><b>'+esc(waFormatValue(r.value,r.format))+'</b></div>';}).join('')+'</div></div>';
+}
+function mountCalculator(calc,id){
+  var container=document.getElementById(id);
+  if(!container||!calc||!Array.isArray(calc.fields)||typeof calc.compute!=='function')return false;
+  var fields=calc.fields.map(function(f){
+    if(f.type==='select')return '<div class="field"><label for="f-'+esc(f.id)+'">'+esc(f.label)+'</label><select id="f-'+esc(f.id)+'" data-field="'+esc(f.id)+'">'+(f.options||[]).map(function(o){return '<option value="'+esc(o.value)+'">'+esc(o.label)+'</option>';}).join('')+'</select></div>';
+    return '<div class="field"><label for="f-'+esc(f.id)+'">'+esc(f.label)+(f.suffix?' <span class="hint">'+esc(f.suffix)+'</span>':'')+'</label><input id="f-'+esc(f.id)+'" data-field="'+esc(f.id)+'" type="number" inputmode="decimal" placeholder="Enter '+esc(f.label.toLowerCase())+'" '+(f.min!==undefined?'min="'+f.min+'"':'')+' '+(f.max!==undefined?'max="'+f.max+'"':'')+' '+(f.step!==undefined?'step="'+f.step+'"':'')+'></div>';
+  }).join('');
+  container.innerHTML='<div class="calc-widget calc-widget-live calc-user-first"><div class="calc-widget-body"><div class="wa-calc-intro"><span>STEP 1</span><b>Enter your own numbers</b><small>Nothing is pre-filled, so you can calculate your situation faster.</small></div><div class="calc-grid">'+fields+'</div><button type="button" class="wa-calculate-btn" id="'+id+'-calculate">Calculate my result</button><div class="calc-result" id="'+id+'-result" aria-live="polite"><div class="wa-result-empty">Enter your details and tap <b>Calculate my result</b>.</div></div><div class="wa-portfolio-card" id="'+id+'-graph"><div class="wa-portfolio-empty">Your visual summary will appear here after you calculate.</div></div><div class="tool-actions"><button type="button" class="tool-action primary" id="'+id+'-share">Share</button><button type="button" class="tool-action" id="'+id+'-export">Export report</button><button type="button" class="tool-action" id="'+id+'-compare" aria-expanded="false">Compare</button></div><div class="compare-panel" id="'+id+'-compare-panel" hidden></div><p class="calc-note">This is an estimate to help you plan. It is not financial or tax advice.</p></div></div>';
+  var latest=[],latestValues={};
+  function hasAllRequired(){return calc.fields.filter(function(f){return f.type!=='select';}).every(function(f){var e=document.getElementById('f-'+f.id);return e&&String(e.value).trim()!=='';});}
+  function compute(show){
+    if(!hasAllRequired()){if(show){document.getElementById(id+'-result').innerHTML='<div class="wa-result-empty">Please fill in all the fields first. Then your result will be easy to understand.</div>';}return false;}
+    latestValues={};calc.fields.forEach(function(f){var e=document.getElementById('f-'+f.id);latestValues[f.id]=f.type==='select'?e.value:Number(e.value);});
+    try{latest=calc.compute(latestValues)||[];}catch(err){console.error('Calculator failed:',calc.id,err);document.getElementById(id+'-result').innerHTML='<div class="wa-result-empty">We could not calculate this right now. Please check your numbers.</div>';return false;}
+    var result=document.getElementById(id+'-result');
+    result.innerHTML=waResultSummary(calc,latest)+'<div class="wa-simple-results">'+latest.map(function(r){return '<div class="calc-result-row"><span class="calc-result-label">'+esc(waSimpleLabel(r.label))+'</span><span class="calc-result-value '+esc(r.emphasis||'')+'">'+esc(waFormatValue(r.value,r.format))+'</span></div>';}).join('')+'</div>';
+    waRenderPortfolio(id,latest);return true;
+  }
+  calc.fields.forEach(function(f){var e=document.getElementById('f-'+f.id);if(!e)return;e.addEventListener('input',function(){if(latest.length)compute(false);});e.addEventListener('change',function(){if(latest.length)compute(false);});});
+  document.getElementById(id+'-calculate').addEventListener('click',function(){compute(true);});
+  document.getElementById(id+'-share').addEventListener('click',function(){if(compute(false))waShare(calc.title,latest.map(function(r){return waSimpleLabel(r.label)+' '+waFormatValue(r.value,r.format);}).join(' • '),location.href);});
+  document.getElementById(id+'-export').addEventListener('click',function(){if(compute(false))waOpenPrintReport(calc,latestValues,latest);});
+  document.getElementById(id+'-compare').addEventListener('click',function(e){if(!compute(false))return;var p=document.getElementById(id+'-compare-panel');p.hidden=!p.hidden;e.currentTarget.setAttribute('aria-expanded',String(!p.hidden));if(!p.hidden)buildComparePanel(id,calc,latestValues,latest);});
+  initMasthead(function(){if(latest.length)compute(false);});container.dataset.waMounted='1';return true;
+}
