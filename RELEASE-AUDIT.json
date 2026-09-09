@@ -1,8 +1,8 @@
 {
-  "release": "01",
-  "files": 29,
+  "release": "02",
+  "files": 32,
   "html_pages": 20,
-  "calculators_tested": 8,
+  "calculators_tested": 20,
   "local_link_errors": 0,
   "html_parse_errors": 0,
   "duplicate_files_removed": [
@@ -28,13 +28,22 @@
     "removed Google Fonts network dependency",
     "deferred JS",
     "reduced render-blocking dependencies",
-    "mobile responsive action UI"
+    "mobile responsive action UI",
+    "static CSS/JS/SVG caching policy"
+  ],
+  "security_changes": [
+    "security headers policy",
+    "content security policy with script hash for theme bootstrap",
+    "permissions policy",
+    "same-origin framing policy",
+    "referrer and MIME sniffing protection"
   ],
   "product_changes": [
     "share",
     "export report",
     "copy embed",
     "worked-example comparison",
-    "embeddable widget.html?calc=<id>"
+    "embeddable widget.html?calc=<id>",
+    "20-scenario deterministic calculator QA"
   ]
 }
