@@ -261,3 +261,80 @@ function waRenderPortfolio(id,results){
   });
   host.innerHTML='<div class="wa-portfolio-head"><div><span>YOUR BREAKDOWN</span><h3>Where the result comes from</h3><p>Percentages are calculated only from values that genuinely add up together.</p></div></div><div class="wa-portfolio-layout"><div class="wa-donut"><svg viewBox="0 0 100 100" role="img" aria-label="Accurate percentage breakdown">'+paths+labels+'<circle cx="50" cy="50" r="14" fill="var(--surface)"></circle><text x="50" y="49" text-anchor="middle" class="wa-pie-total">100%</text><text x="50" y="56" text-anchor="middle" class="wa-pie-caption">TOTAL</text></svg></div><div class="wa-portfolio-list">'+legend+'</div></div>';
 }
+
+
+/* ================= PHASE 9 FINAL — SMART PRODUCT INTELLIGENCE =================
+   Deterministic, calculator-specific guidance. No fake AI and no invented financial advice.
+*/
+function waP9Validate(calc,values){
+  var issues=[];
+  calc.fields.forEach(function(f){
+    if(f.type==='select')return;
+    var v=Number(values[f.id]);
+    if(!Number.isFinite(v))issues.push('Enter a valid '+f.label.toLowerCase()+'.');
+    else if(f.min!==undefined&&v<Number(f.min))issues.push(f.label+' cannot be below '+f.min+'.');
+    else if(f.max!==undefined&&v>Number(f.max))issues.push(f.label+' cannot be above '+f.max+'.');
+  });
+  if(values.rate!==undefined&&Number(values.rate)>30)issues.push('A return or interest rate above 30% is unusually high. Double-check this assumption.');
+  if(values.years!==undefined&&Number(values.years)>40)issues.push('A period above 40 years is a very long assumption. Check that this is intentional.');
+  if(values.inflation!==undefined&&Number(values.inflation)>15)issues.push('Inflation above 15% is unusually high for a long-term planning assumption.');
+  return issues;
+}
+function waP9Plain(calc,values,results){
+  var primary=results.find(function(r){return r.emphasis==='positive'||/future|final|target|monthly payment|take-home|net profit|maturity/i.test(r.label);})||results[0];
+  if(!primary)return 'Enter your numbers to see an explanation.';
+  var name=calc.title.replace(/ Calculator$/,'');
+  var lines=['For your '+name+' calculation, '+waSimpleLabel(primary.label).toLowerCase()+' is '+waFormatValue(primary.value,primary.format)+'.'];
+  var gain=results.find(function(r){return /growth|interest earned|net gain|profit/i.test(r.label);});
+  if(gain&&Number.isFinite(Number(gain.value)))lines.push('The main difference-maker is '+waSimpleLabel(gain.label).toLowerCase()+': '+waFormatValue(gain.value,gain.format)+'.');
+  lines.push('This is an estimate based on the assumptions you entered, not a guaranteed financial outcome.');
+  return lines.join(' ');
+}
+function waP9Scenario(calc,values,results){
+  var cards=[];
+  if(values.monthly!==undefined&&Number(values.monthly)>0)cards.push({title:'Try +10% monthly',text:'Increase your monthly amount by 10% and compare the result.',patch:{monthly:Number(values.monthly)*1.1}});
+  if(values.years!==undefined&&Number(values.years)>0)cards.push({title:'Try more time',text:'Add 5 years to see the effect of a longer horizon.',patch:{years:Number(values.years)+5}});
+  if(values.rate!==undefined&&Number(values.rate)>0)cards.push({title:'Stress-test the rate',text:'Reduce the rate by 2 percentage points and compare.',patch:{rate:Math.max(0,Number(values.rate)-2)}});
+  if(values.principal!==undefined&&Number(values.principal)>0&&values.rate!==undefined)cards.push({title:'Lower-rate scenario',text:'Reduce the interest rate by 1 percentage point.',patch:{rate:Math.max(0,Number(values.rate)-1)}});
+  return cards.slice(0,3);
+}
+function waP9Goal(calc,values,results){
+  if(calc.id==='sip'&&values.monthly!==undefined&&values.rate!==undefined&&values.years!==undefined){
+    var fv=results.find(function(r){return /future|could have/i.test(r.label);});
+    if(fv)return 'Goal planning: decide your target amount first, then we can calculate the monthly investment needed. This calculator currently shows what your chosen monthly amount could grow into.';
+  }
+  if(/retirement|freedom/.test(calc.id))return 'Goal planning: your target is based on spending and the withdrawal assumption. Lower withdrawal rates increase the amount you need.';
+  return 'Use scenarios to test realistic best-case and conservative assumptions before relying on one result.';
+}
+function waP9Render(calc,id,values,results){
+  var host=document.getElementById(id+'-insights');if(!host)return;
+  var scenarios=waP9Scenario(calc,values,results);
+  host.innerHTML='<section class="wa-p9"><div class="wa-p9-head"><span>SMART INSIGHTS</span><h3>Understand your result</h3></div><div class="wa-p9-explain"><b>In simple language</b><p>'+esc(waP9Plain(calc,values,results))+'</p></div><div class="wa-p9-scenarios">'+scenarios.map(function(s,i){return '<button type="button" class="wa-p9-scenario" data-p9="'+i+'"><b>'+esc(s.title)+'</b><span>'+esc(s.text)+'</span></button>';}).join('')+'</div><div class="wa-p9-goal"><b>Planning tip</b><p>'+esc(waP9Goal(calc,values,results))+'</p></div></section>';
+  scenarios.forEach(function(s,i){var b=host.querySelector('[data-p9="'+i+'"]');if(b)b.addEventListener('click',function(){Object.keys(s.patch).forEach(function(k){var el=document.getElementById('f-'+k);if(el){el.value=Number(s.patch[k].toFixed(6));el.dispatchEvent(new Event('input',{bubbles:true}));}});var cb=document.getElementById(id+'-calculate');if(cb)cb.click();});});
+}
+/* Final authoritative calculator mount for Phase 9. */
+function mountCalculator(calc,id){
+  var container=document.getElementById(id);if(!container||!calc||!Array.isArray(calc.fields)||typeof calc.compute!=='function')return false;
+  var fields=calc.fields.map(function(f){
+    if(f.type==='select')return '<div class="field"><label for="f-'+esc(f.id)+'">'+esc(f.label)+'</label><select id="f-'+esc(f.id)+'" data-field="'+esc(f.id)+'">'+(f.options||[]).map(function(o){return '<option value="'+esc(o.value)+'"'+(String(o.value)===String(f.default)?' selected':'')+'>'+esc(o.label)+'</option>';}).join('')+'</select></div>';
+    return '<div class="field"><label for="f-'+esc(f.id)+'">'+esc(f.label)+(f.suffix?' <span class="hint">('+esc(f.suffix)+')</span>':'')+'</label><input id="f-'+esc(f.id)+'" data-field="'+esc(f.id)+'" type="number" inputmode="decimal" placeholder="Enter '+esc(f.label.toLowerCase())+'" '+(f.min!==undefined?'min="'+f.min+'"':'')+' '+(f.max!==undefined?'max="'+f.max+'"':'')+' '+(f.step!==undefined?'step="'+f.step+'"':'')+'></div>';
+  }).join('');
+  container.innerHTML='<div class="calc-widget calc-user-first"><div class="calc-widget-body"><div class="wa-calc-intro"><span>STEP 1</span><b>Enter your own numbers</b><small>We check unusual values before calculating.</small></div><div class="calc-grid">'+fields+'</div><div id="'+id+'-warnings" class="wa-input-warnings" aria-live="polite"></div><button type="button" class="wa-calculate-btn" id="'+id+'-calculate">Calculate my result</button><div class="calc-result" id="'+id+'-result" aria-live="polite"><div class="wa-result-empty">Enter your details and calculate your result.</div></div><div class="wa-portfolio-card" id="'+id+'-graph"><div class="wa-portfolio-empty">Your accurate visual breakdown will appear here when applicable.</div></div><div id="'+id+'-insights"></div><div class="tool-actions"><button type="button" class="tool-action primary" id="'+id+'-share">Share</button><button type="button" class="tool-action" id="'+id+'-export">Export report</button><button type="button" class="tool-action" id="'+id+'-compare" aria-expanded="false">Compare</button></div><div class="compare-panel" id="'+id+'-compare-panel" hidden></div><p class="calc-note">Planning estimate only. Not financial, tax, legal or investment advice.</p></div></div>';
+  var latest=[],latestValues={};
+  function collect(){latestValues={};calc.fields.forEach(function(f){var e=document.getElementById('f-'+f.id);latestValues[f.id]=f.type==='select'?e.value:(e&&String(e.value).trim()!==''?Number(e.value):NaN);});return latestValues;}
+  function renderWarnings(issues){var h=document.getElementById(id+'-warnings');if(!h)return;h.innerHTML=issues.length?'<div class="wa-warning-list">'+issues.map(function(x){return '<div>⚠ '+esc(x)+'</div>';}).join('')+'</div>':'';}
+  function compute(show){
+    var v=collect(),missing=calc.fields.filter(function(f){return f.type!=='select'&&!Number.isFinite(v[f.id]));if(missing.length){if(show)document.getElementById(id+'-result').innerHTML='<div class="wa-result-empty">Please complete every field first.</div>';renderWarnings([]);return false;}
+    var issues=waP9Validate(calc,v);renderWarnings(issues);
+    try{latest=calc.compute(v)||[];}catch(err){console.error('Calculator failed',calc.id,err);document.getElementById(id+'-result').innerHTML='<div class="wa-result-empty">Please check your numbers and try again.</div>';return false;}
+    if(!latest.length){document.getElementById(id+'-result').innerHTML='<div class="wa-result-empty">No result could be calculated from these values.</div>';return false;}
+    document.getElementById(id+'-result').innerHTML=waResultSummary(calc,latest)+'<div class="wa-simple-results">'+latest.map(function(r){return '<div class="calc-result-row"><span class="calc-result-label">'+esc(waSimpleLabel(r.label))+'</span><span class="calc-result-value '+esc(r.emphasis||'')+'">'+esc(waFormatValue(r.value,r.format))+'</span></div>';}).join('')+'</div>';
+    waRenderPortfolio(id,latest);waP9Render(calc,id,v,latest);return true;
+  }
+  calc.fields.forEach(function(f){var e=document.getElementById('f-'+f.id);if(!e)return;e.addEventListener('input',function(){if(latest.length)compute(false);});e.addEventListener('change',function(){if(latest.length)compute(false);});});
+  document.getElementById(id+'-calculate').addEventListener('click',function(){compute(true);});
+  document.getElementById(id+'-share').addEventListener('click',function(){if(compute(false))waShare(calc.title,latest.map(function(r){return waSimpleLabel(r.label)+' '+waFormatValue(r.value,r.format);}).join(' • '),location.href);});
+  document.getElementById(id+'-export').addEventListener('click',function(){if(compute(false))waOpenPrintReport(calc,latestValues,latest);});
+  document.getElementById(id+'-compare').addEventListener('click',function(e){if(!compute(false))return;var p=document.getElementById(id+'-compare-panel');p.hidden=!p.hidden;e.currentTarget.setAttribute('aria-expanded',String(!p.hidden));if(!p.hidden)buildComparePanel(id,calc,latestValues,latest);});
+  container.dataset.waMounted='1';return true;
+}
