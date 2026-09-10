@@ -338,3 +338,59 @@ function mountCalculator(calc,id){
   document.getElementById(id+'-compare').addEventListener('click',function(e){if(!compute(false))return;var p=document.getElementById(id+'-compare-panel');p.hidden=!p.hidden;e.currentTarget.setAttribute('aria-expanded',String(!p.hidden));if(!p.hidden)buildComparePanel(id,calc,latestValues,latest);});
   container.dataset.waMounted='1';return true;
 }
+
+
+/* ================= EMERGENCY PRODUCTION RECOVERY =================
+   Keep calculator rendering independent from optional intelligence features.
+*/
+function mountCalculator(calc,id){
+  var container=document.getElementById(id);
+  if(!container||!calc||!Array.isArray(calc.fields)||typeof calc.compute!=='function'){
+    console.error('Wealth Arrays calculator mount failed',id,calc);
+    return false;
+  }
+  function h(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&gt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function fmt(v,format){
+    try{return typeof waFormatValue==='function'?waFormatValue(v,format):(Number(v).toLocaleString(undefined,{maximumFractionDigits:2}));}
+    catch(e){return String(v);}
+  }
+  var fields=calc.fields.map(function(f){
+    var label=h(f.label);
+    if(f.type==='select'){
+      var options=(f.options||[]).map(function(o){return '<option value="'+h(o.value)+'">'+h(o.label)+'</option>';}).join('');
+      return '<div class="field"><label>'+label+'</label><select data-wa-field="'+h(f.id)+'">'+options+'</select></div>';
+    }
+    return '<div class="field"><label>'+label+'</label><input data-wa-field="'+h(f.id)+'" type="number" inputmode="decimal" placeholder="Enter '+label.toLowerCase()+'" '+(f.min!==undefined?'min="'+h(f.min)+'" ':'')+(f.max!==undefined?'max="'+h(f.max)+'" ':'')+(f.step!==undefined?'step="'+h(f.step)+'" ':'')+'></div>';
+  }).join('');
+  container.innerHTML='<div class="calc-widget"><div class="calc-widget-body"><div class="calc-grid">'+fields+'</div><div class="wa-input-warnings" aria-live="polite"></div><button type="button" class="wa-calculate-btn">Calculate my result</button><div class="calc-result" aria-live="polite"><div class="wa-result-empty">Enter your details and calculate your result.</div></div><div class="wa-portfolio-card"><div class="wa-portfolio-empty">Your visual breakdown will appear after calculation when applicable.</div></div><div class="tool-actions"><button type="button" class="tool-action primary">Share</button></div><p class="calc-note">Planning estimate only. Not financial, tax, legal or investment advice.</p></div></div>';
+  var btn=container.querySelector('.wa-calculate-btn'),result=container.querySelector('.calc-result'),warn=container.querySelector('.wa-input-warnings'),graph=container.querySelector('.wa-portfolio-card'),latest=[],values={};
+  function read(){
+    var bad=[];
+    calc.fields.forEach(function(f){
+      var el=container.querySelector('[data-wa-field="'+f.id+'"]');
+      if(f.type==='select') values[f.id]=el.value;
+      else {var raw=String(el.value||'').trim(); values[f.id]=raw===''?NaN:Number(raw); if(raw===''||!Number.isFinite(values[f.id]))bad.push(f.label);}
+    });
+    return bad;
+  }
+  function draw(){
+    var bad=read();
+    if(bad.length){warn.innerHTML='<div class="wa-warning-list">Please enter a valid value for: '+h(bad.join(', '))+'.</div>';result.innerHTML='<div class="wa-result-empty">Complete all fields to calculate your result.</div>';return;}
+    warn.innerHTML='';
+    var rows;
+    try{rows=calc.compute(values)||[];}catch(e){console.error('Calculator compute failed',calc.id,e);result.innerHTML='<div class="wa-result-empty">Calculation failed. Please check your numbers.</div>';return;}
+    if(!rows.length){result.innerHTML='<div class="wa-result-empty">No result could be calculated.</div>';return;}
+    latest.splice(0,latest.length,...rows);
+    result.innerHTML='<div class="wa-simple-results">'+rows.map(function(r){return '<div class="calc-result-row"><span class="calc-result-label">'+h((typeof waSimpleLabel==='function'?waSimpleLabel(r.label):r.label))+'</span><span class="calc-result-value">'+h(fmt(r.value,r.format))+'</span></div>';}).join('')+'</div>';
+    if(typeof waRenderPortfolio==='function') waRenderPortfolio((graph.id||(graph.id=id+'-graph')),rows);
+    else graph.innerHTML='';
+  }
+  graph.id=id+'-graph';
+  btn.addEventListener('click',draw);
+  container.querySelector('.tool-action.primary').addEventListener('click',function(){
+    if(!latest.length){draw();if(!latest.length)return;}
+    if(navigator.share)navigator.share({title:calc.title,text:latest.map(function(r){return r.label+': '+fmt(r.value,r.format);}).join('\n'),url:location.href}).catch(function(){});
+  });
+  container.dataset.waMounted='1';
+  return true;
+}
