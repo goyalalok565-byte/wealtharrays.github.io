@@ -6,3 +6,6 @@
 /p/privacy.html /privacy.html 301
 /p/terms.html /terms.html 301
 /www/* https://wealtharrays.com/:splat 301
+
+# Canonical homepage
+/index.html / 301
