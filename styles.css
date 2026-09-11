@@ -571,3 +571,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 /* Phase 19 calculation-summary fallback: real values, never fabricated percentages */
 .wa-value-bars{display:grid;gap:12px;padding:18px;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
 .wa-value-bars>div{display:grid;grid-template-columns:minmax(90px,1fr) minmax(70px,2fr) auto;gap:10px;align-items:center}.wa-value-bars span{font-size:12px;font-weight:700;min-width:0}.wa-value-bars i{display:block;height:10px;border-radius:999px;background:var(--accent);opacity:.82}.wa-value-bars b{font-size:12px;text-align:right;white-space:nowrap}@media(max-width:600px){.wa-value-bars>div{grid-template-columns:1fr}.wa-value-bars b{text-align:left}}
+
+
+/* Phase 20: professional footer lockup and dense calculator library */
+@media(min-width:901px){.tools-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:14px!important}.tool-card{min-height:205px!important;padding:20px!important}.tool-card h2{font-size:15px!important}}
+@media(max-width:900px){.tools-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+.footer-brand,.footer-mark{display:block}.footer-mark{font-size:1.18rem!important;line-height:1.15!important;letter-spacing:-.035em!important;white-space:nowrap}.footer-mark span{font-size:.5em!important;vertical-align:super;margin-left:2px}.footer-brand p{max-width:330px}.site-footer .footer-brand{min-width:0}.premium-footer .footer-mark{font-weight:800!important}
