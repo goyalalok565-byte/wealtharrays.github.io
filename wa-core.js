@@ -39,7 +39,7 @@ const apply=t=>{document.documentElement.dataset.theme=t;localStorage.waTheme=t;
 apply(localStorage.waTheme||'light');
 if(b)b.onclick=()=>{const next=document.documentElement.dataset.theme==='dark'?'light':'dark';apply(next);window.waTrack?.('theme_change',{theme:next})};
 
-const qs=[...document.querySelectorAll('#tool-search')];
+const qs=[...document.querySelectorAll('#tool-search')].filter(q=>q.dataset.waHomeSearch!=='1');
 qs.forEach(q=>{
   let box=q.parentElement.querySelector('.tool-search-results')||document.querySelector('#tool-search-results');
   if(!box){box=document.createElement('div');box.className='tool-search-results';box.hidden=true;q.insertAdjacentElement('afterend',box)}
