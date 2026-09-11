@@ -28,43 +28,56 @@ function buildComparePanel(id,calc,currentValues,currentResults){const panel=doc
 function waRenderAccuratePie(id,calc,values,rows){
  const host=document.getElementById(id+'-graph');if(!host)return;
  const row=(re)=>rows.find(r=>re.test(String(r.label)));
- const num=x=>Number(x);
- let parts=null;
-
- // Each chart uses only genuine parts of one total. Derived totals are never added again.
+ const n=x=>Number(x), clean=x=>Number.isFinite(n(x))?n(x):0;
+ let parts=null, title='Where your result comes from';
+ const add=(label,value,format='currency')=>({label,value:clean(value),format});
+ const monthly=clean(values.monthly), principal=clean(values.principal), rate=clean(values.rate), years=clean(values.years);
+ const firstTotal=()=>rows.find(r=>/future value|maturity value|total amount|final value|estimated corpus|total repayment/i.test(r.label));
  if(calc.id==='sip'||calc.id==='investment'){
-   const invested=row(/^You put in$/i),gain=row(/^Your growth \/ profit$/i);
-   if(invested&&gain)parts=[{label:'Money you invested',value:num(invested.value),format:'currency'},{label:'Growth / profit',value:num(gain.value),format:'currency'}];
- }else if(calc.id==='compound-interest'){
-   const principal=row(/^Principal$/i),interest=row(/^Interest earned$/i);
-   if(principal&&interest)parts=[principal,interest];
- }else if(calc.id==='mortgage'||calc.id==='car-loan'||calc.id==='personal-loan'){
-   const repayment=row(/^Total repayment$/i),interest=row(/^Total interest$/i);
-   if(repayment&&interest){const principal=Math.max(0,num(repayment.value)-num(interest.value));parts=[{label:'Loan amount',value:principal,format:'currency'},{label:'Total interest',value:num(interest.value),format:'currency'}];}
- }else if(calc.id==='simple-interest'){
-   const interest=row(/^Interest$/i),total=row(/^Total amount$/i);
-   if(interest&&total){const principal=Math.max(0,num(total.value)-num(interest.value));parts=[{label:'Original amount',value:principal,format:'currency'},{label:'Interest',value:num(interest.value),format:'currency'}];}
- }else if(calc.id==='overtime-pay'){
-   const regular=row(/^Regular pay$/i),overtime=row(/^Overtime pay$/i);
-   if(regular&&overtime)parts=[regular,overtime];
- }else if(calc.id==='profit-margin'){
-   // Revenue = COGS + operating expenses + net profit.
-   const revenue=num(values.revenue),cogs=num(values.cogs),expenses=num(values.expenses),net=revenue-cogs-expenses;
-   if([revenue,cogs,expenses,net].every(Number.isFinite)&&revenue>0&&cogs>=0&&expenses>=0&&net>=0)parts=[{label:'Cost of goods',value:cogs,format:'currency'},{label:'Operating expenses',value:expenses,format:'currency'},{label:'Net profit',value:net,format:'currency'}];
+   const inv=row(/You put in|Invested amount/i), gain=row(/growth|profit|returns/i);
+   if(inv&&gain)parts=[add('Money invested',inv.value),add('Growth / returns',gain.value)];
+ } else if(calc.id==='compound-interest'||calc.id==='lumpsum'||calc.id==='fixed-deposit'){
+   const total=firstTotal(), interest=row(/interest earned|growth|returns/i);
+   if(total&&interest)parts=[add('Original investment',Math.max(0,clean(total.value)-clean(interest.value))),add('Growth / interest',interest.value)];
+ } else if(calc.id==='recurring-deposit'){
+   const total=firstTotal(); if(total){const invested=monthly*12*years;parts=[add('Money deposited',invested),add('Interest earned',Math.max(0,clean(total.value)-invested))];}
+ } else if(['mortgage','car-loan','personal-loan'].includes(calc.id)){
+   const repayment=row(/total repayment/i), interest=row(/total interest/i);
+   if(repayment&&interest)parts=[add('Loan amount',Math.max(0,clean(repayment.value)-clean(interest.value))),add('Total interest',interest.value)];
+ } else if(calc.id==='simple-interest'){
+   const total=row(/total amount/i), interest=row(/^Interest$/i);
+   if(total&&interest)parts=[add('Original amount',Math.max(0,clean(total.value)-clean(interest.value))),add('Interest',interest.value)];
+ } else if(calc.id==='roi'){
+   const cost=clean(values.cost), finalValue=clean(values.finalValue);
+   if(finalValue>=cost)parts=[add('Original investment',cost),add('Profit',finalValue-cost)];
+ } else if(calc.id==='profit-margin'){
+   const revenue=clean(values.revenue),cogs=clean(values.cogs),expenses=clean(values.expenses),net=revenue-cogs-expenses;
+   if(revenue>0&&net>=0)parts=[add('Cost of goods',cogs),add('Operating expenses',expenses),add('Net profit',net)];
+ } else if(calc.id==='net-worth'){
+   const assets=clean(values.cash)+clean(values.investments)+clean(values.property),debt=clean(values.debt);
+   if(assets>0)parts=[add('Cash',values.cash),add('Investments',values.investments),add('Property',values.property),add('Debt reduction',Math.min(debt,assets))].filter(p=>p.value>0);
+   title='Your balance-sheet components';
+ } else if(calc.id==='overtime'){
+   const regular=row(/regular pay/i), overtime=row(/overtime pay/i);if(regular&&overtime)parts=[add('Regular pay',regular.value),add('Overtime pay',overtime.value)];
+ } else if(calc.id==='debt-payoff'){
+   const balance=clean(values.balance), payment=clean(values.payment);
+   if(balance>0&&payment>0){const interest=Math.max(0,rows.find(r=>/total interest/i.test(r.label))?.value||0);parts=[add('Debt principal',balance),add('Estimated interest',interest)];}
+ } else if(calc.id==='income-tax-planner'){
+   const income=clean(values.income),ded=clean(values.deductions);const taxRow=row(/tax/i);const tax=taxRow?Math.max(0,clean(taxRow.value)):0;
+   if(income>0)parts=[add('Tax',Math.min(tax,income)),add('After-tax income',Math.max(0,income-tax))];
+   title='Income split';
  }
- if(!parts||parts.length<2||parts.some(p=>!Number.isFinite(num(p.value))||num(p.value)<0)){host.innerHTML='';return;}
- const total=parts.reduce((a,p)=>a+num(p.value),0);if(total<=0){host.innerHTML='';return;}
- const colors=['#2563eb','#14b8a6','#7c3aed','#f59e0b'];let angle=-90;
+ if(!parts||parts.length<2||parts.some(p=>p.value<0)||parts.reduce((s,p)=>s+p.value,0)<=0){
+   const numeric=rows.filter(r=>Number.isFinite(clean(r.value))&&clean(r.value)>=0).slice(0,5).map(r=>add(r.label,r.value,r.format||'number'));
+   if(numeric.length>=2){host.innerHTML='<div class="wa-pie-head"><span>CALCULATION SUMMARY</span><h3>'+esc(title)+'</h3><p>These bars use the actual values calculated from your inputs.</p></div><div class="wa-value-bars">'+numeric.map(r=>'<div><span>'+esc(r.label)+'</span><i style="width:'+Math.max(4,clean(r.value)/Math.max(...numeric.map(x=>clean(x.value)))*100).toFixed(2)+'%"></i><b>'+esc(waFormatValue(r.value,r.format))+'</b></div>').join('')+'</div>';return;}
+   host.innerHTML='';return;
+ }
+ const total=parts.reduce((s,p)=>s+p.value,0),colors=['#2563eb','#14b8a6','#7c3aed','#f59e0b'];let angle=-90;
  const pt=(a,r)=>{const q=a*Math.PI/180;return[50+r*Math.cos(q),50+r*Math.sin(q)]};
- const path=(a,b)=>{const p1=pt(a,42),p2=pt(b,42),large=b-a>180?1:0;return'M 50 50 L '+p1[0].toFixed(2)+' '+p1[1].toFixed(2)+' A 42 42 0 '+large+' 1 '+p2[0].toFixed(2)+' '+p2[1].toFixed(2)+' Z'};
+ const path=(a,b)=>{const p1=pt(a,42),p2=pt(b,42),large=b-a>180?1:0;return 'M 50 50 L '+p1[0].toFixed(2)+' '+p1[1].toFixed(2)+' A 42 42 0 '+large+' 1 '+p2[0].toFixed(2)+' '+p2[1].toFixed(2)+' Z'};
  let arcs='',labels='',legend='';
- parts.forEach((p,i)=>{const pct=num(p.value)/total*100,end=angle+pct*3.6,mid=(angle+end)/2;
-   arcs+='<path d="'+path(angle,end)+'" fill="'+colors[i%colors.length]+'" stroke="var(--surface,#fff)" stroke-width="1"></path>';
-   if(pct>=8){const q=pt(mid,25);labels+='<text x="'+q[0].toFixed(2)+'" y="'+(q[1]+2).toFixed(2)+'" text-anchor="middle" fill="#fff" font-size="7" font-weight="800">'+(pct<10?pct.toFixed(1):pct.toFixed(0))+'%</text>';}
-   legend+='<div class="wa-pie-row"><i style="background:'+colors[i%colors.length]+'"></i><span>'+esc(p.label)+'</span><b>'+esc(waFormatValue(p.value,p.format))+' · '+(pct<10?pct.toFixed(1):pct.toFixed(0))+'%</b></div>';
-   angle=end;
- });
- host.innerHTML='<div class="wa-pie-head"><span>RESULT BREAKDOWN</span><h3>Where your result comes from</h3><p>Each percentage is calculated from real parts of the same total.</p></div><div class="wa-pie-layout"><svg viewBox="0 0 100 100" role="img" aria-label="Accurate result breakdown">'+arcs+labels+'<circle cx="50" cy="50" r="14" fill="var(--surface,#fff)"></circle><text x="50" y="49" text-anchor="middle" font-size="9" font-weight="900" fill="currentColor">100%</text><text x="50" y="56" text-anchor="middle" font-size="3.5" font-weight="700" fill="currentColor">TOTAL</text></svg><div>'+legend+'</div></div>';
+ parts.forEach((p,i)=>{const pct=p.value/total*100,end=angle+pct*3.6,mid=(angle+end)/2;arcs+='<path d="'+path(angle,end)+'" fill="'+colors[i%colors.length]+'"></path>';if(pct>=8){const q=pt(mid,25);labels+='<text x="'+q[0].toFixed(2)+'" y="'+(q[1]+2).toFixed(2)+'" text-anchor="middle" fill="#fff" font-size="7" font-weight="800">'+(pct<10?pct.toFixed(1):pct.toFixed(0))+'%</text>';}legend+='<div class="wa-pie-row"><i style="background:'+colors[i%colors.length]+'"></i><span>'+esc(p.label)+'</span><b>'+esc(waFormatValue(p.value,p.format))+' · '+(pct<10?pct.toFixed(1):pct.toFixed(0))+'%</b></div>';angle=end;});
+ host.innerHTML='<div class="wa-pie-head"><span>RESULT BREAKDOWN</span><h3>'+esc(title)+'</h3><p>Percentages are calculated only from genuine parts of the same total.</p></div><div class="wa-pie-layout"><svg viewBox="0 0 100 100" role="img" aria-label="Accurate result breakdown">'+arcs+labels+'<circle cx="50" cy="50" r="14" fill="var(--surface,#fff)"></circle><text x="50" y="51" text-anchor="middle" font-size="9" font-weight="900" fill="currentColor">100%</text></svg><div>'+legend+'</div></div>';
 }
 // Calculator-page SEO content: formula, worked example, assumptions and FAQs.
 function waRenderCalculatorEducation(calc,id){
@@ -119,3 +132,7 @@ function initSearch(inputId,listSelector,headingId,totalLabel){const input=docum
   window.addEventListener('load',function(){setTimeout(boot,0);});
   setTimeout(boot,0);
 })();
+
+
+// Phase 19 homepage search recovery: build suggestions directly from visible calculator cards.
+(function(){function boot(){const q=document.getElementById('tool-search');const box=document.getElementById('tool-search-results');if(!q||!box||q.dataset.p19==='1')return;q.dataset.p19='1';const cards=[...document.querySelectorAll('.home-tool-card[data-search],.tool-card[data-search]')];const aliases={emi:'mortgage home loan',fd:'fixed deposit',rd:'recurring deposit',sip:'systematic investment',tax:'income tax',roi:'return investment',cagr:'annual growth'};q.addEventListener('input',function(){const raw=q.value.trim().toLowerCase();if(!raw){box.hidden=true;box.innerHTML='';cards.forEach(c=>c.hidden=false);return;}const terms=(aliases[raw]||raw).split(/\\s+/).filter(Boolean);const matches=cards.filter(c=>{const h=((c.dataset.search||'')+' '+c.textContent).toLowerCase();return h.includes(raw)||terms.some(t=>h.includes(t));});cards.forEach(c=>c.hidden=!matches.includes(c));box.innerHTML=matches.length?matches.slice(0,8).map(c=>{const title=(c.querySelector('b,h2')||{}).textContent||'Calculator';const href=c.getAttribute('href');return '<a href="'+href+'"><span>'+title.trim()+'</span><small>Open calculator</small><b>→</b></a>';}).join(''):'<div class="tool-search-empty">No calculator found. Try SIP, EMI, FD, RD, loan, tax or ROI.</div>';box.hidden=false;});q.addEventListener('keydown',function(e){if(e.key==='Enter'){const a=box.querySelector('a');if(a){e.preventDefault();location.href=a.href;}}});}document.addEventListener('DOMContentLoaded',boot);boot();})();
