@@ -557,3 +557,12 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 .wa-faq-list details{border-top:1px solid var(--line);padding:14px 0}.wa-faq-list details:last-child{border-bottom:1px solid var(--line)}.wa-faq-list summary{cursor:pointer;font-weight:750}.wa-faq-list details p{margin:9px 0 0}
 .wa-related{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.wa-related a{display:block;padding:14px;border:1px solid var(--line);border-radius:12px;text-decoration:none;color:inherit}.wa-related a:hover{transform:translateY(-1px);border-color:var(--accent)}.wa-related b,.wa-related span{display:block}.wa-related span{font-size:13px;color:var(--muted);margin-top:4px}.wa-education-note{font-size:13px;margin-top:20px!important}
 @media(max-width:640px){.wa-education{padding:18px}.wa-related{grid-template-columns:1fr}}
+
+
+/* Phase 18 premium homepage and calculator library refinement */
+.ledger-hero{position:relative;overflow:hidden;border-radius:28px;border:1px solid color-mix(in srgb,var(--line) 80%,transparent);box-shadow:0 24px 70px rgba(15,23,42,.08)}
+.ledger-hero:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 82% 14%,color-mix(in srgb,var(--accent) 14%,transparent),transparent 32%)}
+.hero-copy,.hero-panel{position:relative;z-index:1}.hero-copy h1{max-width:760px;letter-spacing:-.065em}.hero-copy>p{max-width:640px;font-size:1.05rem;line-height:1.7}.hero-panel{border-radius:22px;background:linear-gradient(145deg,color-mix(in srgb,var(--surface) 92%,#0b1220 8%),var(--surface));box-shadow:0 18px 45px rgba(15,23,42,.1)}
+.panel-top i{font-style:normal;letter-spacing:.08em}.panel-value{font-size:clamp(1.8rem,3vw,2.8rem);line-height:1.08}.chart{margin-top:28px;padding:10px 0 2px;border-top:1px solid var(--line)}
+.tools-grid{gap:18px!important}.tool-card{min-height:178px!important;padding:24px!important;border-radius:22px!important;display:flex;flex-direction:column;justify-content:space-between}.tool-card h2{font-size:1.18rem!important;margin:18px 0 8px!important}.tool-card p{font-size:.86rem!important;line-height:1.55}.tool-card span{margin-top:20px!important;font-weight:800}
+@media(max-width:760px){.tools-grid{grid-template-columns:1fr!important}.ledger-hero{border-radius:20px}.hero-copy>p{font-size:.98rem}}
