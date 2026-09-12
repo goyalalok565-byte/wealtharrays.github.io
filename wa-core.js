@@ -39,19 +39,8 @@ const apply=t=>{document.documentElement.dataset.theme=t;localStorage.waTheme=t;
 apply(localStorage.waTheme||'light');
 if(b)b.onclick=()=>{const next=document.documentElement.dataset.theme==='dark'?'light':'dark';apply(next);window.waTrack?.('theme_change',{theme:next})};
 
-const qs=[...document.querySelectorAll('#tool-search')].filter(q=>q.dataset.waHomeSearch!=='1');
-qs.forEach(q=>{
-  let box=q.parentElement.querySelector('.tool-search-results')||document.querySelector('#tool-search-results');
-  if(!box){box=document.createElement('div');box.className='tool-search-results';box.hidden=true;q.insertAdjacentElement('afterend',box)}
-  const aliases={sip:['systematic investment','monthly investment'],emi:['mortgage','home loan'],fd:['fixed deposit'],rd:['recurring deposit'],roi:['return on investment'],cagr:['annual return'],tax:['income tax'],salary:['hourly pay','overtime'],car:['car loan','vehicle'],loan:['mortgage','personal loan','car loan','debt payoff']};
-  const searchable=()=>[...document.querySelectorAll('.home-tool-card[data-search],.tool-card[data-search]')];
-  const findMatches=value=>{const raw=value.toLowerCase().trim(),terms=raw.split(/\s+/).filter(Boolean),extra=aliases[raw]||[],seen=new Set();return searchable().filter(el=>{const hay=(el.dataset.search+' '+el.textContent).toLowerCase();const ok=!raw||terms.every(t=>hay.includes(t))||extra.some(t=>hay.includes(t));const key=el.getAttribute('href')||el.textContent;if(!ok||seen.has(key))return false;seen.add(key);return true})};
-  const render=matches=>{if(!q.value.trim()){box.hidden=true;box.innerHTML='';return}box.innerHTML=matches.length?matches.slice(0,8).map(el=>{const title=(el.querySelector('b,h2,h3')||{}).textContent||el.textContent.trim(),href=el.getAttribute('href'),desc=(el.querySelector('p')||{}).textContent||'';return '<a href="'+href+'"><span>'+title.trim()+'</span><small>'+desc.trim()+'</small><b>→</b></a>'}).join(''):'<div class="tool-search-empty">No calculator found. Try SIP, EMI, FD, RD, loan, tax, salary or ROI.</div>';box.hidden=false};
-  q.addEventListener('input',()=>{const matches=findMatches(q.value);const set=new Set(matches);searchable().forEach(el=>{el.hidden=!!q.value.trim()&&!set.has(el)});render(matches)});
-  q.addEventListener('keydown',e=>{if(e.key==='Enter'){const first=box.querySelector('a');if(first){e.preventDefault();window.waTrack?.('tool_search_select',{query:q.value.trim().slice(0,80),tool:first.getAttribute('href')||''});location.href=first.href}}if(e.key==='Escape'){box.hidden=true;q.blur()}});
-  document.addEventListener('click',e=>{if(!box.contains(e.target)&&e.target!==q)box.hidden=true});
-});
-}
+// Homepage search is handled only by index.html; do not attach a second handler here.
+
 
 
 // Google Analytics 4 + privacy-friendly consent controls
