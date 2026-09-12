@@ -6,7 +6,24 @@ function waCurrencySymbol(){const c=currencyList().find(c=>c[0]===waState.curren
 function waFormatValue(value,format){if(!Number.isFinite(Number(value)))return'—';const n=Number(value);if(format==='percent')return n.toFixed(2)+'%';if(format==='number')return Math.round(n).toLocaleString('en-US');if(format==='years')return n.toFixed(1)+' yrs';return waCurrencySymbol()+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function esc(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function applyGlobalTheme(){document.documentElement.dataset.theme=waState.theme;const b=document.getElementById('theme-toggle'),s=b?.querySelector('[data-theme-label]')||document.getElementById('theme-toggle-label');if(s)s.textContent=waState.theme==='dark'?'Light mode':'Dark mode';if(b)b.setAttribute('aria-pressed',String(waState.theme==='dark'))}
-function initMasthead(onChange){const select=document.getElementById('currency-select'),toggle=document.getElementById('theme-toggle');if(select){select.innerHTML=currencyList().map(c=>`<option value="${c[0]}">${c[0]} (${c[1]})</option>`).join('');select.value=waState.currency;select.addEventListener('change',()=>{waState.currency=select.value;safeStorage.set('waCurrency',waState.currency);document.documentElement.dataset.currency=waState.currency;onChange?.()})}toggle?.addEventListener('click',()=>{waState.theme=waState.theme==='dark'?'light':'dark';safeStorage.set('waTheme',waState.theme);applyGlobalTheme()});applyGlobalTheme()}
+function initMasthead(onChange){
+  // wa-core.js owns the shared header controls. This module only observes them.
+  const select=document.getElementById('currency-select');
+  const toggle=document.getElementById('theme-toggle');
+  if(select){
+    waState.currency=select.value||safeStorage.get('waCurrency')||'INR';
+    select.addEventListener('change',()=>{waState.currency=select.value||'INR';safeStorage.set('waCurrency',waState.currency);onChange?.();});
+  }
+  if(toggle){
+    waState.theme=document.documentElement.dataset.theme||safeStorage.get('waTheme')||'light';
+  }
+  window.addEventListener('wa-currency',()=>{if(select){waState.currency=select.value||waState.currency;onChange?.();}});
+  window.addEventListener('storage',e=>{
+    if(e.key==='waCurrency'){waState.currency=e.newValue||'INR';onChange?.();}
+    if(e.key==='waTheme'){waState.theme=e.newValue||'light';applyGlobalTheme();}
+  });
+}
+
 async function waShare(title,text,url){if(navigator.share){try{await navigator.share({title,text,url});return}catch(e){}}try{await navigator.clipboard.writeText(url);alert('Link copied.')}catch(e){}}
 function waOpenPrintReport(calc,values,results){
  const rows=results.map(r=>`<tr><td>${esc(r.label)}</td><td>${esc(waFormatValue(r.value,r.format))}</td></tr>`).join('');
