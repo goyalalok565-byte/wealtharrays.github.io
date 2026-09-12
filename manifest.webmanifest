@@ -1,9 +1,24 @@
 {
-  "name":"Wealth Arrays",
-  "short_name":"Wealth Arrays",
-  "start_url":"/",
-  "display":"standalone",
-  "background_color":"#f7f8fb",
-  "theme_color":"#f7f8fb",
-  "description":"Fast, free financial calculators and original money guides.","icons":[{"src":"favicon-v2.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+  "name": "Wealth Arrays",
+  "short_name": "Wealth Arrays",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f8fb",
+  "theme_color": "#f7f8fb",
+  "description": "Fast, free financial calculators and original money guides.",
+  "icons": [
+    {
+      "src": "favicon-v2.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "favicon-v2.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
 }
