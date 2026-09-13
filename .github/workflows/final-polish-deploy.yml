@@ -21,7 +21,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import re
-          tag = '<script src="final-polish.js?v=20260913-1" defer></script>'
+          tag = '<script src="final-polish.js?v=20260913-2" defer></script>'
           pattern = re.compile(r'<script\s+src=["\']final-polish\.js(?:\?[^"\']*)?["\'][^>]*></script>', re.I)
           pages = sorted(Path('.').glob('*.html')) + sorted(Path('articles').glob('*.html'))
           for p in pages:
