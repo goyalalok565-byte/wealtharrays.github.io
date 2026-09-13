@@ -39,22 +39,23 @@ jobs:
                   s = s.replace(marker, marker + tag) if marker in s else s.replace('</body>', tag + '</body>')
               p.write_text(s)
 
-          # Inject the universal owner once into every top-level and article HTML page.
-          universal = '<script src="site-runtime.js?v=20260913-1" defer></script>'
+          # Inject the universal owner with a cache-busting version into every HTML page.
+          universal = '<script src="site-runtime.js?v=20260913-2" defer></script>'
           all_pages = sorted(Path('.').glob('*.html')) + sorted(Path('articles').glob('*.html'))
           u_pattern = re.compile(r'<script\s+src=["\']site-runtime\.js(?:\?[^"\']*)?["\'][^>]*></script>', re.I)
           for p in all_pages:
               s = p.read_text()
               if u_pattern.search(s): s = u_pattern.sub(universal, s, count=1)
               elif '</body>' in s:
-                  p.write_text(s.replace('</body>', universal + '</body>'))
+                  s = s.replace('</body>', universal + '</body>')
+              p.write_text(s)
 
           css = Path('styles.css')
           s = css.read_text()
           extra = '''\n/* Search suggestions must render above every homepage chart/panel stacking context. */\n.search-bar{position:relative;z-index:1000!important;overflow:visible!important}\n#tool-search-results{z-index:100000!important;position:absolute!important;visibility:visible}\n'''
           if '#tool-search-results{z-index:100000!important' not in s: css.write_text(s + extra)
 
-          Path('404.html').write_text('''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page moved — Wealth Arrays</title><script>(function(){var p=location.pathname.toLowerCase().replace(/^\\/+|\\/+$/g,\"\");var b=p.split(\"/\").pop().replace(/\\.html$/,\"\");var map={sip:\"sip-calculator.html\",\"sip-calculator\":\"sip-calculator.html\",emi:\"mortgage-emi-calculator.html\",\"emi-calculator\":\"mortgage-emi-calculator.html\",mortgage:\"mortgage-emi-calculator.html\",roi:\"roi-calculator.html\",cagr:\"cagr-calculator.html\",compound:\"compound-interest-calculator.html\",\"compound-interest\":\"compound-interest-calculator.html\",fd:\"fixed-deposit-calculator.html\",rd:\"recurring-deposit-calculator.html\",lumpsum:\"lumpsum-calculator.html\",\"lump-sum\":\"lumpsum-calculator.html\",inflation:\"inflation-calculator.html\",retirement:\"retirement-calculator.html\",\"car-loan\":\"car-loan-calculator.html\",\"personal-loan\":\"personal-loan-calculator.html\",\"debt-payoff\":\"debt-payoff-calculator.html\",\"simple-interest\":\"simple-interest-calculator.html\",\"profit-margin\":\"profit-margin-calculator.html\",\"net-worth\":\"net-worth-calculator.html\",\"salary-to-hourly\":\"salary-to-hourly-calculator.html\",\"overtime-pay\":\"overtime-pay-calculator.html\",\"freelance-rate\":\"freelance-rate-calculator.html\",\"income-tax\":\"income-tax-planner.html\"};var target=map[b];if(!target&&b&&b.indexOf(\"calculator\")>-1)target=b+\".html\";location.replace(\"/\"+(target||\"index.html\"));})();</script></head><body><p>That page has moved. <a href="/">Open Wealth Arrays</a>.</p></body></html>''')
+          Path('404.html').write_text('''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page moved — Wealth Arrays</title><script>(function(){var p=location.pathname.toLowerCase().replace(/^\\/+|\\/+$/g,\"\");var b=p.split(\"/\").pop().replace(/\\.html$/,\"\");var map={\"privacy-policy\":\"privacy.html\",privacy:\"privacy.html\",terms:\"terms.html\",disclaimer:\"disclaimer.html\",contact:\"contact.html\",sip:\"sip-calculator.html\",\"sip-calculator\":\"sip-calculator.html\",emi:\"mortgage-emi-calculator.html\",\"emi-calculator\":\"mortgage-emi-calculator.html\",mortgage:\"mortgage-emi-calculator.html\",roi:\"roi-calculator.html\",cagr:\"cagr-calculator.html\",compound:\"compound-interest-calculator.html\",\"compound-interest\":\"compound-interest-calculator.html\",fd:\"fixed-deposit-calculator.html\",rd:\"recurring-deposit-calculator.html\",lumpsum:\"lumpsum-calculator.html\",\"lump-sum\":\"lumpsum-calculator.html\",inflation:\"inflation-calculator.html\",retirement:\"retirement-calculator.html\",\"car-loan\":\"car-loan-calculator.html\",\"personal-loan\":\"personal-loan-calculator.html\",\"debt-payoff\":\"debt-payoff-calculator.html\",\"simple-interest\":\"simple-interest-calculator.html\",\"profit-margin\":\"profit-margin-calculator.html\",\"net-worth\":\"net-worth-calculator.html\",\"salary-to-hourly\":\"salary-to-hourly-calculator.html\",\"overtime-pay\":\"overtime-pay-calculator.html\",\"freelance-rate\":\"freelance-rate-calculator.html\",\"income-tax\":\"income-tax-planner.html\",\"decoding-auto-financing-how-car-loan\":\"articles/loan-emi-guide.html\"};var target=map[b];if(!target&&b&&b.indexOf(\"calculator\")>-1)target=b+\".html\";location.replace(\"/\"+(target||\"index.html\"));})();</script></head><body><p>That page has moved. <a href="/">Open Wealth Arrays</a>.</p></body></html>''')
           PY
 
       - name: Commit fixes
