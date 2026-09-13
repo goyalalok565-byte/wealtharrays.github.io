@@ -1,0 +1,64 @@
+name: Calculator runtime deployment fix
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  apply-runtime-fixes:
+    if: ${{ !contains(github.event.head_commit.message, '[runtime-fix]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply calculator runtime, validation and 404 fixes
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          # 1) Remove the obsolete 50% return / 60-year artificial caps.
+          p = Path('calculators.js')
+          s = p.read_text()
+          s = s.replace('max: 50,', 'max: 1000,')
+          s = s.replace('max: 60,', 'max: 200,')
+          p.write_text(s)
+
+          # 2) Load the isolated calculator runtime on every calculator page.
+          pages = sorted(Path('.').glob('*-calculator.html')) + [Path('income-tax-planner.html')]
+          tag = '<script src="calculator-runtime.js?v=20260913"></script>'
+          for p in pages:
+              s = p.read_text()
+              if 'calculator-runtime.js' not in s:
+                  marker = '<script src="wa-core.js" defer></script>'
+                  if marker in s:
+                      s = s.replace(marker, marker + tag)
+                  else:
+                      s = s.replace('</body>', tag + '</body>')
+                  p.write_text(s)
+
+          # 3) Keep homepage search suggestions above the hero graph/panel stacking context.
+          css = Path('styles.css')
+          s = css.read_text()
+          extra = '''\n/* Search suggestions must render above every homepage chart/panel. */\n.search-bar{position:relative;z-index:1000!important;overflow:visible!important}\n#tool-search-results{z-index:100000!important;position:absolute!important;visibility:visible}\n'''
+          if '#tool-search-results{z-index:100000!important' not in s:
+              css.write_text(s + extra)
+
+          # 4) Create a useful GitHub Pages 404 recovery page for old indexed calculator URLs.
+          Path('404.html').write_text('''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page moved — Wealth Arrays</title><script>(function(){var p=location.pathname.toLowerCase().replace(/^\\/+|\\/+$/g,\"\");var b=p.split(\"/\").pop().replace(/\\.html$/,\"\");var map={sip:\"sip-calculator.html\",\"sip-calculator\":\"sip-calculator.html\",emi:\"mortgage-emi-calculator.html\",\"emi-calculator\":\"mortgage-emi-calculator.html\",mortgage:\"mortgage-emi-calculator.html\",roi:\"roi-calculator.html\",cagr:\"cagr-calculator.html\",compound:\"compound-interest-calculator.html\",\"compound-interest\":\"compound-interest-calculator.html\",fd:\"fixed-deposit-calculator.html\",rd:\"recurring-deposit-calculator.html\",lumpsum:\"lumpsum-calculator.html\",\"lump-sum\":\"lumpsum-calculator.html\",inflation:\"inflation-calculator.html\",retirement:\"retirement-calculator.html\",\"car-loan\":\"car-loan-calculator.html\",\"personal-loan\":\"personal-loan-calculator.html\",\"debt-payoff\":\"debt-payoff-calculator.html\",\"simple-interest\":\"simple-interest-calculator.html\",\"profit-margin\":\"profit-margin-calculator.html\",\"net-worth\":\"net-worth-calculator.html\",\"salary-to-hourly\":\"salary-to-hourly-calculator.html\",\"overtime-pay\":\"overtime-pay-calculator.html\",\"freelance-rate\":\"freelance-rate-calculator.html\",\"income-tax\":\"income-tax-planner.html\"};var target=map[b];if(!target&&b&&b.indexOf(\"calculator\")>-1)target=b+\".html\";location.replace(\"/\"+(target||\"index.html\"));})();</script></head><body><p>That page has moved. <a href="/">Open Wealth Arrays</a>.</p></body></html>''')
+          PY
+
+      - name: Commit fixes
+        run: |
+          git config user.name "wealth-arrays-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add calculators.js styles.css 404.html '*-calculator.html' income-tax-planner.html calculator-runtime.js
+          git diff --cached --quiet && exit 0
+          git commit -m "Fix calculator controls, high-range inputs and 404 recovery [runtime-fix]"
+          git push
