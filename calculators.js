@@ -52,8 +52,8 @@ const CALCULATORS = [
     },
     fields: [
       { id: "monthly", label: "Monthly investment", type: "number", default: 200, min: 0, step: 10 },
-      { id: "rate", label: "Expected annual return", type: "number", default: 10, min: 0, max: 50, step: 0.1, suffix: "%" },
-      { id: "years", label: "Investment period", type: "number", default: 15, min: 1, max: 60, step: 1, suffix: "yrs" },
+      { id: "rate", label: "Expected annual return", type: "number", default: 10, min: 0, max: 1000, step: 0.1, suffix: "%" },
+      { id: "years", label: "Investment period", type: "number", default: 15, min: 1, max: 200, step: 1, suffix: "yrs" },
       { id: "inflation", label: "Expected annual inflation", type: "number", default: 6, min: 0, max: 30, step: 0.1, suffix: "%" },
     ],
     compute(v) {
@@ -88,8 +88,8 @@ const CALCULATORS = [
     },
     fields: [
       { id: "principal", label: "Initial amount", type: "number", default: 5000, min: 0, step: 100 },
-      { id: "rate", label: "Annual interest rate", type: "number", default: 6, min: 0, max: 50, step: 0.1, suffix: "%" },
-      { id: "years", label: "Time period", type: "number", default: 10, min: 1, max: 60, step: 1, suffix: "yrs" },
+      { id: "rate", label: "Annual interest rate", type: "number", default: 6, min: 0, max: 1000, step: 0.1, suffix: "%" },
+      { id: "years", label: "Time period", type: "number", default: 10, min: 1, max: 200, step: 1, suffix: "yrs" },
       { id: "inflation", label: "Expected annual inflation", type: "number", default: 6, min: 0, max: 30, step: 0.1, suffix: "%" },
       {
         id: "freq", label: "Compounding frequency", type: "select", default: "12",
@@ -164,7 +164,7 @@ const CALCULATORS = [
     fields: [
       { id: "cost", label: "Amount invested", type: "number", default: 10000, min: 0.01, step: 100 },
       { id: "finalValue", label: "Current / final value", type: "number", default: 14500, min: 0, step: 100 },
-      { id: "years", label: "Holding period", type: "number", default: 3, min: 0.1, max: 60, step: 0.1, suffix: "yrs" },
+      { id: "years", label: "Holding period", type: "number", default: 3, min: 0.1, max: 200, step: 0.1, suffix: "yrs" },
     ],
     compute(v) {
       const gain = v.finalValue - v.cost;
@@ -195,7 +195,7 @@ const CALCULATORS = [
     },
     fields: [
       { id: "principal", label: "Principal amount", type: "number", default: 5000, min: 0, step: 100 },
-      { id: "rate", label: "Annual interest rate", type: "number", default: 8, min: 0, max: 50, step: 0.1, suffix: "%" },
+      { id: "rate", label: "Annual interest rate", type: "number", default: 8, min: 0, max: 1000, step: 0.1, suffix: "%" },
       { id: "years", label: "Time period", type: "number", default: 2, min: 0.1, max: 40, step: 0.1, suffix: "yrs" },
     ],
     compute(v) {

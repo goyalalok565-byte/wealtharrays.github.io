@@ -611,3 +611,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 .wa-consent-actions [data-consent="granted"]{background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important}
 #wa-install-toast{top:10px!important;bottom:auto!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;width:min(620px,calc(100vw - 18px))!important;max-width:none!important;z-index:100001!important}
 @media(max-width:620px){#wa-consent{bottom:12px!important;flex-direction:column!important;align-items:stretch!important}.wa-consent-actions button{flex:1!important}#wa-install-toast{top:6px!important}}
+
+/* Search suggestions must render above every homepage chart/panel. */
+.search-bar{position:relative;z-index:1000!important;overflow:visible!important}
+#tool-search-results{z-index:100000!important;position:absolute!important;visibility:visible}
