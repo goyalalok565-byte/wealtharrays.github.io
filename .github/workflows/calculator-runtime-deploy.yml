@@ -39,8 +39,8 @@ jobs:
                   s = s.replace(marker, marker + tag) if marker in s else s.replace('</body>', tag + '</body>')
               p.write_text(s)
 
-          # Inject the universal owner with a cache-busting version into every HTML page.
-          universal = '<script src="site-runtime.js?v=20260913-2" defer></script>'
+          # Inject the universal owner with a fresh cache-busting version into every HTML page.
+          universal = '<script src="site-runtime.js?v=20260913-3" defer></script>'
           all_pages = sorted(Path('.').glob('*.html')) + sorted(Path('articles').glob('*.html'))
           u_pattern = re.compile(r'<script\s+src=["\']site-runtime\.js(?:\?[^"\']*)?["\'][^>]*></script>', re.I)
           for p in all_pages:
