@@ -1,0 +1,40 @@
+name: Wealth Arrays final polish deployment
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  polish:
+    if: ${{ !contains(github.event.head_commit.message, '[final-polish]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Inject final polish runtime
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          tag = '<script src="final-polish.js?v=20260913-1" defer></script>'
+          pattern = re.compile(r'<script\s+src=["\']final-polish\.js(?:\?[^"\']*)?["\'][^>]*></script>', re.I)
+          pages = sorted(Path('.').glob('*.html')) + sorted(Path('articles').glob('*.html'))
+          for p in pages:
+              s = p.read_text()
+              if pattern.search(s): s = pattern.sub(tag, s, count=1)
+              elif '</body>' in s: s = s.replace('</body>', tag + '</body>')
+              p.write_text(s)
+          PY
+      - name: Commit
+        run: |
+          git config user.name "wealth-arrays-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add final-polish.js '*.html' articles/*.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Apply final polish fixes [final-polish]"
+          git push
