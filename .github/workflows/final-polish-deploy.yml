@@ -24,7 +24,7 @@ jobs:
           tags = {
             'final-polish.js': '<script src="final-polish.js?v=20260914-3" defer></script>',
             'ux-fix.js': '<script src="ux-fix.js?v=20260914-1" defer></script>',
-            'interaction-fix.js': '<script src="interaction-fix.js?v=20260914-3" defer></script>'
+            'interaction-fix.js': '<script src="interaction-fix.js?v=20260914-4" defer></script>'
           }
           pages = sorted(Path('.').glob('*.html')) + sorted(Path('articles').glob('*.html'))
           for p in pages:
@@ -33,7 +33,7 @@ jobs:
                   stem = re.escape(name[:-3])
                   pattern = re.compile(r'<script\s+src=["\']' + stem + r'\.js(?:\?[^"\']*)?["\'][^>]*></script>', re.I)
                   s = pattern.sub(tag, s, count=1) if pattern.search(s) else s.replace('</body>', tag + '</body>')
-              css_tag = '<link rel="stylesheet" href="interaction-fix.css?v=20260914-2"> '
+              css_tag = '<link rel="stylesheet" href="interaction-fix.css?v=20260914-3"> '
               css_pattern = re.compile(r'<link\s+rel=["\']stylesheet["\']\s+href=["\']interaction-fix\.css(?:\?[^"\']*)?["\'][^>]*>', re.I)
               s = css_pattern.sub(css_tag, s, count=1) if css_pattern.search(s) else s.replace('</head>', css_tag + '</head>', 1)
               p.write_text(s)
@@ -42,11 +42,17 @@ jobs:
         run: |
           node --check interaction-fix.js
           test -s interaction-fix.css
+          python3 - <<'PY'
+          import json
+          m=json.load(open('manifest.webmanifest'))
+          assert any(i.get('sizes')=='192x192' and i.get('type')=='image/png' for i in m['icons'])
+          assert any(i.get('sizes')=='512x512' and i.get('type')=='image/png' for i in m['icons'])
+          PY
       - name: Commit
         run: |
           git config user.name "wealth-arrays-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add final-polish.js ux-fix.js interaction-fix.js interaction-fix.css '*.html' articles/*.html
+          git add final-polish.js ux-fix.js interaction-fix.js interaction-fix.css '*.html' articles/*.html manifest.webmanifest icon-192.png icon-512.png
           git diff --cached --quiet && exit 0
           git commit -m "Apply final polish fixes [final-polish]"
           git push
