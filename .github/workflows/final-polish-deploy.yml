@@ -26,6 +26,8 @@ jobs:
               s = p.read_text()
               s = re.sub(r'<script\s+src=["\'][^"\']*(?:ux-fix|interaction-fix)\.js(?:\?[^"\']*)?["\'][^>]*></script>\s*', '', s, flags=re.I)
               s = re.sub(r'<link\s+rel=["\']stylesheet["\']\s+href=["\'][^"\']*interaction-fix\.css(?:\?[^"\']*)?["\'][^>]*>\s*', '', s, flags=re.I)
+              s = re.sub(r'<link\s+rel=["\']manifest["\'][^>]*>\s*', '', s, flags=re.I)
+              s = s.replace('</head>', '<link rel="manifest" href="/manifest.webmanifest"></head>', 1)
               tag = '<script src="final-polish.js?v=20260914-3" defer></script>'
               pattern = re.compile(r'<script\s+src=["\']final-polish\.js(?:\?[^"\']*)?["\'][^>]*></script>', re.I)
               s = pattern.sub(tag, s, count=1) if pattern.search(s) else s.replace('</body>', tag + '</body>')
