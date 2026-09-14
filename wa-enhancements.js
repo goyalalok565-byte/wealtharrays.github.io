@@ -1,27 +1,6 @@
-/* Wealth Arrays UX enhancements — install banner + live calculation/PDF hardening. */
+/* Wealth Arrays UX enhancements — live calculation/PDF hardening. */
 (function () {
   'use strict';
-  function installed() { return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true || document.referrer.indexOf('android-app://') === 0; }
-  function installBanner() {
-    if (installed() || document.getElementById('wa-install-banner')) return;
-    let deferred = null;
-    const box = document.createElement('aside');
-    box.id = 'wa-install-banner';
-    box.setAttribute('role', 'dialog');
-    box.setAttribute('aria-label', 'Install Wealth Arrays');
-    box.innerHTML = '<div class="wa-install-copy"><span class="wa-install-icon">WA</span><span><strong>Install Wealth Arrays</strong><small>Keep your finance tools one tap away.</small></span></div><div class="wa-install-actions"><button type="button" class="wa-install-btn" disabled>Install App</button><button type="button" class="wa-install-close" aria-label="Dismiss install message">×</button></div>';
-    const style = document.createElement('style');
-    style.id = 'wa-install-css';
-    style.textContent = '#wa-install-banner{position:fixed;z-index:100000;top:12px;left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));margin:auto;width:min(620px,calc(100% - 24px));padding:10px 11px;border:1px solid var(--line,#e2e6ed);border-radius:15px;background:var(--surface,#fff);color:var(--text,#10141b);box-shadow:0 14px 42px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:space-between;gap:12px;font:500 13px/1.3 system-ui,sans-serif}.wa-install-copy{display:flex;align-items:center;gap:10px;min-width:0}.wa-install-copy>span:last-child{display:grid;gap:2px}.wa-install-copy strong{font-size:12px}.wa-install-copy small{font-size:10px;color:var(--muted,#667085)}.wa-install-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:var(--text,#10141b);color:var(--bg,#fff);font-size:9px;font-weight:900;flex:none}.wa-install-actions{display:flex;align-items:center;gap:6px;flex:none}.wa-install-btn,.wa-install-close{font:750 11px/1 system-ui,sans-serif;cursor:pointer}.wa-install-btn{border:1px solid var(--text,#10141b);border-radius:9px;padding:9px 11px;background:var(--text,#10141b);color:var(--bg,#fff)}.wa-install-btn:disabled{opacity:.5;cursor:default}.wa-install-close{width:31px;height:31px;border:1px solid var(--line,#e2e6ed);border-radius:9px;background:transparent;color:var(--muted,#667085);font-size:20px;padding:0}#wa-install-banner.wa-install-hide{transform:translateY(calc(-100% - 24px));opacity:0;pointer-events:none;transition:transform .28s ease,opacity .22s ease}html[data-theme="dark"] .wa-install-btn{background:#fff;color:#080a0f;border-color:#fff}html[data-theme="dark"] .wa-install-icon{background:#fff;color:#080a0f}@media(max-width:520px){#wa-install-banner{top:8px;padding:9px}.wa-install-copy small{display:none}.wa-install-btn{padding:9px 10px}}';
-    document.head.appendChild(style);
-    document.body.appendChild(box);
-    const button = box.querySelector('.wa-install-btn');
-    const hide = function () { box.classList.add('wa-install-hide'); setTimeout(function () { box.remove(); style.remove(); }, 320); };
-    box.querySelector('.wa-install-close').addEventListener('click', hide);
-    window.addEventListener('beforeinstallprompt', function (event) { event.preventDefault(); deferred = event; button.disabled = false; }, { once: true });
-    button.addEventListener('click', async function () { if (!deferred) return; const promptEvent = deferred; deferred = null; button.disabled = true; try { await promptEvent.prompt(); } catch (e) {} hide(); });
-    window.addEventListener('appinstalled', hide, { once: true });
-  }
   function liveCalculator() {
     let timer = 0;
     const isControl = function (target) { return target && target.matches && target.matches('#calc-widget input,#calc-widget select,#calc-widget textarea'); };
@@ -59,6 +38,6 @@
       try { return original(calc, values, results); } finally { setTimeout(function () { window.open = oldOpen; }, 0); }
     };
   }
-  function start() { installBanner(); liveCalculator(); patchPdfLogo(); setTimeout(patchPdfLogo, 300); setTimeout(patchPdfLogo, 900); }
+  function start() { liveCalculator(); patchPdfLogo(); setTimeout(patchPdfLogo, 300); setTimeout(patchPdfLogo, 900); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true }); else start();
 })();
