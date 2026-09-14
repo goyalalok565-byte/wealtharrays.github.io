@@ -615,3 +615,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 /* Search suggestions must render above every homepage chart/panel. */
 .search-bar{position:relative;z-index:1000!important;overflow:visible!important}
 #tool-search-results{z-index:100000!important;position:absolute!important;visibility:visible}
+
+/* Runtime-owned search overlay. */
+.search-bar{position:relative!important;z-index:1000!important;overflow:visible!important}
+#tool-search-results{z-index:100000!important;position:absolute!important;overflow:hidden!important}
