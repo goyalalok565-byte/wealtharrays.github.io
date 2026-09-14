@@ -20,6 +20,9 @@ jobs:
       - name: Validate calculator math and definitions
         run: node scripts/phase10-qa.mjs
 
+      - name: Validate site-wide internal links, metadata and crawl files
+        run: node scripts/site-integrity.mjs
+
       - name: Validate calculator page coverage
         shell: bash
         run: |
