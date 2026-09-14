@@ -15,44 +15,48 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Inject final polish and UX runtime
+      - name: Normalize shared runtime references
         shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
           import re
-          tags = {
-            'final-polish.js': '<script src="final-polish.js?v=20260914-3" defer></script>',
-            'ux-fix.js': '<script src="ux-fix.js?v=20260914-1" defer></script>',
-            'interaction-fix.js': '<script src="interaction-fix.js?v=20260914-4" defer></script>'
-          }
           pages = sorted(Path('.').glob('*.html')) + sorted(Path('articles').glob('*.html'))
           for p in pages:
               s = p.read_text()
-              for name, tag in tags.items():
-                  stem = re.escape(name[:-3])
-                  pattern = re.compile(r'<script\s+src=["\']' + stem + r'\.js(?:\?[^"\']*)?["\'][^>]*></script>', re.I)
-                  s = pattern.sub(tag, s, count=1) if pattern.search(s) else s.replace('</body>', tag + '</body>')
-              css_tag = '<link rel="stylesheet" href="interaction-fix.css?v=20260914-3"> '
-              css_pattern = re.compile(r'<link\s+rel=["\']stylesheet["\']\s+href=["\']interaction-fix\.css(?:\?[^"\']*)?["\'][^>]*>', re.I)
-              s = css_pattern.sub(css_tag, s, count=1) if css_pattern.search(s) else s.replace('</head>', css_tag + '</head>', 1)
+              # wa-core is the sole owner of calculator search and PWA install.
+              s = re.sub(r'<script\s+src=["\'][^"\']*(?:ux-fix|interaction-fix)\.js(?:\?[^"\']*)?["\'][^>]*></script>\s*', '', s, flags=re.I)
+              s = re.sub(r'<link\s+rel=["\']stylesheet["\']\s+href=["\'][^"\']*interaction-fix\.css(?:\?[^"\']*)?["\'][^>]*>\s*', '', s, flags=re.I)
+              tag = '<script src="final-polish.js?v=20260914-3" defer></script>'
+              pattern = re.compile(r'<script\s+src=["\']final-polish\.js(?:\?[^"\']*)?["\'][^>]*></script>', re.I)
+              s = pattern.sub(tag, s, count=1) if pattern.search(s) else s.replace('</body>', tag + '</body>')
               p.write_text(s)
           PY
-      - name: Validate interaction assets
+      - name: Validate canonical runtime and PWA assets
         run: |
-          node --check interaction-fix.js
-          test -s interaction-fix.css
+          node --check wa-core.js
+          node --check final-polish.js
+          test ! -e ux-fix.js
+          test ! -e interaction-fix.js
+          test ! -e home-recovery.js
+          test ! -e interaction-fix.css
           python3 - <<'PY'
-          import json
+          import json, pathlib
           m=json.load(open('manifest.webmanifest'))
           assert any(i.get('sizes')=='192x192' and i.get('type')=='image/png' for i in m['icons'])
           assert any(i.get('sizes')=='512x512' and i.get('type')=='image/png' for i in m['icons'])
+          b=pathlib.Path('og-image.png').read_bytes()
+          assert b.startswith(b'\x89PNG\r\n\x1a\n')
+          assert b'IHDR' in b[:32]
+          for p in list(pathlib.Path('.').glob('*.html')) + list(pathlib.Path('articles').glob('*.html')):
+              s=p.read_text()
+              assert not re.search(r'(?:ux-fix|interaction-fix)\.js',s,re.I)
           PY
-      - name: Commit
+      - name: Commit normalized site
         run: |
           git config user.name "wealth-arrays-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add final-polish.js ux-fix.js interaction-fix.js interaction-fix.css '*.html' articles/*.html manifest.webmanifest icon-192.png icon-512.png
+          git add '*.html' articles/*.html final-polish.js .github/workflows/final-polish-deploy.yml
           git diff --cached --quiet && exit 0
-          git commit -m "Apply final polish fixes [final-polish]"
+          git commit -m "Normalize shared runtime ownership [final-polish]"
           git push
