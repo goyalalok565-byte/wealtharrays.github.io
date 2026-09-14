@@ -30,51 +30,41 @@ jobs:
           def normalize_script(text, filename, tag):
               pattern=re.compile(r'<script\s+src=["\'][^"\']*'+re.escape(filename)+r'(?:\?[^"\']*)?["\'][^>]*></script>',re.I)
               matches=list(pattern.finditer(text))
-              if not matches:
-                  return text.replace('</body>',tag+'</body>',1)
+              if not matches: return text.replace('</body>',tag+'</body>',1)
               first=matches[0]
               text=text[:first.start()]+tag+text[first.end():]
               offset=first.start()+len(tag)
-              tail=text[offset:]
-              tail=pattern.sub('',tail)
-              return text[:offset]+tail
+              return text[:offset]+pattern.sub('',text[offset:])
 
           p=Path('calculators.js')
-          s=p.read_text()
-          s=s.replace('max: 50,','max: 1000,').replace('max: 60,','max: 200,')
+          s=p.read_text().replace('max: 50,','max: 1000,').replace('max: 60,','max: 200,')
           p.write_text(s)
 
           calculator_pages=sorted(Path('.').glob('*-calculator.html'))+[Path('income-tax-planner.html')]
           for p in calculator_pages:
-              s=p.read_text()
-              s=normalize_script(s,'calculator-runtime.js','<script src="/calculator-runtime.js?v=20260914-5" defer></script>')
-              p.write_text(s)
+              p.write_text(normalize_script(p.read_text(),'calculator-runtime.js','<script src="/calculator-runtime.js?v=20260914-5" defer></script>'))
 
           all_pages=sorted(Path('.').glob('*.html'))+sorted(Path('articles').glob('*.html'))+sorted(Path('p').glob('*.html'))
           footer='''<footer class="site-footer premium-footer"><div class="site-footer-inner"><div class="footer-brand-row"><a class="footer-logo" href="/index.html" aria-label="Wealth Arrays home"><img src="/favicon-v2.svg" alt="Wealth Arrays logo" width="44" height="44"><span><b>Wealth Arrays</b><small>Financial tools that make numbers clearer.</small></span></a><p class="footer-brand-copy">Fast, browser-first financial calculators for clearer decisions. Results are educational estimates and not financial, tax, legal or investment advice.</p></div><nav class="footer-nav-box" aria-label="Company and legal pages"><a class="footer-link" href="/privacy.html">Privacy Policy</a><a class="footer-link" href="/terms.html">Terms &amp; Conditions</a><a class="footer-link" href="/disclaimer.html">Disclaimer</a><a class="footer-link" href="/about.html">About Us</a><a class="footer-link" href="/contact.html">Contact Us</a><a class="footer-link" href="/methodology.html">Methodology</a><a class="footer-link" href="/editorial-standards.html">Editorial Standards</a><a class="footer-link" href="/advertising-policy.html">Advertising Policy</a><a class="footer-link" href="/faq.html">FAQ</a></nav><div class="footer-bottom"><span>© 2026 Wealth Arrays</span><span>Questions or corrections: <a href="mailto:goyalalok565@gmail.com">goyalalok565@gmail.com</a></span></div></div></footer>'''
           footer_pattern=re.compile(r'<footer\b[^>]*>.*?</footer>',re.I|re.S)
-
           for p in all_pages:
               s=p.read_text()
               s=normalize_script(s,'wa-core.js','<script src="/wa-core.js?v=20260914-5" defer></script>')
               s=normalize_script(s,'site-runtime.js','<script src="/site-runtime.js?v=20260914-2" defer></script>')
               s=normalize_script(s,'wa-enhancements.js','<script src="/wa-enhancements.js?v=20260914-2" defer></script>')
+              s=s.replace("const host = document.querySelector('.calc-page') || document.querySelector('.tool-article') || document.querySelector('main');","const host = document.querySelector('.calc-page');",1)
               s=re.sub(r'<script\s+src=["\'][^"\']*home-recovery\.js(?:\?[^"\']*)?["\'][^>]*></script>','',s,flags=re.I)
               s=footer_pattern.sub(footer,s)
               if '<footer' not in s.lower(): s=s.replace('</body>',footer+'</body>',1)
-              s=re.sub(r'<link\s+rel=["\'](?:shortcut icon|icon)["\'][^>]*>', '', s, flags=re.I)
+              s=re.sub(r'<link\s+rel=["\'](?:shortcut icon|icon)["\'][^>]*>','',s,flags=re.I)
               s=s.replace('</head>','<link rel="icon" href="/favicon-v2.svg" type="image/svg+xml" sizes="any"><link rel="shortcut icon" href="/favicon-v2.svg" type="image/svg+xml"></head>',1)
-              if 'property="og:image"' not in s.lower():
-                  s=s.replace('</head>','<meta property="og:image" content="https://wealtharrays.com/og-image.png"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"></head>',1)
-              else:
-                  s=re.sub(r'<meta\s+property=["\']og:image["\'][^>]*>', '<meta property="og:image" content="https://wealtharrays.com/og-image.png">', s, count=1, flags=re.I)
+              if 'property="og:image"' not in s.lower(): s=s.replace('</head>','<meta property="og:image" content="https://wealtharrays.com/og-image.png"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"></head>',1)
+              else: s=re.sub(r'<meta\s+property=["\']og:image["\'][^>]*>','<meta property="og:image" content="https://wealtharrays.com/og-image.png">',s,count=1,flags=re.I)
               for cls in ['home-tool-index','tool-num','calc-icon','category-icon','share-icon','footer-mark']:
-                  s=re.sub(r'(<[^>]*class=["\'][^"\']*\b'+re.escape(cls)+r'\b[^"\']*["\'][^>]*)(>)', lambda m: m.group(1)+(' aria-hidden="true"' if 'aria-hidden=' not in m.group(1) else '')+m.group(2), s, flags=re.I)
+                  s=re.sub(r'(<[^>]*class=["\'][^"\']*\b'+re.escape(cls)+r'\b[^"\']*["\'][^>]*)(>)',lambda m:m.group(1)+(' aria-hidden="true"' if 'aria-hidden=' not in m.group(1) else '')+m.group(2),s,flags=re.I)
               p.write_text(s)
 
-          css=Path('styles.css')
-          s=css.read_text()
-          extra='\n/* Runtime-owned search overlay. */\n.search-bar{position:relative!important;z-index:1000!important;overflow:visible!important}\n#tool-search-results{z-index:100000!important;position:absolute!important;overflow:hidden!important}\n'
+          css=Path('styles.css'); s=css.read_text(); extra='\n/* Runtime-owned search overlay. */\n.search-bar{position:relative!important;z-index:1000!important;overflow:visible!important}\n#tool-search-results{z-index:100000!important;position:absolute!important;overflow:hidden!important}\n'
           if '/* Runtime-owned search overlay. */' not in s: css.write_text(s+extra)
           PY
 
@@ -97,11 +87,9 @@ jobs:
           managed={'wa-core.js','site-runtime.js','wa-enhancements.js','calculator-runtime.js','final-polish.js'}
           pages=list(Path('.').glob('*.html'))+list(Path('articles').glob('*.html'))+list(Path('p').glob('*.html'))
           for p in pages:
-              s=p.read_text()
-              m=footer.search(s)
+              s=p.read_text(); m=footer.search(s)
               if not m or 'footer-logo' not in m.group(1) or 'Wealth Arrays' not in m.group(1): raise SystemExit(f'Invalid canonical footer: {p}')
-              scripts=re.findall(r'<script\s+src=["\']([^"\']+)["\'][^>]*></script>',s,re.I)
-              names=[Path(x.split('?',1)[0]).name for x in scripts]
+              scripts=re.findall(r'<script\s+src=["\']([^"\']+)["\'][^>]*></script>',s,re.I); names=[Path(x.split('?',1)[0]).name for x in scripts]
               for src in managed:
                   if names.count(src)>1: raise SystemExit(f'Duplicate {src}: {p}')
           PY
