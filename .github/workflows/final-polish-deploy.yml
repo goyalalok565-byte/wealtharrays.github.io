@@ -16,6 +16,17 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Prepare deterministic hardening helper
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('.github/scripts/production_hardening.py')
+          s=p.read_text()
+          s=s.replace("SEARCH + '\\n  function analytics()', s, count=1, flags=re.S)", "lambda m: SEARCH + '\\n  function analytics()', s, count=1, flags=re.S)")
+          s=s.replace("CONSENT + '\\n\\n  let installEvent = null;', s, count=1, flags=re.S)", "lambda m: CONSENT + '\\n\\n  let installEvent = null;', s, count=1, flags=re.S)")
+          p.write_text(s)
+          PY
+
       - name: Apply production hardening
         run: python3 .github/scripts/production_hardening.py
 
