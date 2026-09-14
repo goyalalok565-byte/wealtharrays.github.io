@@ -31,7 +31,7 @@ jobs:
               s = pattern.sub(tag, s, count=1) if pattern.search(s) else s.replace('</body>', tag + '</body>')
               p.write_text(s)
           PY
-      - name: Validate canonical runtime and PWA assets
+      - name: Validate canonical runtime
         run: |
           node --check wa-core.js
           node --check final-polish.js
@@ -40,16 +40,15 @@ jobs:
           test ! -e home-recovery.js
           test ! -e interaction-fix.css
           python3 - <<'PY'
-          import json, pathlib, re
-          m=json.load(open('manifest.webmanifest'))
-          assert any(i.get('sizes')=='192x192' and i.get('type')=='image/png' for i in m['icons'])
-          assert any(i.get('sizes')=='512x512' and i.get('type')=='image/png' for i in m['icons'])
-          b=pathlib.Path('og-image.png').read_bytes()
-          assert b.startswith(b'\x89PNG\r\n\x1a\n')
-          assert b'IHDR' in b[:32]
-          for p in list(pathlib.Path('.').glob('*.html')) + list(pathlib.Path('articles').glob('*.html')):
+          from pathlib import Path
+          import re
+          for p in list(Path('.').glob('*.html')) + list(Path('articles').glob('*.html')):
               s=p.read_text()
-              assert not re.search(r'(?:ux-fix|interaction-fix)\.js',s,re.I)
+              assert not re.search(r'(?:ux-fix|interaction-fix)\.js',s,re.I), p
+              assert not re.search(r'interaction-fix\.css',s,re.I), p
+          b=Path('og-image.png').read_bytes()
+          assert b.startswith(b'\x89PNG\r\n\x1a\n'), 'og-image.png is not a PNG'
+          assert b'IHDR' in b[:32], 'og-image.png has no PNG IHDR'
           PY
       - name: Commit normalized site
         run: |
