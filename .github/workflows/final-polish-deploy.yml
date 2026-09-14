@@ -15,122 +15,25 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Apply root UX fixes and normalize HTML
+      - name: Normalize shared runtime references
         shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
           import re
-
-          core = Path('wa-core.js')
-          s = core.read_text()
-
-          # Search: make one owner work on home, tools, and calculator pages.
-          start = s.index('  function calculatorSearch() {')
-          end = s.index('\n\n  function analytics()', start)
-          search_fn = '''  function calculatorSearch() {
-    const catalog = [
-      ['SIP Calculator','Monthly investing and projected wealth.','sip systematic investment plan monthly mutual fund','sip-calculator.html'],
-      ['Compound Interest','See compounding over time.','compound interest savings growth investing','compound-interest-calculator.html'],
-      ['Mortgage / EMI','Monthly payment and total interest.','mortgage emi home loan payment loan','mortgage-emi-calculator.html'],
-      ['ROI Calculator','Total and annualized returns.','roi return investment profit','roi-calculator.html'],
-      ['Simple Interest','Flat interest on principal.','simple interest banking loan','simple-interest-calculator.html'],
-      ['Retirement Calculator','Estimate a financial independence target.','retirement fire pension freedom','retirement-calculator.html'],
-      ['Salary to Hourly','Convert annual and hourly pay.','salary hourly wage income','salary-to-hourly-calculator.html'],
-      ['Profit Margin','Revenue, cost and margin math.','profit margin business revenue cost','profit-margin-calculator.html'],
-      ['Fixed Deposit','Deposit growth and maturity value.','fd fixed deposit banking maturity','fixed-deposit-calculator.html'],
-      ['Recurring Deposit','Monthly deposit maturity planning.','rd recurring deposit monthly deposit','recurring-deposit-calculator.html'],
-      ['Lumpsum Calculator','Project a one-time investment.','lumpsum lump sum investment','lumpsum-calculator.html'],
-      ['CAGR Calculator','Calculate compound annual growth.','cagr annual growth return','cagr-calculator.html'],
-      ['Car Loan EMI','Plan vehicle-loan payments.','car loan auto vehicle emi','car-loan-calculator.html'],
-      ['Personal Loan','Estimate repayment cost.','personal loan payment repayment','personal-loan-calculator.html'],
-      ['Debt Payoff','Plan a faster route out of debt.','debt payoff repayment credit','debt-payoff-calculator.html'],
-      ['Inflation Calculator','Understand future purchasing power.','inflation future value purchasing power','inflation-calculator.html'],
-      ['Net Worth','Assets minus liabilities.','net worth assets liabilities wealth','net-worth-calculator.html'],
-      ['Overtime Pay','Estimate overtime earnings.','overtime pay salary wage','overtime-pay-calculator.html'],
-      ['Freelance Rate','Turn target income into an hourly rate.','freelance rate hourly pricing business','freelance-rate-calculator.html'],
-      ['Income Tax Planner','Plan transparent tax scenarios.','income tax planner tax effective rate','income-tax-planner.html']
-    ];
-    let input = document.getElementById('tool-search');
-    let box = document.getElementById('tool-search-results');
-    if (!input) {
-      const page = document.querySelector('.calc-page');
-      if (page) {
-        const shell = document.createElement('div'); shell.className = 'tool-library-search tool-search-shell wa-calculator-search';
-        shell.innerHTML = '<input id="tool-search" type="search" autocomplete="off" placeholder="Search any calculator: SIP, EMI, FD, ROI…" aria-label="Search calculators"><div id="tool-search-results" class="tool-search-results" hidden></div>';
-        const title = page.querySelector('.calc-title') || page.firstElementChild;
-        if (title) title.insertAdjacentElement('beforebegin', shell); else page.prepend(shell);
-        input = shell.querySelector('#tool-search'); box = shell.querySelector('#tool-search-results');
-      }
-    }
-    if (!input || !box || input.dataset.waSearchOwner === '1') return;
-    input.dataset.waSearchOwner = '1';
-    const aliases = {sip:'systematic investment plan monthly investment mutual fund',emi:'mortgage home loan payment',fd:'fixed deposit banking',rd:'recurring deposit monthly deposit',roi:'return investment profit',cagr:'compound annual growth',tax:'income tax planner',salary:'hourly wage income',loan:'mortgage personal car debt',retirement:'pension financial independence'};
-    const normalize = (v) => String(v || '').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
-    function render(){
-      const q = normalize(input.value);
-      if(!q){box.innerHTML='';box.hidden=true;box.style.display='none';return;}
-      const terms=(q+' '+(aliases[q]||'')).split(/\s+/).filter(Boolean);
-      const hits=catalog.map(item=>{const text=normalize(item[0]+' '+item[1]+' '+item[2]);let score=text.includes(q)?100:0;terms.forEach(t=>{if(t.length>1&&text.includes(t))score+=4});return {item,score};}).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,8);
-      box.innerHTML=hits.length?hits.map(x=>'<a class="wa-search-suggestion" href="'+x.item[3]+'"><span><strong>'+x.item[0]+'</strong><small>'+x.item[1]+'</small></span><b>→</b></a>').join(''):'<div class="tool-search-empty">No exact match. Try SIP, EMI, FD, RD, loan, tax, salary or ROI.</div>';
-      box.hidden=false;box.style.setProperty('display','block','important');
-    }
-    ['input','keyup','search','focus'].forEach(n=>input.addEventListener(n,render,true));
-    input.addEventListener('keydown',e=>{if(e.key==='Escape'){box.hidden=true;box.style.display='none'}},true);
-    document.addEventListener('click',e=>{if(!input.contains(e.target)&&!box.contains(e.target)){box.hidden=true;box.style.display='none'}},true);
-  }'''
-          s = s[:start] + search_fn + s[end:]
-
-          # Consent: visible again, buttons clickable, and privacy settings can be reopened.
-          cstart=s.index('  function consentDialog() {'); cend=s.index('\n\n  let installEvent',cstart)
-          consent_fn='''  function consentDialog() {
-    let box=null;
-    let style=document.getElementById('wa-consent-css');
-    const create=()=>{
-      if(box&&document.body.contains(box))return;
-      if(!style){style=document.createElement('style');style.id='wa-consent-css';style.textContent='#wa-consent{position:fixed;z-index:100001;left:16px;right:16px;bottom:16px;margin:auto;width:min(620px,calc(100% - 32px));display:flex;align-items:center;justify-content:space-between;gap:18px;padding:15px 16px;border:1px solid var(--line,#e2e6ed);border-radius:16px;background:var(--surface,#fff);color:var(--text,#10141b);box-shadow:0 16px 48px rgba(0,0,0,.18);font:500 13px/1.4 system-ui,sans-serif;pointer-events:auto}#wa-consent p{margin:3px 0 0;color:var(--muted,#667085);font-size:11px}.wa-consent-actions{display:flex;gap:8px;flex:none}.wa-consent-actions button{padding:9px 14px;border-radius:9px;font:800 11px system-ui,sans-serif;cursor:pointer;pointer-events:auto}';document.head.appendChild(style)}
-      box=document.createElement('aside');box.id='wa-consent';box.setAttribute('role','dialog');box.setAttribute('aria-label','Privacy choices');box.innerHTML='<div><strong>Privacy choices</strong><p>We use analytics only with your permission to understand site usage and improve Wealth Arrays.</p></div><div class="wa-consent-actions"><button type="button" data-wa-consent="reject">Reject</button><button type="button" data-wa-consent="accept">Accept</button></div>';document.body.appendChild(box);
-      box.addEventListener('click',e=>{const b=e.target.closest('[data-wa-consent]');if(!b)return;const granted=b.dataset.waConsent==='accept';set('waAnalyticsConsent',granted?'granted':'denied');if(typeof window.gtag==='function')window.gtag('consent','update',{analytics_storage:granted?'granted':'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});box.remove();box=null});
-    };
-    const open=()=>{create();box.hidden=false};window.waOpenConsent=open;
-    document.addEventListener('click',e=>{const link=e.target.closest&&e.target.closest('[data-wa-open-consent]');if(link){e.preventDefault();open()}},true);
-    if(!get('waAnalyticsConsent',''))open();
-  }'''
-          s=s[:cstart]+consent_fn+s[cend:]
-
-          # Install banner: keep it above consent, show quickly, and don't permanently disappear.
-          s=s.replace("if (get('waInstallDismissed','') === '1' || document.getElementById('wa-install')) return;", "if (get('waInstallDismissedUntil','') && Number(get('waInstallDismissedUntil','0')) > Date.now() || document.getElementById('wa-install')) return;")
-          s=s.replace("set('waInstallDismissed','1');box.remove();return;", "set('waInstallDismissedUntil',String(Date.now()+7*24*60*60*1000));box.remove();return;")
-          s=s.replace("function installPromptInit() { setTimeout(showInstallBanner, 900); }", "function installPromptInit() { setTimeout(showInstallBanner, 350); }")
-          s=s.replace("z-index:100000;left:16px;right:16px;bottom:16px;", "z-index:100002;left:16px;right:16px;bottom:92px;")
-          s=s.replace("@media(max-width:560px){#wa-install{align-items:stretch;flex-direction:column;gap:9px}", "@media(max-width:560px){#wa-install{left:10px;right:10px;bottom:132px;align-items:stretch;flex-direction:column;gap:9px}")
-
-          # Re-openable privacy setting in footer.
-          marker='<a class="footer-link" href="/faq.html">FAQ</a>'
-          if marker in s and 'data-wa-open-consent' not in s:s=s.replace(marker,marker+'<a class="footer-link" href="#" data-wa-open-consent>Privacy choices</a>',1)
-          s=s.replace(".tool-search-empty{padding:14px;color:var(--muted,#667085);font-size:11px}", ".tool-search-empty{padding:14px;color:var(--muted,#667085);font-size:11px}.wa-calculator-search{margin:0 0 20px}.wa-calculator-search input{height:48px}",1)
-          core.write_text(s)
-
-          # Remove stale patch files/references and duplicate script includes.
-          pages=sorted(Path('.').glob('*.html'))+sorted(Path('articles').glob('*.html'))
+          pages = sorted(Path('.').glob('*.html')) + sorted(Path('articles').glob('*.html'))
           for p in pages:
-              text=p.read_text()
-              text=re.sub(r'<script\s+src=["\'][^"\']*(?:ux-fix|interaction-fix)\.js(?:\?[^"\']*)?["\'][^>]*></script>\s*','',text,flags=re.I)
-              text=re.sub(r'<link\s+rel=["\']stylesheet["\']\s+href=["\'][^"\']*interaction-fix\.css(?:\?[^"\']*)?["\'][^>]*>\s*','',text,flags=re.I)
-              text=re.sub(r'<link\s+rel=["\']manifest["\'][^>]*>\s*','',text,flags=re.I)
-              text=text.replace('</head>','<link rel="manifest" href="/manifest.webmanifest"></head>',1)
-              seen=set()
-              def dedupe(m):
-                  base=m.group(1).split('?')[0].split('/')[-1].lower()
-                  if base in seen:return ''
-                  seen.add(base);return m.group(0)
-              text=re.sub(r'<script\s+src=["\']([^"\']+)["\'][^>]*></script>\s*',dedupe,text,flags=re.I)
-              tag='<script src="final-polish.js?v=20260914-3" defer></script>'
-              fp=re.compile(r'<script\s+src=["\']final-polish\.js(?:\?[^"\']*)?["\'][^>]*></script>',re.I)
-              text=fp.sub(tag,text,count=1) if fp.search(text) else text.replace('</body>',tag+'</body>')
-              p.write_text(text)
+              s = p.read_text()
+              s = re.sub(r'<script\s+src=["\'][^"\']*(?:ux-fix|interaction-fix)\.js(?:\?[^"\']*)?["\'][^>]*></script>\s*', '', s, flags=re.I)
+              s = re.sub(r'<link\s+rel=["\']stylesheet["\']\s+href=["\'][^"\']*interaction-fix\.css(?:\?[^"\']*)?["\'][^>]*>\s*', '', s, flags=re.I)
+              s = re.sub(r'<link\s+rel=["\']manifest["\'][^>]*>\s*', '', s, flags=re.I)
+              s = s.replace('</head>', '<link rel="manifest" href="/manifest.webmanifest"></head>', 1)
+              tag = '<script src="final-polish.js?v=20260914-3" defer></script>'
+              pattern = re.compile(r'<script\s+src=["\']final-polish\.js(?:\?[^"\']*)?["\'][^>]*></script>', re.I)
+              s = pattern.sub(tag, s, count=1) if pattern.search(s) else s.replace('</body>', tag + '</body>')
+              p.write_text(s)
           PY
-      - name: Validate root fixes
+      - name: Validate cleanup only
         run: |
           set -euo pipefail
           test ! -e ux-fix.js
@@ -139,15 +42,12 @@ jobs:
           test ! -e interaction-fix.css
           ! grep -R -n -E 'ux-fix\.js|interaction-fix\.js|interaction-fix\.css' --include='*.html' .
           node --check wa-core.js
-          grep -q "const catalog" wa-core.js
-          grep -q "waOpenConsent" wa-core.js
-          grep -q "bottom:92px" wa-core.js
           git diff --check
       - name: Commit normalized site
         run: |
           git config user.name "wealth-arrays-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add '*.html' articles/*.html wa-core.js .github/workflows/final-polish-deploy.yml
+          git add '*.html' articles/*.html final-polish.js .github/workflows/final-polish-deploy.yml
           git diff --cached --quiet && exit 0
-          git commit -m "Fix core UX and normalize runtime [final-polish]"
+          git commit -m "Normalize shared runtime ownership [final-polish]"
           git push
