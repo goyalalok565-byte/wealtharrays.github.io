@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Apply calculator runtime, validation and legacy route fixes
+      - name: Apply calculator runtime, metadata, accessibility and route fixes
         shell: bash
         run: |
           python3 - <<'PY'
@@ -33,16 +33,30 @@ jobs:
           u_pattern=re.compile(r'<script\s+src=["\']site-runtime\.js(?:\?[^"\']*)?["\'][^>]*></script>',re.I)
           e_pattern=re.compile(r'<script\s+src=["\']wa-enhancements\.js(?:\?[^"\']*)?["\'][^>]*></script>',re.I)
           for p in all_pages:
-              s=p.read_text(); s=u_pattern.sub(universal,s,count=1) if u_pattern.search(s) else s.replace('</body>',universal+'</body>'); s=e_pattern.sub(enhancements,s,count=1) if e_pattern.search(s) else s.replace('</body>',enhancements+'</body>'); p.write_text(s)
+              s=p.read_text(); s=u_pattern.sub(universal,s,count=1) if u_pattern.search(s) else s.replace('</body>',universal+'</body>'); s=e_pattern.sub(enhancements,s,count=1) if e_pattern.search(s) else s.replace('</body>',enhancements+'</body>')
+              # Canonical favicon on every HTML page.
+              s=re.sub(r'<link\s+rel=["\'](?:shortcut icon|icon)["\'][^>]*>', '', s, flags=re.I)
+              s=s.replace('</head>','<link rel="icon" href="/favicon-v2.svg" type="image/svg+xml" sizes="any"><link rel="shortcut icon" href="/favicon-v2.svg" type="image/svg+xml"></head>',1)
+              # One stable PNG for WhatsApp/Facebook/X previews.
+              if 'property="og:image"' not in s.lower(): s=s.replace('</head>','<meta property="og:image" content="https://wealtharrays.com/og-image.png"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"></head>',1)
+              # Hide decorative glyph containers from screen readers without touching meaningful text.
+              for cls in ['home-tool-index','tool-num','calc-icon','category-icon','share-icon','footer-mark']:
+                  s=re.sub(r'(<[^>]*class=["\'][^"\']*\b'+re.escape(cls)+r'\b[^"\']*["\'][^>]*)(>)', lambda m: m.group(1)+(' aria-hidden="true"' if 'aria-hidden=' not in m.group(1) else '')+m.group(2), s, flags=re.I)
+              p.write_text(s)
           css=Path('styles.css'); s=css.read_text(); extra='\n/* Runtime-owned search overlay. */\n.search-bar{position:relative!important;z-index:1000!important;overflow:visible!important}\n#tool-search-results{z-index:100000!important;position:absolute!important;overflow:hidden!important}\n';
           if '/* Runtime-owned search overlay. */' not in s: css.write_text(s+extra)
           Path('404.html').write_text('''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page moved — Wealth Arrays</title><script>(function(){var p=location.pathname.toLowerCase().replace(/^\\/+|\\/+$/g,"");var b=p.split("/").pop().replace(/\\.html$/,"");var map={"privacy-policy":"privacy.html","privacy":"privacy.html","terms":"terms.html","disclaimer":"disclaimer.html","contact":"contact.html","about-us":"about.html","sip":"sip-calculator.html","sip-calculator":"sip-calculator.html","emi":"mortgage-emi-calculator.html","emi-calculator":"mortgage-emi-calculator.html","mortgage":"mortgage-emi-calculator.html","roi":"roi-calculator.html","cagr":"cagr-calculator.html","compound":"compound-interest-calculator.html","compound-interest":"compound-interest-calculator.html","fd":"fixed-deposit-calculator.html","rd":"recurring-deposit-calculator.html","lumpsum":"lumpsum-calculator.html","lump-sum":"lumpsum-calculator.html","inflation":"inflation-calculator.html","retirement":"retirement-calculator.html","car-loan":"car-loan-calculator.html","personal-loan":"personal-loan-calculator.html","debt-payoff":"debt-payoff-calculator.html","simple-interest":"simple-interest-calculator.html","profit-margin":"profit-margin-calculator.html","net-worth":"net-worth-calculator.html","salary-to-hourly":"salary-to-hourly-calculator.html","overtime-pay":"overtime-pay-calculator.html","freelance-rate":"freelance-rate-calculator.html","income-tax":"income-tax-planner.html","decoding-auto-financing-how-car-loan":"articles/loan-emi-guide.html"};var target=map[b];if(!target&&b&&b.indexOf("calculator")>-1)target=b+".html";location.replace("/"+(target||"index.html"));})();</script></head><body><p>That page has moved. <a href="/">Open Wealth Arrays</a>.</p></body></html>''')
           PY
+      - name: Validate JavaScript syntax
+        shell: bash
+        run: |
+          set -e
+          for f in *.js articles/*.js p/*.js 2>/dev/null; do [ -f "$f" ] && node --check "$f"; done
       - name: Commit fixes
         run: |
           git config user.name "wealth-arrays-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add calculators.js styles.css 404.html site-runtime.js wa-enhancements.js '*.html' articles/*.html p/*.html calculator-runtime.js
           git diff --cached --quiet && exit 0
-          git commit -m "Refresh universal runtime and legacy routes [runtime-fix]"
+          git commit -m "Refresh universal runtime and page metadata [runtime-fix]"
           git push
