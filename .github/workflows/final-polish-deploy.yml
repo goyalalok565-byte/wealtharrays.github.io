@@ -1,35 +1,17 @@
-name: Wealth Arrays final polish deployment
+name: Wealth Arrays production validation
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  polish:
-    if: ${{ !contains(github.event.head_commit.message, '[final-polish]') }}
+  validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Keep shared runtime production-safe
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          core=Path('wa-core.js')
-          s=core.read_text()
-          old="const host = document.querySelector('.calc-page') || document.querySelector('.tool-article') || document.querySelector('main');"
-          new="const host = document.querySelector('.calc-page');"
-          if old in s:
-              s=s.replace(old,new,1)
-          core.write_text(s)
-          PY
-
-      - name: Validate production build
+      - name: Validate production runtime
         run: |
           set -euo pipefail
           test ! -e ux-fix.js
@@ -37,24 +19,18 @@ jobs:
           test ! -e home-recovery.js
           test ! -e interaction-fix.css
           ! grep -R -n -E 'ux-fix\.js|interaction-fix\.js|interaction-fix\.css' --include='*.html' .
-          node --check wa-core.js
-          node --check sw.js
-          node --check site-runtime.js
-          node --check calculator-runtime.js
-          node --check wa-enhancements.js
-          node --check final-polish.js
+          find . -maxdepth 2 -type f -name '*.js' -print0 | xargs -0 -n1 node --check
           python3 - <<'PY'
           from pathlib import Path
           import re
-          pages=sorted(Path('.').glob('*.html'))+sorted(Path('articles').glob('*.html'))
-          managed={'wa-core.js','site-runtime.js','final-polish.js','wa-enhancements.js','calculator-runtime.js','calculators.js','widget.js','smart.js'}
+          managed={'wa-core.js','site-runtime.js','wa-enhancements.js','calculator-runtime.js','final-polish.js'}
+          pages=list(Path('.').glob('*.html'))+list(Path('articles').glob('*.html'))+list(Path('p').glob('*.html'))
           for p in pages:
               s=p.read_text()
               assert s.count('rel="manifest"')==1, p
               scripts=re.findall(r'<script\s+src=["\']([^"\']+)["\'][^>]*></script>',s,re.I)
               names=[Path(x.split('?',1)[0]).name for x in scripts]
-              for src in managed:
-                  assert names.count(src)<=1, (p,src,names)
+              for src in managed: assert names.count(src)<=1, (p,src,names)
           core=Path('wa-core.js').read_text()
           assert 'const CALCULATOR_CATALOG' in core
           assert "const host = document.querySelector('.calc-page');" in core
@@ -64,20 +40,3 @@ jobs:
           assert 'wealtharrays-pwa-2' in Path('sw.js').read_text()
           PY
           git diff --check
-
-      - name: Commit with concurrency-safe push
-        run: |
-          set -euo pipefail
-          git config user.name "wealth-arrays-bot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git diff --cached --quiet && exit 0
-          git commit -m "Production hardening: calculator search scope [final-polish]"
-          for attempt in 1 2 3; do
-            git fetch origin main
-            git rebase origin/main && git push && exit 0
-            git rebase --abort || true
-            sleep 2
-          done
-          echo "Unable to push production hardening after retries" >&2
-          exit 1
