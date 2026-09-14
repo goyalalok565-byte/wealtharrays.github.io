@@ -34,12 +34,10 @@ jobs:
           e_pattern=re.compile(r'<script\s+src=["\']wa-enhancements\.js(?:\?[^"\']*)?["\'][^>]*></script>',re.I)
           for p in all_pages:
               s=p.read_text(); s=u_pattern.sub(universal,s,count=1) if u_pattern.search(s) else s.replace('</body>',universal+'</body>'); s=e_pattern.sub(enhancements,s,count=1) if e_pattern.search(s) else s.replace('</body>',enhancements+'</body>')
-              # Canonical favicon on every HTML page.
               s=re.sub(r'<link\s+rel=["\'](?:shortcut icon|icon)["\'][^>]*>', '', s, flags=re.I)
               s=s.replace('</head>','<link rel="icon" href="/favicon-v2.svg" type="image/svg+xml" sizes="any"><link rel="shortcut icon" href="/favicon-v2.svg" type="image/svg+xml"></head>',1)
-              # One stable PNG for WhatsApp/Facebook/X previews.
               if 'property="og:image"' not in s.lower(): s=s.replace('</head>','<meta property="og:image" content="https://wealtharrays.com/og-image.png"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"></head>',1)
-              # Hide decorative glyph containers from screen readers without touching meaningful text.
+              else: s=re.sub(r'<meta\s+property=["\']og:image["\'][^>]*>', '<meta property="og:image" content="https://wealtharrays.com/og-image.png">', s, count=1, flags=re.I)
               for cls in ['home-tool-index','tool-num','calc-icon','category-icon','share-icon','footer-mark']:
                   s=re.sub(r'(<[^>]*class=["\'][^"\']*\b'+re.escape(cls)+r'\b[^"\']*["\'][^>]*)(>)', lambda m: m.group(1)+(' aria-hidden="true"' if 'aria-hidden=' not in m.group(1) else '')+m.group(2), s, flags=re.I)
               p.write_text(s)
@@ -51,7 +49,7 @@ jobs:
         shell: bash
         run: |
           set -e
-          for f in *.js articles/*.js p/*.js 2>/dev/null; do [ -f "$f" ] && node --check "$f"; done
+          find . -maxdepth 2 -type f -name '*.js' -print0 | xargs -0 -n1 node --check
       - name: Commit fixes
         run: |
           git config user.name "wealth-arrays-bot"
