@@ -1,0 +1,18 @@
+/* Wealth Arrays card + interaction polish. Keep the category/accent top edge unchanged. */
+.home-tool-card,.tool-card,.ledger-row{
+  border-left:1.5px solid var(--line)!important;
+  border-right:1.5px solid var(--line)!important;
+  border-bottom:1.5px solid var(--line)!important;
+}
+.home-tool-card,.tool-card,.ledger-row{
+  border-top:4px solid var(--wa-card-accent,var(--line))!important;
+}
+.tool-search-shell{position:relative!important;z-index:1000!important;overflow:visible!important}
+#tool-search-results{position:absolute!important;left:0!important;right:0!important;top:calc(100% + 8px)!important;z-index:100000!important;max-height:420px!important;overflow:auto!important;border:1px solid var(--line)!important;border-radius:14px!important;background:var(--surface)!important;box-shadow:0 18px 45px rgba(0,0,0,.16)!important}
+.wa-search-suggestion{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;padding:12px 14px!important;border-bottom:1px solid var(--line)!important;background:var(--surface)!important;color:var(--text)!important;cursor:pointer!important}
+.wa-search-suggestion:last-child{border-bottom:0!important}
+.wa-search-suggestion:hover,.wa-search-suggestion:focus{background:var(--surface2)!important}
+.wa-search-suggestion span{min-width:0!important;display:grid!important;gap:2px!important}
+.wa-search-suggestion strong{font-size:12px!important}
+.wa-search-suggestion small{font-size:10px!important;color:var(--muted)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.tool-search-empty{padding:14px!important;color:var(--muted)!important;font-size:11px!important}
