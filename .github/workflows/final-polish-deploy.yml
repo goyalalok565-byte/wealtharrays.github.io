@@ -24,7 +24,7 @@ jobs:
           tags = {
             'final-polish.js': '<script src="final-polish.js?v=20260914-3" defer></script>',
             'ux-fix.js': '<script src="ux-fix.js?v=20260914-1" defer></script>',
-            'interaction-fix.js': '<script src="interaction-fix.js?v=20260914-2" defer></script>'
+            'interaction-fix.js': '<script src="interaction-fix.js?v=20260914-3" defer></script>'
           }
           pages = sorted(Path('.').glob('*.html')) + sorted(Path('articles').glob('*.html'))
           for p in pages:
