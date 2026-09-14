@@ -24,7 +24,6 @@ jobs:
           pages = sorted(Path('.').glob('*.html')) + sorted(Path('articles').glob('*.html'))
           for p in pages:
               s = p.read_text()
-              # wa-core is the sole owner of calculator search and PWA install.
               s = re.sub(r'<script\s+src=["\'][^"\']*(?:ux-fix|interaction-fix)\.js(?:\?[^"\']*)?["\'][^>]*></script>\s*', '', s, flags=re.I)
               s = re.sub(r'<link\s+rel=["\']stylesheet["\']\s+href=["\'][^"\']*interaction-fix\.css(?:\?[^"\']*)?["\'][^>]*>\s*', '', s, flags=re.I)
               tag = '<script src="final-polish.js?v=20260914-3" defer></script>'
@@ -41,7 +40,7 @@ jobs:
           test ! -e home-recovery.js
           test ! -e interaction-fix.css
           python3 - <<'PY'
-          import json, pathlib
+          import json, pathlib, re
           m=json.load(open('manifest.webmanifest'))
           assert any(i.get('sizes')=='192x192' and i.get('type')=='image/png' for i in m['icons'])
           assert any(i.get('sizes')=='512x512' and i.get('type')=='image/png' for i in m['icons'])
