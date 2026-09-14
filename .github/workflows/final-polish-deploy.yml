@@ -24,7 +24,7 @@ jobs:
           tags = {
             'final-polish.js': '<script src="final-polish.js?v=20260914-3" defer></script>',
             'ux-fix.js': '<script src="ux-fix.js?v=20260914-1" defer></script>',
-            'interaction-fix.js': '<script src="interaction-fix.js?v=20260914-1" defer></script>'
+            'interaction-fix.js': '<script src="interaction-fix.js?v=20260914-2" defer></script>'
           }
           pages = sorted(Path('.').glob('*.html')) + sorted(Path('articles').glob('*.html'))
           for p in pages:
@@ -33,8 +33,9 @@ jobs:
                   stem = re.escape(name[:-3])
                   pattern = re.compile(r'<script\s+src=["\']' + stem + r'\.js(?:\?[^"\']*)?["\'][^>]*></script>', re.I)
                   s = pattern.sub(tag, s, count=1) if pattern.search(s) else s.replace('</body>', tag + '</body>')
-              if 'interaction-fix.css' not in s:
-                  s = s.replace('</head>', '<link rel="stylesheet" href="interaction-fix.css?v=20260914-1"> </head>', 1)
+              css_tag = '<link rel="stylesheet" href="interaction-fix.css?v=20260914-2"> '
+              css_pattern = re.compile(r'<link\s+rel=["\']stylesheet["\']\s+href=["\']interaction-fix\.css(?:\?[^"\']*)?["\'][^>]*>', re.I)
+              s = css_pattern.sub(css_tag, s, count=1) if css_pattern.search(s) else s.replace('</head>', css_tag + '</head>', 1)
               p.write_text(s)
           PY
       - name: Validate interaction assets
