@@ -16,20 +16,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Prepare deterministic hardening helper
+      - name: Keep shared runtime production-safe
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          p=Path('.github/scripts/production_hardening.py')
-          s=p.read_text()
-          s=s.replace("SEARCH + '\\n  function analytics()', s, count=1, flags=re.S)", "lambda m: SEARCH + '\\n  function analytics()', s, count=1, flags=re.S)")
-          s=s.replace("CONSENT + '\\n\\n  let installEvent = null;', s, count=1, flags=re.S)", "lambda m: CONSENT + '\\n\\n  let installEvent = null;', s, count=1, flags=re.S)")
-          s=s.replace("src.split('?',1)[0].lstrip('/')", "Path(src.split('?',1)[0]).name")
-          p.write_text(s)
+          import re
+          core=Path('wa-core.js')
+          s=core.read_text()
+          old="const host = document.querySelector('.calc-page') || document.querySelector('.tool-article') || document.querySelector('main');"
+          new="const host = document.querySelector('.calc-page');"
+          if old in s:
+              s=s.replace(old,new,1)
+          core.write_text(s)
           PY
-
-      - name: Apply production hardening
-        run: python3 .github/scripts/production_hardening.py
 
       - name: Validate production build
         run: |
@@ -58,17 +57,14 @@ jobs:
               for src in managed:
                   assert names.count(src)<=1, (p,src,names)
           core=Path('wa-core.js').read_text()
-          assert 'CALCULATOR_CATALOG' in core
+          assert 'const CALCULATOR_CATALOG' in core
+          assert "const host = document.querySelector('.calc-page');" in core
           assert 'data-wa-open-consent' in core
           assert 'bottom:92px' in core
           assert '7*24*60*60*1000' in core
-          sw=Path('sw.js').read_text()
-          assert 'wealtharrays-pwa-2' in sw
+          assert 'wealtharrays-pwa-2' in Path('sw.js').read_text()
           PY
           git diff --check
-
-      - name: Remove CI helper after successful hardening
-        run: rm -f .github/scripts/production_hardening.py
 
       - name: Commit normalized production build
         run: |
@@ -76,5 +72,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git diff --cached --quiet && exit 0
-          git commit -m "Production hardening: universal search, privacy choices, PWA, performance [final-polish]"
+          git commit -m "Production hardening: calculator search scope [final-polish]"
           git push
