@@ -1,8 +1,9 @@
-/* Wealth Arrays interaction hotfix v2. Left/right/bottom = 1.5px. Top is intentionally untouched. */
+/* Wealth Arrays card border refinement. Top accent is intentionally preserved by site-runtime. */
 .home-tool-card,.tool-card,.ledger-row{
   border-left:1.5px solid var(--line)!important;
   border-right:1.5px solid var(--line)!important;
   border-bottom:1.5px solid var(--line)!important;
+  border-top:3.5px solid var(--wa-card-accent,var(--line))!important;
 }
 .tool-search-shell{position:relative!important;z-index:1000!important;overflow:visible!important}
 #tool-search-results{position:absolute!important;left:0!important;right:0!important;top:calc(100% + 8px)!important;z-index:100000!important;max-height:420px!important;overflow:auto!important;border:1px solid var(--line)!important;border-radius:14px!important;background:var(--surface)!important;box-shadow:0 18px 45px rgba(0,0,0,.16)!important}
