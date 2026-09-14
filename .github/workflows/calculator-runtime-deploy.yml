@@ -35,9 +35,11 @@ jobs:
               s=pattern.sub(tag,s,count=1) if pattern.search(s) else s.replace('</body>',tag+'</body>')
               p.write_text(s)
 
+          core='<script src="wa-core.js?v=20260914-3" defer></script>'
           universal='<script src="site-runtime.js?v=20260914-2" defer></script>'
           enhancements='<script src="wa-enhancements.js?v=20260914-2" defer></script>'
           all_pages=sorted(Path('.').glob('*.html'))+sorted(Path('articles').glob('*.html'))+sorted(Path('p').glob('*.html'))
+          core_pattern=re.compile(r'<script\s+src=["\']wa-core\.js(?:\?[^"\']*)?["\'][^>]*></script>',re.I)
           u_pattern=re.compile(r'<script\s+src=["\']site-runtime\.js(?:\?[^"\']*)?["\'][^>]*></script>',re.I)
           e_pattern=re.compile(r'<script\s+src=["\']wa-enhancements\.js(?:\?[^"\']*)?["\'][^>]*></script>',re.I)
           old_home=re.compile(r'<script\s+src=["\']home-recovery\.js(?:\?[^"\']*)?["\'][^>]*></script>',re.I)
@@ -47,6 +49,7 @@ jobs:
 
           for p in all_pages:
               s=p.read_text()
+              s=core_pattern.sub(core,s,count=1) if core_pattern.search(s) else s.replace('</body>',core+'</body>')
               s=u_pattern.sub(universal,s,count=1) if u_pattern.search(s) else s.replace('</body>',universal+'</body>')
               s=e_pattern.sub(enhancements,s,count=1) if e_pattern.search(s) else s.replace('</body>',enhancements+'</body>')
               s=old_home.sub('',s)
@@ -67,16 +70,33 @@ jobs:
           extra='\n/* Runtime-owned search overlay. */\n.search-bar{position:relative!important;z-index:1000!important;overflow:visible!important}\n#tool-search-results{z-index:100000!important;position:absolute!important;overflow:hidden!important}\n'
           if '/* Runtime-owned search overlay. */' not in s: css.write_text(s+extra)
           PY
-      - name: Validate JavaScript syntax
+      - name: Validate JavaScript syntax and runtime ownership
         shell: bash
         run: |
-          set -e
+          set -euo pipefail
           find . -maxdepth 2 -type f -name '*.js' -print0 | xargs -0 -n1 node --check
+          test "$(grep -o "function calculatorSearch" wa-core.js | wc -l)" -eq 1
+          test "$(grep -o "tool-search" site-runtime.js | wc -l)" -eq 0
+          test "$(grep -o "tool-search" wa-enhancements.js | wc -l)" -eq 0
+          grep -q "serviceWorker.register('/sw.js'" wa-core.js
+          grep -q "function renderFooter" wa-core.js
+          grep -q "function analytics" wa-core.js
+          grep -q "function consentDialog" wa-core.js
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          footer=re.compile(r'<footer\b[^>]*>(.*?)</footer>',re.I|re.S)
+          for p in list(Path('.').glob('*.html'))+list(Path('articles').glob('*.html'))+list(Path('p').glob('*.html')):
+              s=p.read_text()
+              m=footer.search(s)
+              if not m or 'footer-logo' not in m.group(1) or 'Wealth Arrays' not in m.group(1):
+                  raise SystemExit(f'Invalid canonical footer: {p}')
+          PY
       - name: Commit fixes
         run: |
           git config user.name "wealth-arrays-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add calculators.js styles.css '*.html' articles/*.html p/*.html site-runtime.js wa-enhancements.js calculator-runtime.js
+          git add calculators.js styles.css '*.html' articles/*.html p/*.html wa-core.js site-runtime.js wa-enhancements.js calculator-runtime.js
           git diff --cached --quiet && exit 0
           git commit -m "Fix canonical page shell and runtime ownership [runtime-fix]"
           git push
