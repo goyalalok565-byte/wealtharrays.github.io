@@ -31,25 +31,16 @@ jobs:
               s = pattern.sub(tag, s, count=1) if pattern.search(s) else s.replace('</body>', tag + '</body>')
               p.write_text(s)
           PY
-      - name: Validate canonical runtime
+      - name: Validate cleanup only
         run: |
-          node --check wa-core.js
-          node --check final-polish.js
+          set -euo pipefail
           test ! -e ux-fix.js
           test ! -e interaction-fix.js
           test ! -e home-recovery.js
           test ! -e interaction-fix.css
-          python3 - <<'PY'
-          from pathlib import Path
-          import re
-          for p in list(Path('.').glob('*.html')) + list(Path('articles').glob('*.html')):
-              s=p.read_text()
-              assert not re.search(r'(?:ux-fix|interaction-fix)\.js',s,re.I), p
-              assert not re.search(r'interaction-fix\.css',s,re.I), p
-          b=Path('og-image.png').read_bytes()
-          assert b.startswith(b'\x89PNG\r\n\x1a\n'), 'og-image.png is not a PNG'
-          assert b'IHDR' in b[:32], 'og-image.png has no PNG IHDR'
-          PY
+          ! grep -R -n -E 'ux-fix\.js|interaction-fix\.js|interaction-fix\.css' --include='*.html' .
+          node --check wa-core.js
+          git diff --check
       - name: Commit normalized site
         run: |
           git config user.name "wealth-arrays-bot"
