@@ -1,4 +1,4 @@
-/* Wealth Arrays UX enhancements — install banner + delegated homepage search. */
+/* Wealth Arrays UX enhancements — install banner + delegated homepage search + live calculation/PDF hardening. */
 (function(){'use strict';
 const qsa=(s)=>Array.from(document.querySelectorAll(s));
 function installed(){return window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true||document.referrer.indexOf('android-app://')===0}
@@ -35,6 +35,29 @@ function homeSearch(){
   document.addEventListener('click',e=>{if(!input.contains(e.target)&&!box.contains(e.target)){box.hidden=true;box.style.display='none'}});
   render();
 }
-function start(){installBanner();homeSearch();setTimeout(homeSearch,250);setTimeout(homeSearch,900)}
+function liveCalculator(){
+  let timer=0;
+  const isCalcControl=t=>t&&t.matches&&t.matches('#calc-widget input,#calc-widget select,#calc-widget textarea');
+  const trigger=()=>{const root=document.getElementById('calc-widget');if(!root)return;const btn=qsa('#calc-widget button').find(b=>/^(calculate|recalculate|update|compute|show result|calculate now)/i.test((b.textContent||'').trim())||b.dataset.action==='calculate');if(btn&&!btn.disabled)btn.click()};
+  const schedule=()=>{clearTimeout(timer);timer=setTimeout(trigger,40)};
+  document.addEventListener('input',e=>{if(isCalcControl(e.target))schedule()},true);
+  document.addEventListener('change',e=>{if(isCalcControl(e.target))schedule()},true);
+  [250,700,1400].forEach(ms=>setTimeout(trigger,ms));
+}
+function patchPdfLogo(){
+  if(window.waPdfLogoPatched||typeof window.waOpenPrintReport!=='function')return;
+  window.waPdfLogoPatched=true;
+  const original=window.waOpenPrintReport;
+  const logo='PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjggMTI4IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IldlYWx0aCBBcnJheXMgZmluYW5jZSBsb2dvIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9IndhIiB4MT0iMTgiIHkxPSIxMDgiIHgyPSIxMTAiIHkyPSIxOCIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPjxzdG9wIHN0b3AtY29sb3I9IiMwRjc2NkUiLz48c3RvcCBvZmZzZXQ9Ii41MiIgc3RvcC1jb2xvcj0iIzE0QjhBNiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzYwQTVGQSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjQiIHk9IjQiIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiByeD0iMzAiIGZpbGw9IiMwQjEyMjAiLz48cmVjdCB4PSI1IiB5PSI1IiB3aWR0aD0iMTE4IiBoZWlnaHQ9IjExOCIgcng9IjI5IiBmaWxsPSJub25lIiBzdHJva2U9IiMyNjMyNDYiIHN0cm9rZS13aWR0aD0iMiIvPjxwYXRoIGQ9Ik0yNSA5MlY3ME01MiA5MlY1NU03OSA5MlYzOSIgc3Ryb2tlPSIjRUFGMkZGIiBzdHJva2Utd2lkdGg9IjEwIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNMjEgNjYgNDYgNDcgNjggNTQgMTAzIDI0IiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjd2EpIiBzdHJva2Utd2lkdGg9IjkiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik04NyAyNGgxNnYxNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNjBBNUZBIiBzdHJva2Utd2lkdGg9IjgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxjaXJjbGUgY3g9Ijk4IiBjeT0iOTUiIHI9IjE3IiBmaWxsPSIjMTExQzJEIiBzdHJva2U9IiMxNEI4QTYiIHN0cm9rZS13aWR0aD0iNCIvPjxwYXRoIGQ9Ik05OCA4NHYyMk0xMDUgODljLTItMi01LTMtOC0yLTcgMi00IDggMSA5IDcgMiA3IDggMCAxMC0zIDEtNiAwLTgtMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRUFGMkZGIiBzdHJva2Utd2lkdGg9IjMuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9zdmc+';
+  window.waOpenPrintReport=function(calc,values,results){
+    const oldOpen=window.open;
+    window.open=function(){
+      const win=oldOpen.apply(window,arguments);
+      if(win&&win.document){const oldWrite=win.document.write.bind(win.document);win.document.write=function(html){const img='<div class="pdf-brand"><img alt="Wealth Arrays logo" src="data:image/svg+xml;base64,'+logo+'"><span>WEALTH ARRAYS</span></div>';html=String(html).replace('<div class="brand">WEALTH ARRAYS · CALCULATION REPORT</div>',img);html=html.replace('</style>',' .pdf-brand{display:flex;align-items:center;gap:10px;margin-bottom:14px;font-weight:800;letter-spacing:.08em;color:#475467}.pdf-brand img{width:42px;height:42px;display:block}</style>');oldWrite(html)}}return win;
+    };
+    try{return original(calc,values,results)}finally{setTimeout(()=>{window.open=oldOpen},0)}
+  };
+}
+function start(){installBanner();homeSearch();liveCalculator();patchPdfLogo();setTimeout(homeSearch,250);setTimeout(homeSearch,900);setTimeout(patchPdfLogo,300);setTimeout(patchPdfLogo,900)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
