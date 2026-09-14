@@ -87,7 +87,7 @@
     let input = document.getElementById('tool-search');
     let box = document.getElementById('tool-search-results');
     if (!input || !box) {
-      const host = document.querySelector('.calc-page') || document.querySelector('.tool-article') || document.querySelector('main');
+      const host = document.querySelector('.calc-page');
       const title = host && host.querySelector('.calc-title');
       if (!host) return;
       const shell = document.createElement('div');
