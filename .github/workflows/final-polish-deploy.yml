@@ -24,6 +24,7 @@ jobs:
           s=p.read_text()
           s=s.replace("SEARCH + '\\n  function analytics()', s, count=1, flags=re.S)", "lambda m: SEARCH + '\\n  function analytics()', s, count=1, flags=re.S)")
           s=s.replace("CONSENT + '\\n\\n  let installEvent = null;', s, count=1, flags=re.S)", "lambda m: CONSENT + '\\n\\n  let installEvent = null;', s, count=1, flags=re.S)")
+          s=s.replace("src.split('?',1)[0].lstrip('/')", "Path(src.split('?',1)[0]).name")
           p.write_text(s)
           PY
 
@@ -48,11 +49,14 @@ jobs:
           from pathlib import Path
           import re
           pages=sorted(Path('.').glob('*.html'))+sorted(Path('articles').glob('*.html'))
+          managed={'wa-core.js','site-runtime.js','final-polish.js','wa-enhancements.js','calculator-runtime.js','calculators.js','widget.js','smart.js'}
           for p in pages:
               s=p.read_text()
               assert s.count('rel="manifest"')==1, p
-              for src in ['wa-core.js','site-runtime.js','final-polish.js','wa-enhancements.js','calculator-runtime.js','calculators.js','widget.js','smart.js']:
-                  assert len(re.findall(r'<script\s+src=["\'][^"\']*'+re.escape(src)+r'(?:\?[^"\']*)?["\']',s,re.I))<=1, (p,src)
+              scripts=re.findall(r'<script\s+src=["\']([^"\']+)["\'][^>]*></script>',s,re.I)
+              names=[Path(x.split('?',1)[0]).name for x in scripts]
+              for src in managed:
+                  assert names.count(src)<=1, (p,src,names)
           core=Path('wa-core.js').read_text()
           assert 'CALCULATOR_CATALOG' in core
           assert 'data-wa-open-consent' in core
