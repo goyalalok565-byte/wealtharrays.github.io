@@ -58,14 +58,13 @@
   function renderField(field) {
     const suffix = field.suffix ? '<span class="wa-extra-suffix">' + esc(field.suffix) + '</span>' : '';
     return '<div class="wa-extra-field"><label for="wa-extra-' + esc(field.id) + '">' + esc(field.label) + '</label>' +
-      '<div class="wa-extra-input"><input id="wa-extra-' + esc(field.id) + '" type="number" inputmode="decimal" value="' + esc(field.default) + '" min="' + esc(field.min ?? '') + '" max="' + esc(field.max ?? '') + '" step="' + esc(field.step ?? 'any') + '" autocomplete="off"></div>' + suffix + '</div>';
+      '<div class="wa-extra-input"><input id="wa-extra-' + esc(field.id) + '" type="number" inputmode="decimal" value="' + esc(field.default) + '" min="' + esc(field.min ?? '') + '" max="' + esc(field.max ?? '') + '" step="' + esc(field.step ?? 'any') + '" autocomplete="off">' + suffix + '</div></div>';
   }
 
   function mount(calc, id) {
     const host = document.getElementById(id);
-    if (!host || !calc) return false;
+    if (!host || !calc || !Array.isArray(calc.fields)) return false;
     injectStyles();
-
     host.innerHTML = '<section class="wa-extra-card" aria-label="' + esc(calc.title) + '">' +
       '<div class="wa-extra-grid">' + calc.fields.map(renderField).join('') + '</div>' +
       '<div class="wa-extra-error" id="' + esc(id) + '-error" aria-live="polite"></div>' +
@@ -106,8 +105,14 @@
       }
     }
 
-    inputs.forEach(function (input) { input.addEventListener('input', calculate); input.addEventListener('change', calculate); });
-    document.getElementById(id + '-reset').addEventListener('click', function () {
+    inputs.forEach(function (input) {
+      if (input) {
+        input.addEventListener('input', calculate);
+        input.addEventListener('change', calculate);
+      }
+    });
+    const reset = document.getElementById(id + '-reset');
+    if (reset) reset.addEventListener('click', function () {
       calc.fields.forEach(function (field) { document.getElementById('wa-extra-' + field.id).value = field.default; });
       calculate();
     });
@@ -119,11 +124,18 @@
   window.mountExtraCalculator = mount;
 
   function autoMount() {
-    const host = document.querySelector('[data-wa-extra-calculator]');
+    const host = document.getElementById('calc-widget');
     const catalog = window.WA_EXTRA_CALCULATORS || {};
     if (!host) return;
-    const key = host.getAttribute('data-wa-extra-calculator');
-    mount(catalog[key], host.id);
+
+    let key = host.getAttribute('data-wa-extra-calculator');
+    if (!key) {
+      const path = window.location.pathname;
+      if (path.endsWith('/step-up-sip-calculator.html')) key = 'step-up-sip';
+      else if (path.endsWith('/emergency-fund-calculator.html')) key = 'emergency-fund';
+      else if (path.endsWith('/real-return-calculator.html')) key = 'real-return';
+    }
+    if (key && catalog[key]) mount(catalog[key], 'calc-widget');
   }
 
   if (document.readyState === 'loading') {
