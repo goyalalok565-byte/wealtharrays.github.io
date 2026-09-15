@@ -41,7 +41,7 @@ jobs:
               s = s2
           p.write_text(s)
 
-          for p in list(Path('.').glob('*.html')) + list(Path('articles').glob('*.html')) + list(Path('p').glob('*.html'):
+          for p in list(Path('.').glob('*.html')) + list(Path('articles').glob('*.html')) + list(Path('p').glob('*.html')):
               s = p.read_text()
               s = s.replace('href="income-tax-planner.html"', 'href="income-tax-scenario-calculator.html"')
               s = s.replace('>Income Tax Planner</b>', '>Income Tax Scenario Calculator</b>')
@@ -57,22 +57,26 @@ jobs:
           is_png() { [ "$(head -c 8 "$1" | xxd -p 2>/dev/null || true)" = "89504e470d0a1a0a" ]; }
           rm -f og-image.decoded.png og-image.decoded2.png
           if ! is_png og-image.png; then
-            if base64 -d og-image.png > og-image.decoded.png 2>/dev/null && is_png og-image.decoded.png; then
+            base64 -d og-image.png > og-image.decoded.png 2>/dev/null || true
+            if is_png og-image.decoded.png; then
               mv og-image.decoded.png og-image.png
-            elif base64 -d og-image.decoded.png > og-image.decoded2.png 2>/dev/null && is_png og-image.decoded2.png; then
-              mv og-image.decoded2.png og-image.png
-            elif [ -f og-image.svg ]; then
-              if command -v magick >/dev/null 2>&1; then
-                magick og-image.svg -resize 1200x630 -background white -alpha remove og-image.png
-              elif command -v convert >/dev/null 2>&1; then
-                convert og-image.svg -resize 1200x630 -background white -alpha remove og-image.png
+            else
+              base64 -d og-image.decoded.png > og-image.decoded2.png 2>/dev/null || true
+              if is_png og-image.decoded2.png; then
+                mv og-image.decoded2.png og-image.png
+              elif [ -f og-image.svg ]; then
+                if command -v magick >/dev/null 2>&1; then
+                  magick og-image.svg -resize 1200x630 -background white -alpha remove og-image.png
+                elif command -v convert >/dev/null 2>&1; then
+                  convert og-image.svg -resize 1200x630 -background white -alpha remove og-image.png
+                else
+                  echo "Existing OG PNG is invalid and no SVG rasterizer is available" >&2
+                  exit 1
+                fi
               else
-                echo "Existing OG PNG is invalid and no SVG rasterizer is available" >&2
+                echo "OG PNG is invalid and no decodable base64/SVG source exists" >&2
                 exit 1
               fi
-            else
-              echo "OG PNG is invalid and no decodable base64/SVG source exists" >&2
-              exit 1
             fi
           fi
           rm -f og-image.decoded.png og-image.decoded2.png
