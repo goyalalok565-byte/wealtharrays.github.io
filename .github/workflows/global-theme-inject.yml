@@ -15,30 +15,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Inject latest theme runtime into every HTML page
+      - name: Inject latest theme and calculator runtime versions into every HTML page
         shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          old='theme-fix.js?v=20260915-theme-v1'
-          marker='theme-fix.js?v=20260915-theme-v2'
-          tag=f'<script src="/{marker}" defer></script>'
+          theme_old='theme-fix.js?v=20260915-theme-v1'
+          theme_marker='theme-fix.js?v=20260915-theme-v2'
+          calculator_old='calculator-runtime.js?v=20260915-1'
+          calculator_marker='calculator-runtime.js?v=20260915-2'
+          theme_tag=f'<script src="/{theme_marker}" defer></script>'
           changed=[]
           for path in Path('.').rglob('*.html'):
               if any(part.startswith('.') for part in path.parts):
                   continue
               text=path.read_text(encoding='utf-8')
               original=text
-              text=text.replace(old, marker)
-              if marker not in text:
+              text=text.replace(theme_old, theme_marker)
+              text=text.replace(calculator_old, calculator_marker)
+              if theme_marker not in text:
                   if '</body>' in text:
-                      text=text.replace('</body>', tag+'</body>', 1)
+                      text=text.replace('</body>', theme_tag+'</body>', 1)
                   elif '</head>' in text:
-                      text=text.replace('</head>', tag+'</head>', 1)
+                      text=text.replace('</head>', theme_tag+'</head>', 1)
               if text != original:
                   path.write_text(text,encoding='utf-8')
                   changed.append(str(path))
-          print('Updated theme runtime in',len(changed),'HTML files')
+          print('Updated runtime versions in',len(changed),'HTML files')
           for item in changed: print(item)
           PY
 
