@@ -1,0 +1,82 @@
+name: Runtime integrity fix
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: ${{ !contains(github.event.head_commit.message, '[integrity-fix]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply surgical runtime integrity fixes
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          # Remove only the duplicate homepage search implementation from site-runtime.
+          p = Path('site-runtime.js')
+          s = p.read_text()
+          s = re.sub(r'\n  const CATALOG = \[.*?\n  \];\n(?=  function normalize)', '\n', s, flags=re.S)
+          s = re.sub(r'\n  function homeSearchFallback\(\)\{.*?\n  \}\n(?=  function installHelp\(\))', '\n', s, flags=re.S)
+          s = re.sub(r';homeSearchFallback\(\)', ';', s)
+          s = re.sub(r'setTimeout\(homeSearchFallback,\s*\d+\);?', '', s)
+          p.write_text(s)
+
+          # Do not rewrite wa-core: replace only its final initialization call with isolated guards.
+          p = Path('wa-core.js')
+          s = p.read_text()
+          old = "  function init() { styles(); setupTheme(); applyCurrency(); applyCategories(); calculatorSearch(); addRelatedAndTrust(); renderFooter(); analytics(); consentDialog(); registerServiceWorker(); installPromptInit(); }\n  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once:true }); else init();"
+          new = "  function runSafe(name, fn) { try { fn(); } catch (error) { try { console.error('[Wealth Arrays]', name, error); } catch (_) {} } }\n  function init() { [['styles',styles],['theme',setupTheme],['currency',applyCurrency],['categories',applyCategories],['search',calculatorSearch],['related',addRelatedAndTrust],['footer',renderFooter],['analytics',analytics],['consent',consentDialog],['serviceWorker',registerServiceWorker],['install',installPromptInit]].forEach(function (task) { runSafe(task[0], task[1]); }); }\n  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { runSafe('init', init); }, { once:true }); else runSafe('init', init);"
+          if old in s:
+              s = s.replace(old, new, 1)
+          elif 'function runSafe(name, fn)' not in s:
+              raise SystemExit('Expected wa-core init anchor missing; refusing unsafe rewrite')
+          p.write_text(s)
+          PY
+
+      - name: Restore real binary Open Graph PNG
+        run: |
+          set -euo pipefail
+          if [ -f og-image.svg ]; then
+            if command -v magick >/dev/null 2>&1; then
+              magick og-image.svg -resize 1200x630 -background white -alpha remove og-image.png
+            elif command -v convert >/dev/null 2>&1; then
+              convert og-image.svg -resize 1200x630 -background white -alpha remove og-image.png
+            else
+              echo "No SVG rasterizer available" >&2
+              exit 1
+            fi
+          fi
+          test "$(head -c 8 og-image.png | xxd -p)" = "89504e470d0a1a0a"
+          file og-image.png | grep -qi 'PNG image data'
+
+      - name: Validate single ownership and fault isolation
+        run: |
+          set -euo pipefail
+          node --check wa-core.js
+          node --check site-runtime.js
+          ! grep -q 'homeSearchFallback' site-runtime.js
+          ! grep -q 'waFallbackOwner' site-runtime.js
+          test "$(grep -o 'waSearchOwner' wa-core.js | wc -l)" -ge 1
+          grep -q 'function runSafe(name, fn)' wa-core.js
+          test "$(head -c 8 og-image.png | xxd -p)" = "89504e470d0a1a0a"
+          file og-image.png | grep -qi 'PNG image data'
+
+      - name: Commit integrity fixes
+        run: |
+          set -euo pipefail
+          git config user.name "wealth-arrays-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site-runtime.js wa-core.js og-image.png
+          git diff --cached --quiet && exit 0
+          git commit -m "Fix single search owner, runtime isolation and binary OG image [integrity-fix]"
+          git push
