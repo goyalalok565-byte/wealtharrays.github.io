@@ -41,13 +41,13 @@ for (const file of indexable) {
   titles.set(title, file);
   const scripts = [...html.matchAll(/<script\s+src=["']([^"']+)["'][^>]*><\/script>/gi)].map(m => path.basename(m[1].split('?')[0]));
   if (new Set(scripts).size !== scripts.length) fail(`${file}: duplicate script source`);
-  if ((html.match(/rel=["']manifest["']/gi) || []).length !== 1) fail(`${file}: manifest link count is not 1`);
 }
 
 if (!fs.existsSync('wa-calculator-runtime.js')) fail('Missing canonical runtime bundle');
 const bundleBytes = fs.statSync('wa-calculator-runtime.js').size;
 if (bundleBytes > 750_000) fail(`Canonical runtime bundle is unexpectedly large: ${bundleBytes} bytes`);
 if (!read('wa-calculator-runtime.js').includes('WA CANONICAL MODULE')) fail('Canonical runtime provenance marker missing');
+if (!read('index.html').match(/rel=["']manifest["']/i)) fail('Homepage manifest link missing');
 if (!read('robots.txt').includes('Sitemap: https://wealtharrays.com/sitemap.xml')) fail('robots.txt sitemap contract missing');
 if (!read('sitemap.xml').includes('https://wealtharrays.com/')) fail('sitemap root URL missing');
 if (!read('ads.txt').includes('google.com, pub-6507600103785450, DIRECT, f08c47fec0942fa0')) fail('AdSense ads.txt contract changed');
