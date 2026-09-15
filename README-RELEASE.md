@@ -1,26 +1,34 @@
-# Wealth Arrays — Release
+# Wealth Arrays — Production Release
 
-This release upgrades the existing static GitHub Pages site without adding a framework.
+Wealth Arrays is a static, browser-first financial calculator site served from `wealtharrays.com`.
 
-## Included
-- 8 calculator pages + category pages
-- Fast system-font rendering (no Google Fonts network dependency)
+## Current production scope
+- 23 calculator landing pages
+- 18 original educational guides
 - Responsive/mobile-first UI
-- Share / export-report / copy-embed actions
-- Working embeddable calculator endpoint: `widget.html?calc=sip`
+- Browser-side deterministic calculations
+- Share, export-report and embed actions
 - Canonical URLs, robots.txt and sitemap.xml
-- WebApplication/WebSite structured data
-- Social preview card + favicon + web manifest
-- Duplicate alternate files removed to reduce duplicate URLs
-- Accessibility improvements: labels, focus states, live calculator output
-- SEO/GEO-friendly semantic content and internal-link architecture
+- WebApplication, CollectionPage and Article structured data where appropriate
+- Social preview card, favicon and web manifest
+- Trust, privacy, methodology, editorial and advertising-policy pages
+- Production security headers and CSP
+- Automated calculator, metadata, crawl, privacy and browser smoke validation
 
-## Before production
-1. Replace `https://www.wealtharrays.com/` with your real production domain everywhere if the domain is different.
-2. In Google Search Console, verify the domain and submit `/sitemap.xml`.
-3. Test representative URLs with URL Inspection.
-4. Run Lighthouse/PageSpeed on home + one calculator page.
-5. Add your analytics measurement ID only after deciding which analytics platform you want.
+## Growth architecture
+- Calculator → guide → related calculator internal-link clusters
+- Dedicated collections for investment and retirement/future planning
+- New Step-Up SIP, Emergency Fund and Real Return tools
+- Search-friendly tool library with calculator discovery
+- Original explanatory content instead of mass-generated pages
 
-## Important
-SEO can make pages eligible and easier to understand, but no code can guarantee a Google ranking position or viral traffic.
+## Operational notes
+1. Google Analytics and Search Console account configuration is external to this repository.
+2. AdSense is intentionally not hard-coded until the publisher account is approved/configured.
+3. `ads.txt` should only be added after the real AdSense publisher ID exists.
+4. Search Console query/impression data should drive the next content and calculator expansion cycle.
+
+## Quality bar
+Every production change should preserve calculator correctness, mobile usability, accessibility, transparent assumptions, crawlability and trust. Avoid destructive rewrites of stable CSS/runtime files.
+
+SEO and AI-search optimization improve eligibility and machine understanding; neither can guarantee rankings, citations, traffic or AdSense approval.
