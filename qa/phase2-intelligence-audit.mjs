@@ -9,18 +9,21 @@ const calculators = [
   'debt-payoff-calculator.html','simple-interest-calculator.html','net-worth-calculator.html','salary-to-hourly-calculator.html',
   'overtime-pay-calculator.html','freelance-rate-calculator.html','profit-margin-calculator.html','income-tax-scenario-calculator.html'
 ];
-const required = [
-  'DECISION RANGE','SENSITIVITY','YOUR RESULT','Continue the decision','waPhase2Loaded','wa2-scenario-grid','wa2-table'
-];
+const required = ['DECISION RANGE','SENSITIVITY','YOUR RESULT','Continue the decision','waPhase2Loaded','wa2-scenario-grid','wa2-table'];
 const phase2 = readFileSync(`${root}/phase2-intelligence.js`, 'utf8');
 for (const token of required) if (!phase2.includes(token)) throw new Error(`Phase 2 runtime missing required feature: ${token}`);
 for (const file of ['phase2-intelligence.js','phase2-retirement.js','wa-enhancements.js']) {
   const result = spawnSync(process.execPath, ['--check', `${root}/${file}`], { encoding: 'utf8' });
   if (result.status !== 0) throw new Error(`${file} syntax check failed: ${result.stderr || result.stdout}`);
 }
+const bundle = readFileSync(`${root}/wa-calculator-runtime.js`, 'utf8');
+for (const token of ['DECISION RANGE','SENSITIVITY','YOUR RESULT','Continue the decision','waPhase2Loaded','wa2-scenario-grid','wa2-table']) {
+  if (!bundle.includes(token)) throw new Error(`Canonical runtime bundle is missing Phase 2 feature marker: ${token}`);
+}
 for (const file of calculators) {
   const html = readFileSync(`${root}/${file}`, 'utf8');
-  if (!html.includes('phase2-intelligence.js')) throw new Error(`${file} is missing Phase 2 runtime injection`);
+  if (!html.includes('wa-calculator-runtime.js')) throw new Error(`${file} is missing canonical calculator runtime`);
+  if (html.includes('phase2-intelligence.js')) throw new Error(`${file} still directly loads retired Phase 2 source module`);
 }
 const allHtml = readdirSync(root).filter(x => x.endsWith('.html'));
 for (const file of allHtml) {
@@ -29,4 +32,4 @@ for (const file of allHtml) {
     if (html.includes(retired)) throw new Error(`${file} still references retired calculator ${retired}`);
   }
 }
-console.log(`Phase 2 audit passed: ${calculators.length}/20 calculator pages contain the decision-intelligence runtime; required scenario/sensitivity/meaning/journey features and JS syntax checks are healthy; retired calculator references are absent.`);
+console.log(`Phase 2 audit passed: ${calculators.length}/20 calculator pages use the canonical runtime containing decision-intelligence features; source syntax and retired references are healthy.`);
