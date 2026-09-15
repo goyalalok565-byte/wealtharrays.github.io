@@ -22,13 +22,13 @@ for (const page of calculatorPages) {
   const canonicalRuntime = (html.match(/wa-calculator-runtime\.js(?:\?[^"']*)?/g) || []).length;
   if (canonicalRuntime !== 1) fail(`${page}: expected exactly one canonical calculator runtime, found ${canonicalRuntime}`);
   for (const legacy of ['calculator-runtime.js','calculators.js','widget.js','wa-core.js','site-runtime.js','final-polish.js','wa-enhancements.js','theme-fix.js','phase2-intelligence.js','phase2-retirement.js','phase3-seo.js','calculator-page-init.js','phase4-premium.js']) {
-    if (new RegExp(`<script[^>]+${legacy.replaceAll('.', '\\.')}`, 'i').test(html)) fail(`${page}: legacy runtime still page-loaded: ${legacy}`);
+    const legacyPattern = legacy === 'calculator-runtime.js' ? '(?<!wa-)calculator-runtime\\.js' : legacy.replaceAll('.', '\\.') ;
+    if (new RegExp(`<script[^>]+src=["'][^"']*${legacyPattern}`, 'i').test(html)) fail(`${page}: legacy runtime still page-loaded: ${legacy}`);
   }
 }
 
 const indexable = allHtml.filter(file => !/noindex/i.test(read(file).match(/<meta[^>]+name=["']robots["'][^>]*>/i)?.[0] || ''));
 const titles = new Map();
-const canonicals = new Set();
 for (const file of indexable) {
   const html = read(file);
   const title = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]?.trim();
@@ -39,7 +39,6 @@ for (const file of indexable) {
   if (!canonical) fail(`${file}: missing canonical`);
   if (titles.has(title)) fail(`Duplicate title: ${title} (${titles.get(title)} and ${file})`);
   titles.set(title, file);
-  canonicals.add(canonical);
   const scripts = [...html.matchAll(/<script\s+src=["']([^"']+)["'][^>]*><\/script>/gi)].map(m => path.basename(m[1].split('?')[0]));
   if (new Set(scripts).size !== scripts.length) fail(`${file}: duplicate script source`);
   if ((html.match(/rel=["']manifest["']/gi) || []).length !== 1) fail(`${file}: manifest link count is not 1`);
