@@ -28,9 +28,12 @@ jobs:
           phase2_marker='phase2-intelligence.js?v=20260915-2'
           retirement_old='phase2-retirement.js?v=20260915-1'
           retirement_marker='phase2-retirement.js?v=20260915-1'
+          phase3_old='phase3-seo.js?v=20260915-1'
+          phase3_marker='phase3-seo.js?v=20260915-2'
           theme_tag=f'<script src="/{theme_marker}" defer></script>'
           phase2_tag=f'<script src="/{phase2_marker}" defer></script>'
           retirement_tag=f'<script src="/{retirement_marker}" defer></script>'
+          phase3_tag=f'<script src="/{phase3_marker}" defer></script>'
           changed=[]
           for path in Path('.').rglob('*.html'):
               if any(part.startswith('.') for part in path.parts):
@@ -40,12 +43,16 @@ jobs:
               text=text.replace(theme_old, theme_marker)
               text=text.replace(calculator_old, calculator_marker)
               text=text.replace(phase2_old, phase2_marker)
+              text=text.replace(phase3_old, phase3_marker)
               if phase2_marker not in text and 'phase2-intelligence.js' not in text:
                   if '</body>' in text: text=text.replace('</body>', phase2_tag+'</body>', 1)
                   elif '</head>' in text: text=text.replace('</head>', phase2_tag+'</head>', 1)
               if retirement_marker not in text and 'phase2-retirement.js' not in text:
                   if '</body>' in text: text=text.replace('</body>', retirement_tag+'</body>', 1)
                   elif '</head>' in text: text=text.replace('</head>', retirement_tag+'</head>', 1)
+              if phase3_marker not in text and 'phase3-seo.js' not in text:
+                  if '</body>' in text: text=text.replace('</body>', phase3_tag+'</body>', 1)
+                  elif '</head>' in text: text=text.replace('</head>', phase3_tag+'</head>', 1)
               if text != original:
                   path.write_text(text,encoding='utf-8')
                   changed.append(str(path))
