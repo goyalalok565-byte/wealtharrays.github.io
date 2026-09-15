@@ -25,11 +25,25 @@ jobs:
         with:
           node-version: 24
 
+      - name: Validate source JavaScript
+        run: |
+          set -euo pipefail
+          find . -maxdepth 2 -type f -name '*.js' -print0 | xargs -0 -n1 node --check
+
+      - name: Run calculator regression suite before build
+        run: node qa/calculator-regression.mjs
+
       - name: Build canonical runtime
         run: node scripts/phase-stabilization-build.mjs
 
       - name: Validate canonical runtime
         run: node qa/stabilization-audit.mjs
+
+      - name: Run Phase 4-5 production gate
+        run: node qa/phase45-production-audit.mjs
+
+      - name: Verify repository diff hygiene
+        run: git diff --check
 
       - name: Commit deterministic build
         run: |
