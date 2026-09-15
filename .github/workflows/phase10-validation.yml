@@ -28,11 +28,14 @@ jobs:
         run: |
           set -euo pipefail
           count=$(find . -maxdepth 1 -type f -name '*-calculator.html' | wc -l)
-          test "$count" -eq 19 || { echo "Expected 19 *-calculator.html pages, found $count"; exit 1; }
+          test "$count" -eq 20 || { echo "Expected 20 *-calculator.html pages, found $count"; exit 1; }
           test -f income-tax-planner.html
-          test "$(grep -l 'calculators.js' *-calculator.html | wc -l)" -eq 19
-          grep -q 'calculators.js' income-tax-planner.html
-          grep -q 'smart.js' income-tax-planner.html
+          test -f income-tax-scenario-calculator.html
+          test "$(grep -l 'calculators.js' *-calculator.html | wc -l)" -eq 20
+          grep -q 'noindex' income-tax-planner.html
+          grep -q 'income-tax-scenario-calculator.html' income-tax-planner.html
+          grep -q 'calculators.js' income-tax-scenario-calculator.html
+          grep -q 'smart.js' income-tax-scenario-calculator.html
 
       - name: Validate privacy-sensitive client code
         shell: bash
