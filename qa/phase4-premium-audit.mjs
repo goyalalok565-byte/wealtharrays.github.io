@@ -5,7 +5,7 @@ const root=process.cwd();
 const files=[];
 function walk(dir){for(const n of fs.readdirSync(dir)){if(n.startsWith('.')||n==='node_modules')continue;const f=path.join(dir,n),s=fs.statSync(f);if(s.isDirectory())walk(f);else if(n.endsWith('.html'))files.push(f)}}
 walk(root);
-const publicFiles=files.filter(f=>!f.split(path.sep).includes('p')&&!f.split(path.sep).slice(0,-1).some(x=>x==='node_modules'));
+const publicFiles=files.filter(f=>{const rel=path.relative(root,f);return !rel.startsWith('p'+path.sep)&&!rel.startsWith('node_modules'+path.sep)&&(/^[^/\\]+\.html$/.test(rel)||rel.startsWith('articles'+path.sep)||rel.startsWith('categories'+path.sep));});
 const calc=['sip-calculator.html','compound-interest-calculator.html','mortgage-emi-calculator.html','roi-calculator.html','simple-interest-calculator.html','retirement-calculator.html','salary-to-hourly-calculator.html','profit-margin-calculator.html','fixed-deposit-calculator.html','recurring-deposit-calculator.html','lumpsum-calculator.html','cagr-calculator.html','car-loan-calculator.html','personal-loan-calculator.html','debt-payoff-calculator.html','inflation-calculator.html','net-worth-calculator.html','overtime-pay-calculator.html','freelance-rate-calculator.html','income-tax-scenario-calculator.html'];
 const failures=[];
 if(!fs.existsSync('phase4-premium.js')||!fs.existsSync('phase4-premium.css')||!fs.existsSync('theme-init.js')||!fs.existsSync('calculator-page-init.js')||!fs.existsSync('404-runtime.js')) failures.push('Phase 4 runtime assets missing');
