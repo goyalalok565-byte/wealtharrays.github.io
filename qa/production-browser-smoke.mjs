@@ -24,7 +24,7 @@ async function diagnostics(label) {
   if (errors.length) console.error(`BROWSER_ERRORS ${label}: ${errors.join(' | ')}`);
 }
 
-async function assertCalculator(path, label) {
+async function assertCalculator(path, label, phase2 = true) {
   errors.length = 0;
   failedResponses.length = 0;
   await page.goto(`${baseUrl}/${path}`, { waitUntil: 'networkidle' });
@@ -32,6 +32,7 @@ async function assertCalculator(path, label) {
   catch (error) { await diagnostics(label); throw new Error(`${label} failed to render at ${page.url()}: ${error.message}`); }
   if ((await page.locator('h1').count()) !== 1) throw new Error(`${label} must have exactly one H1`);
   if (!(await page.locator('#calc-widget input, #calc-widget select').count())) throw new Error(`${label} controls did not render`);
+  if (phase2 && !(await page.locator('[data-wa-phase2], [data-wa-retirement-intelligence]').count())) throw new Error(`${label} Phase 2 decision-intelligence panels did not render`);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 2);
   if (overflow) throw new Error(`${label} has horizontal overflow at 390px viewport`);
 }
@@ -43,8 +44,15 @@ try {
   const bodyDisplay = await page.locator('body').evaluate(el => getComputedStyle(el).display);
   if (bodyDisplay === 'inline') throw new Error('Homepage body is rendering with inline/default styling; CSS may be missing');
   if ((await page.locator('h1').count()) !== 1) throw new Error('Homepage must have exactly one H1');
+  const retiredLinks = await page.locator('a[href*="step-up-sip"],a[href*="emergency-fund"],a[href*="real-return"]').count();
+  if (retiredLinks) throw new Error('Homepage still exposes a retired calculator link');
+
   await assertCalculator('sip-calculator.html', 'SIP calculator');
+  await assertCalculator('mortgage-emi-calculator.html', 'Mortgage / EMI calculator');
+  await assertCalculator('retirement-calculator.html', 'Freedom Milestone calculator');
+  await assertCalculator('debt-payoff-calculator.html', 'Debt payoff calculator');
+
   if (failedResponses.length) throw new Error(`Failed network responses: ${failedResponses.join(' | ')}`);
   if (errors.length) throw new Error(`Browser errors: ${errors.join(' | ')}`);
-  console.log(`Production browser smoke passed at ${baseUrl}: homepage CSS, one-H1 structure, stable calculator rendering and 390px mobile overflow checks are healthy.`);
+  console.log(`Production browser smoke passed at ${baseUrl}: homepage, four representative calculators, Phase 2 decision panels and 390px mobile overflow checks are healthy.`);
 } finally { await browser.close(); }
