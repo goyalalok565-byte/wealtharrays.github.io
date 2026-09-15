@@ -30,10 +30,12 @@ jobs:
           retirement_marker='phase2-retirement.js?v=20260915-1'
           phase3_old='phase3-seo.js?v=20260915-1'
           phase3_marker='phase3-seo.js?v=20260915-2'
+          phase3_css_marker='phase3-seo.css?v=20260915-1'
           theme_tag=f'<script src="/{theme_marker}" defer></script>'
           phase2_tag=f'<script src="/{phase2_marker}" defer></script>'
           retirement_tag=f'<script src="/{retirement_marker}" defer></script>'
           phase3_tag=f'<script src="/{phase3_marker}" defer></script>'
+          phase3_css_tag=f'<link rel="stylesheet" href="/{phase3_css_marker}">'
           changed=[]
           for path in Path('.').rglob('*.html'):
               if any(part.startswith('.') for part in path.parts):
@@ -53,6 +55,8 @@ jobs:
               if phase3_marker not in text and 'phase3-seo.js' not in text:
                   if '</body>' in text: text=text.replace('</body>', phase3_tag+'</body>', 1)
                   elif '</head>' in text: text=text.replace('</head>', phase3_tag+'</head>', 1)
+              if 'phase3-seo.css' not in text:
+                  if '</head>' in text: text=text.replace('</head>', phase3_css_tag+'</head>', 1)
               if text != original:
                   path.write_text(text,encoding='utf-8')
                   changed.append(str(path))
