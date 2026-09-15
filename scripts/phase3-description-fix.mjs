@@ -19,9 +19,10 @@ for (const [file, description] of Object.entries(descriptions)) {
   if (!fs.existsSync(full)) continue;
   const html = fs.readFileSync(full, 'utf8');
   const escaped = description.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-  const re = /<meta([^>]+)name=["']description["']([^>]*)>/i;
+  const re = /<meta[^>]+name=["']description["'][^>]*>/i;
   if (!re.test(html)) continue;
-  const updated = html.replace(re, `<meta$1name="description"$2 content="${escaped}">`);
+  const replacement = `<meta name="description" content="${escaped}">`;
+  const updated = html.replace(re, replacement);
   if (updated !== html) { fs.writeFileSync(full, updated); changed++; }
 }
 console.log(`Phase 3 description hardening changed ${changed} file(s).`);
