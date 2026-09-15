@@ -88,4 +88,12 @@
     }
   };
   window.WA_EXTRA_CALCULATORS = extra;
+  var path = location.pathname.split('/').pop();
+  if (/^(step-up-sip|emergency-fund|real-return)-calculator\.html$/.test(path) && !window.__WA_EXTRA_RUNTIME_REFRESH__) {
+    window.__WA_EXTRA_RUNTIME_REFRESH__ = true;
+    var script = document.createElement('script');
+    script.src = '/extra-calculators-runtime.js?v=20260915-extra-runtime-2';
+    script.defer = true;
+    document.head.appendChild(script);
+  }
 })();
