@@ -22,6 +22,9 @@ jobs:
           node scripts/phase10-qa.mjs
           node qa/calculator-regression.mjs
 
+      - name: Validate canonical source architecture
+        run: node qa/architecture-audit.mjs
+
       - name: Validate site-wide internal links, metadata and crawl files
         run: node scripts/site-integrity.mjs
 
