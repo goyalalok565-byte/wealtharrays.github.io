@@ -20,6 +20,9 @@ function mobileSearchFallback(){
  const input=document.getElementById('tool-search'),box=document.getElementById('tool-search-results');
  if(!input||!box||window.__WA_MOBILE_SEARCH_FALLBACK__)return;
  window.__WA_MOBILE_SEARCH_FALLBACK__=true;
+ const shell=input.closest('.tool-search-shell,.search-bar,.hero-copy')||box.parentElement;
+ if(shell){shell.style.position='relative';shell.style.zIndex='10000';shell.style.isolation='isolate'}
+ box.style.position='absolute';box.style.left='0';box.style.right='0';box.style.top='calc(100% + 8px)';box.style.zIndex='10001';box.style.background='var(--surface,#fff)';box.style.border='1px solid var(--line,#e2e6ed)';box.style.borderRadius='14px';box.style.boxShadow='0 18px 45px rgba(16,20,27,.18)';box.style.maxHeight='min(55vh,420px)';box.style.overflowY='auto';box.style.webkitOverflowScrolling='touch';
  const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
  const aliases={sip:'systematic investment plan monthly mutual fund',emi:'mortgage home loan monthly payment',fd:'fixed deposit banking',rd:'recurring deposit monthly banking',roi:'return investment profit',tax:'income tax scenario',salary:'hourly wage income',loan:'mortgage personal car debt',retirement:'pension financial independence',inflation:'purchasing power future prices'};
  const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -33,6 +36,16 @@ function mobileSearchFallback(){
  ['input','keyup','search','focus','touchstart'].forEach(name=>input.addEventListener(name,render,{passive:name==='touchstart',capture:true}));
  input.addEventListener('click',render,true); input.addEventListener('keydown',e=>{if(e.key==='Escape'){box.hidden=true;box.style.display='none';input.blur()}},true);
 }
-function start(){tidy();reframeTaxScenario();addReviewStamp();syncStaticCurrencyExamples();setTimeout(()=>{tidy();reframeTaxScenario();syncStaticCurrencyExamples();mobileSearchFallback()},400);setTimeout(()=>{tidy();reframeTaxScenario();syncStaticCurrencyExamples();mobileSearchFallback()},1200);window.addEventListener('wa-currency',syncStaticCurrencyExamples)}
+function expansionCalculatorRescue(){
+ const match=/^(step-up-sip|emergency-fund|real-return)-calculator\.html$/i.exec(location.pathname.split('/').pop()||'');
+ if(!match)return;
+ const key=match[1],host=document.getElementById('calc-widget');
+ if(!host)return;
+ const rescue=()=>{if(host.children.length||host.textContent.trim())return;if(typeof window.mountExtraCalculator==='function'&&window.WA_EXTRA_CALCULATORS?.[key]){try{window.mountExtraCalculator(window.WA_EXTRA_CALCULATORS[key],'calc-widget');return}catch(e){}}
+   if(!document.querySelector('script[data-wa-extra-rescue]')){const s=document.createElement('script');s.src='/extra-calculators-runtime.js?v=20260915-rescue-1';s.dataset.waExtraRescue='1';document.head.appendChild(s);}
+ };
+ [300,900,1800,3000].forEach(ms=>setTimeout(rescue,ms));
+}
+function start(){tidy();reframeTaxScenario();addReviewStamp();syncStaticCurrencyExamples();mobileSearchFallback();expansionCalculatorRescue();setTimeout(()=>{tidy();reframeTaxScenario();syncStaticCurrencyExamples();mobileSearchFallback();expansionCalculatorRescue()},400);setTimeout(()=>{tidy();reframeTaxScenario();syncStaticCurrencyExamples();mobileSearchFallback();expansionCalculatorRescue()},1200);window.addEventListener('wa-currency',syncStaticCurrencyExamples)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
