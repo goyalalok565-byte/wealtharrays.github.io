@@ -1,12 +1,13 @@
 {
-  "release": "2026-09-15-production-hardening",
+  "release": "2026-09-15-production-growth-wave",
   "search": "universal-catalog-with-home-fallback",
   "privacy_choices": "reopenable",
   "pwa_install": "native-prompt-with-manual-fallback",
   "service_worker": "wealtharrays-pwa-3",
   "script_dedupe": true,
   "seo": "sitemap-robots-canonical-structured-data",
-  "content": "20-calculators-11-original-guides",
+  "content": "23-calculators-18-original-guides",
+  "new_calculators": ["step-up-sip", "emergency-fund", "real-return"],
   "adsense_account": "not-configured",
-  "live_browser_verification": "pending-user-device-check"
+  "live_browser_verification": "ci-production-smoke"
 }
