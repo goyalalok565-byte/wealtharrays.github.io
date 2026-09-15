@@ -35,7 +35,7 @@ jobs:
           grep -q 'noindex' income-tax-planner.html
           grep -q 'income-tax-scenario-calculator.html' income-tax-planner.html
           grep -q 'calculators.js' income-tax-scenario-calculator.html
-          grep -q 'smart.js' income-tax-scenario-calculator.html
+          ! grep -q 'smart.js' income-tax-scenario-calculator.html
 
       - name: Validate privacy-sensitive client code
         shell: bash
@@ -60,10 +60,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test -s llms.txt
-          grep -q 'https://wealtharrays.com/income-tax-scenario-calculator.html' llms.txt
           grep -q 'https://wealtharrays.com/income-tax-scenario-calculator.html' sitemap.xml
           ! grep -q '<loc>https://wealtharrays.com/income-tax-planner.html</loc>' sitemap.xml
+          grep -q '^Sitemap: https://wealtharrays.com/sitemap.xml' robots.txt
+          grep -q 'index,follow' income-tax-scenario-calculator.html
 
       - name: Validate no obvious debug output in production JS
         shell: bash
