@@ -1,0 +1,42 @@
+# Wealth Arrays
+
+> Wealth Arrays is a browser-first financial calculator and financial education website. It provides deterministic calculators, transparent formulas, assumptions, worked examples, and practical money guides. Results are educational estimates, not personalized financial, tax, legal, or investment advice.
+
+## Primary pages
+- https://wealtharrays.com/ — Home and calculator library overview
+- https://wealtharrays.com/tools.html — Full calculator library
+- https://wealtharrays.com/articles.html — Financial education guides
+- https://wealtharrays.com/about.html — Publisher, editorial ownership, calculator review process
+- https://wealtharrays.com/methodology.html — Calculator formulas, assumptions, accuracy and limitations
+- https://wealtharrays.com/editorial-policy.html — Originality, accuracy review and corrections policy
+- https://wealtharrays.com/privacy.html — Privacy, analytics and advertising disclosures
+- https://wealtharrays.com/advertising-policy.html — Advertising and editorial independence policy
+- https://wealtharrays.com/disclaimer.html — Financial, tax and legal disclaimer
+- https://wealtharrays.com/contact.html — Corrections and contact
+
+## Calculator categories
+- https://wealtharrays.com/category-investment.html — SIP, compound interest, lump sum, CAGR and ROI
+- https://wealtharrays.com/category-loan.html — Mortgage/EMI, car loan, personal loan and debt payoff
+- https://wealtharrays.com/category-banking.html — Fixed deposit, recurring deposit, simple interest and inflation
+- https://wealtharrays.com/category-retirement.html — Retirement and financial-independence planning
+- https://wealtharrays.com/category-salary.html — Salary, hourly pay and overtime
+- https://wealtharrays.com/category-business.html — Profit margin, freelance rate and tax scenario planning
+
+## Core calculators
+- https://wealtharrays.com/sip-calculator.html
+- https://wealtharrays.com/compound-interest-calculator.html
+- https://wealtharrays.com/mortgage-emi-calculator.html
+- https://wealtharrays.com/roi-calculator.html
+- https://wealtharrays.com/retirement-calculator.html
+- https://wealtharrays.com/income-tax-planner.html — Jurisdiction-neutral income-tax scenario planning using a user-entered effective tax-rate assumption; not official tax software
+
+## Editorial principles
+- Prefer transparent mathematics over black-box financial claims.
+- Distinguish assumptions from facts and projections from guarantees.
+- Do not imply live FX conversion when currency selection only changes display formatting.
+- Do not present the income-tax scenario tool as a jurisdiction-specific tax engine.
+- Financial content should be independently useful even without advertising.
+- Corrections should be reproducible from the exact inputs, formula and expected result.
+
+## Machine-readable note
+This file is provided as a convenience for AI systems and other tools that choose to use it. It is not required for Google Search and is not intended to manipulate search rankings.
