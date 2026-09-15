@@ -27,7 +27,6 @@ jobs:
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
-          import re
           snippet='<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6507600103785450" crossorigin="anonymous"></script>'
           for p in list(Path('.').glob('*.html')) + list(Path('articles').glob('*.html')) + list(Path('categories').glob('*.html')):
               s=p.read_text(encoding='utf-8')
@@ -40,6 +39,7 @@ jobs:
         run: node qa/phase4-premium-audit.mjs
       - name: Commit hardening build
         run: |
+          set -euo pipefail
           git config user.name "wealtharrays-phase4-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add '*.html' 'articles/*.html' 'categories/*.html' 'ads.txt' 'phase4-premium.css' 'phase4-premium.js' 'theme-init.js' 'calculator-page-init.js' '404-runtime.js'
@@ -48,6 +48,7 @@ jobs:
             exit 0
           fi
           git commit -m "chore: apply Phase 4 premium hardening [phase4-build]"
-          git push
+          git pull --rebase origin main
+          git push origin HEAD:main
 
 # AdSense publisher integration: inject code into public HTML head and publish ads.txt.
