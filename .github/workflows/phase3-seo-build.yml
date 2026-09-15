@@ -21,6 +21,8 @@ jobs:
           node-version: 24
       - name: Build static SEO metadata
         run: node scripts/phase3-seo-build.mjs
+      - name: Harden short calculator descriptions
+        run: node scripts/phase3-description-fix.mjs
       - name: Commit SEO build changes
         run: |
           git config user.name "wealtharrays-seo-bot"
