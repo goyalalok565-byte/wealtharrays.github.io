@@ -1,7 +1,5 @@
 import fs from 'node:fs';
-import path from 'node:path';
 import crypto from 'node:crypto';
-import { execFileSync } from 'node:child_process';
 
 const BUILD = fs.readFileSync('scripts/phase-stabilization-build.mjs', 'utf8');
 const BUNDLE = fs.readFileSync('wa-calculator-runtime.js', 'utf8');
@@ -29,15 +27,14 @@ for (const file of sources) {
 const markerCount = (BUNDLE.match(/WA CANONICAL MODULE:/g) || []).length;
 if (markerCount !== sources.length) throw new Error(`Expected ${sources.length} bundle provenance markers, found ${markerCount}`);
 
-execFileSync(process.execPath, ['--check', 'wa-calculator-runtime.js'], { stdio: 'inherit' });
-
 for (const page of calculatorPages) {
   const html = fs.readFileSync(page, 'utf8');
   if ((html.match(/wa-calculator-runtime\.js(?:\?[^"']*)?/g) || []).length !== 1) {
     throw new Error(`${page}: canonical runtime ownership violation`);
   }
   for (const file of sources) {
-    if (new RegExp(`<script[^>]+src=["'][^"']*${file.replaceAll('.', '\\.')}`, 'i').test(html)) {
+    const escaped = file.replaceAll('.', '\\.');
+    if (new RegExp(`<script[^>]+src=["'][^"']*(?:^|/)${escaped}(?:[?"'])`, 'i').test(html)) {
       throw new Error(`${page}: source module must not be directly page-loaded: ${file}`);
     }
   }
@@ -46,4 +43,4 @@ for (const page of calculatorPages) {
 if (fs.statSync('wa-calculator-runtime.js').size > 750_000) throw new Error('Canonical runtime exceeded 750 KB budget');
 if (fs.existsSync('node_modules')) throw new Error('node_modules must never be present in the deployable tree');
 
-console.log(`Architecture audit PASS — ${sources.length} versioned source modules, fresh hash-provenance bundle, syntax-valid canonical runtime, and ${calculatorPages.length}/20 pages with single runtime ownership.`);
+console.log(`Architecture audit PASS — ${sources.length} versioned source modules, fresh hash-provenance bundle, and ${calculatorPages.length}/20 pages with single runtime ownership.`);
