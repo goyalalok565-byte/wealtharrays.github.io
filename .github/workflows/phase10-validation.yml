@@ -23,6 +23,9 @@ jobs:
       - name: Validate site-wide internal links, metadata and crawl files
         run: node scripts/site-integrity.mjs
 
+      - name: Validate launch-readiness gates
+        run: node scripts/launch-readiness.mjs
+
       - name: Validate calculator page coverage
         shell: bash
         run: |
