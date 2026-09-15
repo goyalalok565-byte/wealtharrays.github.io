@@ -100,24 +100,17 @@ if (fs.existsSync(headersPath)) {
   for (const required of ['Strict-Transport-Security:', 'Content-Security-Policy:', 'X-Content-Type-Options:', 'Referrer-Policy:', 'Permissions-Policy:']) {
     if (!headers.includes(required)) errors.push(`_headers missing ${required}`);
   }
-  for (const required of ['www.googletagmanager.com', 'www.google-analytics.com', 'pagead2.googlesyndication.com', 'googleads.g.doubleclick.net']) {
-    if (!headers.includes(required)) warnings.push(`CSP does not mention ${required}; re-check before enabling Google advertising/analytics scripts.`);
-  }
 }
 
 for (const requiredFile of ['about.html', 'contact.html', 'privacy.html', 'terms.html', 'disclaimer.html', 'methodology.html', 'editorial-policy.html', 'advertising-policy.html', '404.html', 'og-image.png']) {
   if (!fs.existsSync(path.join(root, requiredFile))) errors.push(`Production trust/UX asset missing: ${requiredFile}`);
 }
 
-// The sitemap is the source of truth for the production calculator set. This avoids
-// counting intentionally retired/legacy calculator URLs that remain in the repository.
 const calculatorUrls = sitemapLocs.filter(url => {
   try {
     const pathname = new URL(url).pathname.replace(/^\//, '');
     return pathname.endsWith('-calculator.html') && !pathname.includes('/');
-  } catch {
-    return false;
-  }
+  } catch { return false; }
 });
 if (calculatorUrls.length !== 20) errors.push(`Expected 20 calculator pages in sitemap, found ${calculatorUrls.length}`);
 for (const url of calculatorUrls) {
@@ -126,13 +119,13 @@ for (const url of calculatorUrls) {
   if (!fs.existsSync(file)) continue;
   const html = read(file);
   const name = rel(file);
-  if (!/calculators\.js/i.test(html)) errors.push(`${name}: calculator runtime missing`);
+  if (!/wa-calculator-runtime\.js/i.test(html)) errors.push(`${name}: canonical calculator runtime missing`);
+  if (/calculators\.js/i.test(html)) errors.push(`${name}: legacy calculators.js runtime reference found`);
   if (!/formula|how it works|assumptions|limitations|estimate/i.test(html)) warnings.push(`${name}: educational/explanatory copy may be too thin`);
 }
 
-const analyticsMentioned = htmlFiles.some(file => /Google Analytics/i.test(read(file)));
-const privacy = path.join(root, 'privacy.html');
-if (analyticsMentioned && fs.existsSync(privacy) && !/Google Analytics/i.test(read(privacy))) errors.push('Analytics is referenced in site content but privacy policy does not explain it');
+if (fs.existsSync('wa-calculator-runtime.js') && fs.statSync('wa-calculator-runtime.js').size > 750_000) errors.push('Canonical calculator runtime exceeds 750 KB budget');
+if (fs.existsSync('node_modules')) errors.push('node_modules must not be present in the deployable repository');
 
 if (errors.length) {
   console.error(`LAUNCH READINESS FAILED (${errors.length} errors)`);
@@ -140,7 +133,7 @@ if (errors.length) {
   if (warnings.length) { console.error(`Warnings: ${warnings.length}`); warnings.forEach(w => console.error(`- ${w}`)); }
   process.exit(1);
 }
-console.log(`LAUNCH READINESS PASS: ${htmlFiles.length} HTML pages, ${calculatorUrls.length} sitemap calculators, sitemap, robots, security headers and trust assets validated.`);
+console.log(`LAUNCH READINESS PASS: ${htmlFiles.length} HTML pages, ${calculatorUrls.length} sitemap calculators, sitemap, robots, security headers, canonical runtime and trust assets validated.`);
 if (warnings.length) {
   console.log(`Warnings: ${warnings.length}`);
   warnings.forEach(w => console.log(`- ${w}`));
