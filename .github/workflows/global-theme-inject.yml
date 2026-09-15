@@ -15,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Inject latest theme and calculator runtime versions into every HTML page
+      - name: Inject current shared runtime versions into every HTML page
         shell: bash
         run: |
           python3 - <<'PY'
@@ -24,7 +24,10 @@ jobs:
           theme_marker='theme-fix.js?v=20260915-theme-v2'
           calculator_old='calculator-runtime.js?v=20260915-1'
           calculator_marker='calculator-runtime.js?v=20260915-2'
+          phase2_old='phase2-intelligence.js?v=20260915-1'
+          phase2_marker='phase2-intelligence.js?v=20260915-2'
           theme_tag=f'<script src="/{theme_marker}" defer></script>'
+          phase2_tag=f'<script src="/{phase2_marker}" defer></script>'
           changed=[]
           for path in Path('.').rglob('*.html'):
               if any(part.startswith('.') for part in path.parts):
@@ -33,6 +36,12 @@ jobs:
               original=text
               text=text.replace(theme_old, theme_marker)
               text=text.replace(calculator_old, calculator_marker)
+              text=text.replace(phase2_old, phase2_marker)
+              if phase2_marker not in text:
+                  if '</body>' in text:
+                      text=text.replace('</body>', phase2_tag+'</body>', 1)
+                  elif '</head>' in text:
+                      text=text.replace('</head>', phase2_tag+'</head>', 1)
               if theme_marker not in text:
                   if '</body>' in text:
                       text=text.replace('</body>', theme_tag+'</body>', 1)
@@ -41,7 +50,7 @@ jobs:
               if text != original:
                   path.write_text(text,encoding='utf-8')
                   changed.append(str(path))
-          print('Updated runtime versions in',len(changed),'HTML files')
+          print('Updated shared runtime versions in',len(changed),'HTML files')
           for item in changed: print(item)
           PY
 
@@ -54,5 +63,5 @@ jobs:
             echo "No HTML changes needed"
             exit 0
           fi
-          git commit -m "chore: refresh global theme runtime [theme-inject]"
+          git commit -m "chore: refresh global shared runtimes [theme-inject]"
           git push
