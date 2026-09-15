@@ -20,7 +20,9 @@ let changed=0;
 for(const file of htmlFiles){
   let s=fs.readFileSync(file,'utf8');
   const before=s;
-  s=s.replace(/<script>document\.documentElement\.dataset\.theme=localStorage\.waTheme\|\|['"]light['"]<\/script>/g, themeJs);
+  // Replace legacy inline theme bootstraps with one CSP-friendly external bootstrap.
+  s=s.replace(/<script>[^<]*(?:document\.documentElement\.dataset\.theme|localStorage\.(?:waTheme|getItem\(['"]waTheme['"]\)))[^<]*<\/script>/gi, '');
+  if(!s.includes('/theme-init.js')) s=s.replace('</head>',`${themeJs}</head>`);
   s=s.replace(/<link rel="stylesheet" href="\/phase4-premium\.css[^>]*>/g,'');
   s=s.replace(/<script src="\/phase4-premium\.js[^>]*><\/script>/g,'');
   if(!s.includes('/phase4-premium.css')) s=s.replace('</head>',`${phase4Css}</head>`);
