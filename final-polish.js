@@ -36,6 +36,15 @@ function mobileSearchFallback(){
  ['input','keyup','search','focus','touchstart'].forEach(name=>input.addEventListener(name,render,{passive:name==='touchstart',capture:true}));
  input.addEventListener('click',render,true); input.addEventListener('keydown',e=>{if(e.key==='Escape'){box.hidden=true;box.style.display='none';input.blur()}},true);
 }
+function moveHomepageSearchUp(){
+ if(window.innerWidth>760)return;
+ const input=document.getElementById('tool-search');
+ const shell=input?.closest('.tool-search-shell,.search-bar');
+ const hero=document.querySelector('.hero-copy');
+ if(!shell||!hero)return;
+ hero.style.display='flex';hero.style.flexDirection='column';hero.style.alignItems='stretch';
+ shell.style.order='-1';shell.style.marginTop='0';shell.style.marginBottom='26px';shell.style.maxWidth='620px';shell.style.width='100%';
+}
 function mobileSearchLayerFix(){
  const input=document.getElementById('tool-search'),box=document.getElementById('tool-search-results');
  if(!input||!box||window.innerWidth>680)return;
@@ -71,6 +80,6 @@ function directExpansionRender(){
  data.fields.forEach(f=>document.getElementById(id+'-'+f[0]).addEventListener('input',calc));calc();
  const mo=new MutationObserver(()=>{if(!host.querySelector('input[type="number"]')){host.innerHTML='';setTimeout(directExpansionRender,0)}});mo.observe(host,{childList:true});
 }
-function start(){tidy();reframeTaxScenario();addReviewStamp();syncStaticCurrencyExamples();mobileSearchFallback();mobileSearchLayerFix();expansionCalculatorRescue();directExpansionRender();setTimeout(()=>{tidy();reframeTaxScenario();syncStaticCurrencyExamples();mobileSearchFallback();mobileSearchLayerFix();expansionCalculatorRescue();directExpansionRender()},400);setTimeout(()=>{tidy();reframeTaxScenario();syncStaticCurrencyExamples();mobileSearchFallback();mobileSearchLayerFix();expansionCalculatorRescue();directExpansionRender()},1200);window.addEventListener('wa-currency',syncStaticCurrencyExamples)}
+function start(){tidy();reframeTaxScenario();addReviewStamp();syncStaticCurrencyExamples();moveHomepageSearchUp();mobileSearchFallback();mobileSearchLayerFix();expansionCalculatorRescue();directExpansionRender();setTimeout(()=>{tidy();reframeTaxScenario();syncStaticCurrencyExamples();moveHomepageSearchUp();mobileSearchFallback();mobileSearchLayerFix();expansionCalculatorRescue();directExpansionRender()},400);setTimeout(()=>{tidy();reframeTaxScenario();syncStaticCurrencyExamples();moveHomepageSearchUp();mobileSearchFallback();mobileSearchLayerFix();expansionCalculatorRescue();directExpansionRender()},1200);window.addEventListener('wa-currency',syncStaticCurrencyExamples);window.addEventListener('resize',moveHomepageSearchUp,{passive:true})}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
