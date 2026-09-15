@@ -41,7 +41,7 @@ jobs:
               s = s2
           p.write_text(s)
 
-          for p in list(Path('.').glob('*.html')) + list(Path('articles').glob('*.html')) + list(Path('p').glob('*.html')):
+          for p in list(Path('.').glob('*.html')) + list(Path('articles').glob('*.html')) + list(Path('p').glob('*.html'):
               s = p.read_text()
               s = s.replace('href="income-tax-planner.html"', 'href="income-tax-scenario-calculator.html"')
               s = s.replace('>Income Tax Planner</b>', '>Income Tax Scenario Calculator</b>')
@@ -55,9 +55,12 @@ jobs:
         run: |
           set -euo pipefail
           is_png() { [ "$(head -c 8 "$1" | xxd -p 2>/dev/null || true)" = "89504e470d0a1a0a" ]; }
+          rm -f og-image.decoded.png og-image.decoded2.png
           if ! is_png og-image.png; then
             if base64 -d og-image.png > og-image.decoded.png 2>/dev/null && is_png og-image.decoded.png; then
               mv og-image.decoded.png og-image.png
+            elif base64 -d og-image.decoded.png > og-image.decoded2.png 2>/dev/null && is_png og-image.decoded2.png; then
+              mv og-image.decoded2.png og-image.png
             elif [ -f og-image.svg ]; then
               if command -v magick >/dev/null 2>&1; then
                 magick og-image.svg -resize 1200x630 -background white -alpha remove og-image.png
@@ -72,6 +75,7 @@ jobs:
               exit 1
             fi
           fi
+          rm -f og-image.decoded.png og-image.decoded2.png
           test "$(head -c 8 og-image.png | xxd -p)" = "89504e470d0a1a0a"
           file og-image.png | grep -qi 'PNG image data'
 
@@ -92,6 +96,7 @@ jobs:
           set -euo pipefail
           git config user.name "wealth-arrays-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f og-image-fallback.txt
           git add site-runtime.js wa-core.js og-image.png '*.html' 'articles/*.html' 'p/*.html'
           git diff --cached --quiet && exit 0
           git commit -m "Fix canonical navigation and runtime integrity [integrity-fix]"
