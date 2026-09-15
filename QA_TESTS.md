@@ -35,6 +35,28 @@ This repository-level QA matrix documents deterministic scenario tests for all 2
 - Mortgage, ROI and CAGR protect against invalid divide-by-zero or invalid annualization cases.
 - Results that become non-finite are rejected by the UI rather than rendered as NaN/Infinity.
 
+## Phase 1 independent audit — 2026-09-15
+
+`qa/phase1-calculator-audit.mjs` independently re-implements the expected mathematics for all 20 calculator IDs and compares the live `calculators.js` results against those references. CI runs the audit on every push to `main` and can also be run manually.
+
+The audit covers:
+
+- all 20 calculator definitions are present;
+- default/reference scenarios;
+- stress scenarios kept inside a finite numerical domain;
+- zero-rate branches for growth and loan calculators;
+- zero/negative-growth cases where the model permits them;
+- alternate salary conversion direction;
+- debt-payoff behavior when the payment is insufficient;
+- non-finite output rejection (`NaN`, `Infinity`, `-Infinity`);
+- exact label/result-pair matching against independent reference equations.
+
+## Calculator review standard
+
+Each calculator page now exposes a Phase 1 review panel with a **Last reviewed** date, publisher identity, calculation basis, important assumptions and a review/source note. The review panel intentionally does not claim professional certification or regulated financial advice. Country-specific calculators must identify their jurisdiction and tax year; the current Income Tax Planner does not use tax tables and is explicitly jurisdiction-neutral.
+
+The review date is currently **2026-09-15**. A material formula, assumption or regulatory change should trigger a new review date and an updated QA scenario before release.
+
 ## Current production QA
 
 1. **Deterministic calculators:** identical inputs produce identical outputs; formulas are local and transparent.
