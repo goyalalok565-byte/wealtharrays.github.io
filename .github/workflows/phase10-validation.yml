@@ -48,11 +48,22 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          grep -q 'Strict-Transport-Security: max-age=31536000' _headers
           grep -q 'X-Content-Type-Options: nosniff' _headers
           grep -q 'Referrer-Policy: strict-origin-when-cross-origin' _headers
           grep -q 'Permissions-Policy:' _headers
           grep -q 'X-Frame-Options: SAMEORIGIN' _headers
+          grep -q 'Content-Security-Policy:' _headers
           grep -q 'Cache-Control:' _headers
+
+      - name: Validate AI discovery and canonical crawl targets
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s llms.txt
+          grep -q 'https://wealtharrays.com/income-tax-scenario-calculator.html' llms.txt
+          grep -q 'https://wealtharrays.com/income-tax-scenario-calculator.html' sitemap.xml
+          ! grep -q '<loc>https://wealtharrays.com/income-tax-planner.html</loc>' sitemap.xml
 
       - name: Validate no obvious debug output in production JS
         shell: bash
