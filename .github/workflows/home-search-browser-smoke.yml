@@ -1,4 +1,4 @@
-name: Homepage search browser smoke
+name: Homepage and production browser smoke
 
 on:
   push:
@@ -31,10 +31,18 @@ jobs:
           cat /tmp/wealtharrays-http.log
           exit 1
 
-      - name: Run homepage search smoke test against exact checkout
+      - name: Run homepage search smoke against exact checkout
         run: node qa/home-search-smoke.mjs
+
+      - name: Run visual and calculator smoke against exact checkout
+        run: node qa/production-browser-smoke.mjs
 
       - name: Verify production homepage search
         env:
           BASE_URL: https://wealtharrays.com
         run: node qa/home-search-smoke.mjs
+
+      - name: Verify production visual and calculator health
+        env:
+          BASE_URL: https://wealtharrays.com
+        run: node qa/production-browser-smoke.mjs
