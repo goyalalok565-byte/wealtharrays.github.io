@@ -16,30 +16,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Apply surgical runtime and canonical-link fixes
+      - name: Apply surgical canonical-link fixes only
         run: |
           python3 - <<'PY'
           from pathlib import Path
           import re
-
-          p = Path('site-runtime.js')
-          s = p.read_text()
-          s = re.sub(r'\n  const CATALOG = \[.*?\n  \];\n(?=  function normalize)', '\n', s, flags=re.S)
-          s = re.sub(r'\n  function homeSearchFallback\(\)\{.*?\n  \}\n(?=  function installHelp\(\))', '\n', s, flags=re.S)
-          s = re.sub(r';homeSearchFallback\(\)', ';', s)
-          s = re.sub(r'setTimeout\(homeSearchFallback,\s*\d+\);?', '', s)
-          p.write_text(s)
-
-          p = Path('wa-core.js')
-          s = p.read_text()
-          if 'function runSafe(name, fn)' not in s:
-              pattern = r"  function init\(\) \{.*?\n  if \(document\.readyState === 'loading'\).*?else init\(\);"
-              replacement = "  function runSafe(name, fn) { try { fn(); } catch (error) { try { console.error('[Wealth Arrays]', name, error); } catch (_) {} } }\n  function init() { [['styles',styles],['theme',setupTheme],['currency',applyCurrency],['categories',applyCategories],['search',calculatorSearch],['related',addRelatedAndTrust],['footer',renderFooter],['analytics',analytics],['consent',consentDialog],['serviceWorker',registerServiceWorker],['install',installPromptInit]].forEach(function (task) { runSafe(task[0], task[1]); }); setTimeout(calculatorSearch, 250); setTimeout(calculatorSearch, 1000); window.addEventListener('load', calculatorSearch, { once:true }); window.addEventListener('pageshow', calculatorSearch); }\n  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { runSafe('init', init); }, { once:true }); else runSafe('init', init);"
-              s2, n = re.subn(pattern, replacement, s, count=1, flags=re.S)
-              if n != 1:
-                  raise SystemExit('Expected current wa-core init block missing; refusing unsafe rewrite')
-              s = s2
-          p.write_text(s)
 
           for p in list(Path('.').glob('*.html')) + list(Path('articles').glob('*.html')) + list(Path('p').glob('*.html')):
               s = p.read_text()
@@ -113,7 +94,7 @@ jobs:
           ! grep -q 'function installController' site-runtime.js
           test "$(grep -o 'beforeinstallprompt' wa-core.js | wc -l)" -eq 1
           test "$(grep -o 'function installPromptInit' wa-core.js | wc -l)" -eq 1
-          grep -q 'function runSafe(name, fn)' wa-core.js
+          grep -q 'function runSafe(name,fn)' wa-core.js
           test "$(head -c 8 og-image.png | xxd -p)" = "89504e470d0a1a0a"
           file og-image.png | grep -qi 'PNG image data'
 
