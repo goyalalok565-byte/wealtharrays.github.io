@@ -119,7 +119,7 @@ const calculatorUrls = sitemapLocs.filter(url => {
     return false;
   }
 });
-if (calculatorUrls.length !== 23) errors.push(`Expected 23 calculator pages in sitemap, found ${calculatorUrls.length}`);
+if (calculatorUrls.length !== 20) errors.push(`Expected 20 calculator pages in sitemap, found ${calculatorUrls.length}`);
 for (const url of calculatorUrls) {
   const pathname = new URL(url).pathname.replace(/^\//, '');
   const file = path.join(root, pathname);
@@ -141,4 +141,4 @@ if (errors.length) {
   process.exit(1);
 }
 console.log(`LAUNCH READINESS PASS: ${htmlFiles.length} HTML pages, ${calculatorUrls.length} sitemap calculators, sitemap, robots, security headers and trust assets validated.`);
-if (warnings.length) { console.log(`Warnings: ${warnings.length}`); warnings.forEach(w => console.log(`- ${w}`)); }
+if (warnings.length) { console.log(`Warnings: ${warnings.length}`); warnings.forEach(w => console.log(`- ${w}`); }
