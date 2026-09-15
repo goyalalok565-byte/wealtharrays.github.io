@@ -42,6 +42,9 @@ jobs:
       - name: Run architecture audit
         run: node qa/architecture-audit.mjs
 
+      - name: Run source code quality audit
+        run: node qa/code-quality-audit.mjs
+
       - name: Run Phase 4-5 production gate
         run: node qa/phase45-production-audit.mjs
 
