@@ -16,7 +16,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Apply surgical runtime integrity fixes
+      - name: Apply surgical runtime and canonical-link fixes
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -42,6 +42,16 @@ jobs:
                   raise SystemExit('Expected current wa-core init block missing; refusing unsafe rewrite')
               s = s2
           p.write_text(s)
+
+          # Keep canonical public navigation aligned with the tax scenario page and editorial policy page.
+          for p in list(Path('.').glob('*.html')) + list(Path('articles').glob('*.html')) + list(Path('p').glob('*.html')):
+              s = p.read_text()
+              s = s.replace('href="income-tax-planner.html"', 'href="income-tax-scenario-calculator.html"')
+              s = s.replace('>Income Tax Planner</b>', '>Income Tax Scenario Calculator</b>')
+              s = s.replace('income tax planner tax plan transparent tax scenarios.', 'income tax scenario calculator tax plan transparent tax scenarios.')
+              s = s.replace('income-tax-planner.html', 'income-tax-scenario-calculator.html')
+              s = s.replace('href="/editorial-standards.html"', 'href="/editorial-policy.html"')
+              p.write_text(s)
           PY
 
       - name: Validate or restore binary Open Graph PNG
@@ -82,7 +92,7 @@ jobs:
           set -euo pipefail
           git config user.name "wealth-arrays-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add site-runtime.js wa-core.js og-image.png
+          git add site-runtime.js wa-core.js og-image.png '*.html' 'articles/*.html' 'p/*.html'
           git diff --cached --quiet && exit 0
-          git commit -m "Fix single search owner, runtime isolation and binary OG image [integrity-fix]"
+          git commit -m "Fix canonical navigation and runtime integrity [integrity-fix]"
           git push
