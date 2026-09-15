@@ -42,8 +42,6 @@ for (const file of htmlFiles) {
   const c = canonical(html);
   const isIndexable = indexable(html);
 
-  // Only pages intended for search indexing are held to the full SEO metadata gate.
-  // Utility/legacy/redirect pages may intentionally be noindex and need not carry a full metadata stack.
   if (isIndexable) {
     if (!t) errors.push(`${name}: missing title`);
     if (!d) errors.push(`${name}: missing meta description`);
@@ -115,7 +113,7 @@ for (const requiredFile of ['about.html', 'contact.html', 'privacy.html', 'terms
 // counting intentionally retired/legacy calculator URLs that remain in the repository.
 const calculatorUrls = sitemapLocs.filter(url => {
   try {
-    const pathname = new URL(url).pathname;
+    const pathname = new URL(url).pathname.replace(/^\//, '');
     return pathname.endsWith('-calculator.html') && !pathname.includes('/');
   } catch {
     return false;
@@ -143,4 +141,4 @@ if (errors.length) {
   process.exit(1);
 }
 console.log(`LAUNCH READINESS PASS: ${htmlFiles.length} HTML pages, ${calculatorUrls.length} sitemap calculators, sitemap, robots, security headers and trust assets validated.`);
-if (warnings.length) { console.log(`Warnings: ${warnings.length}`); warnings.forEach(w => console.log(`- ${w}`)); }
+if (warnings.length) { console.log(`Warnings: ${warnings.length}`); warnings.forEach(w => console.log(`- ${w}`); }
