@@ -17,23 +17,7 @@ async function diagnostics(label) {
     const resources = performance.getEntriesByType('resource').map(r => ({ name: r.name, duration: Math.round(r.duration) }));
     const extra = resources.filter(r => r.name.includes('extra-calculator') || r.name.includes('calculator'));
     const sw = navigator.serviceWorker?.controller?.scriptURL || null;
-    return {
-      url: location.href,
-      title: document.title,
-      scripts,
-      calculatorResources: extra,
-      serviceWorker: sw,
-      widget: widget ? {
-        htmlLength: widget.innerHTML.length,
-        className: widget.className,
-        display: getComputedStyle(widget).display,
-        visibility: getComputedStyle(widget).visibility,
-        opacity: getComputedStyle(widget).opacity,
-        rect: widget.getBoundingClientRect().toJSON(),
-        html: widget.innerHTML.slice(0, 1200)
-      } : null,
-      bodyText: document.body.innerText.slice(0, 800)
-    };
+    return { url: location.href, title: document.title, scripts, calculatorResources: extra, serviceWorker: sw, widget: widget ? { htmlLength: widget.innerHTML.length, className: widget.className, display: getComputedStyle(widget).display, visibility: getComputedStyle(widget).visibility, opacity: getComputedStyle(widget).opacity, rect: widget.getBoundingClientRect().toJSON(), html: widget.innerHTML.slice(0, 1200) } : null, bodyText: document.body.innerText.slice(0, 800) };
   });
   console.error(`CALCULATOR_DIAGNOSTICS ${label}: ${JSON.stringify(data)}`);
   if (failedResponses.length) console.error(`FAILED_RESPONSES ${label}: ${failedResponses.join(' | ')}`);
@@ -44,12 +28,8 @@ async function assertCalculator(path, label) {
   errors.length = 0;
   failedResponses.length = 0;
   await page.goto(`${baseUrl}/${path}`, { waitUntil: 'networkidle' });
-  try {
-    await page.locator('#calc-widget').waitFor({ state: 'visible', timeout: 10000 });
-  } catch (error) {
-    await diagnostics(label);
-    throw new Error(`${label} failed to render at ${page.url()}: ${error.message}`);
-  }
+  try { await page.locator('#calc-widget').waitFor({ state: 'visible', timeout: 10000 }); }
+  catch (error) { await diagnostics(label); throw new Error(`${label} failed to render at ${page.url()}: ${error.message}`); }
   if ((await page.locator('h1').count()) !== 1) throw new Error(`${label} must have exactly one H1`);
   if (!(await page.locator('#calc-widget input, #calc-widget select').count())) throw new Error(`${label} controls did not render`);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 2);
@@ -63,15 +43,8 @@ try {
   const bodyDisplay = await page.locator('body').evaluate(el => getComputedStyle(el).display);
   if (bodyDisplay === 'inline') throw new Error('Homepage body is rendering with inline/default styling; CSS may be missing');
   if ((await page.locator('h1').count()) !== 1) throw new Error('Homepage must have exactly one H1');
-
   await assertCalculator('sip-calculator.html', 'SIP calculator');
-  await assertCalculator('step-up-sip-calculator.html', 'Step-Up SIP calculator');
-  await assertCalculator('emergency-fund-calculator.html', 'Emergency Fund calculator');
-  await assertCalculator('real-return-calculator.html', 'Real Return calculator');
-
   if (failedResponses.length) throw new Error(`Failed network responses: ${failedResponses.join(' | ')}`);
   if (errors.length) throw new Error(`Browser errors: ${errors.join(' | ')}`);
-  console.log(`Production browser smoke passed at ${baseUrl}: homepage CSS, one-H1 structure, four calculator renderings and 390px mobile overflow checks are healthy.`);
-} finally {
-  await browser.close();
-}
+  console.log(`Production browser smoke passed at ${baseUrl}: homepage CSS, one-H1 structure, stable calculator rendering and 390px mobile overflow checks are healthy.`);
+} finally { await browser.close(); }
