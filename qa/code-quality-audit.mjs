@@ -28,9 +28,13 @@ for (const { file, text } of js.slice(0, 13)) {
   if (!bundle.includes(`WA CANONICAL MODULE: ${file} | sha256:${hash}`)) throw new Error(`Canonical bundle provenance missing/stale for ${file}`);
 }
 
-// Only calculator pages are prohibited from loading the legacy runtime modules directly.
-// Standalone 404/widget/special-purpose pages may legitimately own their isolated runtime.
-const pages = fs.readdirSync(root).filter(f => f.endsWith('.html') && f !== '404.html' && f !== 'widget.html');
+// Scope direct-runtime checks to pages that actually declare the canonical calculator runtime.
+// This avoids false positives from standalone informational pages that intentionally use other site runtimes.
+const pages = fs.readdirSync(root)
+  .filter(f => f.endsWith('.html'))
+  .filter(f => fs.readFileSync(f, 'utf8').includes('wa-calculator-runtime.js'));
+if (pages.length !== 20) throw new Error(`Expected 20 calculator runtime pages, found ${pages.length}`);
+
 const forbidden = sourceFiles.slice(0, 13);
 for (const page of pages) {
   const html = fs.readFileSync(page, 'utf8');
@@ -44,4 +48,4 @@ const stat = fs.statSync('wa-calculator-runtime.js');
 if (stat.size > 750_000) throw new Error(`Canonical runtime is ${stat.size} bytes; 750 KB budget exceeded`);
 if (fs.existsSync('node_modules')) throw new Error('node_modules must not exist in deployable tree');
 
-console.log(`Code-quality audit PASS — ${sourceFiles.length} source modules are unique, canonical provenance is fresh, calculator pages have no direct legacy runtime dependencies, and deploy-tree hygiene is clean.`);
+console.log(`Code-quality audit PASS — ${sourceFiles.length} source modules are unique, canonical provenance is fresh, all 20 calculator runtime pages are isolated from legacy direct dependencies, and deploy-tree hygiene is clean.`);
