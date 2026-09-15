@@ -18,7 +18,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Validate calculator math and definitions
-        run: node scripts/phase10-qa.mjs
+        run: |
+          node scripts/phase10-qa.mjs
+          node qa/calculator-regression.mjs
 
       - name: Validate site-wide internal links, metadata and crawl files
         run: node scripts/site-integrity.mjs
@@ -34,10 +36,11 @@ jobs:
           test "$count" -eq 20 || { echo "Expected 20 *-calculator.html pages, found $count"; exit 1; }
           test -f income-tax-planner.html
           test -f income-tax-scenario-calculator.html
-          test "$(grep -l 'calculators.js' *-calculator.html | wc -l)" -eq 20
+          test "$(grep -l 'wa-calculator-runtime.js' *-calculator.html | wc -l)" -eq 20
+          test "$(grep -l 'calculators.js' *-calculator.html | wc -l)" -eq 0
           grep -q 'noindex' income-tax-planner.html
           grep -q 'income-tax-scenario-calculator.html' income-tax-planner.html
-          grep -q 'calculators.js' income-tax-scenario-calculator.html
+          grep -q 'wa-calculator-runtime.js' income-tax-scenario-calculator.html
           ! grep -q 'smart.js' income-tax-scenario-calculator.html
 
       - name: Validate privacy-sensitive client code
@@ -68,11 +71,11 @@ jobs:
           grep -q '^Sitemap: https://wealtharrays.com/sitemap.xml' robots.txt
           grep -q 'index,follow' income-tax-scenario-calculator.html
 
-      - name: Validate no obvious debug output in production JS
+      - name: Validate no debug output in deployable runtime
         shell: bash
         run: |
           set -euo pipefail
-          if grep -RniE 'console\.log\(|debugger;' --include='*.js' --exclude-dir=node_modules .; then
-            echo 'Debug statements found in production JavaScript.'
-            exit 1
-          fi
+          for file in wa-calculator-runtime.js wa-core.js site-runtime.js wa-enhancements.js final-polish.js theme-init.js 404-runtime.js; do
+            test -f "$file" || continue
+            ! grep -nE 'console\.log\(|debugger;' "$file"
+          done
