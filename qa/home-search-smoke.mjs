@@ -17,18 +17,18 @@ try {
 
   const firstHref = await results.first().getAttribute('href');
   const firstTitle = (await results.first().innerText()).trim();
-  if (firstHref !== '/sip-calculator.html') throw new Error(`Unexpected SIP result href: ${firstHref}`);
+  if (new URL(firstHref, page.url()).pathname !== '/sip-calculator.html') throw new Error(`Unexpected SIP result href: ${firstHref}`);
   if (!/SIP Calculator/i.test(firstTitle)) throw new Error(`Unexpected SIP result title: ${firstTitle}`);
 
   await input.fill('emi');
   await results.first().waitFor({ state: 'visible', timeout: 5000 });
   const emiHref = await results.first().getAttribute('href');
-  if (emiHref !== '/mortgage-emi-calculator.html') throw new Error(`Unexpected EMI result href: ${emiHref}`);
+  if (new URL(emiHref, page.url()).pathname !== '/mortgage-emi-calculator.html') throw new Error(`Unexpected EMI result href: ${emiHref}`);
 
   await input.fill('tax');
   await results.first().waitFor({ state: 'visible', timeout: 5000 });
   const taxHref = await results.first().getAttribute('href');
-  if (taxHref !== '/income-tax-scenario-calculator.html') throw new Error(`Unexpected tax result href: ${taxHref}`);
+  if (new URL(taxHref, page.url()).pathname !== '/income-tax-scenario-calculator.html') throw new Error(`Unexpected tax result href: ${taxHref}`);
 
   console.log(`Homepage calculator search smoke test passed at ${baseUrl}.`);
   if (errors.length) throw new Error(`Browser page errors: ${errors.join(' | ')}`);
