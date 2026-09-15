@@ -44,16 +44,21 @@ jobs:
           p.write_text(s)
           PY
 
-      - name: Restore real binary Open Graph PNG
+      - name: Validate or restore binary Open Graph PNG
         run: |
           set -euo pipefail
-          if [ -f og-image.svg ]; then
-            if command -v magick >/dev/null 2>&1; then
-              magick og-image.svg -resize 1200x630 -background white -alpha remove og-image.png
-            elif command -v convert >/dev/null 2>&1; then
-              convert og-image.svg -resize 1200x630 -background white -alpha remove og-image.png
+          if [ "$(head -c 8 og-image.png | xxd -p 2>/dev/null || true)" != "89504e470d0a1a0a" ]; then
+            if [ -f og-image.svg ]; then
+              if command -v magick >/dev/null 2>&1; then
+                magick og-image.svg -resize 1200x630 -background white -alpha remove og-image.png
+              elif command -v convert >/dev/null 2>&1; then
+                convert og-image.svg -resize 1200x630 -background white -alpha remove og-image.png
+              else
+                echo "Existing OG PNG is invalid and no SVG rasterizer is available" >&2
+                exit 1
+              fi
             else
-              echo "No SVG rasterizer available" >&2
+              echo "OG PNG is invalid and no SVG source exists" >&2
               exit 1
             fi
           fi
