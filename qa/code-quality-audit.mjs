@@ -29,7 +29,6 @@ for (const { file, text } of js.slice(0, 13)) {
 }
 
 // Scope direct-runtime checks to pages that actually declare the canonical calculator runtime.
-// This avoids false positives from standalone informational pages that intentionally use other site runtimes.
 const pages = fs.readdirSync(root)
   .filter(f => f.endsWith('.html'))
   .filter(f => fs.readFileSync(f, 'utf8').includes('wa-calculator-runtime.js'));
@@ -38,9 +37,10 @@ if (pages.length !== 20) throw new Error(`Expected 20 calculator runtime pages, 
 const forbidden = sourceFiles.slice(0, 13);
 for (const page of pages) {
   const html = fs.readFileSync(page, 'utf8');
+  const srcs = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi)].map(m => m[1]);
+  const loadedBasenames = new Set(srcs.map(src => src.split('?')[0].split('#')[0].split('/').pop()));
   for (const file of forbidden) {
-    const direct = new RegExp(`<script\\s+src=["'][^"']*${file.replace('.', '\\.')}[^"']*["']`, 'i');
-    if (direct.test(html)) throw new Error(`${page}: direct legacy calculator runtime dependency ${file}`);
+    if (loadedBasenames.has(file)) throw new Error(`${page}: direct legacy calculator runtime dependency ${file}`);
   }
 }
 
