@@ -32,11 +32,10 @@ for (const page of calculatorPages) {
   if ((html.match(/wa-calculator-runtime\.js(?:\?[^"']*)?/g) || []).length !== 1) {
     throw new Error(`${page}: canonical runtime ownership violation`);
   }
+  const scriptNames = [...html.matchAll(/<script\s+src=["']([^"']+)["'][^>]*><\/script>/gi)]
+    .map(m => m[1].split('?')[0].split('/').pop());
   for (const file of sources) {
-    const escaped = file.replaceAll('.', '\\.');
-    if (new RegExp(`<script[^>]+src=["'][^"']*(?:^|/)${escaped}(?:[?"'])`, 'i').test(html)) {
-      throw new Error(`${page}: source module must not be directly page-loaded: ${file}`);
-    }
+    if (scriptNames.includes(file)) throw new Error(`${page}: source module must not be directly page-loaded: ${file}`);
   }
 }
 
