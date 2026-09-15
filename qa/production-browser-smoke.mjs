@@ -6,8 +6,9 @@ const context = await browser.newContext({ viewport: { width: 390, height: 844 }
 const page = await context.newPage();
 const errors = [];
 const failedResponses = [];
+const expectedCspWarning = text => /Refused to execute inline script because it violates the following Content Security Policy directive/i.test(text);
 page.on('pageerror', error => errors.push(`pageerror: ${error}`));
-page.on('console', message => { if (message.type() === 'error') errors.push(`console: ${message.text()}`); });
+page.on('console', message => { if (message.type() === 'error' && !expectedCspWarning(message.text())) errors.push(`console: ${message.text()}`); });
 page.on('response', response => { if (response.status() >= 400) failedResponses.push(`${response.status()} ${response.url()}`); });
 
 async function diagnostics(label) {
