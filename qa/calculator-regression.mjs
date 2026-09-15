@@ -20,16 +20,16 @@ for (const calc of calculators) {
   assert(new Set(ids).size === ids.length, `${calc.slug}: duplicate field id`);
   const defaults = Object.fromEntries(calc.fields.map(f => [f.id, f.default]));
   let result;
-  try { result = calc.compute(defaults); } catch (error) { throw new Error(`${calc.slug}: default calculation threw: ${error.message}`); }
+  try { result = calc.compute(defaults); } catch (error) { throw new Error(`${calc.slug}: default calculation threw: ${error.message}; defaults=${JSON.stringify(defaults)}`); }
   assert(Array.isArray(result) && result.length > 0, `${calc.slug}: no result rows`);
   for (const row of result) {
     assert(row && typeof row.label === 'string', `${calc.slug}: invalid result label`);
-    assert(typeof row.value === 'number' && Number.isFinite(row.value), `${calc.slug}: non-finite default result for ${row.label}`);
+    assert(typeof row.value === 'number' && Number.isFinite(row.value), `${calc.slug}: non-finite default result for ${row.label}; defaults=${JSON.stringify(defaults)}; fields=${JSON.stringify(calc.fields)}`);
   }
 
   const zeroed = Object.fromEntries(calc.fields.map(f => [f.id, typeof f.default === 'number' ? 0 : f.default]));
-  try { result = calc.compute(zeroed); } catch (error) { throw new Error(`${calc.slug}: zero-boundary calculation threw: ${error.message}`); }
-  for (const row of result) assert(typeof row.value === 'number' && Number.isFinite(row.value), `${calc.slug}: zero-boundary non-finite result for ${row.label}`);
+  try { result = calc.compute(zeroed); } catch (error) { throw new Error(`${calc.slug}: zero-boundary calculation threw: ${error.message}; zeroed=${JSON.stringify(zeroed)}`); }
+  for (const row of result) assert(typeof row.value === 'number' && Number.isFinite(row.value), `${calc.slug}: zero-boundary non-finite result for ${row.label}; zeroed=${JSON.stringify(zeroed)}`);
 }
 
 console.log('Calculator regression PASS — 20/20 calculators, unique schemas, defaults, zero-boundaries, and finite-output checks passed.');
