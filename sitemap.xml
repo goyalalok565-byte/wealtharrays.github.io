@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://wealtharrays.com/</loc><lastmod>2026-09-14</lastmod></url>
-  <url><loc>https://wealtharrays.com/tools.html</loc><lastmod>2026-09-11</lastmod></url>
-  <url><loc>https://wealtharrays.com/articles.html</loc><lastmod>2026-09-14</lastmod></url>
+  <url><loc>https://wealtharrays.com/</loc><lastmod>2026-09-15</lastmod></url>
+  <url><loc>https://wealtharrays.com/tools.html</loc><lastmod>2026-09-15</lastmod></url>
+  <url><loc>https://wealtharrays.com/articles.html</loc><lastmod>2026-09-15</lastmod></url>
   <url><loc>https://wealtharrays.com/faq.html</loc><lastmod>2026-09-10</lastmod></url>
-  <url><loc>https://wealtharrays.com/about.html</loc><lastmod>2026-09-14</lastmod></url>
+  <url><loc>https://wealtharrays.com/about.html</loc><lastmod>2026-09-15</lastmod></url>
   <url><loc>https://wealtharrays.com/contact.html</loc><lastmod>2026-09-10</lastmod></url>
   <url><loc>https://wealtharrays.com/privacy.html</loc><lastmod>2026-09-14</lastmod></url>
   <url><loc>https://wealtharrays.com/terms.html</loc><lastmod>2026-09-10</lastmod></url>
@@ -15,8 +15,8 @@
   <url><loc>https://wealtharrays.com/category-retirement.html</loc><lastmod>2026-09-10</lastmod></url>
   <url><loc>https://wealtharrays.com/category-salary.html</loc><lastmod>2026-09-10</lastmod></url>
   <url><loc>https://wealtharrays.com/category-business.html</loc><lastmod>2026-09-10</lastmod></url>
-  <url><loc>https://wealtharrays.com/sip-calculator.html</loc><lastmod>2026-09-10</lastmod></url>
-  <url><loc>https://wealtharrays.com/compound-interest-calculator.html</loc><lastmod>2026-09-10</lastmod></url>
+  <url><loc>https://wealtharrays.com/sip-calculator.html</loc><lastmod>2026-09-15</lastmod></url>
+  <url><loc>https://wealtharrays.com/compound-interest-calculator.html</loc><lastmod>2026-09-15</lastmod></url>
   <url><loc>https://wealtharrays.com/mortgage-emi-calculator.html</loc><lastmod>2026-09-10</lastmod></url>
   <url><loc>https://wealtharrays.com/roi-calculator.html</loc><lastmod>2026-09-10</lastmod></url>
   <url><loc>https://wealtharrays.com/simple-interest-calculator.html</loc><lastmod>2026-09-10</lastmod></url>
@@ -34,7 +34,7 @@
   <url><loc>https://wealtharrays.com/net-worth-calculator.html</loc><lastmod>2026-09-10</lastmod></url>
   <url><loc>https://wealtharrays.com/overtime-pay-calculator.html</loc><lastmod>2026-09-10</lastmod></url>
   <url><loc>https://wealtharrays.com/freelance-rate-calculator.html</loc><lastmod>2026-09-10</lastmod></url>
-  <url><loc>https://wealtharrays.com/income-tax-planner.html</loc><lastmod>2026-09-10</lastmod></url>
+  <url><loc>https://wealtharrays.com/income-tax-planner.html</loc><lastmod>2026-09-15</lastmod></url>
   <url><loc>https://wealtharrays.com/articles/sip-calculator-guide.html</loc><lastmod>2026-09-14</lastmod></url>
   <url><loc>https://wealtharrays.com/articles/compound-interest-guide.html</loc><lastmod>2026-09-14</lastmod></url>
   <url><loc>https://wealtharrays.com/articles/loan-emi-guide.html</loc><lastmod>2026-09-14</lastmod></url>
@@ -48,5 +48,6 @@
   <url><loc>https://wealtharrays.com/articles/why-one-crore-in-the-future-may-not-mean-what-you-think.html</loc><lastmod>2026-09-14</lastmod></url>
   <url><loc>https://wealtharrays.com/methodology.html</loc><lastmod>2026-09-10</lastmod></url>
   <url><loc>https://wealtharrays.com/editorial-policy.html</loc><lastmod>2026-09-10</lastmod></url>
+  <url><loc>https://wealtharrays.com/editorial-standards.html</loc><lastmod>2026-09-15</lastmod></url>
   <url><loc>https://wealtharrays.com/advertising-policy.html</loc><lastmod>2026-09-11</lastmod></url>
 </urlset>
