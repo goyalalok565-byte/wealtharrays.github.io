@@ -1,4 +1,4 @@
-/* Wealth Arrays calculator-page runtime guard — deterministic, order-safe, cache-safe. */
+/* Wealth Arrays calculator-page runtime — shared behavior only. Theme is owned by wa-core.js. */
 (function () {
   'use strict';
 
@@ -6,7 +6,6 @@
     ['USD','$','US Dollar'],['EUR','€','Euro'],['JPY','¥','Japanese Yen'],['GBP','£','British Pound'],['AUD','A$','Australian Dollar'],['CAD','C$','Canadian Dollar'],['CHF','CHF','Swiss Franc'],['CNY','CN¥','Chinese Yuan'],['HKD','HK$','Hong Kong Dollar'],['NZD','NZ$','New Zealand Dollar'],['SEK','kr','Swedish Krona'],['KRW','₩','South Korean Won'],['SGD','S$','Singapore Dollar'],['NOK','kr','Norwegian Krone'],['MXN','MX$','Mexican Peso'],['INR','₹','Indian Rupee'],['ZAR','R','South African Rand'],['BRL','R$','Brazilian Real'],['AED','د.إ','UAE Dirham'],['SAR','﷼','Saudi Riyal'],['TRY','₺','Turkish Lira'],['PLN','zł','Polish Zloty'],['THB','฿','Thai Baht'],['IDR','Rp','Indonesian Rupiah'],['MYR','RM','Malaysian Ringgit'],['PHP','₱','Philippine Peso'],['DKK','kr','Danish Krone'],['ILS','₪','Israeli Shekel'],['CZK','Kč','Czech Koruna'],['HUF','Ft','Hungarian Forint']
   ];
 
-  // Give the calculator widget the same currency source even if wa-core initializes later.
   window.WA = window.WA || {};
   window.WA.currencies = CURRENCIES;
 
@@ -18,8 +17,6 @@
   }
 
   function getCalculators() {
-    // CALCULATORS is declared with `const` in calculators.js, so it is a global lexical
-    // binding rather than window.CALCULATORS. The old guard incorrectly checked only window.
     try { return (typeof CALCULATORS !== 'undefined' && Array.isArray(CALCULATORS)) ? CALCULATORS : null; }
     catch (_) { return null; }
   }
@@ -38,32 +35,6 @@
       });
     });
     return true;
-  }
-
-  function applyTheme() {
-    const root = document.documentElement;
-    const button = document.getElementById('theme-toggle');
-    const saved = storageGet('waTheme', 'light') === 'dark' ? 'dark' : 'light';
-    const apply = theme => {
-      root.dataset.theme = theme === 'dark' ? 'dark' : 'light';
-      storageSet('waTheme', root.dataset.theme);
-      const b = document.getElementById('theme-toggle');
-      if (b) {
-        b.setAttribute('aria-pressed', String(root.dataset.theme === 'dark'));
-        b.setAttribute('aria-label', root.dataset.theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-        const label = b.querySelector('[data-theme-label]') || document.getElementById('theme-toggle-label');
-        if (label) label.textContent = root.dataset.theme === 'dark' ? 'Light mode' : 'Dark mode';
-      }
-    };
-    apply(saved);
-    if (button && !button.dataset.waRuntimeBound) {
-      button.dataset.waRuntimeBound = '1';
-      button.addEventListener('click', event => {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        apply(root.dataset.theme === 'dark' ? 'light' : 'dark');
-      }, true);
-    }
   }
 
   function applyCurrency() {
@@ -105,13 +76,11 @@
   function sync() {
     normalizeDefinitions();
     applyCurrency();
-    applyTheme();
     removeCapsFromRenderedInputs();
   }
 
   function start() {
     sync();
-    // Retry because calculator pages intentionally load calculators/widget as deferred scripts.
     [0, 25, 100, 250, 500, 1000].forEach(ms => setTimeout(sync, ms));
     const target = document.getElementById('calc-widget') || document.body;
     if (target && !target.dataset.waRuntimeObserver) {
