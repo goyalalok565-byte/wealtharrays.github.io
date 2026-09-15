@@ -12,15 +12,17 @@ for(const f of calc){if(!fs.existsSync(f)) failures.push(`Missing calculator: ${
 for(const f of files){const s=fs.readFileSync(f,'utf8');
  if(!s.includes('/phase4-premium.css')) failures.push(`${f}: missing Phase 4 CSS`);
  if(!s.includes('/phase4-premium.js')) failures.push(`${f}: missing Phase 4 JS`);
+ if(!s.includes('/theme-init.js')) failures.push(`${f}: missing external theme bootstrap`);
  if(/<script>document\.documentElement\.dataset\.theme=/.test(s)) failures.push(`${f}: inline theme bootstrap remains`);
  if(/<script(?![^>]+src=)(?![^>]+application\/ld\+json)[^>]*>/.test(s)) failures.push(`${f}: executable inline script remains`);
  if(!/<meta name="referrer" content="strict-origin-when-cross-origin">/.test(s)) failures.push(`${f}: missing referrer policy meta`);
- if(!/<h1\b/i.test(s)) failures.push(`${f}: missing H1`);
 }
+for(const f of calc){const s=fs.readFileSync(f,'utf8');if(!/<h1\b/i.test(s)) failures.push(`${f}: missing H1`);}
 const headers=fs.existsSync('_headers')?fs.readFileSync('_headers','utf8'):'';
 if(!headers.includes('Strict-Transport-Security')) failures.push('_headers: HSTS missing');
 if(!headers.includes('X-Content-Type-Options: nosniff')) failures.push('_headers: nosniff missing');
 if(!headers.includes('Referrer-Policy: strict-origin-when-cross-origin')) failures.push('_headers: referrer policy missing');
 if(!headers.includes('frame-ancestors')) failures.push('_headers: frame-ancestors missing');
+if(!headers.includes("script-src 'self' https://www.googletagmanager.com")) failures.push('_headers: CSP script source policy not hardened');
 if(failures.length){console.error(failures.join('\n'));process.exit(1)}
 console.log(`Phase 4 premium audit PASS — ${files.length} HTML files and ${calc.length} calculators checked.`);
