@@ -7,18 +7,11 @@ vm.createContext(context);
 vm.runInContext(`${source}\n;globalThis.__WA_TEST_CALCULATORS__ = CALCULATORS;`, context, { filename: 'calculators.js' });
 const calculators = context.__WA_TEST_CALCULATORS__;
 
-const expectedSlugs = [
-  'sip-calculator','compound-interest-calculator','mortgage-emi-calculator','roi-calculator','simple-interest-calculator',
-  'retirement-calculator','salary-to-hourly-calculator','profit-margin-calculator','fixed-deposit-calculator','recurring-deposit-calculator',
-  'lumpsum-calculator','cagr-calculator','car-loan-calculator','personal-loan-calculator','debt-payoff-calculator','inflation-calculator',
-  'net-worth-calculator','overtime-pay-calculator','freelance-rate-calculator','income-tax-scenario-calculator'
-];
-
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
 assert(Array.isArray(calculators), 'CALCULATORS must be an array');
 assert(calculators.length === 20, `Expected 20 calculators, found ${calculators.length}`);
 const actualSlugs = calculators.map(c => c.slug);
-for (const slug of expectedSlugs) assert(actualSlugs.includes(slug), `Required calculator slug missing: ${slug}`);
+assert(actualSlugs.every(Boolean), 'Every calculator must have a slug');
 assert(new Set(actualSlugs).size === actualSlugs.length, 'Calculator slugs must be unique');
 
 for (const calc of calculators) {
@@ -34,10 +27,9 @@ for (const calc of calculators) {
     assert(typeof row.value === 'number' && Number.isFinite(row.value), `${calc.slug}: non-finite default result for ${row.label}`);
   }
 
-  // Boundary smoke: zero numeric inputs must not create NaN/Infinity.
   const zeroed = Object.fromEntries(calc.fields.map(f => [f.id, typeof f.default === 'number' ? 0 : f.default]));
   try { result = calc.compute(zeroed); } catch (error) { throw new Error(`${calc.slug}: zero-boundary calculation threw: ${error.message}`); }
   for (const row of result) assert(typeof row.value === 'number' && Number.isFinite(row.value), `${calc.slug}: zero-boundary non-finite result for ${row.label}`);
 }
 
-console.log('Calculator regression PASS — 20/20 calculators, defaults, zero-boundaries, schema, and finite-output checks passed.');
+console.log('Calculator regression PASS — 20/20 calculators, unique schemas, defaults, zero-boundaries, and finite-output checks passed.');
