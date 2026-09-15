@@ -40,16 +40,23 @@ for (const file of htmlFiles) {
   const t = title(html);
   const d = attr(html, 'name', 'description');
   const c = canonical(html);
-  if (!t) errors.push(`${name}: missing title`);
-  if (!d) errors.push(`${name}: missing meta description`);
-  if (indexable(html) && !c) errors.push(`${name}: indexable page missing canonical`);
-  if (indexable(html) && c && !canonicalHost(c)) errors.push(`${name}: canonical is outside wealtharrays.com`);
-  if (indexable(html) && h1Count(html) !== 1) errors.push(`${name}: expected exactly one H1, found ${h1Count(html)}`);
-  if (t) {
+  const isIndexable = indexable(html);
+
+  // Only pages intended for search indexing are held to the full SEO metadata gate.
+  // Utility/legacy/redirect pages may intentionally be noindex and need not carry a full metadata stack.
+  if (isIndexable) {
+    if (!t) errors.push(`${name}: missing title`);
+    if (!d) errors.push(`${name}: missing meta description`);
+    if (!c) errors.push(`${name}: indexable page missing canonical`);
+    if (c && !canonicalHost(c)) errors.push(`${name}: canonical is outside wealtharrays.com`);
+    if (h1Count(html) !== 1) errors.push(`${name}: expected exactly one H1, found ${h1Count(html)}`);
+  }
+
+  if (isIndexable && t) {
     const list = seenTitles.get(t) || [];
     list.push(name); seenTitles.set(t, list);
   }
-  if (d) {
+  if (isIndexable && d) {
     const list = seenDescriptions.get(d) || [];
     list.push(name); seenDescriptions.set(d, list);
   }
@@ -66,12 +73,13 @@ if (!fs.existsSync(sitemapPath)) errors.push('sitemap.xml missing');
 if (!fs.existsSync(robotsPath)) errors.push('robots.txt missing');
 if (!fs.existsSync(headersPath)) errors.push('_headers missing');
 
+let sitemapLocs = [];
 if (fs.existsSync(sitemapPath)) {
   const sitemap = read(sitemapPath);
-  const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1].trim());
-  if (!locs.includes(publicUrl)) errors.push('sitemap does not contain canonical homepage');
+  sitemapLocs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1].trim());
+  if (!sitemapLocs.includes(publicUrl)) errors.push('sitemap does not contain canonical homepage');
   const seen = new Set();
-  for (const url of locs) {
+  for (const url of sitemapLocs) {
     if (seen.has(url)) errors.push(`Duplicate sitemap URL: ${url}`);
     seen.add(url);
     if (!canonicalHost(url)) errors.push(`Sitemap URL outside canonical host: ${url}`);
@@ -80,7 +88,7 @@ if (fs.existsSync(sitemapPath)) {
     if (!fs.existsSync(target)) errors.push(`Sitemap URL has no repository file: ${url}`);
     else if (target.endsWith('.html') && !indexable(read(target))) errors.push(`Sitemap contains noindex page: ${url}`);
   }
-  if (locs.length < 20) warnings.push(`Sitemap has only ${locs.length} URLs; verify intentional coverage.`);
+  if (sitemapLocs.length < 20) warnings.push(`Sitemap has only ${sitemapLocs.length} URLs; verify intentional coverage.`);
 }
 
 if (fs.existsSync(robotsPath)) {
@@ -103,9 +111,21 @@ for (const requiredFile of ['about.html', 'contact.html', 'privacy.html', 'terms
   if (!fs.existsSync(path.join(root, requiredFile))) errors.push(`Production trust/UX asset missing: ${requiredFile}`);
 }
 
-const calcPages = htmlFiles.filter(file => /-calculator\.html$/.test(path.basename(file)));
-if (calcPages.length !== 20) errors.push(`Expected 20 calculator pages, found ${calcPages.length}`);
-for (const file of calcPages) {
+// The sitemap is the source of truth for the production calculator set. This avoids
+// counting intentionally retired/legacy calculator URLs that remain in the repository.
+const calculatorUrls = sitemapLocs.filter(url => {
+  try {
+    const pathname = new URL(url).pathname;
+    return pathname.endsWith('-calculator.html') && !pathname.includes('/');
+  } catch {
+    return false;
+  }
+});
+if (calculatorUrls.length !== 20) errors.push(`Expected 20 calculator pages in sitemap, found ${calculatorUrls.length}`);
+for (const url of calculatorUrls) {
+  const pathname = new URL(url).pathname.replace(/^\//, '');
+  const file = path.join(root, pathname);
+  if (!fs.existsSync(file)) continue;
   const html = read(file);
   const name = rel(file);
   if (!/calculators\.js/i.test(html)) errors.push(`${name}: calculator runtime missing`);
@@ -122,5 +142,5 @@ if (errors.length) {
   if (warnings.length) { console.error(`Warnings: ${warnings.length}`); warnings.forEach(w => console.error(`- ${w}`)); }
   process.exit(1);
 }
-console.log(`LAUNCH READINESS PASS: ${htmlFiles.length} HTML pages, ${calcPages.length} calculators, sitemap, robots, security headers and trust assets validated.`);
+console.log(`LAUNCH READINESS PASS: ${htmlFiles.length} HTML pages, ${calculatorUrls.length} sitemap calculators, sitemap, robots, security headers and trust assets validated.`);
 if (warnings.length) { console.log(`Warnings: ${warnings.length}`); warnings.forEach(w => console.log(`- ${w}`)); }
