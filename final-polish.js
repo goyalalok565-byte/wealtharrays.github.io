@@ -27,6 +27,7 @@ function addReviewStamp(){
 function reframeTaxScenario(){
  const isTax=/income-tax-(planner|scenario-calculator)\.html$/i.test(location.pathname);
  try{if(typeof CALCULATORS!=='undefined'){const calc=CALCULATORS.find(c=>c&&c.id==='income-tax-planner');if(calc){calc.title='Income Tax Scenario Calculator';calc.short='Explore tax scenarios with a transparent effective-rate assumption.';calc.desc='Explore income-tax scenarios using a user-entered effective tax-rate assumption. This is not jurisdiction-specific tax software.';}}}catch(e){}
+ document.querySelectorAll('a[href="income-tax-planner.html"],a[href="/income-tax-planner.html"]').forEach(a=>a.setAttribute('href','/income-tax-scenario-calculator.html'));
  if(!isTax){
    document.querySelectorAll('[data-search]').forEach(el=>{if(typeof el.dataset.search==='string')el.dataset.search=el.dataset.search.replace(/income tax planner/gi,'income tax scenario calculator')});
    document.querySelectorAll('b,h2,h3,small,p,a').forEach(el=>{if(el.children.length===0&&/Income Tax Planner/i.test(el.textContent||''))el.textContent=(el.textContent||'').replace(/Income Tax Planner/gi,'Income Tax Scenario Calculator')});
