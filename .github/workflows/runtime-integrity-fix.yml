@@ -104,9 +104,15 @@ jobs:
           set -euo pipefail
           node --check wa-core.js
           node --check site-runtime.js
-          ! grep -q 'homeSearchFallback' site-runtime.js
-          ! grep -q 'waFallbackOwner' site-runtime.js
-          test "$(grep -o 'waSearchOwner' wa-core.js | wc -l)" -ge 1
+          node --check final-polish.js
+          test "$(grep -o 'function calculatorSearch' wa-core.js | wc -l)" -eq 1
+          ! grep -q 'function calculatorSearch' final-polish.js
+          ! grep -q 'function installSafeSearch' final-polish.js
+          ! grep -q 'waSearchFix' final-polish.js
+          ! grep -q 'beforeinstallprompt' site-runtime.js
+          ! grep -q 'function installController' site-runtime.js
+          test "$(grep -o 'beforeinstallprompt' wa-core.js | wc -l)" -eq 1
+          test "$(grep -o 'function installPromptInit' wa-core.js | wc -l)" -eq 1
           grep -q 'function runSafe(name, fn)' wa-core.js
           test "$(head -c 8 og-image.png | xxd -p)" = "89504e470d0a1a0a"
           file og-image.png | grep -qi 'PNG image data'
