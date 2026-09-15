@@ -31,15 +31,16 @@ jobs:
           s = re.sub(r'setTimeout\(homeSearchFallback,\s*\d+\);?', '', s)
           p.write_text(s)
 
-          # Do not rewrite wa-core: replace only its final initialization call with isolated guards.
+          # Harden wa-core initialization without depending on an obsolete exact anchor.
           p = Path('wa-core.js')
           s = p.read_text()
-          old = "  function init() { styles(); setupTheme(); applyCurrency(); applyCategories(); calculatorSearch(); addRelatedAndTrust(); renderFooter(); analytics(); consentDialog(); registerServiceWorker(); installPromptInit(); }\n  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once:true }); else init();"
-          new = "  function runSafe(name, fn) { try { fn(); } catch (error) { try { console.error('[Wealth Arrays]', name, error); } catch (_) {} } }\n  function init() { [['styles',styles],['theme',setupTheme],['currency',applyCurrency],['categories',applyCategories],['search',calculatorSearch],['related',addRelatedAndTrust],['footer',renderFooter],['analytics',analytics],['consent',consentDialog],['serviceWorker',registerServiceWorker],['install',installPromptInit]].forEach(function (task) { runSafe(task[0], task[1]); }); }\n  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { runSafe('init', init); }, { once:true }); else runSafe('init', init);"
-          if old in s:
-              s = s.replace(old, new, 1)
-          elif 'function runSafe(name, fn)' not in s:
-              raise SystemExit('Expected wa-core init anchor missing; refusing unsafe rewrite')
+          if 'function runSafe(name, fn)' not in s:
+              pattern = r"  function init\(\) \{.*?\n  if \(document\.readyState === 'loading'\).*?else init\(\);"
+              replacement = "  function runSafe(name, fn) { try { fn(); } catch (error) { try { console.error('[Wealth Arrays]', name, error); } catch (_) {} } }\n  function init() { [['styles',styles],['theme',setupTheme],['currency',applyCurrency],['categories',applyCategories],['search',calculatorSearch],['related',addRelatedAndTrust],['footer',renderFooter],['analytics',analytics],['consent',consentDialog],['serviceWorker',registerServiceWorker],['install',installPromptInit]].forEach(function (task) { runSafe(task[0], task[1]); }); setTimeout(calculatorSearch, 250); setTimeout(calculatorSearch, 1000); window.addEventListener('load', calculatorSearch, { once:true }); window.addEventListener('pageshow', calculatorSearch); }\n  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { runSafe('init', init); }, { once:true }); else runSafe('init', init);"
+              s2, n = re.subn(pattern, replacement, s, count=1, flags=re.S)
+              if n != 1:
+                  raise SystemExit('Expected current wa-core init block missing; refusing unsafe rewrite')
+              s = s2
           p.write_text(s)
           PY
 
