@@ -28,7 +28,7 @@
 - https://wealtharrays.com/mortgage-emi-calculator.html
 - https://wealtharrays.com/roi-calculator.html
 - https://wealtharrays.com/retirement-calculator.html
-- https://wealtharrays.com/income-tax-planner.html — Jurisdiction-neutral income-tax scenario planning using a user-entered effective tax-rate assumption; not official tax software
+- https://wealtharrays.com/income-tax-scenario-calculator.html — Jurisdiction-neutral income-tax scenario planning using a user-entered effective tax-rate assumption; not official tax software
 
 ## Editorial principles
 - Prefer transparent mathematics over black-box financial claims.
