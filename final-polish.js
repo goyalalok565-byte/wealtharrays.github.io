@@ -24,10 +24,15 @@ function addReviewStamp(){
  stamp.style.cssText='margin:8px 0 0;color:var(--muted,#667085);font-size:11px;line-height:1.5';
  desc.insertAdjacentElement('afterend',stamp);
 }
+function rewriteTaxLinks(){
+ document.querySelectorAll('a[href="income-tax-planner.html"],a[href="/income-tax-planner.html"]').forEach(a=>a.setAttribute('href','/income-tax-scenario-calculator.html'));
+ const box=document.getElementById('tool-search-results');
+ if(box&&!box.dataset.waTaxLinkGuard){box.dataset.waTaxLinkGuard='1';const patch=()=>box.querySelectorAll('a[href="/income-tax-planner.html"],a[href="income-tax-planner.html"]').forEach(a=>a.setAttribute('href','/income-tax-scenario-calculator.html'));new MutationObserver(patch).observe(box,{childList:true,subtree:true});patch();}
+}
 function reframeTaxScenario(){
  const isTax=/income-tax-(planner|scenario-calculator)\.html$/i.test(location.pathname);
  try{if(typeof CALCULATORS!=='undefined'){const calc=CALCULATORS.find(c=>c&&c.id==='income-tax-planner');if(calc){calc.title='Income Tax Scenario Calculator';calc.short='Explore tax scenarios with a transparent effective-rate assumption.';calc.desc='Explore income-tax scenarios using a user-entered effective tax-rate assumption. This is not jurisdiction-specific tax software.';}}}catch(e){}
- document.querySelectorAll('a[href="income-tax-planner.html"],a[href="/income-tax-planner.html"]').forEach(a=>a.setAttribute('href','/income-tax-scenario-calculator.html'));
+ rewriteTaxLinks();
  if(!isTax){
    document.querySelectorAll('[data-search]').forEach(el=>{if(typeof el.dataset.search==='string')el.dataset.search=el.dataset.search.replace(/income tax planner/gi,'income tax scenario calculator')});
    document.querySelectorAll('b,h2,h3,small,p,a').forEach(el=>{if(el.children.length===0&&/Income Tax Planner/i.test(el.textContent||''))el.textContent=(el.textContent||'').replace(/Income Tax Planner/gi,'Income Tax Scenario Calculator')});
