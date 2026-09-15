@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 
+// Phase 4/5 deterministic calculator regression gate.
 const source = fs.readFileSync('calculators.js', 'utf8');
 const context = { console };
 vm.createContext(context);
