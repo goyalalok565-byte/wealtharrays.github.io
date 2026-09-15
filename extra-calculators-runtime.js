@@ -1,6 +1,7 @@
 /* Wealth Arrays — isolated runtime for expansion calculators.
-   Kept separate from the stable widget runtime so new tools cannot break the
-   production calculator engine. */
+   These calculators own their UI. They deliberately do not use widget.js,
+   because widget.js expects a calculator registry entry and can leave an
+   expansion page blank when no registry entry exists. */
 (function () {
   'use strict';
 
@@ -8,10 +9,8 @@
   const currencySymbols = { USD: '$', EUR: '€', GBP: '£', INR: '₹' };
 
   function symbol() {
-    const code = window.WA && window.WA.currencies
-      ? ((document.getElementById('currency-select') || {}).value || 'INR')
-      : ((document.getElementById('currency-select') || {}).value || 'INR');
-    return currencySymbols[code] || '₹';
+    const select = document.getElementById('currency-select');
+    return currencySymbols[select && select.value] || '₹';
   }
 
   function format(value, formatType) {
@@ -39,7 +38,7 @@
       .wa-extra-field{display:flex;flex-direction:column;gap:7px}
       .wa-extra-field label{font-size:13px;font-weight:750;color:var(--text,#111827)}
       .wa-extra-input{display:flex;align-items:center;border:1px solid var(--border,#d1d5db);border-radius:12px;background:var(--surface,#fff);overflow:hidden;min-height:48px}
-      .wa-extra-input input{width:100%;border:0;outline:0;background:transparent;color:inherit;padding:12px 13px;font:inherit;font-size:16px;min-width:0}
+      .wa-extra-input input{width:100%;border:0;outline:0;background:transparent;color:inherit;padding:12px 13px;font:inherit;font-size:16px;min-width:0;box-sizing:border-box}
       .wa-extra-suffix{padding:0 12px;color:var(--muted,#667085);font-size:13px;font-weight:700;white-space:nowrap}
       .wa-extra-actions{display:flex;gap:10px;align-items:center;margin-top:18px;flex-wrap:wrap}
       .wa-extra-reset{border:1px solid var(--border,#d1d5db);background:transparent;color:inherit;border-radius:11px;padding:10px 15px;font-weight:700;cursor:pointer}
@@ -59,7 +58,7 @@
   function renderField(field) {
     const suffix = field.suffix ? '<span class="wa-extra-suffix">' + esc(field.suffix) + '</span>' : '';
     return '<div class="wa-extra-field"><label for="wa-extra-' + esc(field.id) + '">' + esc(field.label) + '</label>' +
-      '<div class="wa-extra-input"><input id="wa-extra-' + esc(field.id) + '" type="number" inputmode="decimal" value="' + esc(field.default) + '" min="' + esc(field.min ?? '') + '" max="' + esc(field.max ?? '') + '" step="' + esc(field.step ?? 'any') + '" autocomplete="off">' + suffix + '</div></div>';
+      '<div class="wa-extra-input"><input id="wa-extra-' + esc(field.id) + '" type="number" inputmode="decimal" value="' + esc(field.default) + '" min="' + esc(field.min ?? '') + '" max="' + esc(field.max ?? '') + '" step="' + esc(field.step ?? 'any') + '" autocomplete="off"></div>' + suffix + '</div>';
   }
 
   function mount(calc, id) {
@@ -81,8 +80,7 @@
     function readValues() {
       const values = {};
       calc.fields.forEach(function (field) {
-        const input = document.getElementById('wa-extra-' + field.id);
-        values[field.id] = Number(input.value);
+        values[field.id] = Number(document.getElementById('wa-extra-' + field.id).value);
       });
       return values;
     }
@@ -119,4 +117,18 @@
   }
 
   window.mountExtraCalculator = mount;
+
+  function autoMount() {
+    const host = document.querySelector('[data-wa-extra-calculator]');
+    const catalog = window.WA_EXTRA_CALCULATORS || {};
+    if (!host) return;
+    const key = host.getAttribute('data-wa-extra-calculator');
+    mount(catalog[key], host.id);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', autoMount, { once: true });
+  } else {
+    autoMount();
+  }
 })();
