@@ -10,6 +10,15 @@ page.on('pageerror', error => errors.push(`pageerror: ${error}`));
 page.on('console', message => { if (message.type() === 'error') errors.push(`console: ${message.text()}`); });
 page.on('response', response => { if (response.status() >= 400) failedResponses.push(`${response.status()} ${response.url()}`); });
 
+async function assertCalculator(path, label) {
+  await page.goto(`${baseUrl}/${path}`, { waitUntil: 'networkidle' });
+  await page.locator('#calc-widget').waitFor({ state: 'visible', timeout: 10000 });
+  if ((await page.locator('h1').count()) !== 1) throw new Error(`${label} must have exactly one H1`);
+  if (!(await page.locator('#calc-widget input, #calc-widget select').count())) throw new Error(`${label} controls did not render`);
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 2);
+  if (overflow) throw new Error(`${label} has horizontal overflow at 390px viewport`);
+}
+
 try {
   await page.goto(`${baseUrl}/index.html`, { waitUntil: 'networkidle' });
   const stylesheet = await page.locator('link[rel="stylesheet"][href*="styles.css"]').count();
@@ -18,17 +27,14 @@ try {
   if (bodyDisplay === 'inline') throw new Error('Homepage body is rendering with inline/default styling; CSS may be missing');
   if ((await page.locator('h1').count()) !== 1) throw new Error('Homepage must have exactly one H1');
 
-  await page.goto(`${baseUrl}/sip-calculator.html`, { waitUntil: 'networkidle' });
-  await page.locator('#calc-widget').waitFor({ state: 'visible', timeout: 10000 });
-  if ((await page.locator('h1').count()) !== 1) throw new Error('SIP calculator must have exactly one H1');
-  if (!(await page.locator('#calc-widget input, #calc-widget select').count())) throw new Error('SIP calculator controls did not render');
-
-  const mobileOverflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 2);
-  if (mobileOverflow) throw new Error('SIP calculator has horizontal overflow at 390px viewport');
+  await assertCalculator('sip-calculator.html', 'SIP calculator');
+  await assertCalculator('step-up-sip-calculator.html', 'Step-Up SIP calculator');
+  await assertCalculator('emergency-fund-calculator.html', 'Emergency Fund calculator');
+  await assertCalculator('real-return-calculator.html', 'Real Return calculator');
 
   if (failedResponses.length) throw new Error(`Failed network responses: ${failedResponses.join(' | ')}`);
   if (errors.length) throw new Error(`Browser errors: ${errors.join(' | ')}`);
-  console.log(`Production browser smoke passed at ${baseUrl}: homepage CSS, one-H1 structure, SIP calculator rendering and mobile overflow checks are healthy.`);
+  console.log(`Production browser smoke passed at ${baseUrl}: homepage CSS, one-H1 structure, four calculator renderings and 390px mobile overflow checks are healthy.`);
 } finally {
   await browser.close();
 }
