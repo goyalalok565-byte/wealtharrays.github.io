@@ -22,7 +22,6 @@ jobs:
           from pathlib import Path
           import re
 
-          # Remove only the duplicate homepage search implementation from site-runtime.
           p = Path('site-runtime.js')
           s = p.read_text()
           s = re.sub(r'\n  const CATALOG = \[.*?\n  \];\n(?=  function normalize)', '\n', s, flags=re.S)
@@ -31,7 +30,6 @@ jobs:
           s = re.sub(r'setTimeout\(homeSearchFallback,\s*\d+\);?', '', s)
           p.write_text(s)
 
-          # Harden wa-core initialization without depending on an obsolete exact anchor.
           p = Path('wa-core.js')
           s = p.read_text()
           if 'function runSafe(name, fn)' not in s:
@@ -43,7 +41,6 @@ jobs:
               s = s2
           p.write_text(s)
 
-          # Keep canonical public navigation aligned with the tax scenario page and editorial policy page.
           for p in list(Path('.').glob('*.html')) + list(Path('articles').glob('*.html')) + list(Path('p').glob('*.html')):
               s = p.read_text()
               s = s.replace('href="income-tax-planner.html"', 'href="income-tax-scenario-calculator.html"')
@@ -57,8 +54,11 @@ jobs:
       - name: Validate or restore binary Open Graph PNG
         run: |
           set -euo pipefail
-          if [ "$(head -c 8 og-image.png | xxd -p 2>/dev/null || true)" != "89504e470d0a1a0a" ]; then
-            if [ -f og-image.svg ]; then
+          is_png() { [ "$(head -c 8 "$1" | xxd -p 2>/dev/null || true)" = "89504e470d0a1a0a" ]; }
+          if ! is_png og-image.png; then
+            if base64 -d og-image.png > og-image.decoded.png 2>/dev/null && is_png og-image.decoded.png; then
+              mv og-image.decoded.png og-image.png
+            elif [ -f og-image.svg ]; then
               if command -v magick >/dev/null 2>&1; then
                 magick og-image.svg -resize 1200x630 -background white -alpha remove og-image.png
               elif command -v convert >/dev/null 2>&1; then
@@ -68,7 +68,7 @@ jobs:
                 exit 1
               fi
             else
-              echo "OG PNG is invalid and no SVG source exists" >&2
+              echo "OG PNG is invalid and no decodable base64/SVG source exists" >&2
               exit 1
             fi
           fi
