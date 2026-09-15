@@ -19,6 +19,13 @@ jobs:
           test ! -e home-recovery.js
           test ! -e interaction-fix.css
           ! grep -R -n -E 'ux-fix\.js|interaction-fix\.js|interaction-fix\.css' --include='*.html' .
+          ! grep -q 'function calculatorSearch' final-polish.js
+          ! grep -q 'function installSafeSearch' final-polish.js
+          ! grep -q 'waSearchFix' final-polish.js
+          ! grep -q 'beforeinstallprompt' site-runtime.js
+          ! grep -q 'function installController' site-runtime.js
+          test "$(grep -o 'function calculatorSearch' wa-core.js | wc -l)" -eq 1
+          test "$(grep -o 'beforeinstallprompt' wa-core.js | wc -l)" -eq 1
           find . -maxdepth 2 -type f -name '*.js' -print0 | xargs -0 -n1 node --check
           python3 - <<'PY'
           from pathlib import Path
@@ -33,10 +40,10 @@ jobs:
               for src in managed: assert names.count(src)<=1, (p,src,names)
           core=Path('wa-core.js').read_text()
           assert 'const CALCULATOR_CATALOG' in core
-          assert "const host = document.querySelector('.calc-page');" in core
+          assert "const host=document.querySelector('.calc-page')" in core
           assert 'data-wa-open-consent' in core
-          assert 'bottom:92px' in core
-          assert '7*24*60*60*1000' in core
-          assert 'wealtharrays-pwa-2' in Path('sw.js').read_text()
+          assert 'waInstallDismissedV2' in core
+          assert 'beforeinstallprompt' in core
+          assert 'wealtharrays-pwa-3' in Path('sw.js').read_text()
           PY
           git diff --check
