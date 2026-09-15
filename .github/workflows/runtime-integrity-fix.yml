@@ -1,110 +1,14 @@
 name: Runtime integrity fix
 
+# Retired: integrity corrections must be made in source and validated by CI, never rewritten after every push.
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  fix:
-    if: ${{ !contains(github.event.head_commit.message, '[integrity-fix]') }}
+  retired:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Apply surgical canonical-link fixes only
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          import re
-
-          for p in list(Path('.').glob('*.html')) + list(Path('articles').glob('*.html')) + list(Path('p').glob('*.html')):
-              s = p.read_text()
-              s = s.replace('href="income-tax-planner.html"', 'href="income-tax-scenario-calculator.html"')
-              s = s.replace('>Income Tax Planner</b>', '>Income Tax Scenario Calculator</b>')
-              s = s.replace('income tax planner tax plan transparent tax scenarios.', 'income tax scenario calculator tax plan transparent tax scenarios.')
-              s = s.replace('income-tax-planner.html', 'income-tax-scenario-calculator.html')
-              s = s.replace('href="/editorial-standards.html"', 'href="/editorial-policy.html"')
-              s = s.replace('href="editorial-standards.html"', 'href="editorial-policy.html"')
-              s = re.sub(r'<script src="/?smart\.js"[^>]*></script>', '', s, flags=re.I)
-              p.write_text(s)
-
-          p = Path('sitemap.xml')
-          if p.exists():
-              s = p.read_text()
-              s = re.sub(r'\s*<url>\s*<loc>https://wealtharrays\.com/editorial-standards\.html</loc>\s*</url>', '', s, flags=re.I)
-              p.write_text(s)
-
-          for name in ('QA_TESTS.md','README.md'):
-              p = Path(name)
-              if p.exists():
-                  s = p.read_text()
-                  s = s.replace('Phase 9 Smart Calculator', 'Deterministic calculator runtime')
-                  s = s.replace('Smart Calculator layer', 'deterministic calculator runtime')
-                  p.write_text(s)
-          PY
-
-      - name: Validate or restore binary Open Graph PNG
-        run: |
-          set -euo pipefail
-          is_png() { [ "$(head -c 8 "$1" | xxd -p 2>/dev/null || true)" = "89504e470d0a1a0a" ]; }
-          rm -f og-image.decoded.png og-image.decoded2.png
-          if ! is_png og-image.png; then
-            base64 -d og-image.png > og-image.decoded.png 2>/dev/null || true
-            if is_png og-image.decoded.png; then
-              mv og-image.decoded.png og-image.png
-            else
-              base64 -d og-image.decoded.png > og-image.decoded2.png 2>/dev/null || true
-              if is_png og-image.decoded2.png; then
-                mv og-image.decoded2.png og-image.png
-              elif [ -f og-image.svg ]; then
-                if command -v magick >/dev/null 2>&1; then
-                  magick og-image.svg -resize 1200x630 -background white -alpha remove og-image.png
-                elif command -v convert >/dev/null 2>&1; then
-                  convert og-image.svg -resize 1200x630 -background white -alpha remove og-image.png
-                else
-                  echo "Existing OG PNG is invalid and no SVG rasterizer is available" >&2
-                  exit 1
-                fi
-              else
-                echo "OG PNG is invalid and no decodable base64/SVG source exists" >&2
-                exit 1
-              fi
-            fi
-          fi
-          rm -f og-image.decoded.png og-image.decoded2.png
-          test "$(head -c 8 og-image.png | xxd -p)" = "89504e470d0a1a0a"
-          file og-image.png | grep -qi 'PNG image data'
-
-      - name: Validate single ownership and fault isolation
-        run: |
-          set -euo pipefail
-          node --check wa-core.js
-          node --check site-runtime.js
-          node --check final-polish.js
-          test "$(grep -o 'function calculatorSearch' wa-core.js | wc -l)" -eq 1
-          ! grep -q 'function calculatorSearch' final-polish.js
-          ! grep -q 'function installSafeSearch' final-polish.js
-          ! grep -q 'waSearchFix' final-polish.js
-          ! grep -q 'beforeinstallprompt' site-runtime.js
-          ! grep -q 'function installController' site-runtime.js
-          test "$(grep -o 'beforeinstallprompt' wa-core.js | wc -l)" -eq 1
-          test "$(grep -o 'function installPromptInit' wa-core.js | wc -l)" -eq 1
-          grep -q 'function runSafe(name,fn)' wa-core.js
-          test "$(head -c 8 og-image.png | xxd -p)" = "89504e470d0a1a0a"
-          file og-image.png | grep -qi 'PNG image data'
-
-      - name: Commit integrity fixes
-        run: |
-          set -euo pipefail
-          git config user.name "wealth-arrays-bot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          rm -f og-image-fallback.txt og-image.decoded.png og-image.decoded2.png
-          git add -A
-          git diff --cached --quiet && exit 0
-          git commit -m "Finalize launch hardening and canonical cleanup [integrity-fix]"
-          git push
+      - run: echo "Retired. Use source-controlled fixes plus stabilization validation."
