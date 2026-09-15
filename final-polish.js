@@ -21,25 +21,32 @@ function addReviewStamp(){
  const desc=document.querySelector('.calc-desc');
  if(!title||!desc||document.querySelector('.wa-review-stamp'))return;
  const stamp=document.createElement('p');stamp.className='wa-review-stamp';stamp.textContent='Last reviewed: September 15, 2026 · Formula and assumptions checked during release validation.';
+ stamp.style.cssText='margin:8px 0 0;color:var(--muted,#667085);font-size:11px;line-height:1.5';
  desc.insertAdjacentElement('afterend',stamp);
 }
 function reframeTaxScenario(){
- if(!/income-tax-planner\.html$/i.test(location.pathname))return;
+ const isTax=/income-tax-(planner|scenario-calculator)\.html$/i.test(location.pathname);
+ if(window.CALCULATORS){const calc=window.CALCULATORS.find(c=>c&&c.id==='income-tax-planner');if(calc){calc.title='Income Tax Scenario Calculator';calc.short='Explore tax scenarios with a transparent effective-rate assumption.';calc.desc='Explore income-tax scenarios using a user-entered effective tax-rate assumption. This is not jurisdiction-specific tax software.';}}
+ if(!isTax){
+   document.querySelectorAll('[data-search]').forEach(el=>{if(typeof el.dataset.search==='string')el.dataset.search=el.dataset.search.replace(/income tax planner/gi,'income tax scenario calculator')});
+   document.querySelectorAll('b,h2,h3,small,p,a').forEach(el=>{if(el.children.length===0&&/Income Tax Planner/i.test(el.textContent||''))el.textContent=(el.textContent||'').replace(/Income Tax Planner/gi,'Income Tax Scenario Calculator')});
+   return;
+ }
  const title=document.querySelector('.calc-title');
  if(title)title.textContent='Income Tax Scenario Calculator';
  document.title='Income Tax Scenario Calculator — Free Planning Tool | Wealth Arrays';
  const desc=document.querySelector('.calc-desc');
  if(desc)desc.textContent='Explore tax scenarios using a user-entered effective tax-rate assumption. This is not jurisdiction-specific tax software.';
- document.querySelectorAll('script[type="application/ld+json"]').forEach(s=>{try{const text=s.textContent.replaceAll('Income Tax Planner','Income Tax Scenario Calculator');s.textContent=text}catch(e){}});
- document.querySelectorAll('a').forEach(a=>{if((a.textContent||'').trim()==='Income Tax Planner')a.textContent='Income Tax Scenario Calculator'});
+ document.querySelectorAll('script[type="application/ld+json"]').forEach(s=>{try{s.textContent=s.textContent.replaceAll('Income Tax Planner','Income Tax Scenario Calculator')}catch(e){}});
+ document.querySelectorAll('a,b,h2,h3,small,p').forEach(el=>{if(el.children.length===0&&/Income Tax Planner/i.test(el.textContent||''))el.textContent=(el.textContent||'').replace(/Income Tax Planner/gi,'Income Tax Scenario Calculator')});
 }
 function start(){
  tidy();
  reframeTaxScenario();
  addReviewStamp();
  syncStaticCurrencyExamples();
- setTimeout(()=>{tidy();syncStaticCurrencyExamples()},400);
- setTimeout(()=>{tidy();syncStaticCurrencyExamples()},1200);
+ setTimeout(()=>{tidy();reframeTaxScenario();syncStaticCurrencyExamples()},400);
+ setTimeout(()=>{tidy();reframeTaxScenario();syncStaticCurrencyExamples()},1200);
  window.addEventListener('wa-currency',syncStaticCurrencyExamples);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
