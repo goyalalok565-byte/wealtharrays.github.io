@@ -1,0 +1,54 @@
+name: Global Theme Runtime Injection
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  inject-theme-runtime:
+    if: ${{ !contains(github.event.head_commit.message, '[theme-inject]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Inject theme runtime into every HTML page
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          marker='theme-fix.js?v=20260915-theme-v1'
+          tag=f'<script src="/{marker}" defer></script>'
+          changed=[]
+          for path in Path('.').rglob('*.html'):
+              if any(part.startswith('.') for part in path.parts):
+                  continue
+              text=path.read_text(encoding='utf-8')
+              if marker in text:
+                  continue
+              if '</body>' in text:
+                  text=text.replace('</body>', tag+'</body>', 1)
+              elif '</head>' in text:
+                  text=text.replace('</head>', tag+'</head>', 1)
+              else:
+                  continue
+              path.write_text(text,encoding='utf-8')
+              changed.append(str(path))
+          print('Injected into',len(changed),'HTML files')
+          for item in changed: print(item)
+          PY
+
+      - name: Commit injected runtime
+        run: |
+          git config user.name "wealtharrays-theme-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add '*.html'
+          if git diff --cached --quiet; then
+            echo "No HTML changes needed"
+            exit 0
+          fi
+          git commit -m "chore: inject global theme runtime [theme-inject]"
+          git push
