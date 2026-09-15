@@ -34,3 +34,5 @@ jobs:
           fi
           git commit -m "chore: apply Phase 4 premium hardening [phase4-build]"
           git push
+
+# Trigger final Phase 4 production build and certification.
