@@ -3,16 +3,16 @@ name: Homepage search browser smoke
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   smoke:
-    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout exact commit
         uses: actions/checkout@v4
 
       - name: Install Playwright
@@ -31,44 +31,10 @@ jobs:
           cat /tmp/wealtharrays-http.log
           exit 1
 
-      - name: Run homepage search smoke test
+      - name: Run homepage search smoke test against exact checkout
         run: node qa/home-search-smoke.mjs
 
-      - name: Bust browser caches for runtime assets
-        run: |
-          VERSION="20260915-${GITHUB_SHA::12}"
-          python3 - <<'PY'
-          import os, re
-          version = '20260915-' + os.environ['GITHUB_SHA'][:12]
-          patterns = {
-              'wa-core.js': version,
-              'site-runtime.js': version,
-              'final-polish.js': version,
-              'wa-enhancements.js': version,
-          }
-          for root, _, files in os.walk('.'):
-              if '.git' in root or 'node_modules' in root:
-                  continue
-              for name in files:
-                  if not name.endswith('.html'):
-                      continue
-                  path = os.path.join(root, name)
-                  text = open(path, encoding='utf-8').read()
-                  new = text
-                  for asset, ver in patterns.items():
-                      new = re.sub(rf'{re.escape(asset)}(?:\?v=[^"\']+)?', f'{asset}?v={ver}', new)
-                  if new != text:
-                      open(path, 'w', encoding='utf-8').write(new)
-          PY
-
-      - name: Commit cache-busted runtime references
-        run: |
-          if git diff --quiet; then
-            echo 'No runtime cache-bust changes needed.'
-            exit 0
-          fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add '*.html'
-          git commit -m 'Bump runtime asset cache keys after browser smoke test'
-          git push
+      - name: Verify production homepage search
+        env:
+          BASE_URL: https://wealtharrays.com
+        run: node qa/home-search-smoke.mjs
