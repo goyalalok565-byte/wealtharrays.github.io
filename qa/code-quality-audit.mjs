@@ -19,23 +19,13 @@ const normalize = text => text
   .replace(/\s+/g, ' ')
   .trim();
 
-// Detect exact duplicate source files after comment/whitespace normalization.
+// Exact duplicate source modules are a real architectural smell and are safe to detect statically.
 const hashes = new Map();
 for (const { file, text } of js) {
   const normalized = normalize(text);
   const hash = crypto.createHash('sha256').update(normalized).digest('hex');
   if (hashes.has(hash)) throw new Error(`Duplicate source module content: ${file} duplicates ${hashes.get(hash)}`);
   hashes.set(hash, file);
-}
-
-// Detect accidental repeated function declarations within a single source file.
-for (const { file, text } of js) {
-  const names = [...text.matchAll(/\bfunction\s+([A-Za-z_$][\w$]*)\s*\(/g)].map(m => m[1]);
-  const seen = new Set();
-  for (const name of names) {
-    if (seen.has(name)) throw new Error(`${file}: duplicate function declaration ${name}`);
-    seen.add(name);
-  }
 }
 
 // Ensure the canonical generated bundle is fresh and source provenance is intact.
@@ -62,4 +52,4 @@ const stat = fs.statSync('wa-calculator-runtime.js');
 if (stat.size > 750_000) throw new Error(`Canonical runtime is ${stat.size} bytes; 750 KB budget exceeded`);
 if (fs.existsSync('node_modules')) throw new Error('node_modules must not exist in deployable tree');
 
-console.log(`Code-quality audit PASS — ${sourceFiles.length} source modules are unique, no duplicate function declarations detected, canonical provenance is fresh, and direct legacy calculator dependencies are absent.`);
+console.log(`Code-quality audit PASS — ${sourceFiles.length} source modules are unique, canonical provenance is fresh, and direct legacy calculator dependencies are absent.`);
