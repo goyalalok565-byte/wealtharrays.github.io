@@ -29,6 +29,12 @@ jobs:
         run: |
           set -euo pipefail
           test "$(grep -o "function calculatorSearch" wa-core.js | wc -l)" -eq 1
+          ! grep -q "function calculatorSearch" final-polish.js
+          ! grep -q "function installSafeSearch" final-polish.js
+          ! grep -q "waSearchFix" final-polish.js
+          ! grep -q "beforeinstallprompt" site-runtime.js
+          ! grep -q "function installController" site-runtime.js
+          test "$(grep -o "beforeinstallprompt" wa-core.js | wc -l)" -eq 1
           grep -q "CALCULATOR_CATALOG" wa-core.js
           grep -q "data-wa-open-consent" wa-core.js
           grep -q "waInstallDismissedV2" wa-core.js
