@@ -1,59 +1,14 @@
 name: Phase 4 Premium Hardening
 
+# Retired automatic HTML mutator. AdSense/CMP/ads.txt configuration is now source-controlled.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  phase4:
-    if: ${{ !contains(github.event.head_commit.message, '[phase4-build]') }}
+  retired:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-      - name: Apply premium build
-        run: node scripts/phase4-premium-build.mjs
-      - name: Ensure AdSense publisher code is present
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          snippet='<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6507600103785450" crossorigin="anonymous"></script>'
-          paths = list(Path('.').glob('*.html'))
-          for directory in ('articles', 'categories'):
-              p = Path(directory)
-              if p.exists():
-                  paths.extend(p.glob('*.html'))
-          for p in paths:
-              s=p.read_text(encoding='utf-8')
-              if 'ca-pub-6507600103785450' not in s and '</head>' in s:
-                  s=s.replace('</head>', snippet+'</head>', 1)
-                  p.write_text(s, encoding='utf-8')
-          Path('ads.txt').write_text('google.com, pub-6507600103785450, DIRECT, f08c47fec0942fa0\n', encoding='utf-8')
-          PY
-      - name: Run Phase 4 audit
-        run: node qa/phase4-premium-audit.mjs
-      - name: Commit hardening build
-        run: |
-          set -euo pipefail
-          git config user.name "wealtharrays-phase4-bot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          if git diff --cached --quiet; then
-            echo "No Phase 4 build changes needed"
-            exit 0
-          fi
-          git commit -m "chore: apply Phase 4 premium hardening [phase4-build]"
-          git pull --rebase origin main
-          git push origin HEAD:main
-
-# AdSense publisher integration: inject code into public HTML head and publish ads.txt.
+      - run: echo "Retired. Production source changes are validated by the stabilization pipeline."
