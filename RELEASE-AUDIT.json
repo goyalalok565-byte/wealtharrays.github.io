@@ -1,9 +1,12 @@
 {
-  "release": "2026-09-14-production-hardening",
-  "search": "universal-catalog",
+  "release": "2026-09-15-production-hardening",
+  "search": "universal-catalog-with-home-fallback",
   "privacy_choices": "reopenable",
-  "pwa_install": "native-prompt-gesture-safe",
-  "service_worker": "offline-shell-v2",
+  "pwa_install": "native-prompt-with-manual-fallback",
+  "service_worker": "wealtharrays-pwa-3",
   "script_dedupe": true,
-  "adsense_account": "not-configured"
+  "seo": "sitemap-robots-canonical-structured-data",
+  "content": "20-calculators-11-original-guides",
+  "adsense_account": "not-configured",
+  "live_browser_verification": "pending-user-device-check"
 }
