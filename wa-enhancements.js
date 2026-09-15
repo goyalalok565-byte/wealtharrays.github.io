@@ -1,4 +1,4 @@
-/* Wealth Arrays UX enhancements — live calculation/PDF hardening. */
+/* Wealth Arrays UX enhancements — live calculation/PDF hardening + growth discovery. */
 (function () {
   'use strict';
   function liveCalculator() {
@@ -38,6 +38,25 @@
       try { return original(calc, values, results); } finally { setTimeout(function () { window.open = oldOpen; }, 0); }
     };
   }
-  function start() { liveCalculator(); patchPdfLogo(); setTimeout(patchPdfLogo, 300); setTimeout(patchPdfLogo, 900); }
+  function enhanceToolLibrary() {
+    if (!document.querySelector('.tools-grid') || document.querySelector('[data-wa-growth-tools]')) return;
+    const grid = document.querySelector('.tools-grid');
+    const tools = [
+      ['21 / INVEST', 'Step-Up SIP Calculator', 'Increase your monthly investment each year.', '/step-up-sip-calculator.html', 'step up sip annual increase investment recurring'],
+      ['22 / PLANNING', 'Emergency Fund Calculator', 'Set a cash-reserve target from essential expenses.', '/emergency-fund-calculator.html', 'emergency fund cash reserve savings months'],
+      ['23 / INVEST', 'Real Return Calculator', 'See investment returns after inflation.', '/real-return-calculator.html', 'real return inflation purchasing power investment']
+    ];
+    tools.forEach(function (tool) {
+      const a = document.createElement('a');
+      a.className = 'tool-card'; a.href = tool[3]; a.dataset.search = tool[4]; a.dataset.waGrowthTools = 'true';
+      a.innerHTML = '<div class="tool-num" aria-hidden="true">' + tool[0] + '</div><h2>' + tool[1] + '</h2><p>' + tool[2] + '</p><span>Open →</span>';
+      grid.appendChild(a);
+    });
+    const heading = document.querySelector('.tools-head h1');
+    if (heading) heading.innerHTML = '23 calculators for<br><span class="gradient-text">real money decisions.</span>';
+    const note = document.querySelector('.hub-note');
+    if (note) note.innerHTML = '<strong>Build status:</strong> 23 calculators are live, including new Step-Up SIP, Emergency Fund and Real Return tools. Every tool is designed around transparent assumptions, browser-first calculation and practical cross-links.';
+  }
+  function start() { liveCalculator(); patchPdfLogo(); enhanceToolLibrary(); setTimeout(patchPdfLogo, 300); setTimeout(patchPdfLogo, 900); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true }); else start();
 })();
