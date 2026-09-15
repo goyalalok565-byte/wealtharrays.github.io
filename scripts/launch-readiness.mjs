@@ -141,4 +141,4 @@ if (errors.length) {
   process.exit(1);
 }
 console.log(`LAUNCH READINESS PASS: ${htmlFiles.length} HTML pages, ${calculatorUrls.length} sitemap calculators, sitemap, robots, security headers and trust assets validated.`);
-if (warnings.length) { console.log(`Warnings: ${warnings.length}`); warnings.forEach(w => console.log(`- ${w}`); }
+if (warnings.length) { console.log(`Warnings: ${warnings.length}`); warnings.forEach(w => console.log(`- ${w}`)); }
