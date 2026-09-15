@@ -48,7 +48,23 @@ jobs:
               s = s.replace('income tax planner tax plan transparent tax scenarios.', 'income tax scenario calculator tax plan transparent tax scenarios.')
               s = s.replace('income-tax-planner.html', 'income-tax-scenario-calculator.html')
               s = s.replace('href="/editorial-standards.html"', 'href="/editorial-policy.html"')
+              s = s.replace('href="editorial-standards.html"', 'href="editorial-policy.html"')
+              s = re.sub(r'<script src="/?smart\.js"[^>]*></script>', '', s, flags=re.I)
               p.write_text(s)
+
+          p = Path('sitemap.xml')
+          if p.exists():
+              s = p.read_text()
+              s = re.sub(r'\s*<url>\s*<loc>https://wealtharrays\.com/editorial-standards\.html</loc>\s*</url>', '', s, flags=re.I)
+              p.write_text(s)
+
+          for name in ('QA_TESTS.md','README.md'):
+              p = Path(name)
+              if p.exists():
+                  s = p.read_text()
+                  s = s.replace('Phase 9 Smart Calculator', 'Deterministic calculator runtime')
+                  s = s.replace('Smart Calculator layer', 'deterministic calculator runtime')
+                  p.write_text(s)
           PY
 
       - name: Validate or restore binary Open Graph PNG
@@ -100,8 +116,8 @@ jobs:
           set -euo pipefail
           git config user.name "wealth-arrays-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          rm -f og-image-fallback.txt
-          git add site-runtime.js wa-core.js og-image.png '*.html' 'articles/*.html' 'p/*.html'
+          rm -f og-image-fallback.txt og-image.decoded.png og-image.decoded2.png
+          git add -A
           git diff --cached --quiet && exit 0
-          git commit -m "Fix canonical navigation and runtime integrity [integrity-fix]"
+          git commit -m "Finalize launch hardening and canonical cleanup [integrity-fix]"
           git push
