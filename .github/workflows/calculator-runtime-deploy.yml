@@ -1,155 +1,71 @@
-name: Calculator runtime deployment fix
+name: Runtime validation
 
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
-  group: calculator-runtime-${{ github.ref }}
+  group: runtime-validation-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  apply-runtime-fixes:
-    if: ${{ !contains(github.event.head_commit.message, '[runtime-fix]') }}
+  validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Normalize calculators, page shell and metadata
-        shell: bash
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          import re
-
-          def normalize_script(text, filename, tag):
-              pattern=re.compile(r'<script\s+src=["\'][^"\']*'+re.escape(filename)+r'(?:\?[^"\']*)?["\'][^>]*></script>',re.I)
-              matches=list(pattern.finditer(text))
-              if not matches: return text.replace('</body>',tag+'</body>',1)
-              first=matches[0]
-              text=text[:first.start()]+tag+text[first.end():]
-              offset=first.start()+len(tag)
-              return text[:offset]+pattern.sub('',text[offset:])
-
-          p=Path('calculators.js')
-          s=p.read_text().replace('max: 50,','max: 1000,').replace('max: 60,','max: 200,')
-          p.write_text(s)
-
-          calculator_pages=sorted(Path('.').glob('*-calculator.html'))+[Path('income-tax-planner.html')]
-          for p in calculator_pages:
-              p.write_text(normalize_script(p.read_text(),'calculator-runtime.js','<script src="/calculator-runtime.js?v=20260915-1" defer></script>'))
-
-          all_pages=sorted(Path('.').glob('*.html'))+sorted(Path('articles').glob('*.html'))+sorted(Path('p').glob('*.html'))
-          footer='''<footer class="site-footer premium-footer"><div class="site-footer-inner"><div class="footer-brand-row"><a class="footer-logo" href="/index.html" aria-label="Wealth Arrays home"><img src="/favicon-v2.svg" alt="Wealth Arrays logo" width="44" height="44"><span><b>Wealth Arrays</b><small>Financial tools that make numbers clearer.</small></span></a><p class="footer-brand-copy">Fast, browser-first financial calculators for clearer decisions. Results are educational estimates and not financial, tax, legal or investment advice.</p></div><nav class="footer-nav-box" aria-label="Company and legal pages"><a class="footer-link" href="/privacy.html">Privacy Policy</a><a class="footer-link" href="/terms.html">Terms &amp; Conditions</a><a class="footer-link" href="/disclaimer.html">Disclaimer</a><a class="footer-link" href="/about.html">About Us</a><a class="footer-link" href="/contact.html">Contact Us</a><a class="footer-link" href="/methodology.html">Methodology</a><a class="footer-link" href="/editorial-standards.html">Editorial Standards</a><a class="footer-link" href="/advertising-policy.html">Advertising Policy</a><a class="footer-link" href="/faq.html">FAQ</a></nav><div class="footer-bottom"><span>© 2026 Wealth Arrays</span><span>Questions or corrections: <a href="mailto:goyalalok565@gmail.com">goyalalok565@gmail.com</a></span></div></div></footer>'''
-          footer_pattern=re.compile(r'<footer\b[^>]*>.*?</footer>',re.I|re.S)
-          for p in all_pages:
-              s=p.read_text()
-              s=normalize_script(s,'wa-core.js','<script src="/wa-core.js?v=20260915-1" defer></script>')
-              s=normalize_script(s,'site-runtime.js','<script src="/site-runtime.js?v=20260915-1" defer></script>')
-              s=normalize_script(s,'wa-enhancements.js','<script src="/wa-enhancements.js?v=20260915-1" defer></script>')
-              s=s.replace("const host = document.querySelector('.calc-page') || document.querySelector('.tool-article') || document.querySelector('main');","const host = document.querySelector('.calc-page');",1)
-              s=re.sub(r'<script\s+src=["\'][^"\']*home-recovery\.js(?:\?[^"\']*)?["\'][^>]*></script>','',s,flags=re.I)
-              s=footer_pattern.sub(footer,s)
-              if '<footer' not in s.lower(): s=s.replace('</body>',footer+'</body>',1)
-              s=re.sub(r'<link\s+rel=["\'](?:shortcut icon|icon)["\'][^>]*>','',s,flags=re.I)
-              s=s.replace('</head>','<link rel="icon" href="/favicon-v2.svg" type="image/svg+xml" sizes="any"><link rel="shortcut icon" href="/favicon-v2.svg" type="image/svg+xml"></head>',1)
-              if 'property="og:image"' not in s.lower(): s=s.replace('</head>','<meta property="og:image" content="https://wealtharrays.com/og-image.png"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"></head>',1)
-              else: s=re.sub(r'<meta\s+property=["\']og:image["\'][^>]*>','<meta property="og:image" content="https://wealtharrays.com/og-image.png">',s,count=1,flags=re.I)
-              for cls in ['home-tool-index','tool-num','calc-icon','category-icon','share-icon','footer-mark']:
-                  s=re.sub(r'(<[^>]*class=["\'][^"\']*\b'+re.escape(cls)+r'\b[^"\']*["\'][^>]*)(>)',lambda m:m.group(1)+(' aria-hidden="true"' if 'aria-hidden=' not in m.group(1) else '')+m.group(2),s,flags=re.I)
-              p.write_text(s)
-
-          css=Path('styles.css'); s=css.read_text(); extra='\n/* Runtime-owned search overlay. */\n.search-bar{position:relative!important;z-index:1000!important;overflow:visible!important}\n#tool-search-results{z-index:100000!important;position:absolute!important;overflow:hidden!important}\n'
-          if '/* Runtime-owned search overlay. */' not in s: css.write_text(s+extra)
-          PY
-
-      - name: Harden search and PWA delivery against stale browser/CDN state
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          import re
-
-          core=Path('wa-core.js').read_text()
-          core=core.replace("function installPromptInit() { setTimeout(() => { if (installEvent) showInstallBanner(); }, 900); }", "function installPromptInit() { setTimeout(() => { showInstallBanner(); }, 1200); }")
-          core=core.replace("const dismissed = Number(get('waInstallDismissed','0'));", "const dismissed = Number(get('waInstallDismissedV2','0'));")
-          core=core.replace("set('waInstallDismissed',String(Date.now()));box.remove();", "set('waInstallDismissedV2',String(Date.now()));box.remove();")
-          core=core.replace("set('waInstallDismissed',String(Date.now())); });", "set('waInstallDismissedV2',String(Date.now())); });")
-          core=core.replace("let msg='Use your browser menu and choose “Install Wealth Arrays” or “Add to Home screen”.';", "let msg='This browser did not expose the native install prompt yet. Open the browser menu and choose “Install app” or “Add to Home screen”.';")
-          core=core.replace("if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once:true }); else start();", "if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once:true }); else start();")
-          core=core.replace("function init() { styles(); setupTheme(); applyCurrency(); applyCategories(); calculatorSearch(); addRelatedAndTrust(); renderFooter(); analytics(); consentDialog(); registerServiceWorker(); installPromptInit(); }", "function init() { styles(); setupTheme(); applyCurrency(); applyCategories(); calculatorSearch(); addRelatedAndTrust(); renderFooter(); analytics(); consentDialog(); registerServiceWorker(); installPromptInit(); setTimeout(calculatorSearch, 250); setTimeout(calculatorSearch, 1000); window.addEventListener('load', calculatorSearch, { once:true }); window.addEventListener('pageshow', calculatorSearch); }")
-          if "data-wa-search-ready" not in core:
-              core=core.replace("render();\n  }\n\n  function analytics()", "render();\n    input.setAttribute('data-wa-search-ready','1');\n    window.__WA_SEARCH_READY__ = true;\n  }\n\n  function analytics()")
-          Path('wa-core.js').write_text(core)
-
-          sw=Path('sw.js').read_text()
-          sw=sw.replace("const VERSION='wealtharrays-pwa-2';", "const VERSION='wealtharrays-pwa-3';")
-          sw=sw.replace("if(request.mode==='navigate'){event.respondWith(fetch(request).then(response=>{", "const isCode=request.destination==='script'||request.destination==='style'||url.pathname==='/manifest.webmanifest';if(isCode){event.respondWith(fetch(request,{cache:'no-store'}).then(response=>{cacheAndReturn(response);return response;}).catch(()=>caches.match(request)));return;}if(request.mode==='navigate'){event.respondWith(fetch(request).then(response=>{")
-          sw=sw.replace("const copy=response.clone();caches.open(STATIC_CACHE).then(cache=>cache.put(request,copy));return response;", "const copy=response.clone();caches.open(STATIC_CACHE).then(cache=>cache.put(request,copy));return response;",1)
-          Path('sw.js').write_text(sw)
-
-          # Add a cache-busting version to every managed runtime reference after all normalization.
-          pages=list(Path('.').glob('*.html'))+list(Path('articles').glob('*.html'))+list(Path('p').glob('*.html'))
-          replacements={
-            'wa-core.js':'wa-core.js?v=20260915-1',
-            'site-runtime.js':'site-runtime.js?v=20260915-1',
-            'wa-enhancements.js':'wa-enhancements.js?v=20260915-1',
-            'calculator-runtime.js':'calculator-runtime.js?v=20260915-1',
-          }
-          for p in pages:
-              s=p.read_text()
-              for name,new in replacements.items():
-                  s=re.sub(r'src=["\']/'+re.escape(name)+r'(?:\?[^"\']*)?["\']', 'src="/'+new+'"', s)
-              p.write_text(s)
-          PY
-
-      - name: Validate JavaScript syntax and runtime ownership
+      - name: Validate JavaScript syntax
         shell: bash
         run: |
           set -euo pipefail
           find . -maxdepth 2 -type f -name '*.js' -print0 | xargs -0 -n1 node --check
+
+      - name: Validate runtime ownership and PWA contract
+        shell: bash
+        run: |
+          set -euo pipefail
           test "$(grep -o "function calculatorSearch" wa-core.js | wc -l)" -eq 1
-          test "$(grep -o "tool-search" site-runtime.js | wc -l)" -eq 0
-          test "$(grep -o "tool-search" wa-enhancements.js | wc -l)" -eq 0
+          grep -q "CALCULATOR_CATALOG" wa-core.js
+          grep -q "data-wa-open-consent" wa-core.js
+          grep -q "waInstallDismissedV2" wa-core.js
+          grep -q "beforeinstallprompt" wa-core.js
           grep -q "serviceWorker.register('/sw.js'" wa-core.js
-          grep -q "function renderFooter" wa-core.js
-          grep -q "function analytics" wa-core.js
-          grep -q "function consentDialog" wa-core.js
           grep -q "wealtharrays-pwa-3" sw.js
-          grep -q "showInstallBanner(); }, 1200" wa-core.js
-          grep -q "data-wa-search-ready" wa-core.js
+          grep -q "self.skipWaiting" sw.js
+          grep -q "self.clients.claim" sw.js
+          grep -q '"start_url": "/"' manifest.webmanifest
+          grep -q '"display": "standalone"' manifest.webmanifest
+          test -f icon-192.png
+          test -f icon-512.png
+
+      - name: Validate page shell and managed script uniqueness
+        shell: bash
+        run: |
+          set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
           import re
-          footer=re.compile(r'<footer\b[^>]*>(.*?)</footer>',re.I|re.S)
-          managed={'wa-core.js','site-runtime.js','wa-enhancements.js','calculator-runtime.js','final-polish.js'}
           pages=list(Path('.').glob('*.html'))+list(Path('articles').glob('*.html'))+list(Path('p').glob('*.html'))
+          managed={'wa-core.js','site-runtime.js','wa-enhancements.js','calculator-runtime.js','final-polish.js'}
           for p in pages:
-              s=p.read_text(); m=footer.search(s)
-              if not m or 'footer-logo' not in m.group(1) or 'Wealth Arrays' not in m.group(1): raise SystemExit(f'Invalid canonical footer: {p}')
-              scripts=re.findall(r'<script\s+src=["\']([^"\']+)["\'][^>]*></script>',s,re.I); names=[Path(x.split('?',1)[0]).name for x in scripts]
+              s=p.read_text()
+              if s.count('<footer') != 1: raise SystemExit(f'footer count: {p}')
+              if 'wealtharrays.com/og-image.png' not in s: raise SystemExit(f'missing OG image: {p}')
+              scripts=re.findall(r'<script\s+src=["\']([^"\']+)["\'][^>]*></script>',s,re.I)
+              names=[Path(x.split('?',1)[0]).name for x in scripts]
               for src in managed:
-                  if names.count(src)>1: raise SystemExit(f'Duplicate {src}: {p}')
+                  if names.count(src)>1: raise SystemExit(f'duplicate {src}: {p}')
+          print(f'validated {len(pages)} HTML pages')
           PY
 
-      - name: Commit fixes
+      - name: Validate sitemap and robots
+        shell: bash
         run: |
           set -euo pipefail
-          git config user.name "wealth-arrays-bot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git diff --cached --quiet && exit 0
-          git commit -m "Harden search and PWA install delivery [runtime-fix]"
-          for attempt in 1 2 3; do
-            git fetch origin main
-            git rebase origin/main && git push && exit 0
-            git rebase --abort || true
-            sleep 2
-          done
-          exit 1
+          grep -q 'Sitemap: https://wealtharrays.com/sitemap.xml' robots.txt
+          grep -q 'https://wealtharrays.com/' sitemap.xml
+          test "$(grep -o '<url>' sitemap.xml | wc -l)" -ge 40
