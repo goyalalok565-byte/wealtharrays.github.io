@@ -1,4 +1,4 @@
-/* Wealth Arrays UX enhancements — live calculation/PDF hardening + growth discovery. */
+/* Wealth Arrays UX enhancements — live calculation/PDF hardening. */
 (function () {
   'use strict';
   function liveCalculator() {
@@ -7,7 +7,9 @@
     const trigger = function () {
       const root = document.getElementById('calc-widget');
       if (!root) return;
-      const button = Array.from(root.querySelectorAll('button')).find(function (item) { return /^(calculate|recalculate|update|compute|show result|calculate now)/i.test((item.textContent || '').trim()) || item.dataset.action === 'calculate'; });
+      const button = Array.from(root.querySelectorAll('button')).find(function (item) {
+        return /^(calculate|recalculate|update|compute|show result|calculate now)/i.test((item.textContent || '').trim()) || item.dataset.action === 'calculate';
+      });
       if (button && !button.disabled) button.click();
     };
     const schedule = function () { clearTimeout(timer); timer = setTimeout(trigger, 40); };
@@ -38,25 +40,11 @@
       try { return original(calc, values, results); } finally { setTimeout(function () { window.open = oldOpen; }, 0); }
     };
   }
-  function enhanceToolLibrary() {
-    if (!document.querySelector('.tools-grid') || document.querySelector('[data-wa-growth-tools]')) return;
-    const grid = document.querySelector('.tools-grid');
-    const tools = [
-      ['21 / INVEST', 'Step-Up SIP Calculator', 'Increase your monthly investment each year.', '/step-up-sip-calculator.html', 'step up sip annual increase investment recurring'],
-      ['22 / PLANNING', 'Emergency Fund Calculator', 'Set a cash-reserve target from essential expenses.', '/emergency-fund-calculator.html', 'emergency fund cash reserve savings months'],
-      ['23 / INVEST', 'Real Return Calculator', 'See investment returns after inflation.', '/real-return-calculator.html', 'real return inflation purchasing power investment']
-    ];
-    tools.forEach(function (tool) {
-      const a = document.createElement('a');
-      a.className = 'tool-card'; a.href = tool[3]; a.dataset.search = tool[4]; a.dataset.waGrowthTools = 'true';
-      a.innerHTML = '<div class="tool-num" aria-hidden="true">' + tool[0] + '</div><h2>' + tool[1] + '</h2><p>' + tool[2] + '</p><span>Open →</span>';
-      grid.appendChild(a);
-    });
-    const heading = document.querySelector('.tools-head h1');
-    if (heading) heading.innerHTML = '23 calculators for<br><span class="gradient-text">real money decisions.</span>';
-    const note = document.querySelector('.hub-note');
-    if (note) note.innerHTML = '<strong>Build status:</strong> 23 calculators are live, including new Step-Up SIP, Emergency Fund and Real Return tools. Every tool is designed around transparent assumptions, browser-first calculation and practical cross-links.';
+  function start() {
+    liveCalculator();
+    patchPdfLogo();
+    setTimeout(patchPdfLogo, 300);
+    setTimeout(patchPdfLogo, 900);
   }
-  function start() { liveCalculator(); patchPdfLogo(); enhanceToolLibrary(); setTimeout(patchPdfLogo, 300); setTimeout(patchPdfLogo, 900); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true }); else start();
 })();
