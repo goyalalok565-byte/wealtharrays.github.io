@@ -18,6 +18,7 @@ const phase4Js='<script src="/phase4-premium.js?v=20260915-1" defer></script>';
 const themeJs='<script src="/theme-init.js?v=20260915-1"></script>';
 const calcInitJs='<script src="/calculator-page-init.js?v=20260915-1" defer></script>';
 const redirectJs='<script src="/404-runtime.js?v=20260915-1" defer></script>';
+const adsenseJs='<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6507600103785450" crossorigin="anonymous"></script>';
 const calcIds={
  'sip-calculator.html':'sip','compound-interest-calculator.html':'compound-interest','mortgage-emi-calculator.html':'mortgage','roi-calculator.html':'roi','simple-interest-calculator.html':'simple-interest','retirement-calculator.html':'freedom-milestone','salary-to-hourly-calculator.html':'salary-conversion','profit-margin-calculator.html':'profit-margin','fixed-deposit-calculator.html':'fixed-deposit','recurring-deposit-calculator.html':'recurring-deposit','lumpsum-calculator.html':'lumpsum','cagr-calculator.html':'cagr','car-loan-calculator.html':'car-loan','personal-loan-calculator.html':'personal-loan','debt-payoff-calculator.html':'debt-payoff','inflation-calculator.html':'inflation','net-worth-calculator.html':'net-worth','overtime-pay-calculator.html':'overtime','freelance-rate-calculator.html':'freelance-rate','income-tax-scenario-calculator.html':'income-tax-scenario'
 };
@@ -47,6 +48,7 @@ for(const file of htmlFiles){
   if(!s.includes('/phase4-premium.css')) s=s.replace('</head>',`${phase4Css}</head>`);
   if(!s.includes('/phase4-premium.js')) s=s.replace('</body>',`${phase4Js}</body>`);
   if(!s.includes('name="referrer"')) s=s.replace('</head>',`<meta name="referrer" content="strict-origin-when-cross-origin"></head>`);
+  if(!s.includes('ca-pub-6507600103785450')) s=s.replace('</head>',`${adsenseJs}</head>`);
   if(s!==before){fs.writeFileSync(file,s);changed++;}
 }
 console.log(`Phase 4 premium build updated ${changed} HTML files (${htmlFiles.length} public HTML files scanned).`);
