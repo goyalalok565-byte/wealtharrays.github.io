@@ -1,0 +1,74 @@
+name: QA hardening
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  harden:
+    if: ${{ contains(github.event.head_commit.message, '[qa-trigger]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply production hardening
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          core=Path('wa-core.js').read_text()
+          core=core.replace("function installPromptInit() { setTimeout(() => { if (installEvent) showInstallBanner(); }, 900); }", "function installPromptInit() { setTimeout(() => { showInstallBanner(); }, 1200); }")
+          core=core.replace("const dismissed = Number(get('waInstallDismissed','0'));", "const dismissed = Number(get('waInstallDismissedV2','0'));")
+          core=core.replace("set('waInstallDismissed',String(Date.now()));box.remove();", "set('waInstallDismissedV2',String(Date.now()));box.remove();")
+          core=core.replace("set('waInstallDismissed',String(Date.now())); });", "set('waInstallDismissedV2',String(Date.now())); });")
+          core=core.replace("let msg='Use your browser menu and choose “Install Wealth Arrays” or “Add to Home screen”.';", "let msg='This browser did not expose the native install prompt yet. Open the browser menu and choose “Install app” or “Add to Home screen”.';")
+          core=core.replace("function init() { styles(); setupTheme(); applyCurrency(); applyCategories(); calculatorSearch(); addRelatedAndTrust(); renderFooter(); analytics(); consentDialog(); registerServiceWorker(); installPromptInit(); }", "function init() { styles(); setupTheme(); applyCurrency(); applyCategories(); calculatorSearch(); addRelatedAndTrust(); renderFooter(); analytics(); consentDialog(); registerServiceWorker(); installPromptInit(); setTimeout(calculatorSearch, 250); setTimeout(calculatorSearch, 1000); window.addEventListener('load', calculatorSearch, { once:true }); window.addEventListener('pageshow', calculatorSearch); }")
+          if "data-wa-search-ready" not in core:
+              core=core.replace("render();\n  }\n\n  function analytics()", "render();\n    input.setAttribute('data-wa-search-ready','1');\n    window.__WA_SEARCH_READY__ = true;\n  }\n\n  function analytics()")
+          Path('wa-core.js').write_text(core)
+
+          sw="""const VERSION='wealtharrays-pwa-3';
+          const STATIC_CACHE=VERSION+'-static';
+          const STATIC_ASSETS=['/','/index.html','/tools.html','/styles.css','/wa-core.js','/site-runtime.js','/calculator-runtime.js','/wa-enhancements.js','/final-polish.js','/manifest.webmanifest','/favicon-v2.svg','/icon-192.png','/icon-512.png'];
+          self.addEventListener('install',event=>event.waitUntil(caches.open(STATIC_CACHE).then(cache=>cache.addAll(STATIC_ASSETS)).then(()=>self.skipWaiting())));
+          self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==STATIC_CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
+          self.addEventListener('fetch',event=>{const request=event.request;if(request.method!=='GET')return;const url=new URL(request.url);if(url.origin!==self.location.origin)return;const isCode=request.destination==='script'||request.destination==='style'||url.pathname==='/manifest.webmanifest';if(isCode){event.respondWith(fetch(request,{cache:'no-store'}).then(response=>{if(response.ok)caches.open(STATIC_CACHE).then(cache=>cache.put(request,response.clone()));return response;}).catch(()=>caches.match(request)));return;}if(request.mode==='navigate'){event.respondWith(fetch(request).then(response=>{caches.open(STATIC_CACHE).then(cache=>cache.put(request,response.clone()));return response;}).catch(()=>caches.match(request).then(hit=>hit||caches.match('/index.html'))));return;}event.respondWith(caches.match(request).then(hit=>hit||fetch(request).then(response=>{if(response.ok)caches.open(STATIC_CACHE).then(cache=>cache.put(request,response.clone()));return response;}).catch(()=>hit)));});
+          """
+          Path('sw.js').write_text(sw)
+
+          pages=list(Path('.').glob('*.html'))+list(Path('articles').glob('*.html'))+list(Path('p').glob('*.html'))
+          for p in pages:
+              s=p.read_text()
+              for name,version in [('wa-core.js','20260915-1'),('site-runtime.js','20260915-1'),('wa-enhancements.js','20260915-1'),('calculator-runtime.js','20260915-1')]:
+                  s=re.sub(r'src=["\']/'+re.escape(name)+r'(?:\?[^"\']*)?["\']', f'src="/{name}?v={version}"', s)
+              p.write_text(s)
+
+          # This helper is temporary; the production runtime remains owned by wa-core.js.
+          helper=Path('.github/workflows/qa-hardening.yml')
+          if helper.exists(): helper.unlink()
+          PY
+      - name: Validate
+        shell: bash
+        run: |
+          set -euo pipefail
+          find . -maxdepth 2 -type f -name '*.js' -print0 | xargs -0 -n1 node --check
+          grep -q "wealtharrays-pwa-3" sw.js
+          grep -q "showInstallBanner(); }, 1200" wa-core.js
+          grep -q "data-wa-search-ready" wa-core.js
+          grep -q "wa-core.js?v=20260915-1" index.html
+          test "$(grep -o "function calculatorSearch" wa-core.js | wc -l)" -eq 1
+      - name: Commit hardened build
+        run: |
+          set -euo pipefail
+          git config user.name "wealth-arrays-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "Apply QA hardening [runtime-fix]"
+          git push
