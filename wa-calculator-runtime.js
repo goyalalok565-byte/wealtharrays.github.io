@@ -875,10 +875,12 @@ function initSearch(inputId,listSelector,headingId,totalLabel){const input=docum
   else start();
 })();
 
-/* ===== WA CANONICAL MODULE: site-runtime.js | sha256:c23013a4d21e ===== */
+/* ===== WA CANONICAL MODULE: site-runtime.js | sha256:6ab379094710 ===== */
 /* Wealth Arrays visual runtime — cards, charts and defensive UX fallbacks. */
 (function () {
   'use strict';
+  /* Hub pages already have one shared runtime owner; keep this visual/calculator layer off them. */
+  if(window.__WEALTH_ARRAYS_CORE_LOADED__&&!document.querySelector('.calc-page'))return;
   function installAdSense(){
     if(document.querySelector('script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]')) return;
     var s=document.createElement('script');
