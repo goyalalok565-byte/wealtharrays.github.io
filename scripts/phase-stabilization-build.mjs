@@ -45,6 +45,16 @@ const bundle = `/* Wealth Arrays canonical calculator runtime bundle.\n * Genera
 const bundlePath = path.join(root, 'wa-calculator-runtime.js');
 fs.writeFileSync(bundlePath, bundle, 'utf8');
 
+// Hard-stop the recurring homepage search clipping bug at build time. The hero
+// may use overflow clipping for decorative layers in old CSS, but it must never
+// clip the interactive search suggestions themselves.
+const stylesPath = path.join(root, 'styles.css');
+if (fs.existsSync(stylesPath)) {
+  const beforeStyles = fs.readFileSync(stylesPath, 'utf8');
+  const afterStyles = beforeStyles.replace(/(\.ledger-hero\s*\{[^}]*?)overflow\s*:\s*hidden\s*;([^}]*\})/gi, '$1$2');
+  if (afterStyles !== beforeStyles) fs.writeFileSync(stylesPath, afterStyles, 'utf8');
+}
+
 const managedBasenames = new Set(canonicalSources);
 let changed = 0;
 for (const file of calculatorPages) {
