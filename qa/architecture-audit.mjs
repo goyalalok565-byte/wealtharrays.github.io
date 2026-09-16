@@ -14,7 +14,7 @@ const calculatorPages = [
 const match = BUILD.match(/const canonicalSources = \[([\s\S]*?)\n\];/);
 if (!match) throw new Error('Cannot locate canonicalSources in stabilization build');
 const sources = [...match[1].matchAll(/'([^']+)'/g)].map(m => m[1]);
-if (sources.length !== 13) throw new Error(`Expected 13 canonical source modules, found ${sources.length}`);
+if (sources.length !== 12) throw new Error(`Expected 12 canonical source modules, found ${sources.length}`);
 
 for (const file of sources) {
   if (!fs.existsSync(file)) throw new Error(`Missing canonical source: ${file}`);
