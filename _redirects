@@ -1,11 +1,19 @@
-# Legacy URL redirects
+# Canonical legacy URL redirects
+# Keep each known legacy path to one final destination (no redirect chains).
 /p/about-us.html /about.html 301
 /p/about.html /about.html 301
 /p/contact-us.html /contact.html 301
 /p/disclaimer.html /disclaimer.html 301
 /p/privacy.html /privacy.html 301
 /p/terms.html /terms.html 301
-/www/* https://wealtharrays.com/:splat 301
+
+# Known obsolete legacy content: redirect only where a close, useful replacement exists.
+/p/pricing-freelance-projects-how.html /freelance-rate-calculator.html 301
+/p/demystifying-geometric-compound.html /articles/compound-interest-guide.html 301
+/p/navigating-real-estate-credit.html 410
+/p/decoding-profit-margins-gross-operating.html /profit-margin-calculator.html 301
+/p/mastering-return-on-investment-roi-how.html /articles/roi-guide.html 301
+/p/understanding-cpi-currency-degradation.html /inflation-calculator.html 301
 
 # Canonical homepage
 /index.html / 301
