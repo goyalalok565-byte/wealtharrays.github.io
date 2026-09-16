@@ -3,9 +3,11 @@ import path from 'node:path';
 
 const root = process.cwd();
 const forbiddenRuntime = 'calculator-runtime.js';
+const siteSources = [
+  'wa-core.js', 'site-runtime.js', 'final-polish.js', 'wa-enhancements.js',
+  'theme-fix.js', 'phase2-intelligence.js', 'phase2-retirement.js', 'phase3-seo.js', 'phase4-premium.js',
+];
 const sourceFiles = [];
-// Scan deployable source and workflow contracts. QA/build files may intentionally
-// mention the retired filename in assertions, so those are validated separately.
 for (const dir of ['.', 'articles', 'p', '.github/workflows']) {
   const fullDir = path.join(root, dir);
   if (!fs.existsSync(fullDir)) continue;
@@ -21,14 +23,11 @@ for (const dir of ['.', 'articles', 'p', '.github/workflows']) {
 
 const contents = sourceFiles.map(file => ({ file: path.relative(root, file), text: fs.readFileSync(file, 'utf8') }));
 
-// Regression #1: the homepage search dropdown must never be clipped by ledger-hero.
 const clippingPattern = /\.ledger-hero\s*\{[^}]*overflow\s*:\s*hidden\b/i;
 for (const { file, text } of contents) {
   if (clippingPattern.test(text)) throw new Error(`Recurring search clipping rule detected in ${file}`);
 }
 
-// Regression #2: hub search has exactly one canonical owner and the legacy layer
-// must be unable to execute on hub pages even if script load order changes.
 const core = fs.readFileSync(path.join(root, 'wa-core.js'), 'utf8');
 if (!/window\.__WA_SEARCH_OWNER__\s*=\s*['"]wa-core['"]/.test(core)) {
   throw new Error('wa-core.js is missing the canonical search-owner marker');
@@ -44,17 +43,12 @@ if (fs.existsSync(finalPolishPath)) {
   }
 }
 
-// Regression #3: retired calculator-runtime.js must not return. Match only a
-// standalone filename so the valid wa-calculator-runtime.js bundle is allowed.
 const retiredRuntimePattern = /(?:^|[\/'"])calculator-runtime\.js(?:[?#'"$])/i;
 if (fs.existsSync(path.join(root, forbiddenRuntime))) throw new Error(`Retired ${forbiddenRuntime} was recreated`);
 for (const { file, text } of contents) {
-  if (retiredRuntimePattern.test(text)) {
-    throw new Error(`Retired runtime reference detected in ${file}`);
-  }
+  if (retiredRuntimePattern.test(text)) throw new Error(`Retired runtime reference detected in ${file}`);
 }
 
-// The canonical calculator bundle is the only runtime loaded by calculator pages.
 const calculatorPages = [
   'sip-calculator.html', 'compound-interest-calculator.html', 'mortgage-emi-calculator.html',
   'roi-calculator.html', 'simple-interest-calculator.html', 'retirement-calculator.html',
@@ -70,8 +64,38 @@ for (const page of calculatorPages) {
   if (matches.length !== 1) throw new Error(`${page}: expected exactly one canonical calculator runtime, found ${matches.length}`);
 }
 
-// Stabilization source list must not contain retired modules.
+// Shared site pages must follow the same consolidation rule as calculators:
+// one canonical runtime, no direct loading of its component patch files.
+if (!fs.existsSync(path.join(root, 'wa-site-runtime.js'))) {
+  throw new Error('Canonical wa-site-runtime.js bundle is missing');
+}
+const htmlFiles = [];
+const walkHtml = dir => {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (!['.git', 'node_modules'].includes(entry.name)) walkHtml(full);
+    } else if (/\.html$/i.test(entry.name)) htmlFiles.push(full);
+  }
+};
+walkHtml(root);
+for (const full of htmlFiles) {
+  const rel = path.relative(root, full).replaceAll(path.sep, '/');
+  if (calculatorPages.includes(rel)) continue;
+  const text = fs.readFileSync(full, 'utf8');
+  const hasSharedSource = siteSources.some(base => new RegExp(`<script\\s+src=["'][^"']*${base.replace('.', '\\.')}(?:[?#][^"']*)?["'][^>]*><\\/script>`, 'i').test(text));
+  const bundleMatches = text.match(/<script\s+src=["'][^"']*wa-site-runtime\.js[^"']*["'][^>]*><\/script>/gi) || [];
+  if (hasSharedSource || bundleMatches.length) {
+    if (bundleMatches.length !== 1) throw new Error(`${rel}: expected exactly one canonical site runtime, found ${bundleMatches.length}`);
+    for (const base of siteSources) {
+      const direct = new RegExp(`<script\\s+src=["'][^"']*${base.replace('.', '\\.')}(?:[?#][^"']*)?["'][^>]*><\\/script>`, 'i');
+      if (direct.test(text)) throw new Error(`${rel}: direct shared module ${base} bypasses wa-site-runtime.js`);
+    }
+  }
+}
+
 const build = fs.readFileSync(path.join(root, 'scripts/phase-stabilization-build.mjs'), 'utf8');
 if (build.includes("'calculator-runtime.js'")) throw new Error('Stabilization build still revives the retired runtime');
+if (!build.includes("'wa-site-runtime.js'")) throw new Error('Stabilization build does not own the shared site runtime');
 
-console.log('Recurring bug regression suite: PASS — clipping, search ownership, retired runtime revival, and calculator runtime duplication are locked.');
+console.log('Recurring bug regression suite: PASS — clipping, search ownership, retired runtime, calculator runtime, and shared site runtime consolidation are locked.');
