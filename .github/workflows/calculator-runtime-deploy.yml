@@ -24,6 +24,10 @@ jobs:
           set -euo pipefail
           find . -maxdepth 2 -type f -name '*.js' -print0 | xargs -0 -n1 node --check
 
+      - name: Validate recurring bug regression contract
+        shell: bash
+        run: node qa/recurring-bug-regression.mjs
+
       - name: Validate runtime ownership and PWA contract
         shell: bash
         run: |
@@ -56,7 +60,7 @@ jobs:
           from pathlib import Path
           import re
           pages=list(Path('.').glob('*.html'))+list(Path('articles').glob('*.html'))+list(Path('p').glob('*.html'))
-          managed={'wa-core.js','site-runtime.js','wa-enhancements.js','calculator-runtime.js','final-polish.js'}
+          managed={'wa-core.js','site-runtime.js','wa-enhancements.js','final-polish.js'}
           checked=0
           skipped=0
           for p in pages:
