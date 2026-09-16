@@ -1,597 +1,14 @@
-/* Wealth Arrays canonical calculator runtime bundle.
+/* Wealth Arrays canonical site runtime bundle.
  * Generated from CURRENT main sources by scripts/phase-stabilization-build.mjs.
  * Build date: 20260916
  */
 (function(){
-  const key = "__WA_CANONICAL_CALCULATOR_RUNTIME_BUNDLE__";
+  const key = "__WA_CANONICAL_SITE_RUNTIME_BUNDLE__";
   if (window[key]) return;
   window[key] = true;
 })();
 
-/* ===== WA CANONICAL MODULE | calculator | calculators.js | sha256:5d692eb2524a ===== */
-/* Wealth Arrays — calculator definitions
-   Each calculator: id, title, short description, input fields, and a compute(values) function
-   that returns an array of { label, value (number), format: 'currency'|'percent'|'number'|'years', emphasis: 'positive'|'negative'|'neutral'|null }
-   All money formulas are currency-agnostic — the active currency symbol is applied at render time.
-*/
-
-const CATEGORY_ICONS = {
-  investment: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 24 12 16 17 20 27 8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 8h7v7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  loan: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 15 16 6l10 9" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 14v11h14V14" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 25v-6h4v6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  banking: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 13 16 6l11 7" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 13h20v3H6z" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 16v9M13 16v9M19 16v9M24 16v9" stroke-linecap="round"/><path d="M5 25h22" stroke-linecap="round"/></svg>',
-  retirement: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 4v4M6 22a10 10 0 0 1 20 0" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 22h24" stroke-linecap="round"/><path d="M9 9.5 11.5 12M23 9.5 20.5 12" stroke-linecap="round"/></svg>',
-  salary: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="9" width="22" height="16" rx="2"/><path d="M5 13h22" /><circle cx="22" cy="19" r="1.6" fill="currentColor" stroke="none"/></svg>',
-  business: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="22" height="14" rx="2"/><path d="M12 11V8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 17h22" /></svg>',
-};
-
-/* Signature accent color per category — used for card borders, tags, and icons.
-   Distinct hues so categories are visually scannable at a glance. */
-const CATEGORY_COLORS = {
-  investment: "#0D9488",
-  loan: "#D97706",
-  banking: "#2563EB",
-  retirement: "#7C3AED",
-  salary: "#DB2777",
-  business: "#0891B2",
-};
-
-const CATEGORIES = [
-  { id: "investment", label: "Investment Calculators", desc: "Grow your money — projections for recurring and lump-sum investing." },
-  { id: "loan", label: "Loan Calculators", desc: "Mortgages, personal loans, and what they really cost." },
-  { id: "banking", label: "Banking Calculators", desc: "Interest on savings and deposits, simple and compound." },
-  { id: "retirement", label: "Retirement Calculators", desc: "How much you need, and how close you are." },
-  { id: "salary", label: "Salary & Income", desc: "Convert and compare how you're paid." },
-  { id: "business", label: "Business Calculators", desc: "Margins, returns, and the health of a small business." },
-];
-
-const CALCULATORS = [
-  {
-    id: "sip",
-    slug: "sip-calculator",
-    title: "SIP Calculator",
-    category: "investment",
-    short: "Project the future value of monthly investments.",
-    desc: "Estimate what a fixed monthly investment could grow to, given an expected annual return and a time horizon.",
-    article: {
-      formula: "SIP (Systematic Investment Plan) math is the future value of a series of equal monthly payments, compounded monthly: FV = P × [((1+i)^n − 1) / i] × (1+i), where P is the monthly amount, i is the monthly rate (annual rate ÷ 12), and n is the number of months.",
-      exampleInputs: { monthly: 200, rate: 10, years: 15 },
-      faqs: [
-        { q: "What is a SIP?", a: "A SIP is simply investing a fixed amount at regular intervals — usually monthly — rather than a single lump sum. It's commonly used with mutual funds, but the math applies to any recurring investment." },
-        { q: "Is a 10% annual return realistic?", a: "It depends entirely on what you invest in. Equity markets have historically returned around that range over long periods in some markets, but returns are never guaranteed and vary by year — treat any rate you enter as an assumption, not a promise." },
-        { q: "Does this account for fees or taxes?", a: "No — this is a gross growth projection. Fund fees, taxes on gains, and inflation will all reduce the real amount you end up with." },
-      ],
-    },
-    fields: [
-      { id: "monthly", label: "Monthly investment", type: "number", default: 200, min: 0, step: 10 },
-      { id: "rate", label: "Expected annual return", type: "number", default: 10, min: 0, max: 1000, step: 0.1, suffix: "%" },
-      { id: "years", label: "Investment period", type: "number", default: 15, min: 1, max: 200, step: 1, suffix: "yrs" },
-      { id: "inflation", label: "Expected annual inflation", type: "number", default: 6, min: 0, max: 30, step: 0.1, suffix: "%" },
-    ],
-    compute(v) {
-      const P = v.monthly, i = v.rate / 100 / 12, n = v.years * 12;
-      const fv = i === 0 ? P * n : P * ((Math.pow(1 + i, n) - 1) / i) * (1 + i);
-      const invested = P * n;
-      const gains = fv - invested;
-      const realValue = fv / Math.pow(1 + v.inflation / 100, v.years);
-      return [
-        { label: "You put in", value: invested, format: "currency" },
-        { label: "Your growth / profit", value: gains, format: "currency", emphasis: "positive" },
-        { label: "You could have in the future", value: fv, format: "currency", emphasis: "neutral" },
-        { label: "What that future money is worth in today's money", value: realValue, format: "currency", emphasis: "neutral" },
-      ];
-    },
-  },
-  {
-    id: "compound-interest",
-    slug: "compound-interest-calculator",
-    title: "Compound Interest",
-    category: "banking",
-    short: "See how a lump sum grows with compounding.",
-    desc: "Calculate the future value of a one-time deposit compounded over time, at a chosen compounding frequency.",
-    article: {
-      formula: "A = P(1 + r/n)^(nt), where P is the principal, r is the annual interest rate, n is how many times per year interest compounds, and t is time in years.",
-      exampleInputs: { principal: 5000, rate: 6, years: 10, freq: "12" },
-      faqs: [
-        { q: "How is this different from simple interest?", a: "Simple interest is calculated only on the original principal. Compound interest is calculated on the principal plus any interest already earned, so it grows faster the longer it runs." },
-        { q: "Does compounding frequency matter much?", a: "It matters more at higher rates and longer time periods. Moving from annual to monthly compounding usually makes a modest difference; the effect compounds itself over decades." },
-        { q: "Does this show real (inflation-adjusted) growth?", a: "No — this is nominal growth. If you want to compare against inflation, subtract your expected inflation rate from the interest rate before entering it." },
-      ],
-    },
-    fields: [
-      { id: "principal", label: "Initial amount", type: "number", default: 5000, min: 0, step: 100 },
-      { id: "rate", label: "Annual interest rate", type: "number", default: 6, min: 0, max: 1000, step: 0.1, suffix: "%" },
-      { id: "years", label: "Time period", type: "number", default: 10, min: 1, max: 200, step: 1, suffix: "yrs" },
-      { id: "inflation", label: "Expected annual inflation", type: "number", default: 6, min: 0, max: 30, step: 0.1, suffix: "%" },
-      {
-        id: "freq", label: "Compounding frequency", type: "select", default: "12",
-        options: [
-          { value: "1", label: "Annually" },
-          { value: "4", label: "Quarterly" },
-          { value: "12", label: "Monthly" },
-          { value: "365", label: "Daily" },
-        ],
-      },
-    ],
-    compute(v) {
-      const P = v.principal, r = v.rate / 100, t = v.years, n = Number(v.freq);
-      const A = P * Math.pow(1 + r / n, n * t);
-      const realValue = A / Math.pow(1 + v.inflation / 100, t);
-      return [
-        { label: "Principal", value: P, format: "currency" },
-        { label: "Interest earned", value: A - P, format: "currency", emphasis: "positive" },
-        { label: "Final amount (future money)", value: A, format: "currency", emphasis: "neutral" },
-        { label: "Value in today's purchasing power", value: realValue, format: "currency", emphasis: "neutral" },
-      ];
-    },
-  },
-  {
-    id: "mortgage",
-    slug: "mortgage-emi-calculator",
-    title: "Mortgage / Loan EMI",
-    category: "loan",
-    short: "Work out fixed monthly payments on any loan.",
-    desc: "Calculate the equal monthly instalment for a mortgage, car loan, or personal loan, and the total interest paid over its term.",
-    article: {
-      formula: "EMI = [P × r × (1+r)^n] / [(1+r)^n − 1], where P is the loan amount, r is the monthly interest rate (annual rate ÷ 12), and n is the number of monthly payments.",
-      exampleInputs: { principal: 250000, rate: 6.5, years: 25 },
-      faqs: [
-        { q: "Why is so much of my early payment interest?", a: "Loans amortize: early payments are weighted toward interest because the outstanding balance is highest at the start. As the balance shrinks, more of each payment goes toward principal." },
-        { q: "Does paying extra toward principal help?", a: "Yes — extra payments reduce the outstanding balance, which reduces future interest and can shorten the loan term. This calculator doesn't model extra payments directly; recompute with a shorter term to approximate the effect." },
-        { q: "Fixed-rate or adjustable-rate — does this handle both?", a: "This calculator assumes a fixed rate for the full term. For an adjustable-rate loan, rerun the calculation with the new rate once it changes." },
-      ],
-    },
-    fields: [
-      { id: "principal", label: "Loan amount", type: "number", default: 250000, min: 0, step: 1000 },
-      { id: "rate", label: "Annual interest rate", type: "number", default: 6.5, min: 0, max: 30, step: 0.05, suffix: "%" },
-      { id: "years", label: "Loan term", type: "number", default: 25, min: 1, max: 40, step: 1, suffix: "yrs" },
-    ],
-    compute(v) {
-      const P = v.principal, r = v.rate / 100 / 12, n = v.years * 12;
-      const emi = P === 0 ? 0 : n <= 0 ? 0 : r === 0 ? P / n : (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-      const total = emi * n;
-      return [
-        { label: "Monthly payment", value: emi, format: "currency", emphasis: "neutral" },
-        { label: "Total repayment", value: total, format: "currency" },
-        { label: "Total interest", value: total - P, format: "currency", emphasis: "negative" },
-      ];
-    },
-  },
-  {
-    id: "roi",
-    slug: "roi-calculator",
-    title: "ROI Calculator",
-    category: "investment",
-    short: "Measure the return on an investment or purchase.",
-    desc: "Compare what you put in against what you got back, as a total and annualised percentage return.",
-    article: {
-      formula: "Total ROI = (Final value − Cost) / Cost × 100. Annualized ROI = [(Final value / Cost)^(1/years) − 1] × 100 — this spreads the total return evenly across each year, so investments held for different lengths of time can be compared fairly.",
-      exampleInputs: { cost: 10000, finalValue: 14500, years: 3 },
-      faqs: [
-        { q: "What's the difference between ROI and CAGR?", a: "Annualized ROI here is calculated the same way as CAGR (Compound Annual Growth Rate) — both express a multi-year return as an equivalent constant yearly rate." },
-        { q: "Does ROI include fees or taxes?", a: "Only if you build them into your cost or final value inputs. The formula itself is agnostic — it just compares two numbers." },
-        { q: "What does a negative ROI mean?", a: "It means the final value was lower than what you put in — you lost money on the investment or purchase over that period." },
-      ],
-    },
-    fields: [
-      { id: "cost", label: "Amount invested", type: "number", default: 10000, min: 0.01, step: 100 },
-      { id: "finalValue", label: "Current / final value", type: "number", default: 14500, min: 0, step: 100 },
-      { id: "years", label: "Holding period", type: "number", default: 3, min: 0.1, max: 200, step: 0.1, suffix: "yrs" },
-    ],
-    compute(v) {
-      const gain = v.finalValue - v.cost;
-      const roi = v.cost === 0 ? 0 : (gain / v.cost) * 100;
-      const annualized = v.cost <= 0 || v.finalValue < 0 || v.years <= 0 ? 0 : (Math.pow(v.finalValue / v.cost, 1 / v.years) - 1) * 100;
-      return [
-        { label: "Net gain", value: gain, format: "currency", emphasis: gain >= 0 ? "positive" : "negative" },
-        { label: "Total ROI", value: roi, format: "percent", emphasis: roi >= 0 ? "positive" : "negative" },
-        { label: "Annualized ROI", value: annualized, format: "percent", emphasis: "neutral" },
-      ];
-    },
-  },
-  {
-    id: "simple-interest",
-    slug: "simple-interest-calculator",
-    title: "Simple Interest",
-    category: "banking",
-    short: "Flat, non-compounding interest on a loan or deposit.",
-    desc: "Calculate interest that accrues at a fixed rate on the original principal only — used for short-term loans and basic credit.",
-    article: {
-      formula: "SI = (P × R × T) / 100, where P is the principal, R is the annual interest rate as a percentage, and T is the time in years.",
-      exampleInputs: { principal: 5000, rate: 8, years: 2 },
-      faqs: [
-        { q: "Where is simple interest actually used?", a: "It's common for short-term loans, some certificates of deposit, and basic consumer credit agreements — anywhere interest is calculated once on the original amount rather than recalculated on a growing balance." },
-        { q: "Do credit cards use simple interest?", a: "Most credit cards actually compound daily, which behaves more like the compound interest calculator on this site — check your card's terms rather than assuming." },
-        { q: "Which is better for a saver — simple or compound?", a: "Compound interest earns more over time for a saver, since interest is added to the balance and itself earns interest. Simple interest earns more for a borrower, since the interest owed doesn't grow on itself." },
-      ],
-    },
-    fields: [
-      { id: "principal", label: "Principal amount", type: "number", default: 5000, min: 0, step: 100 },
-      { id: "rate", label: "Annual interest rate", type: "number", default: 8, min: 0, max: 1000, step: 0.1, suffix: "%" },
-      { id: "years", label: "Time period", type: "number", default: 2, min: 0.1, max: 40, step: 0.1, suffix: "yrs" },
-    ],
-    compute(v) {
-      const si = (v.principal * v.rate * v.years) / 100;
-      return [
-        { label: "Interest", value: si, format: "currency", emphasis: "positive" },
-        { label: "Total amount", value: v.principal + si, format: "currency", emphasis: "neutral" },
-      ];
-    },
-  },
-  {
-    id: "freedom-milestone",
-    slug: "retirement-calculator",
-    title: "Freedom Milestone",
-    category: "retirement",
-    short: "Estimate the nest egg needed to cover your expenses indefinitely.",
-    desc: "Uses the safe-withdrawal-rate method to estimate the portfolio size needed to sustain your current annual spending.",
-    article: {
-      formula: "Target corpus = Annual expenses ÷ Safe withdrawal rate. This comes from the widely-cited \"4% rule\": if you withdraw 4% of a portfolio per year, historical simulations suggest it has a reasonable chance of lasting 30+ years — dividing by 4% is the same as multiplying expenses by 25.",
-      exampleInputs: { expenses: 30000, withdrawal: 4, current: 20000 },
-      faqs: [
-        { q: "Where does the 4% figure come from?", a: "It's based on historical U.S. market studies (the \"Trinity study\" and similar research) looking at how often a portfolio survived 30-year withdrawal periods. It's a rule of thumb, not a guarantee — markets, retirement length, and spending patterns all affect the real safe rate." },
-        { q: "Does this account for inflation?", a: "The 4% rule as commonly cited already assumes you increase withdrawals with inflation each year. This calculator doesn't separately model inflation on the target itself — treat the result as being in today's money." },
-        { q: "Is this the same as a pension projection?", a: "No — this estimates a self-funded portfolio target. It doesn't include any pension, social security, or annuity income you might also have." },
-      ],
-    },
-    fields: [
-      { id: "expenses", label: "Annual expenses", type: "number", default: 30000, min: 0, step: 500 },
-      { id: "withdrawal", label: "Safe withdrawal rate", type: "number", default: 4, min: 1, max: 10, step: 0.1, suffix: "%" },
-      { id: "current", label: "Current savings", type: "number", default: 20000, min: 0, step: 500 },
-    ],
-    compute(v) {
-      const expenses = Math.max(Number(v.expenses) || 0, 0);
-      const withdrawal = Math.max(Number(v.withdrawal) || 0, 0);
-      const current = Math.max(Number(v.current) || 0, 0);
-      const target = withdrawal > 0 ? expenses / (withdrawal / 100) : 0;
-      const remaining = Math.max(target - current, 0);
-      const progress = target > 0 ? Math.min((current / target) * 100, 100) : 0;
-      return [
-        { label: "Target corpus", value: target, format: "currency", emphasis: "neutral" },
-        { label: "Still needed", value: remaining, format: "currency", emphasis: remaining > 0 ? "negative" : "positive" },
-        { label: "Progress", value: progress, format: "percent", emphasis: "positive" },
-      ];
-    },
-  },
-  {
-    id: "salary-hourly",
-    slug: "salary-to-hourly-calculator",
-    title: "Salary ↔ Hourly",
-    category: "salary",
-    short: "Convert between an annual salary and an hourly rate.",
-    desc: "Switch either direction — see what an annual salary works out to per hour, or what an hourly rate adds up to per year.",
-    article: {
-      formula: "Hourly rate = Annual salary ÷ (Hours per week × Working weeks per year). To go the other way: Annual salary = Hourly rate × Hours per week × Working weeks per year.",
-      exampleInputs: { direction: "toHourly", amount: 60000, hoursPerWeek: 40, weeksPerYear: 48 },
-      faqs: [
-        { q: "Why 48 weeks and not 52?", a: "52 weeks minus a typical 2–4 weeks of unpaid time off (holidays, sick days not covered by salary) gives a more realistic working-weeks figure. Adjust it to match your actual situation — salaried roles with full paid leave might use 52." },
-        { q: "Does this include overtime?", a: "No — this is a straight-line conversion based on regular hours. If you regularly work overtime, your effective hourly rate for salaried work will be lower than shown here." },
-        { q: "Are taxes included?", a: "No, both figures are gross (pre-tax) amounts." },
-      ],
-    },
-    fields: [
-      {
-        id: "direction", label: "Convert", type: "select", default: "toHourly",
-        options: [
-          { value: "toHourly", label: "Salary → Hourly" },
-          { value: "toSalary", label: "Hourly → Salary" },
-        ],
-      },
-      { id: "amount", label: "Amount", type: "number", default: 60000, min: 0, step: 100 },
-      { id: "hoursPerWeek", label: "Hours per week", type: "number", default: 40, min: 1, max: 100, step: 1 },
-      { id: "weeksPerYear", label: "Working weeks per year", type: "number", default: 48, min: 1, max: 52, step: 1 },
-    ],
-    compute(v) {
-      const totalHours = v.hoursPerWeek * v.weeksPerYear;
-      if (v.direction === "toHourly") {
-        const hourly = totalHours === 0 ? 0 : v.amount / totalHours;
-        return [
-          { label: "Working hours / year", value: totalHours, format: "number" },
-          { label: "Hourly rate", value: hourly, format: "currency", emphasis: "neutral" },
-        ];
-      } else {
-        const annual = v.amount * totalHours;
-        return [
-          { label: "Working hours / year", value: totalHours, format: "number" },
-          { label: "Annual salary", value: annual, format: "currency", emphasis: "neutral" },
-        ];
-      }
-    },
-  },
-  {
-    id: "profit-margin",
-    slug: "profit-margin-calculator",
-    title: "Profit Margin",
-    category: "business",
-    short: "Find gross and net margin from revenue and costs.",
-    desc: "Calculate gross margin (revenue minus cost of goods) and net margin (after all expenses) as percentages of revenue.",
-    article: {
-      formula: "Gross margin = (Revenue − Cost of goods sold) ÷ Revenue × 100. Net margin = (Revenue − Cost of goods sold − Other expenses) ÷ Revenue × 100.",
-      exampleInputs: { revenue: 50000, cogs: 28000, expenses: 9000 },
-      faqs: [
-        { q: "What's the difference between gross and net margin?", a: "Gross margin only subtracts the direct cost of producing what you sold. Net margin also subtracts everything else — rent, salaries, marketing, and other operating expenses — giving a fuller picture of profitability." },
-        { q: "What's a 'good' profit margin?", a: "It varies enormously by industry — grocery retail often runs on margins under 5%, while software businesses can see 70%+ gross margins. Compare against others in your specific industry rather than a universal benchmark." },
-        { q: "How can I improve my margin?", a: "Broadly: raise prices, reduce the cost of goods sold, or cut operating expenses — each has trade-offs specific to your business that this calculator can't account for." },
-      ],
-    },
-    fields: [
-      { id: "revenue", label: "Revenue", type: "number", default: 50000, min: 0, step: 100 },
-      { id: "cogs", label: "Cost of goods sold", type: "number", default: 28000, min: 0, step: 100 },
-      { id: "expenses", label: "Other operating expenses", type: "number", default: 9000, min: 0, step: 100 },
-    ],
-    compute(v) {
-      const grossProfit = v.revenue - v.cogs;
-      const netProfit = grossProfit - v.expenses;
-      const grossMargin = v.revenue === 0 ? 0 : (grossProfit / v.revenue) * 100;
-      const netMargin = v.revenue === 0 ? 0 : (netProfit / v.revenue) * 100;
-      return [
-        { label: "Gross profit", value: grossProfit, format: "currency" },
-        { label: "Gross margin", value: grossMargin, format: "percent", emphasis: "neutral" },
-        { label: "Net profit", value: netProfit, format: "currency", emphasis: netProfit >= 0 ? "positive" : "negative" },
-        { label: "Net margin", value: netMargin, format: "percent", emphasis: netProfit >= 0 ? "positive" : "negative" },
-      ];
-    },
-  },
-  {
-    id:"fixed-deposit",slug:"fixed-deposit-calculator",title:"Fixed Deposit Calculator",category:"banking",
-    short:"Estimate fixed-deposit maturity and interest.",desc:"Project a one-time deposit using an annual rate, term and compounding frequency.",
-    fields:[{id:"principal",label:"Deposit amount",type:"number",min:0,step:100},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:1000,step:.1,suffix:"%"},{id:"years",label:"Term",type:"number",min:.1,max:200,step:.1,suffix:"yrs"},{id:"inflation",label:"Expected annual inflation",type:"number",default:6,min:0,max:30,step:.1,suffix:"%"},{id:"freq",label:"Compounding",type:"select",default:"4",options:[{value:"1",label:"Annually"},{value:"4",label:"Quarterly"},{value:"12",label:"Monthly"}]}],
-    compute(v){const P=Math.max(v.principal,0),rate=Math.max(v.rate,0),years=Math.max(v.years,0),inflation=Math.max(v.inflation,0),n=Math.max(1,Number(v.freq)||1),A=P*Math.pow(1+rate/100/n,n*years),real=A/Math.pow(1+inflation/100,years);return[{label:"Deposit",value:P,format:"currency"},{label:"Interest earned",value:A-P,format:"currency",emphasis:"positive"},{label:"Maturity value (future money)",value:A,format:"currency",emphasis:"neutral"},{label:"Value in today's purchasing power",value:real,format:"currency",emphasis:"neutral"}]}
-  },
-  {
-    id:"recurring-deposit",slug:"recurring-deposit-calculator",title:"Recurring Deposit Calculator",category:"banking",
-    short:"Project monthly deposits and their maturity value.",desc:"Estimate the future value of equal monthly deposits using monthly compounding and end-of-month deposits.",
-    article:{formula:"Future value = P × [((1 + i)^n − 1) ÷ i], where P is the monthly deposit, i is the monthly rate and n is the whole number of monthly deposits. This model assumes each deposit is made at the end of the month and compounds monthly.",exampleInputs:{monthly:1000,rate:7,years:5},faqs:[{q:"Does every bank calculate RD interest this way?",a:"No. Banks and countries can use different compounding conventions and installment timing. This is a transparent planning estimate, not a bank maturity quote."},{q:"Why is the term converted to months?",a:"Because deposits occur monthly. The calculator rounds the selected term to a whole number of monthly deposits so it does not pretend that a fraction of a deposit period exists."}]},
-    fields:[{id:"monthly",label:"Monthly deposit",type:"number",min:0,step:100},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:1000,step:.1,suffix:"%"},{id:"years",label:"Deposit term",type:"number",min:1,max:200,step:0.0833333333,suffix:"yrs"},{id:"inflation",label:"Expected annual inflation",type:"number",default:6,min:0,max:30,step:.1,suffix:"%"}],
-    compute(v){const n=Math.max(0,Math.round(v.years*12)),i=v.rate/1200,m=Math.max(v.monthly,0),A=i===0?m*n:m*((Math.pow(1+i,n)-1)/i),real=A/Math.pow(1+v.inflation/100,v.years);return[{label:"Monthly deposits",value:n,format:"number"},{label:"Total deposits",value:m*n,format:"currency"},{label:"Interest earned",value:A-m*n,format:"currency",emphasis:"positive"},{label:"Estimated maturity (future money)",value:A,format:"currency",emphasis:"neutral"},{label:"Value in today's purchasing power",value:real,format:"currency",emphasis:"neutral"}]}
-  },
-  {
-    id:"lumpsum",slug:"lumpsum-calculator",title:"Lumpsum Calculator",category:"investment",
-    short:"Project a one-time investment over time.",desc:"Estimate how a lump-sum investment could grow at an assumed annual return.",
-    fields:[{id:"principal",label:"Investment amount",type:"number",min:0,step:100},{id:"rate",label:"Expected annual return",type:"number",min:0,max:1000,step:.1,suffix:"%"},{id:"years",label:"Investment period",type:"number",min:.1,max:200,step:.1,suffix:"yrs"},{id:"inflation",label:"Expected annual inflation",type:"number",default:6,min:0,max:30,step:.1,suffix:"%"}],
-    compute(v){const P=Math.max(v.principal,0),rate=Math.max(v.rate,0),years=Math.max(v.years,0),inflation=Math.max(v.inflation,0),A=P*Math.pow(1+rate/100,years),real=A/Math.pow(1+inflation/100,years);return[{label:"Amount invested",value:P,format:"currency"},{label:"Estimated gain",value:A-P,format:"currency",emphasis:"positive"},{label:"Projected value (future money)",value:A,format:"currency",emphasis:"neutral"},{label:"Value in today's purchasing power",value:real,format:"currency",emphasis:"neutral"}]}
-  },
-  {
-    id:"cagr",slug:"cagr-calculator",title:"CAGR Calculator",category:"investment",
-    short:"Find the compound annual growth rate.",desc:"Calculate the annualized growth rate between a starting value and an ending value.",
-    fields:[{id:"start",label:"Starting value",type:"number",min:0.01,step:100},{id:"end",label:"Ending value",type:"number",min:0,step:100},{id:"years",label:"Years",type:"number",min:.01,max:200,step:.1,suffix:"yrs"}],
-    compute(v){const start=Math.max(v.start,0),end=Math.max(v.end,0),years=Math.max(v.years,0),gain=end-start,totalGrowth=start>0?(end/start-1)*100:0,cagr=start>0&&end>=0&&years>0?(Math.pow(end/start,1/years)-1)*100:0;return[{label:"Absolute gain",value:gain,format:"currency",emphasis:gain>=0?"positive":"negative"},{label:"Total growth",value:totalGrowth,format:"percent"},{label:"CAGR",value:cagr,format:"percent",emphasis:"neutral"}]}
-  },
-  {
-    id:"car-loan",slug:"car-loan-calculator",title:"Car Loan EMI Calculator",category:"loan",
-    short:"Estimate a vehicle loan payment and total cost.",desc:"Calculate equal monthly payments and interest for a car or vehicle loan.",
-    fields:[{id:"price",label:"Vehicle price",type:"number",min:0,step:1000},{id:"down",label:"Down payment",type:"number",min:0,step:1000},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:40,step:.05,suffix:"%"},{id:"years",label:"Loan term",type:"number",min:1,max:15,step:1,suffix:"yrs"}],
-    compute(v){const price=Math.max(v.price,0),down=Math.min(Math.max(v.down,0),price),P=Math.max(price-down,0),years=Math.max(v.years,0),n=Math.max(1,Math.round(years*12)),r=Math.max(v.rate,0)/1200,emi=P===0?0:(r===0?P/n:P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1)),total=emi*n;return[{label:"Loan amount",value:P,format:"currency"},{label:"Monthly payment",value:emi,format:"currency",emphasis:"neutral"},{label:"Total repayment",value:total,format:"currency"},{label:"Total interest",value:total-P,format:"currency",emphasis:"negative"},{label:"Total cost including down payment",value:total+down,format:"currency"}]}
-  },
-  {
-    id:"personal-loan",slug:"personal-loan-calculator",title:"Personal Loan Calculator",category:"loan",
-    short:"Estimate monthly payments and the cost of a personal loan.",desc:"Calculate an estimated monthly payment from the loan amount, annual rate and repayment term.",
-    fields:[{id:"principal",label:"Loan amount",type:"number",min:0,step:1000},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:60,step:.05,suffix:"%"},{id:"years",label:"Repayment term",type:"number",min:0.0833333333,max:20,step:0.0833333333,suffix:"yrs"}],
-    compute(v){const n=Math.max(1,Math.round(Math.max(v.years,0)*12)),P=Math.max(v.principal,0),r=Math.max(v.rate,0)/1200,emi=P===0?0:(r===0?P/n:P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1)),total=emi*n;return[{label:"Loan months",value:n,format:"number"},{label:"Monthly payment",value:emi,format:"currency",emphasis:"neutral"},{label:"Total repayment",value:total,format:"currency"},{label:"Total interest",value:total-P,format:"currency",emphasis:"negative"}]}
-  },
-  {
-    id:"debt-payoff",slug:"debt-payoff-calculator",title:"Debt Payoff Calculator",category:"loan",
-    short:"Estimate how long a fixed payment takes to clear debt.",desc:"Model a single debt balance with a fixed monthly payment and interest rate.",
-    fields:[{id:"balance",label:"Current balance",type:"number",min:0,step:100},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:100,step:.1,suffix:"%"},{id:"payment",label:"Monthly payment",type:"number",min:.01,step:10}],
-    compute(v){const balance=Math.max(v.balance,0),payment=Math.max(v.payment,0),r=Math.max(v.rate,0)/1200;if(balance===0)return[{label:"Months to payoff",value:0,format:"number",emphasis:"positive"},{label:"Estimated years",value:0,format:"years"},{label:"Estimated interest",value:0,format:"currency",emphasis:"positive"}];if(payment<=balance*r)return[{label:"Monthly interest at current balance",value:balance*r,format:"currency",emphasis:"negative"},{label:"Current monthly payment",value:payment,format:"currency",emphasis:"negative"},{label:"Payment gap to stop negative amortization",value:Math.max(balance*r-payment,0),format:"currency",emphasis:"negative"}];const exactMonths=r===0?balance/payment:-Math.log(1-r*balance/payment)/Math.log(1+r);const months=Math.max(1,Math.ceil(exactMonths));let remaining=balance,total=0;for(let m=1;m<=months;m++){remaining*=1+r;const due=Math.min(payment,remaining);total+=due;remaining=Math.max(remaining-due,0);if(remaining<=1e-8)break}return[{label:"Months to payoff",value:months,format:"number",emphasis:"neutral"},{label:"Estimated years",value:months/12,format:"years"},{label:"Estimated interest",value:Math.max(total-balance,0),format:"currency",emphasis:"negative"}]}
-  },
-  {
-    id:"inflation",slug:"inflation-calculator",title:"Inflation Calculator",category:"retirement",
-    short:"Estimate future prices, purchasing power and what you may need later.",desc:"See how an assumed annual inflation rate changes future costs, real purchasing power and the nominal amount you may need later to buy something that costs a certain amount today.",
-    article:{formula:"Future cost = today's cost × (1 + inflation rate)^years.",exampleInputs:{amount:100000,rate:6,years:20},faqs:[{q:"How much money may I need in the future?",a:"Enter what something costs today, an assumed inflation rate and the number of years. The calculator estimates the nominal amount you may need later to buy the same thing."},{q:"Does this predict actual inflation?",a:"No. The inflation rate is an assumption for planning, not a forecast or guarantee."}]},
-    fields:[{id:"amount",label:"Today's amount / current cost",type:"number",min:0,step:100},{id:"rate",label:"Annual inflation rate",type:"number",min:0,max:1000,step:.1,suffix:"%"},{id:"years",label:"Years from now",type:"number",min:0,max:200,step:.1,suffix:"yrs"}],
-    compute(v){const amount=Math.max(v.amount,0),rate=Math.max(v.rate,0),years=Math.max(v.years,0),factor=Math.pow(1+rate/100,years),future=amount*factor,purchasingPower=amount/factor;return[{label:"Future amount needed to buy the same thing",value:future,format:"currency",emphasis:"negative"},{label:"Price increase",value:future-amount,format:"currency"},{label:"Today's amount worth after inflation",value:purchasingPower,format:"currency",emphasis:"negative"}]}
-  },
-  {
-    id:"net-worth",slug:"net-worth-calculator",title:"Net Worth Calculator",category:"retirement",
-    short:"Calculate assets minus liabilities.",desc:"Add what you own and subtract what you owe to estimate your personal net worth.",
-    fields:[{id:"cash",label:"Cash & savings",type:"number",min:0,step:100},{id:"investments",label:"Investments",type:"number",min:0,step:100},{id:"property",label:"Property value",type:"number",min:0,step:1000},{id:"debt",label:"Total liabilities",type:"number",min:0,step:100}],
-    compute(v){const cash=Math.max(v.cash,0),investments=Math.max(v.investments,0),property=Math.max(v.property,0),debt=Math.max(v.debt,0),assets=cash+investments+property,net=assets-debt;return[{label:"Total assets",value:assets,format:"currency",emphasis:"positive"},{label:"Total liabilities",value:debt,format:"currency",emphasis:"negative"},{label:"Net worth",value:net,format:"currency",emphasis:net>=0?"positive":"negative"}]}
-  },
-  {
-    id:"overtime",slug:"overtime-pay-calculator",title:"Overtime Pay Calculator",category:"salary",
-    short:"Estimate overtime earnings and gross pay.",desc:"Calculate additional pay from an hourly rate, overtime hours and overtime multiplier.",
-    fields:[{id:"hourly",label:"Base hourly rate",type:"number",min:0,step:.01},{id:"regular",label:"Regular hours",type:"number",min:0,max:744,step:.5},{id:"overtime",label:"Overtime hours",type:"number",min:0,max:744,step:.5},{id:"multiplier",label:"Overtime multiplier",type:"number",min:1,max:5,step:.1,suffix:"×"}],
-    compute(v){const hourly=Math.max(v.hourly,0),regular=Math.max(v.regular,0),overtime=Math.max(v.overtime,0),multiplier=Math.max(v.multiplier,1),reg=hourly*regular,ot=hourly*overtime*multiplier;return[{label:"Regular pay",value:reg,format:"currency"},{label:"Overtime pay",value:ot,format:"currency",emphasis:"positive"},{label:"Total gross pay",value:reg+ot,format:"currency",emphasis:"neutral"}]}
-  },
-  {
-    id:"freelance-rate",slug:"freelance-rate-calculator",title:"Freelance Rate Calculator",category:"business",
-    short:"Turn a target income into an hourly freelance rate.",desc:"Estimate the billable hourly rate needed to cover income goals, expenses and non-billable time.",
-    fields:[{id:"income",label:"Target annual income",type:"number",min:0,step:1000},{id:"expenses",label:"Annual business expenses",type:"number",min:0,step:100},{id:"hours",label:"Billable hours per week",type:"number",min:.1,max:100,step:.5},{id:"weeks",label:"Working weeks per year",type:"number",min:1,max:52,step:1}],
-    compute(v){const hours=Math.max(v.hours,0),weeks=Math.max(v.weeks,0),income=Math.max(v.income,0),expenses=Math.max(v.expenses,0),billable=hours*weeks,needed=income+expenses,rate=billable?needed/billable:0;return[{label:"Annual amount to cover",value:needed,format:"currency"},{label:"Billable hours / year",value:billable,format:"number"},{label:"Target hourly rate",value:rate,format:"currency",emphasis:"neutral"}]}
-  },
-  {
-    id:"income-tax-planner",slug:"income-tax-planner",title:"Income Tax Planner",category:"business",
-    short:"Estimate an effective tax rate from a planning assumption.",desc:"A simple jurisdiction-neutral planning tool; it is not a country-specific tax filing calculator.",
-    fields:[{id:"income",label:"Annual gross income",type:"number",min:0,step:1000},{id:"deductions",label:"Estimated deductions",type:"number",min:0,step:100},{id:"rate",label:"Estimated effective tax rate",type:"number",min:0,max:100,step:.1,suffix:"%"}],
-    compute(v){const income=Math.max(v.income,0),deductions=Math.min(Math.max(v.deductions,0),income),taxable=Math.max(income-deductions,0),rate=Math.max(v.rate,0),tax=taxable*rate/100,effective=income>0?tax/income*100:0;return[{label:"Estimated taxable income",value:taxable,format:"currency"},{label:"Estimated tax",value:tax,format:"currency",emphasis:"negative"},{label:"Effective tax on gross income",value:effective,format:"percent"},{label:"Estimated after-tax income",value:income-tax,format:"currency",emphasis:"neutral"}]}
-  }
-];
-
-const CURRENCIES = [
-  { code: "USD", symbol: "$" },
-  { code: "EUR", symbol: "€" },
-  { code: "GBP", symbol: "£" },
-  { code: "INR", symbol: "₹" },
-  { code: "JPY", symbol: "¥" },
-  { code: "AUD", symbol: "A$" },
-  { code: "CAD", symbol: "C$" },
-  { code: "CHF", symbol: "Fr" },
-  { code: "CNY", symbol: "¥" },
-  { code: "AED", symbol: "د.إ" }
-];
-
-/* Node-only export, used by the build script that generates static pages.
-   Browsers ignore this block (typeof module is undefined there). */
-if (typeof module !== "undefined") {
-  module.exports = { CATEGORIES, CATEGORY_ICONS, CATEGORY_COLORS, CALCULATORS, CURRENCIES };
-}
-
-/* ===== WA CANONICAL MODULE | calculator | widget.js | sha256:1b556698a9da ===== */
-/* Wealth Arrays — lightweight calculator UI */
-const safeStorage={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
-const currencyList=()=>window.WA?.currencies||[['USD','$','US Dollar'],['EUR','€','Euro'],['GBP','£','British Pound'],['INR','₹','Indian Rupee']];
-const waState={currency:safeStorage.get('waCurrency')||'INR',theme:safeStorage.get('waTheme')||'light'};
-function waCurrencySymbol(){const c=currencyList().find(c=>c[0]===waState.currency);return c?c[1]:'₹'}
-function waFormatValue(value,format){if(!Number.isFinite(Number(value)))return'—';const n=Number(value);if(format==='percent')return n.toFixed(2)+'%';if(format==='number')return Math.round(n).toLocaleString('en-US');if(format==='years')return n.toFixed(1)+' yrs';return waCurrencySymbol()+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
-function esc(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function applyGlobalTheme(){document.documentElement.dataset.theme=waState.theme;const b=document.getElementById('theme-toggle'),s=b?.querySelector('[data-theme-label]')||document.getElementById('theme-toggle-label');if(s)s.textContent=waState.theme==='dark'?'Light mode':'Dark mode';if(b)b.setAttribute('aria-pressed',String(waState.theme==='dark'))}
-function initMasthead(onChange){
-  // wa-core.js owns the shared header controls. This module only observes them.
-  const select=document.getElementById('currency-select');
-  const toggle=document.getElementById('theme-toggle');
-  if(select){
-    waState.currency=select.value||safeStorage.get('waCurrency')||'INR';
-    select.addEventListener('change',()=>{waState.currency=select.value||'INR';safeStorage.set('waCurrency',waState.currency);onChange?.();});
-  }
-  if(toggle){
-    waState.theme=document.documentElement.dataset.theme||safeStorage.get('waTheme')||'light';
-  }
-  window.addEventListener('wa-currency',()=>{if(select){waState.currency=select.value||waState.currency;onChange?.();}});
-  window.addEventListener('storage',e=>{
-    if(e.key==='waCurrency'){waState.currency=e.newValue||'INR';onChange?.();}
-    if(e.key==='waTheme'){waState.theme=e.newValue||'light';applyGlobalTheme();}
-  });
-}
-
-async function waShare(title,text,url){if(navigator.share){try{await navigator.share({title,text,url});return}catch(e){}}try{await navigator.clipboard.writeText(url);alert('Link copied.')}catch(e){}}
-function waOpenPrintReport(calc,values,results){
- const rows=results.map(r=>`<tr><td>${esc(r.label)}</td><td>${esc(waFormatValue(r.value,r.format))}</td></tr>`).join('');
- const inputs=calc.fields.map(f=>`<tr><td>${esc(f.label)}</td><td>${esc(values[f.id] ?? '')}</td></tr>`).join('');
- const liveGraph=document.querySelector('.wa-portfolio-card svg');
- let chart='';
- if(liveGraph){
-   const svg=liveGraph.cloneNode(true);
-   svg.setAttribute('xmlns','http://www.w3.org/2000/svg');
-   svg.setAttribute('width','520');svg.setAttribute('height','300');
-   chart='<section class="chartbox"><h2>Result breakdown</h2><p>Visualised from the same calculation shown on the calculator page.</p><div class="chartsvg">'+new XMLSerializer().serializeToString(svg)+'</div></section>';
- } else {
-   const numeric=results.map(r=>({label:r.label,value:Number(r.value)})).filter(r=>Number.isFinite(r.value)&&r.value>=0);
-   const max=Math.max(...numeric.map(r=>r.value),1);
-   const bars=numeric.slice(0,6).map(r=>{const pct=Math.max(2,Math.round(r.value/max*100));return `<div class="bar"><span>${esc(r.label)}</span><div><i style="width:${pct}%"></i></div><b>${esc(waFormatValue(r.value,'number'))}</b></div>`;}).join('');
-   chart=bars?`<section class="chartbox"><h2>Calculation summary</h2><p>Bars use the actual calculated values; they are not fabricated percentage shares.</p>${bars}</section>`:'';
- }
- const html=`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(calc.title)} Report</title><style>body{font-family:Arial,sans-serif;max-width:760px;margin:36px auto;padding:0 24px;color:#101828;background:#fff}h1{font-size:30px;margin:0 0 6px}h2{font-size:17px;margin:28px 0 8px}p{color:#667085}table{width:100%;border-collapse:collapse;margin:10px 0 24px;border:1px solid #e4e7ec}td{padding:11px;border-bottom:1px solid #eaecf0}td:last-child{text-align:right;font-weight:700}.brand{color:#667085;font-size:12px;letter-spacing:.08em;font-weight:700}.chartbox{padding:18px;border:1px solid #e4e7ec;border-radius:14px;margin:24px 0}.chartbox h2{margin:0 0 4px}.chartsvg{max-width:560px;margin:14px auto}.chartsvg svg{display:block;width:100%;height:auto}.bar{display:grid;grid-template-columns:160px 1fr auto;gap:10px;align-items:center;margin:12px 0;font-size:12px}.bar>div{height:12px;background:#eef2f6;border-radius:999px;overflow:hidden}.bar i{display:block;height:100%;background:#2563eb;border-radius:999px}.bar b{text-align:right;font-weight:700}@media print{body{margin:18px auto;padding:0}.no-print{display:none}}</style></head><body><div class="brand">WEALTH ARRAYS · CALCULATION REPORT</div><h1>${esc(calc.title)}</h1><p>Generated from the assumptions you entered.</p><h2>Your inputs</h2><table>${inputs}</table><h2>Your calculated results</h2><table>${rows}</table>${chart}<p>Educational estimate only. Not financial, tax, legal or investment advice.</p><button class="no-print" type="button" onclick="window.print()">Save as PDF</button></body></html>`;
- const win=window.open('','_blank');
- if(!win){alert('Your browser blocked the PDF report window. Please allow pop-ups for Wealth Arrays and try again.');return;}
- win.document.open();
- win.document.write(html);
- win.document.close();
- win.focus();
- // Native print dialog is the actual PDF mechanism on desktop browsers.
- // Calling it from the user-triggered export flow avoids a second broken report button.
- setTimeout(()=>{try{win.focus();win.print();}catch(e){const b=win.document.querySelector('.no-print');if(b)b.style.display='inline-block';}},250);
-}
-async function waCopyEmbed(calc){const src=new URL(`widget.html?calc=${encodeURIComponent(calc.id)}`,document.baseURI).href;const code=`<iframe title="${esc(calc.title)} — Wealth Arrays" src="${src}" width="100%" height="620" loading="lazy" style="border:0;border-radius:16px;max-width:900px"></iframe>`;try{await navigator.clipboard.writeText(code);alert('Embed code copied.')}catch(e){prompt('Copy this embed code:',code)}}
-function buildComparePanel(id,calc,currentValues,currentResults){const panel=document.getElementById(`${id}-compare-panel`);if(!panel)return;const example=calc.article?.exampleInputs;if(!example){panel.innerHTML='<div style="padding:14px">No reference scenario is available.</div>';return}let ex=[];try{ex=calc.compute(example)||[]}catch(e){}const a=Object.fromEntries(currentResults.map(r=>[r.label,r])),b=Object.fromEntries(ex.map(r=>[r.label,r]));const labels=[...new Set([...Object.keys(a),...Object.keys(b)])];panel.innerHTML=`<div class="compare-inner"><p>Compared with this calculator's worked example.</p><div class="compare-table"><table><thead><tr><th>Metric</th><th>Your scenario</th><th>Example</th></tr></thead><tbody>${labels.map(l=>`<tr><td>${esc(l)}</td><td>${a[l]?esc(waFormatValue(a[l].value,a[l].format)):'—'}</td><td>${b[l]?esc(waFormatValue(b[l].value,b[l].format)):'—'}</td></tr>`).join('')}</tbody></table></div></div>`}
-
-/* Accurate portfolio-style breakdown. Only charts genuine additive components,
-   never a derived total together with the values that create it. */
-function waRenderAccuratePie(id,calc,values,rows){
- const host=document.getElementById(id+'-graph');if(!host)return;
- const row=(re)=>rows.find(r=>re.test(String(r.label)));
- const n=x=>Number(x), clean=x=>Number.isFinite(n(x))?n(x):0;
- let parts=null, title='Where your result comes from';
- const add=(label,value,format='currency')=>({label,value:clean(value),format});
- const monthly=clean(values.monthly), principal=clean(values.principal), rate=clean(values.rate), years=clean(values.years);
- const firstTotal=()=>rows.find(r=>/future value|maturity value|total amount|final value|estimated corpus|total repayment/i.test(r.label));
- if(calc.id==='sip'||calc.id==='investment'){
-   const inv=row(/You put in|Invested amount/i), gain=row(/growth|profit|returns/i);
-   if(inv&&gain)parts=[add('Money invested',inv.value),add('Growth / returns',gain.value)];
- } else if(calc.id==='compound-interest'||calc.id==='lumpsum'||calc.id==='fixed-deposit'){
-   const total=firstTotal(), interest=row(/interest earned|growth|returns/i);
-   if(total&&interest)parts=[add('Original investment',Math.max(0,clean(total.value)-clean(interest.value))),add('Growth / interest',interest.value)];
- } else if(calc.id==='recurring-deposit'){
-   const total=firstTotal(); if(total){const invested=monthly*12*years;parts=[add('Money deposited',invested),add('Interest earned',Math.max(0,clean(total.value)-invested))];}
- } else if(['mortgage','car-loan','personal-loan'].includes(calc.id)){
-   const repayment=row(/total repayment/i), interest=row(/total interest/i);
-   if(repayment&&interest)parts=[add('Loan amount',Math.max(0,clean(repayment.value)-clean(interest.value))),add('Total interest',interest.value)];
- } else if(calc.id==='simple-interest'){
-   const total=row(/total amount/i), interest=row(/^Interest$/i);
-   if(total&&interest)parts=[add('Original amount',Math.max(0,clean(total.value)-clean(interest.value))),add('Interest',interest.value)];
- } else if(calc.id==='roi'){
-   const cost=clean(values.cost), finalValue=clean(values.finalValue);
-   if(finalValue>=cost)parts=[add('Original investment',cost),add('Profit',finalValue-cost)];
- } else if(calc.id==='profit-margin'){
-   const revenue=clean(values.revenue),cogs=clean(values.cogs),expenses=clean(values.expenses),net=revenue-cogs-expenses;
-   if(revenue>0&&net>=0)parts=[add('Cost of goods',cogs),add('Operating expenses',expenses),add('Net profit',net)];
- } else if(calc.id==='net-worth'){
-   const assets=clean(values.cash)+clean(values.investments)+clean(values.property),debt=clean(values.debt);
-   if(assets>0)parts=[add('Cash',values.cash),add('Investments',values.investments),add('Property',values.property),add('Debt reduction',Math.min(debt,assets))].filter(p=>p.value>0);
-   title='Your balance-sheet components';
- } else if(calc.id==='overtime'){
-   const regular=row(/regular pay/i), overtime=row(/overtime pay/i);if(regular&&overtime)parts=[add('Regular pay',regular.value),add('Overtime pay',overtime.value)];
- } else if(calc.id==='debt-payoff'){
-   const balance=clean(values.balance), payment=clean(values.payment);
-   if(balance>0&&payment>0){const interest=Math.max(0,rows.find(r=>/total interest/i.test(r.label))?.value||0);parts=[add('Debt principal',balance),add('Estimated interest',interest)];}
- } else if(calc.id==='income-tax-planner'){
-   const income=clean(values.income),ded=clean(values.deductions);const taxRow=row(/tax/i);const tax=taxRow?Math.max(0,clean(taxRow.value)):0;
-   if(income>0)parts=[add('Tax',Math.min(tax,income)),add('After-tax income',Math.max(0,income-tax))];
-   title='Income split';
- }
- if(!parts||parts.length<2||parts.some(p=>p.value<0)||parts.reduce((s,p)=>s+p.value,0)<=0){
-   const numeric=rows.filter(r=>Number.isFinite(clean(r.value))&&clean(r.value)>=0).slice(0,5).map(r=>add(r.label,r.value,r.format||'number'));
-   if(numeric.length>=2){host.innerHTML='<div class="wa-pie-head"><span>CALCULATION SUMMARY</span><h3>'+esc(title)+'</h3><p>These bars use the actual values calculated from your inputs.</p></div><div class="wa-value-bars">'+numeric.map(r=>'<div><span>'+esc(r.label)+'</span><i style="width:'+Math.max(4,clean(r.value)/Math.max(...numeric.map(x=>clean(x.value)))*100).toFixed(2)+'%"></i><b>'+esc(waFormatValue(r.value,r.format))+'</b></div>').join('')+'</div>';return;}
-   host.innerHTML='';return;
- }
- const total=parts.reduce((s,p)=>s+p.value,0),colors=['#2563eb','#14b8a6','#7c3aed','#f59e0b'];let angle=-90;
- const pt=(a,r)=>{const q=a*Math.PI/180;return[50+r*Math.cos(q),50+r*Math.sin(q)]};
- const path=(a,b)=>{const p1=pt(a,42),p2=pt(b,42),large=b-a>180?1:0;return 'M 50 50 L '+p1[0].toFixed(2)+' '+p1[1].toFixed(2)+' A 42 42 0 '+large+' 1 '+p2[0].toFixed(2)+' '+p2[1].toFixed(2)+' Z'};
- let arcs='',labels='',legend='';
- parts.forEach((p,i)=>{const pct=p.value/total*100,end=angle+pct*3.6,mid=(angle+end)/2;arcs+='<path d="'+path(angle,end)+'" fill="'+colors[i%colors.length]+'"></path>';if(pct>=8){const q=pt(mid,25);labels+='<text x="'+q[0].toFixed(2)+'" y="'+(q[1]+2).toFixed(2)+'" text-anchor="middle" fill="#fff" font-size="7" font-weight="800">'+(pct<10?pct.toFixed(1):pct.toFixed(0))+'%</text>';}legend+='<div class="wa-pie-row"><i style="background:'+colors[i%colors.length]+'"></i><span>'+esc(p.label)+'</span><b>'+esc(waFormatValue(p.value,p.format))+' · '+(pct<10?pct.toFixed(1):pct.toFixed(0))+'%</b></div>';angle=end;});
- host.innerHTML='<div class="wa-pie-head"><span>RESULT BREAKDOWN</span><h3>'+esc(title)+'</h3><p>Percentages are calculated only from genuine parts of the same total.</p></div><div class="wa-pie-layout"><svg viewBox="0 0 100 100" role="img" aria-label="Accurate result breakdown">'+arcs+labels+'<circle cx="50" cy="50" r="14" fill="var(--surface,#fff)"></circle><text x="50" y="51" text-anchor="middle" font-size="9" font-weight="900" fill="currentColor">100%</text></svg><div>'+legend+'</div></div>';
-}
-// Calculator-page SEO content: formula, worked example, assumptions and FAQs.
-function waRenderCalculatorEducation(calc,id){
- const host=document.getElementById(id+'-education');if(!host)return;
- const a=calc.article;
- const fallback={
-  formula:'This calculator uses the standard mathematical relationship between the values you enter. Change the assumptions to see how the result changes.',
-  exampleInputs:null,
-  faqs:[]
- };
- const data=a||fallback;
- const related=(typeof CALCULATORS==='undefined'?[]:CALCULATORS)
-  .filter(c=>c.id!==calc.id&&c.category===calc.category).slice(0,4);
- host.innerHTML='<section class="wa-education" aria-label="How this calculator works">'
-  +'<div class="eyebrow">UNDERSTAND THE RESULT</div>'
-  +'<h2>How this calculation works</h2><p>'+esc(data.formula)+'</p>'
-  +(data.exampleInputs?'<h3>A worked example</h3><p>Use the Compare button after calculating to see your numbers beside this calculator\'s reference scenario.</p>':'')
-  +'<h3>Important assumptions</h3><p>Results depend entirely on the values and assumptions entered. Rates, returns, inflation, taxes, fees and future conditions can change real-world outcomes.</p>'
-  +(data.faqs&&data.faqs.length?'<h3>Common questions</h3><div class="wa-faq-list">'+data.faqs.map(x=>'<details><summary>'+esc(x.q)+'</summary><p>'+esc(x.a)+'</p></details>').join('')+'</div>':'')
-  +(related.length?'<h3>Related calculators</h3><div class="wa-related">'+related.map(x=>'<a href="'+esc(x.slug)+'.html"><b>'+esc(x.title)+'</b><span>'+esc(x.short)+'</span></a>').join('')+'</div>':'')
-  +'<p class="wa-education-note">Educational estimates only. Read our <a href="methodology.html">methodology</a> and <a href="disclaimer.html">financial disclaimer</a>.</p></section>';
-}
-
-function mountCalculator(calc,id){const container=document.getElementById(id);if(!container||!calc)return;const fields=calc.fields.map(f=>f.type==='select'?`<div class="field"><label for="f-${esc(f.id)}">${esc(f.label)}</label><select id="f-${esc(f.id)}" data-field="${esc(f.id)}">${f.options.map(o=>`<option value="${esc(o.value)}">${esc(o.label)}</option>`).join('')}</select></div>`:`<div class="field"><label for="f-${esc(f.id)}">${esc(f.label)}${f.suffix?` <span class="hint">(${esc(f.suffix)})</span>`:''}</label><input id="f-${esc(f.id)}" data-field="${esc(f.id)}" type="number" inputmode="decimal" placeholder="Enter ${esc(f.label.toLowerCase())}" ${f.min!==undefined?`min="${f.min}"`:''} ${f.max!==undefined?`max="${f.max}"`:''} ${f.step!==undefined?`step="${f.step}"`:''}></div>`).join('');container.innerHTML=`<div class="calc-widget-body"><div class="calc-grid">${fields}</div><button type="button" class="wa-calculate-btn" id="${id}-calculate">Calculate result</button><div class="calc-result" id="${id}-result" aria-live="polite"></div><div class="wa-portfolio-card" id="${id}-graph"></div><div class="tool-actions"><button type="button" class="tool-action primary" id="${id}-share">Share</button><button type="button" class="tool-action" id="${id}-export">Export PDF report</button><button type="button" class="tool-action" id="${id}-embed">Copy embed</button><button type="button" class="tool-action" id="${id}-compare" aria-expanded="false">Compare</button></div><div class="compare-panel" id="${id}-compare-panel" hidden></div><div id="${id}-education"></div><p class="calc-note">Estimates only, for planning purposes — not financial, tax or investment advice.</p></div>`;let latest=[],latestValues={};function recompute(){latestValues={};let issues=[];calc.fields.forEach(f=>{const e=document.getElementById(`f-${f.id}`);if(!e)return;latestValues[f.id]=f.type==='select'?e.value:(String(e.value).trim()===''?NaN:Number(e.value));if(f.type!=='select'){const v=latestValues[f.id];if(!Number.isFinite(v))issues.push('Enter '+f.label+'.');else if(f.min!==undefined&&v<f.min)issues.push(f.label+' must be at least '+f.min+'.');else if(f.max!==undefined&&v>f.max)issues.push(f.label+' cannot be more than '+f.max+'.');}});const resultHost=document.getElementById(`${id}-result`),graphHost=document.getElementById(`${id}-graph`);if(issues.length){latest=[];resultHost.innerHTML='<div class="wa-result-empty"><b>Check your inputs.</b><br>'+issues.map(esc).join('<br>')+'</div>';graphHost.innerHTML='';return;}try{latest=calc.compute(latestValues)||[];}catch(e){latest=[];console.error('Calculator compute failed:',calc.id,e);resultHost.innerHTML='<div class="wa-result-empty"><b>This calculation could not be completed.</b><br>Please review your values and try again.</div>';graphHost.innerHTML='';return;}if(!latest.length||latest.some(r=>!Number.isFinite(Number(r.value)))){latest=[];resultHost.innerHTML='<div class="wa-result-empty"><b>No valid result was produced.</b><br>Please review the values and assumptions entered.</div>';graphHost.innerHTML='';return;}resultHost.innerHTML=latest.map(r=>`<div class="calc-result-row"><span class="calc-result-label">${esc(r.label)}</span><span class="calc-result-value ${esc(r.emphasis||'')}">${esc(waFormatValue(r.value,r.format))}</span></div>`).join('');waRenderAccuratePie(id,calc,latestValues,latest);}
-document.getElementById(`${id}-calculate`)?.addEventListener('click',recompute);
-calc.fields.forEach(f=>{const e=document.getElementById(`f-${f.id}`);if(f.type==='select')e.value=f.default;e.addEventListener('input',()=>{});e.addEventListener('change',()=>{})});function ensureCalculated(){if(latest.length)return true;document.getElementById(`${id}-result`).innerHTML='<div class="wa-result-empty">Enter your values and click Calculate result first.</div>';return false;}document.getElementById(`${id}-share`)?.addEventListener('click',()=>{if(!ensureCalculated())return;waShare(calc.title,latest.map(r=>`${r.label} ${waFormatValue(r.value,r.format)}`).join(' • '),location.href)});document.getElementById(`${id}-export`)?.addEventListener('click',()=>{if(ensureCalculated())waOpenPrintReport(calc,latestValues,latest)});document.getElementById(`${id}-embed`)?.addEventListener('click',()=>waCopyEmbed(calc));document.getElementById(`${id}-compare`)?.addEventListener('click',e=>{const p=document.getElementById(`${id}-compare-panel`);p.hidden=!p.hidden;e.currentTarget.setAttribute('aria-expanded',String(!p.hidden));if(!p.hidden){if(ensureCalculated())buildComparePanel(id,calc,latestValues,latest);else p.hidden=true}});initMasthead(recompute);document.getElementById(`${id}-result`).innerHTML='<div class="wa-result-empty">Enter your details and click Calculate result.</div>';document.getElementById(`${id}-graph`).innerHTML='';waRenderCalculatorEducation(calc,id)}
-function initSearch(inputId,listSelector,headingId,totalLabel){const input=document.getElementById(inputId);if(!input)return;input.addEventListener('input',()=>{const q=input.value.trim().toLowerCase();let n=0;document.querySelectorAll(listSelector).forEach(el=>{const ok=(el.dataset.search||'').toLowerCase().includes(q);el.hidden=!ok;if(ok)n++});const h=document.getElementById(headingId);if(h)h.textContent=q?`${n} RESULT${n===1?'':'S'} FOR "${q.toUpperCase()}"`:totalLabel})}
-
-
-/* Emergency production mount guard: runs independently of page inline listeners. */
-(function(){
-  function boot(){
-    var target=document.getElementById('calc-widget');
-    if(!target || target.dataset.waBooted==='1' || target.children.length) return;
-    if(typeof mountCalculator!=='function' || typeof CALCULATORS==='undefined') return;
-    var file=(location.pathname.split('/').pop()||'').replace(/\.html$/,'');
-    var calc=CALCULATORS.find(function(c){return c.slug===file;});
-    if(!calc){
-      var h=document.querySelector('.calc-title');
-      var title=h?h.textContent.trim().toLowerCase():'';
-      calc=CALCULATORS.find(function(c){return c.title.toLowerCase()===title;});
-    }
-    if(calc){
-      target.dataset.waBooted='1';
-      try{mountCalculator(calc,'calc-widget');}catch(err){target.dataset.waBooted='';console.error('Calculator mount failed',err);}
-    }
-  }
-  document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,0);});
-  window.addEventListener('load',function(){setTimeout(boot,0);});
-  setTimeout(boot,0);
-})();
-
-/* ===== WA CANONICAL MODULE | calculator | wa-core.js | sha256:5e2efc7e2d57 ===== */
+/* ===== WA CANONICAL MODULE | site | wa-core.js | sha256:5e2efc7e2d57 ===== */
 /* Wealth Arrays core runtime — one owner for shared site behaviour. */
 (function () {
   'use strict';
@@ -624,7 +41,7 @@ function initSearch(inputId,listSelector,headingId,totalLabel){const input=docum
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>runSafe('init',init),{once:true});else runSafe('init',init);
 })();
 
-/* ===== WA CANONICAL MODULE | calculator | site-runtime.js | sha256:6ab379094710 ===== */
+/* ===== WA CANONICAL MODULE | site | site-runtime.js | sha256:6ab379094710 ===== */
 /* Wealth Arrays visual runtime — cards, charts and defensive UX fallbacks. */
 (function () {
   'use strict';
@@ -655,7 +72,7 @@ function initSearch(inputId,listSelector,headingId,totalLabel){const input=docum
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true }); else init();
 })();
 
-/* ===== WA CANONICAL MODULE | calculator | final-polish.js | sha256:df556e32bd4f ===== */
+/* ===== WA CANONICAL MODULE | site | final-polish.js | sha256:df556e32bd4f ===== */
 /* Wealth Arrays final polish — non-destructive UX, content consistency and trust signals. */
 (function(){'use strict';
 /* Shared hub behaviour is owned by wa-core. Keep this legacy layer calculator-only so it cannot compete for search/theme ownership. */
@@ -759,7 +176,7 @@ function start(){tidy();reframeTaxScenario();addReviewStamp();syncStaticCurrency
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
 
-/* ===== WA CANONICAL MODULE | calculator | wa-enhancements.js | sha256:e9db32c15ce1 ===== */
+/* ===== WA CANONICAL MODULE | site | wa-enhancements.js | sha256:e9db32c15ce1 ===== */
 /* Wealth Arrays UX enhancements — live calculation/PDF hardening. */
 (function () {
   'use strict';
@@ -811,7 +228,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true }); else start();
 })();
 
-/* ===== WA CANONICAL MODULE | calculator | theme-fix.js | sha256:237818d51e88 ===== */
+/* ===== WA CANONICAL MODULE | site | theme-fix.js | sha256:237818d51e88 ===== */
 /* Wealth Arrays global theme controller — calculator fallback only. Hub pages are owned by wa-core. */
 (function(){
   'use strict';
@@ -862,7 +279,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 
-/* ===== WA CANONICAL MODULE | calculator | phase2-intelligence.js | sha256:9968483bb46c ===== */
+/* ===== WA CANONICAL MODULE | site | phase2-intelligence.js | sha256:9968483bb46c ===== */
 /* Wealth Arrays — Phase 2 decision intelligence */
 (function () {
   'use strict';
@@ -897,7 +314,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
 
-/* ===== WA CANONICAL MODULE | calculator | phase2-retirement.js | sha256:087956c9f330 ===== */
+/* ===== WA CANONICAL MODULE | site | phase2-retirement.js | sha256:087956c9f330 ===== */
 /* Wealth Arrays — Phase 2 retirement decision layer */
 (function () {
   'use strict';
@@ -912,7 +329,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{setTimeout(mount,250);setTimeout(mount,1000)},{once:true});else{setTimeout(mount,250);setTimeout(mount,1000)}
 })();
 
-/* ===== WA CANONICAL MODULE | calculator | phase3-seo.js | sha256:b1dcc15b6c93 ===== */
+/* ===== WA CANONICAL MODULE | site | phase3-seo.js | sha256:b1dcc15b6c93 ===== */
 /* Wealth Arrays Phase 3 — SEO, topic-cluster and internal-linking runtime. */
 (() => {
   'use strict';
@@ -1018,7 +435,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   }
 })();
 
-/* ===== WA CANONICAL MODULE | calculator | phase4-premium.js | sha256:99a2ba6efee4 ===== */
+/* ===== WA CANONICAL MODULE | site | phase4-premium.js | sha256:99a2ba6efee4 ===== */
 /* Wealth Arrays Phase 4 — accessibility, performance and premium UX guardrails. */
 (function(){
   'use strict';
@@ -1060,19 +477,4 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     });
   }
   ready(function(){ addSkip(); improveControls(); announceErrors(); externalLinks(); observeVitals(); });
-})();
-
-/* ===== WA CANONICAL MODULE | calculator | calculator-page-init.js | sha256:26823619c660 ===== */
-/* CSP-friendly calculator page bootstrap. */
-(function(){
-  'use strict';
-  function mount(){
-    if(typeof window.mountCalculator!=='function') return;
-    var host=document.getElementById('calc-widget');
-    var id=document.documentElement.getAttribute('data-wa-calculator');
-    if(!host||!id||typeof window.CALCULATORS==='undefined') return;
-    var def=window.CALCULATORS.find(function(c){return c.id===id;});
-    if(def) window.mountCalculator(def,'calc-widget');
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mount,{once:true}); else mount();
 })();
