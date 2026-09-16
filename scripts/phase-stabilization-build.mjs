@@ -3,105 +3,20 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 
 const root = process.cwd();
-
-// Current production modules only. Never seed a build from an old template or
-// retired patch file: this list is the single source contract for generated runtimes.
-const siteSources = [
-  'wa-core.js', 'site-runtime.js', 'final-polish.js', 'wa-enhancements.js',
-  'theme-fix.js', 'phase2-intelligence.js', 'phase2-retirement.js', 'phase3-seo.js', 'phase4-premium.js',
-];
-const calculatorSources = ['calculators.js', 'widget.js', ...siteSources, 'calculator-page-init.js'];
-const calculatorPages = [
-  'sip-calculator.html','compound-interest-calculator.html','mortgage-emi-calculator.html','roi-calculator.html',
-  'simple-interest-calculator.html','retirement-calculator.html','salary-to-hourly-calculator.html','profit-margin-calculator.html',
-  'fixed-deposit-calculator.html','recurring-deposit-calculator.html','lumpsum-calculator.html','cagr-calculator.html',
-  'car-loan-calculator.html','personal-loan-calculator.html','debt-payoff-calculator.html','inflation-calculator.html',
-  'net-worth-calculator.html','overtime-pay-calculator.html','freelance-rate-calculator.html','income-tax-scenario-calculator.html',
-];
-
-for (const file of [...new Set(calculatorSources)]) {
-  if (!fs.existsSync(path.join(root, file))) throw new Error(`Missing canonical runtime source: ${file}`);
-}
-
-const stamp = new Date().toISOString().slice(0, 10).replaceAll('-', '');
-const buildBundle = (sources, label) => {
-  const sourceParts = sources.map(file => {
-    const content = fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n').trimEnd();
-    const sha = crypto.createHash('sha256').update(content).digest('hex').slice(0, 12);
-    return `/* ===== WA CANONICAL ${label} MODULE: ${file} | sha256:${sha} ===== */\n${content}\n`;
-  });
-  return `/* Wealth Arrays canonical ${label} runtime bundle.\n * Generated from CURRENT main sources by scripts/phase-stabilization-build.mjs.\n * Build date: ${stamp}\n */\n(function(){\n  const key = ${JSON.stringify(`__WA_CANONICAL_${label.toUpperCase()}_RUNTIME_BUNDLE__`)};\n  if (window[key]) return;\n  window[key] = true;\n})();\n\n${sourceParts.join('\n')}`;
-};
-
-fs.writeFileSync(path.join(root, 'wa-site-runtime.js'), buildBundle(siteSources, 'site'), 'utf8');
-fs.writeFileSync(path.join(root, 'wa-calculator-runtime.js'), buildBundle(calculatorSources, 'calculator'), 'utf8');
-
-// Hard-stop the recurring homepage search clipping bug at build time.
-const stylesPath = path.join(root, 'styles.css');
-if (fs.existsSync(stylesPath)) {
-  const beforeStyles = fs.readFileSync(stylesPath, 'utf8');
-  const afterStyles = beforeStyles.replace(/(\.ledger-hero\s*\{[^}]*?)overflow\s*:\s*hidden\s*;([^}]*\})/gi, '$1$2');
-  if (afterStyles !== beforeStyles) fs.writeFileSync(stylesPath, afterStyles, 'utf8');
-}
-
-const managedBasenames = new Set([...new Set(calculatorSources)]);
-const siteManagedBasenames = new Set(siteSources);
-let changed = 0;
-
-for (const file of calculatorPages) {
-  const full = path.join(root, file);
-  if (!fs.existsSync(full)) throw new Error(`Missing calculator page: ${file}`);
-  let html = fs.readFileSync(full, 'utf8');
-  const before = html;
-  html = html.replace(/\s*<script\s+src=["']([^"']+)["'][^>]*><\/script>/gi, (tag, src) => {
-    const base = path.basename(src.split('?', 1)[0]);
-    return managedBasenames.has(base) || base === 'wa-calculator-runtime.js' ? '' : tag;
-  });
-  const canonicalTag = '<script src="/wa-calculator-runtime.js?v=20260916-stable" defer></script>';
-  html = html.replace(/\s*<!-- WA-CANONICAL-RUNTIME:[^>]+-->\s*/g, '\n');
-  if (!html.includes(canonicalTag)) html = html.replace('</body>', `${canonicalTag}</body>`);
-  html = html.replace(/(<body[^>]*>)/i, '$1\n<!-- WA-CANONICAL-RUNTIME:v1 -->');
-  if (html !== before) { fs.writeFileSync(full, html, 'utf8'); changed += 1; }
-}
-
-// Every non-calculator page that references any shared runtime component is
-// normalized to one canonical site bundle. Detection is deliberately based on
-// the literal source basename, avoiding fragile URL-regex differences.
-const htmlFiles = [];
-const walk = dir => {
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      if (!['.git', 'node_modules'].includes(entry.name)) walk(full);
-    } else if (/\.html$/i.test(entry.name)) htmlFiles.push(full);
-  }
-};
-walk(root);
-for (const full of htmlFiles) {
-  const rel = path.relative(root, full).replaceAll(path.sep, '/');
-  if (calculatorPages.includes(rel) || rel === '404.html') continue;
-  let html = fs.readFileSync(full, 'utf8');
-  const before = html;
-  const hasShared = siteSources.some(base => html.includes(base));
-  const hasSiteBundle = html.includes('wa-site-runtime.js');
-  if (!hasShared && !hasSiteBundle) continue;
-
-  html = html.replace(/\s*<script\s+src=["']([^"']+)["'][^>]*><\/script>/gi, (tag, src) => {
-    const base = path.basename(src.split('?', 1)[0]);
-    return siteManagedBasenames.has(base) || base === 'wa-site-runtime.js' ? '' : tag;
-  });
-  const canonicalTag = '<script src="/wa-site-runtime.js?v=20260916-stable" defer></script>';
-  if (!html.includes('wa-site-runtime.js')) html = html.replace('</body>', `${canonicalTag}</body>`);
-  html = html.replace(/\s*<!-- WA-SITE-RUNTIME:[^>]+-->\s*/g, '\n');
-  html = html.replace(/(<body[^>]*>)/i, '$1\n<!-- WA-SITE-RUNTIME:v1 -->');
-  if (html !== before) { fs.writeFileSync(full, html, 'utf8'); changed += 1; }
-}
-
-if (fs.existsSync(path.join(root, 'node_modules'))) fs.rmSync(path.join(root, 'node_modules'), { recursive: true, force: true });
-const gitignore = path.join(root, '.gitignore');
-let ignore = fs.existsSync(gitignore) ? fs.readFileSync(gitignore, 'utf8') : '';
-for (const item of ['node_modules/', '.DS_Store']) {
-  if (!ignore.split(/\r?\n/).includes(item)) ignore += `${ignore.endsWith('\n') || !ignore ? '' : '\n'}${item}\n`;
-}
-fs.writeFileSync(gitignore, ignore, 'utf8');
+const siteSources = ['wa-core.js','site-runtime.js','final-polish.js','wa-enhancements.js','theme-fix.js','phase2-intelligence.js','phase2-retirement.js','phase3-seo.js','phase4-premium.js'];
+const calculatorSources = ['calculators.js','widget.js',...siteSources,'calculator-page-init.js'];
+const calculatorPages = ['sip-calculator.html','compound-interest-calculator.html','mortgage-emi-calculator.html','roi-calculator.html','simple-interest-calculator.html','retirement-calculator.html','salary-to-hourly-calculator.html','profit-margin-calculator.html','fixed-deposit-calculator.html','recurring-deposit-calculator.html','lumpsum-calculator.html','cagr-calculator.html','car-loan-calculator.html','personal-loan-calculator.html','debt-payoff-calculator.html','inflation-calculator.html','net-worth-calculator.html','overtime-pay-calculator.html','freelance-rate-calculator.html','income-tax-scenario-calculator.html'];
+for(const file of [...new Set(calculatorSources)]) if(!fs.existsSync(path.join(root,file))) throw new Error(`Missing canonical runtime source: ${file}`);
+const stamp=new Date().toISOString().slice(0,10).replaceAll('-','');
+const buildBundle=(sources,label)=>{const sourceParts=sources.map(file=>{const content=fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n').trimEnd();const sha=crypto.createHash('sha256').update(content).digest('hex').slice(0,12);return `/* ===== WA CANONICAL MODULE | ${label} | ${file} | sha256:${sha} ===== */\n${content}\n`;});return `/* Wealth Arrays canonical ${label} runtime bundle.\n * Generated from CURRENT main sources by scripts/phase-stabilization-build.mjs.\n * Build date: ${stamp}\n */\n(function(){\n  const key = ${JSON.stringify(`__WA_CANONICAL_${label.toUpperCase()}_RUNTIME_BUNDLE__`)};\n  if (window[key]) return;\n  window[key] = true;\n})();\n\n${sourceParts.join('\n')}`;};
+fs.writeFileSync(path.join(root,'wa-site-runtime.js'),buildBundle(siteSources,'site'),'utf8');
+fs.writeFileSync(path.join(root,'wa-calculator-runtime.js'),buildBundle(calculatorSources,'calculator'),'utf8');
+const stylesPath=path.join(root,'styles.css');
+if(fs.existsSync(stylesPath)){const beforeStyles=fs.readFileSync(stylesPath,'utf8');const afterStyles=beforeStyles.replace(/(\.ledger-hero\s*\{[^}]*?)overflow\s*:\s*hidden\s*;([^}]*\})/gi,'$1$2');if(afterStyles!==beforeStyles) fs.writeFileSync(stylesPath,afterStyles,'utf8');}
+const managedBasenames=new Set(calculatorSources);const siteManagedBasenames=new Set(siteSources);let changed=0;
+for(const file of calculatorPages){const full=path.join(root,file);if(!fs.existsSync(full)) throw new Error(`Missing calculator page: ${file}`);let html=fs.readFileSync(full,'utf8');const before=html;html=html.replace(/\s*<script\s+src=["']([^"']+)["'][^>]*><\/script>/gi,(tag,src)=>{const base=path.basename(src.split('?',1)[0]);return managedBasenames.has(base)||base==='wa-calculator-runtime.js'?'':tag;});const canonicalTag='<script src="/wa-calculator-runtime.js?v=20260916-stable" defer></script>';html=html.replace(/\s*<!-- WA-CANONICAL-RUNTIME:[^>]+-->\s*/g,'\n');if(!html.includes(canonicalTag)) html=html.replace('</body>',`${canonicalTag}</body>`);html=html.replace(/(<body[^>]*>)/i,'$1\n<!-- WA-CANONICAL-RUNTIME:v1 -->');if(html!==before){fs.writeFileSync(full,html,'utf8');changed++;}}
+const htmlFiles=[];const walk=dir=>{for(const entry of fs.readdirSync(dir,{withFileTypes:true})){const full=path.join(dir,entry.name);if(entry.isDirectory()){if(!['.git','node_modules'].includes(entry.name)) walk(full);}else if(/\.html$/i.test(entry.name)) htmlFiles.push(full);}};walk(root);
+for(const full of htmlFiles){const rel=path.relative(root,full).replaceAll(path.sep,'/');if(calculatorPages.includes(rel)||rel==='404.html') continue;let html=fs.readFileSync(full,'utf8');const before=html;const hasShared=siteSources.some(base=>html.includes(base));const hasSiteBundle=html.includes('wa-site-runtime.js');if(!hasShared&&!hasSiteBundle) continue;html=html.replace(/\s*<script\s+src=["']([^"']+)["'][^>]*><\/script>/gi,(tag,src)=>{const base=path.basename(src.split('?',1)[0]);return siteManagedBasenames.has(base)||base==='wa-site-runtime.js'?'':tag;});const canonicalTag='<script src="/wa-site-runtime.js?v=20260916-stable" defer></script>';if(!html.includes('wa-site-runtime.js')) html=html.replace('</body>',`${canonicalTag}</body>`);html=html.replace(/\s*<!-- WA-SITE-RUNTIME:[^>]+-->\s*/g,'\n');html=html.replace(/(<body[^>]*>)/i,'$1\n<!-- WA-SITE-RUNTIME:v1 -->');if(html!==before){fs.writeFileSync(full,html,'utf8');changed++;}}
+if(fs.existsSync(path.join(root,'node_modules'))) fs.rmSync(path.join(root,'node_modules'),{recursive:true,force:true});
+const gitignore=path.join(root,'.gitignore');let ignore=fs.existsSync(gitignore)?fs.readFileSync(gitignore,'utf8'):'';for(const item of ['node_modules/','.DS_Store']) if(!ignore.split(/\r?\n/).includes(item)) ignore+=`${ignore.endsWith('\n')||!ignore?'':'\n'}${item}\n`;fs.writeFileSync(gitignore,ignore,'utf8');
 console.log(`Stabilization build complete — canonical site + calculator bundles generated; ${changed} HTML pages normalized; local node_modules removed/ignored.`);
