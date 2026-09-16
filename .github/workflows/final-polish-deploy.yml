@@ -30,7 +30,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import re
-          managed={'wa-core.js','site-runtime.js','wa-enhancements.js','calculator-runtime.js','final-polish.js'}
+          managed={'wa-core.js','site-runtime.js','wa-enhancements.js','final-polish.js'}
           pages=list(Path('.').glob('*.html'))+list(Path('articles').glob('*.html'))+list(Path('p').glob('*.html'))
           for p in pages:
               s=p.read_text()
@@ -46,4 +46,5 @@ jobs:
           assert 'beforeinstallprompt' in core
           assert 'wealtharrays-pwa-3' in Path('sw.js').read_text()
           PY
+          node qa/recurring-bug-regression.mjs
           git diff --check
