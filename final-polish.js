@@ -1,5 +1,7 @@
 /* Wealth Arrays final polish — non-destructive UX, content consistency and trust signals. */
 (function(){'use strict';
+/* Shared hub behaviour is owned by wa-core. Keep this legacy layer calculator-only so it cannot compete for search/theme ownership. */
+if(window.__WEALTH_ARRAYS_CORE_LOADED__&&!document.querySelector('.calc-page'))return;
 const CURRENCY_SYMBOLS={USD:'$',EUR:'€',JPY:'¥',GBP:'£',AUD:'A$',CAD:'C$',CHF:'CHF',CNY:'CN¥',HKD:'HK$',NZD:'NZ$',SEK:'kr',KRW:'₩',SGD:'S$',NOK:'kr',MXN:'MX$',INR:'₹',ZAR:'R',BRL:'R$',AED:'د.إ',SAR:'﷼',TRY:'₺',PLN:'zł',THB:'฿',IDR:'Rp',MYR:'RM',PHP:'₱',DKK:'kr',ILS:'₪',CZK:'Kč',HUF:'Ft'};
 function tidy(){
  document.querySelectorAll('#language-select').forEach(s=>{if(!s.options.length||!s.value)s.remove()});
