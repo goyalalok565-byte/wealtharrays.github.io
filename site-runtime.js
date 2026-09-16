@@ -1,6 +1,8 @@
 /* Wealth Arrays visual runtime — cards, charts and defensive UX fallbacks. */
 (function () {
   'use strict';
+  /* Hub pages already have one shared runtime owner; keep this visual/calculator layer off them. */
+  if(window.__WEALTH_ARRAYS_CORE_LOADED__&&!document.querySelector('.calc-page'))return;
   function installAdSense(){
     if(document.querySelector('script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]')) return;
     var s=document.createElement('script');
