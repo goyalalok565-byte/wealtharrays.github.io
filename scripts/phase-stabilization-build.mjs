@@ -3,11 +3,13 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 
 const root = process.cwd();
+// Only current production modules belong in the calculator bundle.
+// Retired patch files must never be listed here: doing so would recreate them
+// on the next stabilization build and reintroduce the recurring-bug cycle.
 const canonicalSources = [
   'calculators.js',
   'widget.js',
   'wa-core.js',
-  'calculator-runtime.js',
   'site-runtime.js',
   'final-polish.js',
   'wa-enhancements.js',
