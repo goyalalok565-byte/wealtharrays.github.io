@@ -24,6 +24,10 @@ jobs:
           set -euo pipefail
           find . -maxdepth 2 -type f -name '*.js' -print0 | xargs -0 -n1 node --check
 
+      - name: Materialize current-main stabilization build for validation
+        shell: bash
+        run: node scripts/phase-stabilization-build.mjs
+
       - name: Validate recurring bug regression contract
         shell: bash
         run: node qa/recurring-bug-regression.mjs
@@ -60,7 +64,7 @@ jobs:
           from pathlib import Path
           import re
           pages=list(Path('.').glob('*.html'))+list(Path('articles').glob('*.html'))+list(Path('p').glob('*.html'))
-          managed={'wa-core.js','site-runtime.js','wa-enhancements.js','final-polish.js'}
+          managed={'wa-core.js','site-runtime.js','wa-enhancements.js','final-polish.js','theme-fix.js','phase2-intelligence.js','phase2-retirement.js','phase3-seo.js','phase4-premium.js'}
           checked=0
           skipped=0
           for p in pages:
@@ -73,6 +77,8 @@ jobs:
               if 'wealtharrays.com/og-image.png' not in s: raise SystemExit(f'missing OG image: {p}')
               scripts=re.findall(r'<script\s+src=["\']([^"\']+)["\'][^>]*></script>',s,re.I)
               names=[Path(x.split('?',1)[0]).name for x in scripts]
+              if p.name not in {'404.html'} and 'wa-site-runtime.js' not in names and 'wa-calculator-runtime.js' not in names:
+                  raise SystemExit(f'missing canonical runtime: {p}')
               for src in managed:
                   if names.count(src)>1: raise SystemExit(f'duplicate {src}: {p}')
           print(f'validated {checked} indexable HTML pages; skipped {skipped} noindex redirect shells')
