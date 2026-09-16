@@ -40,6 +40,23 @@ jobs:
       - name: Visual and calculator browser smoke
         run: node qa/production-browser-smoke.mjs
 
+      - name: Wait for canonical runtime to reach production
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 60); do
+            home="$(curl -fsSL https://wealtharrays.com/index.html 2>/dev/null || true)"
+            calc="$(curl -fsSL https://wealtharrays.com/sip-calculator.html 2>/dev/null || true)"
+            if grep -q 'wa-site-runtime.js' <<<"$home" && grep -q 'wa-calculator-runtime.js' <<<"$calc"; then
+              echo "Production is serving canonical site and calculator runtimes."
+              exit 0
+            fi
+            echo "Waiting for production deployment... attempt $i/60"
+            sleep 10
+          done
+          echo "Production did not expose canonical runtime bundles within the wait window."
+          exit 1
+
       - name: Production homepage search smoke
         env:
           BASE_URL: https://wealtharrays.com
