@@ -1,12 +1,13 @@
 # Wealth Arrays — Phase 10 Production Hardening Audit
 
-Phase 10 is the production-hardening phase: reliability, privacy boundaries, deterministic QA, security policy, caching, voice/mobile criteria, and release truth.
+Phase 10 is the production-hardening phase: reliability, privacy boundaries, deterministic QA, security policy, caching, mobile criteria, and release truth.
 
 ## Completed in source
 
 ### Pass 1 — Live permissions
-- Microphone policy allows same-origin voice input.
+- Microphone is intentionally blocked at the HTTP Permissions-Policy layer (`microphone=()`).
 - Camera, geolocation, payment and USB remain blocked.
+- The release documentation does not claim microphone/voice input is available until an actual implementation and permission policy are shipped and tested.
 
 ### Pass 2 — Analytics measurement
 - GA4 interaction tracking is consent-aware.
@@ -35,8 +36,8 @@ Tracked after analytics consent:
 - The repository has no Google Fonts network dependency.
 
 ### Pass 6 — Security policy
-- `_headers` now defines MIME sniffing protection, strict referrer policy, Permissions Policy, same-origin framing and a restrictive Content Security Policy.
-- The CSP allows only same-origin executable JavaScript plus the fixed hash used by the theme bootstrap.
+- `_headers` defines MIME sniffing protection, strict referrer policy, Permissions Policy, same-origin framing and a restrictive Content Security Policy.
+- The actual active serving layer must still be checked because GitHub Pages does not consume Cloudflare Pages `_headers` rules.
 
 ### Pass 7 — Deterministic calculator QA
 - Added `scripts/phase10-qa.mjs`.
@@ -44,14 +45,13 @@ Tracked after analytics consent:
 - The runner validates expected outputs, finite results, unique IDs and basic field-definition integrity.
 - The Phase 10 GitHub Actions workflow runs this test on pushes and pull requests to `main`.
 
-### Pass 8 — Mobile / voice / release criteria
+### Pass 8 — Mobile / release criteria
 Release criteria remain:
 - no horizontal overflow
 - usable touch targets
 - calculator inputs remain visible and keyboard-friendly
 - comparison remains usable on narrow screens
 - charts show an explicit empty state instead of a fake graph
-- supported browsers expose voice input only when browser capability and permission exist
 
 ## Deployment truth
 
@@ -71,8 +71,7 @@ These cannot be truthfully completed from repository access alone:
 
 1. Open one calculator on desktop Chrome and make a valid calculation.
 2. Verify Smart Assist appears and stays local.
-3. Test voice input where supported and permission is granted.
-4. Test Compare, Share and Export after a valid calculation.
-5. Check homepage and one calculator at narrow mobile width.
-6. Verify the actual production response headers at `wealtharrays.com`.
-7. Run PageSpeed Insights on the homepage and one calculator URL.
+3. Test Compare, Share and Export after a valid calculation.
+4. Check homepage and one calculator at narrow mobile width.
+5. Verify the actual production response headers at `wealtharrays.com`.
+6. Run PageSpeed Insights on the homepage and one calculator URL.
