@@ -4,7 +4,9 @@ import path from 'node:path';
 const root = process.cwd();
 const forbiddenRuntime = 'calculator-runtime.js';
 const sourceFiles = [];
-for (const dir of ['.', 'articles', 'p', 'scripts', 'qa', '.github/workflows']) {
+// Scan deployable source and workflow contracts. QA/build files may intentionally
+// mention the retired filename in assertions, so those are validated separately.
+for (const dir of ['.', 'articles', 'p', '.github/workflows']) {
   const fullDir = path.join(root, dir);
   if (!fs.existsSync(fullDir)) continue;
   const walk = current => {
@@ -17,8 +19,7 @@ for (const dir of ['.', 'articles', 'p', 'scripts', 'qa', '.github/workflows']) 
   walk(fullDir);
 }
 
-const scanFiles = sourceFiles.filter(file => path.relative(root, file) !== 'qa/recurring-bug-regression.mjs');
-const contents = scanFiles.map(file => ({ file: path.relative(root, file), text: fs.readFileSync(file, 'utf8') }));
+const contents = sourceFiles.map(file => ({ file: path.relative(root, file), text: fs.readFileSync(file, 'utf8') }));
 
 // Regression #1: the homepage search dropdown must never be clipped by ledger-hero.
 const clippingPattern = /\.ledger-hero\s*\{[^}]*overflow\s*:\s*hidden\b/i;
