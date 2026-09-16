@@ -1060,10 +1060,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true }); else start();
 })();
 
-/* ===== WA CANONICAL MODULE: theme-fix.js | sha256:211f67e7b3f3 ===== */
-/* Wealth Arrays global theme controller — works on every page, including calculator pages. */
+/* ===== WA CANONICAL MODULE: theme-fix.js | sha256:237818d51e88 ===== */
+/* Wealth Arrays global theme controller — calculator fallback only. Hub pages are owned by wa-core. */
 (function(){
   'use strict';
+  if(window.__WEALTH_ARRAYS_CORE_LOADED__&&!document.querySelector('.calc-page'))return;
   var KEY='waTheme';
   var REMOVED=['step-up-sip-calculator.html','emergency-fund-calculator.html','real-return-calculator.html'];
   function read(){try{return localStorage.getItem(KEY)==='dark'?'dark':'light'}catch(e){return document.documentElement.dataset.theme==='dark'?'dark':'light'}}
@@ -1094,7 +1095,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function init(){
     paint(read());
     removeRetiredCards();
-    /* wa-core is the primary owner when present; this listener is only the fallback. */
     if(document.documentElement.dataset.waThemeOwner!=='1'){
       document.addEventListener('click',function(e){
         var button=e.target.closest&&e.target.closest('#theme-toggle,.theme-toggle');
