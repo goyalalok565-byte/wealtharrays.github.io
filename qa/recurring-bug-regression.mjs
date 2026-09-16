@@ -43,11 +43,12 @@ if (fs.existsSync(finalPolishPath)) {
   }
 }
 
-// Regression #3: retired calculator-runtime.js must not return, and no deployable
-// page/workflow may reference it.
+// Regression #3: retired calculator-runtime.js must not return. Match only a
+// standalone filename so the valid wa-calculator-runtime.js bundle is allowed.
+const retiredRuntimePattern = /(?:^|[\/'"])calculator-runtime\.js(?:[?#'"$])/i;
 if (fs.existsSync(path.join(root, forbiddenRuntime))) throw new Error(`Retired ${forbiddenRuntime} was recreated`);
 for (const { file, text } of contents) {
-  if (new RegExp(forbiddenRuntime.replace('.', '\\.'), 'i').test(text)) {
+  if (retiredRuntimePattern.test(text)) {
     throw new Error(`Retired runtime reference detected in ${file}`);
   }
 }
@@ -70,8 +71,6 @@ for (const page of calculatorPages) {
 
 // Stabilization source list must not contain retired modules.
 const build = fs.readFileSync(path.join(root, 'scripts/phase-stabilization-build.mjs'), 'utf8');
-for (const retired of ['calculator-runtime.js']) {
-  if (build.includes(`'${retired}'`)) throw new Error(`Stabilization build still revives ${retired}`);
-}
+if (build.includes("'calculator-runtime.js'")) throw new Error('Stabilization build still revives the retired runtime');
 
 console.log('Recurring bug regression suite: PASS — clipping, search ownership, retired runtime revival, and calculator runtime duplication are locked.');
