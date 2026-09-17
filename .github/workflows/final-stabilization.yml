@@ -46,6 +46,7 @@ jobs:
         run: node scripts/version-runtime-assets.mjs
       - name: Run canonical regression gates
         run: |
+          node qa/root-cause-audit.mjs
           node qa/recurring-bug-regression.mjs
           node qa/stabilization-audit.mjs
           node qa/architecture-audit.mjs
