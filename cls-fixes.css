@@ -1,0 +1,2 @@
+/* CLS guardrails: reserve space before JavaScript-enhanced calculator content arrives. */
+.calc-widget{min-height:520px;contain:layout paint}.calc-result{min-height:150px}.wa-export-chart{min-height:230px}.wa-export-tools{min-height:48px}.hero-panel{min-height:400px}.chart{min-height:125px}.tool-board{min-height:150px}.article-list{min-height:240px}.wa-skeleton{display:block;min-height:1em;border-radius:8px;background:var(--surface2);animation:wa-skeleton-pulse 1.2s ease-in-out infinite}.wa-loading-reserve{min-height:180px}@keyframes wa-skeleton-pulse{50%{opacity:.55}}
