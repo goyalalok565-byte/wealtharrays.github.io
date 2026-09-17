@@ -33,6 +33,8 @@ jobs:
         run: node scripts/phase-stabilization-build.mjs
       - name: Minify production calculator bundle
         run: npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output wa-calculator-runtime.js -- wa-calculator-runtime.js
+      - name: Version runtime assets by content hash
+        run: node scripts/version-runtime-assets.mjs
       - name: Run recurring-bug regression gate
         run: node qa/recurring-bug-regression.mjs
       - name: Validate canonical runtime
