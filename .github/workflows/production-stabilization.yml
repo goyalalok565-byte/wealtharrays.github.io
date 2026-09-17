@@ -1,0 +1,72 @@
+name: Wealth Arrays Production Stabilization
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wealtharrays-production-stabilization
+  cancel-in-progress: true
+
+jobs:
+  stabilize:
+    if: ${{ github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[stabilization-build]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Validate source JavaScript
+        run: find . -maxdepth 2 -type f -name '*.js' -print0 | xargs -0 -n1 node --check
+      - name: Calculator regression
+        run: node qa/calculator-regression.mjs
+      - name: Build canonical runtimes
+        run: node scripts/phase-stabilization-build.mjs
+      - name: Split calculator-only Phase 2 code
+        run: node scripts/strip-site-phase2.mjs
+      - name: Normalize routes and links
+        run: |
+          node scripts/fix-route-alias-links.mjs
+          node scripts/normalize-nested-links.mjs
+          node scripts/fix-accessible-names.mjs
+          node scripts/optimize-resource-hints.mjs
+      - name: Minify production JavaScript
+        run: |
+          npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output wa-site-runtime.js -- wa-site-runtime.js
+          npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output wa-calculator-runtime.js -- wa-calculator-runtime.js
+      - name: Minify production CSS
+        run: |
+          for file in styles.css phase3-seo.css phase4-premium.css cls-fixes.css; do
+            tmp="${file}.min"
+            npx --yes clean-css-cli@5 -O2 -o "$tmp" "$file"
+            mv "$tmp" "$file"
+          done
+      - name: Version runtime assets
+        run: node scripts/version-runtime-assets.mjs
+      - name: Full QA gates
+        run: |
+          node qa/recurring-bug-regression.mjs
+          node qa/stabilization-audit.mjs
+          node qa/architecture-audit.mjs
+          node qa/code-quality-audit.mjs
+          node qa/phase45-production-audit.mjs
+          git diff --check
+      - name: Commit stabilized production tree
+        run: |
+          git config user.name "wealtharrays-stabilization-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No stabilization changes needed"
+            exit 0
+          fi
+          git commit -m "chore: apply deterministic stabilization build [stabilization-build]"
+          git pull --rebase origin main
+          git push origin HEAD:main
