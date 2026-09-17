@@ -14,5 +14,9 @@
 /p/mastering-return-on-investment-roi-how.html /articles/roi-guide.html 301
 /p/understanding-cpi-currency-degradation.html /inflation-calculator.html 301
 
+# Keep repository-only QA scripts from being served as public pages.
+/qa/* /404.html 302
+/RELEASE-AUDIT.json /404.html 302
+
 # Canonical homepage
 /index.html / 301
