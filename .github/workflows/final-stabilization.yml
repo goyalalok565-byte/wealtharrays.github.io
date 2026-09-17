@@ -1,19 +1,21 @@
-name: Wealth Arrays Final Stabilization
+name: Wealth Arrays Canonical CI
 
 on:
-  workflow_dispatch:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: wealtharrays-final-stabilization
+  group: wealtharrays-canonical-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  stabilize:
+  canonical:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,31 +26,25 @@ jobs:
           node-version: 24
       - name: Validate source JavaScript
         run: find . -maxdepth 2 -type f -name '*.js' -print0 | xargs -0 -n1 node --check
-      - name: Calculator regression
+      - name: Calculator regression before build
         run: node qa/calculator-regression.mjs
-      - name: Build canonical runtime
-        run: node scripts/phase-stabilization-build.mjs
-      - name: Split calculator-only Phase 2 code
-        run: node scripts/strip-site-phase2.mjs
+      - name: Build canonical runtime, split definitions and sitemap
+        run: node scripts/root-cause-build.mjs
+      - name: Normalize route aliases and accessibility
+        run: node scripts/fix-route-alias-links.mjs && node scripts/normalize-nested-links.mjs && node scripts/fix-accessible-names.mjs
       - name: Repair static pages and redirect shells
         run: node scripts/repair-site-integrity.mjs
-      - name: Normalize routes
-        run: node scripts/fix-route-alias-links.mjs && node scripts/normalize-nested-links.mjs
-      - name: Accessibility and resource hints
-        run: node scripts/fix-accessible-names.mjs && node scripts/optimize-resource-hints.mjs
-      - name: Minify JS
+      - name: Minify canonical bundles and CSS
         run: |
           npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output wa-site-runtime.js -- wa-site-runtime.js
           npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output wa-calculator-runtime.js -- wa-calculator-runtime.js
-      - name: Minify CSS
-        run: |
           for file in styles.css phase3-seo.css phase4-premium.css cls-fixes.css; do
             npx --yes clean-css-cli@5 -O2 -o "${file}.min" "$file"
             mv "${file}.min" "$file"
           done
-      - name: Version runtime assets
+      - name: Version assets by content hash
         run: node scripts/version-runtime-assets.mjs
-      - name: Regression and architecture gates
+      - name: Run canonical regression gates
         run: |
           node qa/recurring-bug-regression.mjs
           node qa/stabilization-audit.mjs
@@ -57,13 +53,16 @@ jobs:
           node qa/phase45-production-audit.mjs
           node qa/phase4-premium-audit.mjs
           node scripts/site-integrity.mjs
+          node scripts/launch-readiness.mjs
+          node scripts/phase10-qa.mjs
           git diff --check
       - name: Commit deterministic build
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           git config user.name "wealtharrays-stabilization-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          if git diff --cached --quiet; then echo "No stabilization changes needed"; exit 0; fi
-          git commit -m "chore: apply deterministic stabilization build [stabilization-build]"
+          if git diff --cached --quiet; then echo "No generated changes needed"; exit 0; fi
+          git commit -m "chore: apply canonical production build [canonical-build]"
           git pull --rebase origin main
           git push origin HEAD:main
