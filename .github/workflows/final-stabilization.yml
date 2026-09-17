@@ -64,3 +64,4 @@ jobs:
           git commit -m "chore: apply deterministic stabilization build [stabilization-build]"
           git pull --rebase origin main
           git push origin HEAD:main
+# Explicit post-create trigger: guarantees this workflow executes on the next main push.
