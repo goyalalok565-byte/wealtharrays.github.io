@@ -43,6 +43,12 @@ jobs:
         run: npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output wa-site-runtime.js -- wa-site-runtime.js
       - name: Minify production calculator bundle
         run: npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output wa-calculator-runtime.js -- wa-calculator-runtime.js
+      - name: Minify production CSS
+        run: |
+          set -euo pipefail
+          for file in styles.css phase3-seo.css phase4-premium.css cls-fixes.css; do
+            npx --yes clean-css-cli@5 --level 2 --output "$file" -- "$file"
+          done
       - name: Version runtime assets by content hash
         run: node scripts/version-runtime-assets.mjs
       - name: Run recurring-bug regression gate
