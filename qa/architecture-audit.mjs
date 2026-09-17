@@ -8,8 +8,8 @@ const calculatorPages = ['sip-calculator.html','compound-interest-calculator.htm
 const siteMatch = BUILD.match(/const siteSources = \[([^\]]+)\]/);
 if (!siteMatch) throw new Error('Cannot locate siteSources in stabilization build');
 const siteSources = [...siteMatch[1].matchAll(/'([^']+)'/g)].map(m => m[1]);
-const sources = ['calculators.js','widget.js',...siteSources,'calculator-page-init.js','calculator-enhancements.js'];
-if (sources.length !== 13) throw new Error(`Expected 13 canonical source modules, found ${sources.length}`);
+const sources = ['calculators.js','widget.js',...siteSources,'calculator-safety.js','calculator-page-init.js','calculator-enhancements.js'];
+if (sources.length !== 14) throw new Error(`Expected 14 canonical source modules, found ${sources.length}`);
 
 for (const file of sources) {
   if (!fs.existsSync(file)) throw new Error(`Missing canonical source: ${file}`);
