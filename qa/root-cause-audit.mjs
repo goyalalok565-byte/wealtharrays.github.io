@@ -29,7 +29,9 @@ if(!/\.search-bar\{[^}]*position:relative/i.test(styles)&&!styles.includes('.sea
 if(!styles.includes('z-index:1000'))throw new Error('Homepage search parent z-index missing');
 
 const calcSearch=fs.readFileSync('calculator-search.js','utf8');
-for(const needle of ['toLowerCase().trim()','addEventListener(\'input\'', 'keywords','slug'])if(!calcSearch.includes(needle))throw new Error(`Calculator search regression missing: ${needle}`);
+for(const needle of ['toLowerCase().trim()','addEventListener(\'input\'', 'k=normalize(c[3])','s=normalize(c[1])'])if(!calcSearch.includes(needle))throw new Error(`Calculator search regression missing: ${needle}`);
+if(!calcSearch.includes('new MutationObserver'))throw new Error('Calculator search must recover when widget markup mounts late');
+if(!calcSearch.includes('setTimeout(install,2500)'))throw new Error('Calculator search retry window missing');
 
 const enhancement=fs.readFileSync('calculator-enhancements.js','utf8');
 if(!enhancement.includes("new URL('/icon-512.png',window.location.origin).href"))throw new Error('PDF export must use current icon-512.png');
