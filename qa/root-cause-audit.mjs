@@ -38,7 +38,7 @@ if(!enhancement.includes("new URL('/icon-512.png',window.location.origin).href")
 if(!enhancement.includes('id="wa-pdf-logo"'))throw new Error('PDF report logo element missing');
 
 const hotfix=fs.readFileSync('production-hotfix.js','utf8');
-if(!hotfix.includes("production-hotfix"))throw new Error('Production hotfix loader missing');
+if(!hotfix.includes('__WA_PRODUCTION_HOTFIX__'))throw new Error('Production hotfix guard missing');
 if(!hotfix.includes("#currency-select"))throw new Error('Header dedupe hotfix missing');
 if(!hotfix.includes("calculator-search.js"))throw new Error('Calculator search hotfix loader missing');
 if(!hotfix.includes("pdf-export-fix.js"))throw new Error('PDF hotfix loader missing');
