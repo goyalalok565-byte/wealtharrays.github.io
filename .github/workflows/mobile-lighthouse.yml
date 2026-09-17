@@ -42,6 +42,31 @@ jobs:
             --output=json \
             --output-path=/tmp/lighthouse.json \
             --chrome-flags='--headless --no-sandbox'
+      - name: Print failed audits and key metrics
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const r=JSON.parse(fs.readFileSync('/tmp/lighthouse.json','utf8'));
+          const cats=r.categories||{};
+          const names=['performance','accessibility','best-practices','seo'];
+          const scores=Object.fromEntries(names.map(n=>[n,Math.round((cats[n]?.score||0)*100)]));
+          console.log('CATEGORY SCORES');
+          console.log(JSON.stringify(scores,null,2));
+          console.log('KEY METRICS');
+          for(const id of ['first-contentful-paint','largest-contentful-paint','total-blocking-time','cumulative-layout-shift','speed-index','interactive']){
+            const a=r.audits?.[id]; if(a) console.log(`${id}: ${a.displayValue||a.numericValue}`);
+          }
+          console.log('FAILED/IMPERFECT AUDITS');
+          for(const [id,a] of Object.entries(r.audits||{})){
+            if(a.score!==null && a.score<1 && a.scoreDisplayMode!=='notApplicable' && a.scoreDisplayMode!=='informative') console.log(`${id}: score=${a.score} | ${a.title} | ${a.displayValue||''}`);
+          }
+          NODE
+      - name: Upload Lighthouse report
+        uses: actions/upload-artifact@v4
+        with:
+          name: wealtharrays-mobile-lighthouse
+          path: /tmp/lighthouse.json
+          retention-days: 14
       - name: Enforce 95+ category scores
         run: |
           node - <<'NODE'
@@ -50,7 +75,6 @@ jobs:
           const cats=r.categories||{};
           const names=['performance','accessibility','best-practices','seo'];
           const scores=Object.fromEntries(names.map(n=>[n,Math.round((cats[n]?.score||0)*100)]));
-          console.log(JSON.stringify(scores,null,2));
           const failures=names.filter(n=>scores[n]<95);
           if(failures.length){
             console.error('95+ gate failed:',failures.map(n=>`${n}=${scores[n]}`).join(', '));
