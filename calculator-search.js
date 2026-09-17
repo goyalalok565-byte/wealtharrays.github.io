@@ -1,4 +1,4 @@
-/* Wealth Arrays calculator search — one owner for calculator-page suggestions. */
+/* Wealth Arrays calculator search — one owner for calculator-page and library suggestions. */
 (function () {
   'use strict';
   if (window.__WA_CALCULATOR_SEARCH_LOADED__) return;
@@ -54,7 +54,10 @@
   }
 
   function install() {
-    if (!document.querySelector('.calc-page')) return;
+    const isCalculatorPage = !!document.querySelector('.calc-page');
+    const isLibraryPage = !!document.querySelector('.tool-library-search');
+    if (!isCalculatorPage && !isLibraryPage) return;
+
     let input = document.getElementById('tool-search');
     let box = document.getElementById('tool-search-results');
     if (!input || !box) return;
@@ -71,7 +74,7 @@
     box = replacementBox;
     input.dataset.waSearchOwner = 'calculator-search';
 
-    const shell = input.closest('.tool-search-shell,.search-bar,.calc-page');
+    const shell = input.closest('.tool-search-shell,.search-bar,.tool-library-search,.calc-page');
     if (shell) {
       shell.style.position = 'relative';
       shell.style.zIndex = '1000';
@@ -101,21 +104,40 @@
         return;
       }
 
-      const results = CATALOG
-        .map(calc => ({ calc, score: scoreCalculator(calc, normalizedQuery) }))
-        .filter(result => result.score > 0)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 8);
+      if (isLibraryPage) {
+        const terms = normalize(`${normalizedQuery} ${ALIASES[normalizedQuery] || ''}`).split(' ').filter(Boolean);
+        const cards = [...document.querySelectorAll('.tools-grid .tool-card')];
+        const matches = cards.map(card => {
+          const haystack = normalize(`${card.querySelector('h2')?.textContent || ''} ${card.dataset.search || ''} ${card.querySelector('p')?.textContent || ''}`);
+          let score = haystack.includes(normalizedQuery) ? 300 : 0;
+          for (const term of terms) if (term.length > 1 && haystack.includes(term)) score += term === normalizedQuery ? 30 : 5;
+          return { card, score };
+        }).filter(x => x.score > 0).sort((a,b) => b.score - a.score);
 
-      box.innerHTML = results.length
-        ? results.map(({ calc }) => `<a class="wa-search-suggestion" href="${escapeHtml(calc[1])}"><span><strong>${escapeHtml(calc[0])}</strong><small>${escapeHtml(calc[2])}</small></span><b aria-hidden="true">→</b></a>`).join('')
-        : '<div class="tool-search-empty">No calculator found. Try SIP, EMI, FD, RD, loan, tax, salary or ROI.</div>';
+        cards.forEach(card => { card.hidden = !matches.some(x => x.card === card); });
+        box.innerHTML = matches.slice(0, 8).map(({card}) => {
+          const title = card.querySelector('h2')?.textContent?.trim() || 'Calculator';
+          const desc = card.querySelector('p')?.textContent?.trim() || '';
+          return `<a class="wa-search-suggestion" href="${escapeHtml(card.getAttribute('href') || '#')}"><span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(desc)}</small></span><b aria-hidden="true">→</b></a>`;
+        }).join('') || '<div class="tool-search-empty">No calculator found. Try SIP, EMI, FD, RD, loan, tax or ROI.</div>';
+      } else {
+        const results = CATALOG
+          .map(calc => ({ calc, score: scoreCalculator(calc, normalizedQuery) }))
+          .filter(result => result.score > 0)
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 8);
+
+        box.innerHTML = results.length
+          ? results.map(({ calc }) => `<a class="wa-search-suggestion" href="${escapeHtml(calc[1])}"><span><strong>${escapeHtml(calc[0])}</strong><small>${escapeHtml(calc[2])}</small></span><b aria-hidden="true">→</b></a>`).join('')
+          : '<div class="tool-search-empty">No calculator found. Try SIP, EMI, FD, RD, loan, tax, salary or ROI.</div>';
+      }
 
       box.hidden = false;
       box.style.setProperty('display', 'block', 'important');
     };
 
-    ['input', 'search'].forEach(type => input.addEventListener(type, render));
+    input.addEventListener('input', render);
+    input.addEventListener('search', render);
     input.addEventListener('keyup', render);
     input.addEventListener('focus', render);
     input.addEventListener('keydown', event => {
