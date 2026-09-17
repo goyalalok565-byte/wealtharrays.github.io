@@ -4,8 +4,8 @@ import crypto from 'node:crypto';
 
 const root=process.cwd();
 const stamp=new Date().toISOString().slice(0,10).replaceAll('-','');
-const siteSources=['wa-core.js','site-runtime.js','final-polish.js','wa-enhancements.js','theme-fix.js','phase3-seo.js','phase4-premium.js','homepage-search.js'];
-const calcSources=['widget.js','calculator-search.js',...siteSources,'calculator-safety.js','calculator-page-init.js','calculator-enhancements.js'];
+const siteSources=['wa-core.js','site-runtime.js','final-polish.js','wa-enhancements.js','theme-fix.js','phase3-seo.js','phase4-premium.js','homepage-search.js','calculator-search.js'];
+const calcSources=['widget.js',...siteSources,'calculator-safety.js','calculator-page-init.js','calculator-enhancements.js'];
 const calculatorPages=['sip-calculator.html','compound-interest-calculator.html','mortgage-emi-calculator.html','roi-calculator.html','simple-interest-calculator.html','retirement-calculator.html','salary-to-hourly-calculator.html','profit-margin-calculator.html','fixed-deposit-calculator.html','recurring-deposit-calculator.html','lumpsum-calculator.html','cagr-calculator.html','car-loan-calculator.html','personal-loan-calculator.html','debt-payoff-calculator.html','inflation-calculator.html','net-worth-calculator.html','overtime-pay-calculator.html','freelance-rate-calculator.html','income-tax-scenario-calculator.html'];
 const slugs=calculatorPages.map(x=>x.replace(/\.html$/,''));
 const required=[...new Set([...siteSources,...calcSources,'calculators.js'])];
