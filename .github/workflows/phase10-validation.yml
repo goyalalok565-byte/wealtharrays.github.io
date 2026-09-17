@@ -42,7 +42,7 @@ jobs:
           test "$(grep -l 'wa-calculator-runtime.js' *-calculator.html | wc -l)" -eq 20
           test "$(grep -l 'calculators.js' *-calculator.html | wc -l)" -eq 0
           grep -q 'noindex' income-tax-planner.html
-          grep -q 'income-tax-scenario-calculator.html' income-tax-planner.html
+          grep -Eq 'income-tax-scenario-calculator(?:/|\.html)' income-tax-planner.html
           grep -q 'wa-calculator-runtime.js' income-tax-scenario-calculator.html
           ! grep -q 'smart.js' income-tax-scenario-calculator.html
 
@@ -69,7 +69,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'https://wealtharrays.com/income-tax-scenario-calculator.html' sitemap.xml
+          grep -Eq 'https://wealtharrays\.com/income-tax-scenario-calculator(?:/|\.html)' sitemap.xml
           ! grep -q '<loc>https://wealtharrays.com/income-tax-planner.html</loc>' sitemap.xml
           grep -q '^Sitemap: https://wealtharrays.com/sitemap.xml' robots.txt
           grep -q 'index,follow' income-tax-scenario-calculator.html
