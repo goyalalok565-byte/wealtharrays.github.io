@@ -33,7 +33,10 @@ async function assertCalculator(path, label, phase2 = true) {
   catch (error) { await diagnostics(label); throw new Error(`${label} failed to render at ${page.url()}: ${error.message}`); }
   if ((await page.locator('h1').count()) !== 1) throw new Error(`${label} must have exactly one H1`);
   if (!(await page.locator('#calc-widget input, #calc-widget select').count())) throw new Error(`${label} controls did not render`);
-  if (phase2 && !(await page.locator('[data-wa-phase2], [data-wa-retirement-intelligence]').count())) throw new Error(`${label} Phase 2 decision-intelligence panels did not render`);
+  if (phase2) {
+    try { await page.locator('[data-wa-phase2], [data-wa-retirement-intelligence]').first().waitFor({ state: 'attached', timeout: 5000 }); }
+    catch (error) { await diagnostics(label); throw new Error(`${label} Phase 2 decision-intelligence panels did not render within 5s: ${error.message}`); }
+  }
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 2);
   if (overflow) throw new Error(`${label} has horizontal overflow at 390px viewport`);
 }
