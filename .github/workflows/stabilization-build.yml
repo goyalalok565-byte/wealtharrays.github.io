@@ -19,41 +19,32 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 24
-
       - name: Validate source JavaScript
         run: |
           set -euo pipefail
           find . -maxdepth 2 -type f -name '*.js' -print0 | xargs -0 -n1 node --check
-
       - name: Run calculator regression suite before build
         run: node qa/calculator-regression.mjs
-
       - name: Build canonical runtime
         run: node scripts/phase-stabilization-build.mjs
-
+      - name: Minify production calculator bundle
+        run: npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output wa-calculator-runtime.js -- wa-calculator-runtime.js
       - name: Run recurring-bug regression gate
         run: node qa/recurring-bug-regression.mjs
-
       - name: Validate canonical runtime
         run: node qa/stabilization-audit.mjs
-
       - name: Run architecture audit
         run: node qa/architecture-audit.mjs
-
       - name: Run source code quality audit
         run: node qa/code-quality-audit.mjs
-
       - name: Run Phase 4-5 production gate
         run: node qa/phase45-production-audit.mjs
-
       - name: Verify repository diff hygiene
         run: git diff --check
-
       - name: Commit deterministic build
         run: |
           set -euo pipefail
