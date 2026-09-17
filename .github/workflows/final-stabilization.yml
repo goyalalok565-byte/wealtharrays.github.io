@@ -30,6 +30,8 @@ jobs:
         run: node scripts/phase-stabilization-build.mjs
       - name: Split calculator-only Phase 2 code
         run: node scripts/strip-site-phase2.mjs
+      - name: Repair static pages and redirect shells
+        run: node scripts/repair-site-integrity.mjs
       - name: Normalize routes
         run: node scripts/fix-route-alias-links.mjs && node scripts/normalize-nested-links.mjs
       - name: Accessibility and resource hints
@@ -53,6 +55,8 @@ jobs:
           node qa/architecture-audit.mjs
           node qa/code-quality-audit.mjs
           node qa/phase45-production-audit.mjs
+          node qa/phase4-premium-audit.mjs
+          node scripts/site-integrity.mjs
           git diff --check
       - name: Commit deterministic build
         run: |
