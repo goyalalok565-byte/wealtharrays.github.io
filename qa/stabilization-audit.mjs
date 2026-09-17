@@ -17,8 +17,8 @@ for (const file of calculators) {
   if (tags.filter(x=>x==='wa-calculator-runtime.js').length !== 1) throw new Error(`${file}: canonical bundle count is not 1`);
   if (tags.includes('calculator-runtime.js')) throw new Error(`${file}: retired calculator runtime still loaded`);
   for (const name of runtimeSources) if (tags.includes(name)) throw new Error(`${file}: runtime source ${name} still loaded directly`);
-  const id=html.match(/data-wa-calculator="([^"]+)"/i)?.[1];
-  if (!html.includes('calculator-definitions/') || !id || !fs.existsSync(`calculator-definitions/${id}.js`)) throw new Error(`${file}: split calculator definition missing`);
+  const definitionMatch=html.match(/(?:src|href)=["'](?:[^"']*\/)?calculator-definitions\/([^"'?]+)\.js(?:\?[^"']*)?["']/i);
+  if (!definitionMatch || !fs.existsSync(`calculator-definitions/${definitionMatch[1]}.js`)) throw new Error(`${file}: split calculator definition missing`);
   if (!html.includes('ca-pub-6507600103785450')) throw new Error(`${file}: AdSense publisher id missing`);
   if (!html.includes('rel="canonical"')) throw new Error(`${file}: canonical tag missing`);
 }
