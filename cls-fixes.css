@@ -1,1 +1,8 @@
 .calc-widget{min-height:520px;contain:layout paint}.calc-result{min-height:150px}.wa-export-chart{min-height:230px}.wa-export-tools{min-height:48px}.hero-panel{min-height:400px}.chart{min-height:125px}.tool-board{min-height:150px}.article-list{min-height:240px}.wa-skeleton{display:block;min-height:1em;border-radius:8px;background:var(--surface2);animation:1.2s ease-in-out infinite wa-skeleton-pulse}.wa-loading-reserve{min-height:180px}.feature,.ledger-index,.section-wrap,.site-footer{content-visibility:auto;contain-intrinsic-size:500px}@keyframes wa-skeleton-pulse{50%{opacity:.55}}
+
+/* Search dropdown: keep it above subsequent homepage sections without clipping. */
+.ledger-hero{position:relative!important;z-index:1000!important;isolation:isolate!important;overflow:visible!important}
+.hero-copy{position:relative!important;z-index:1001!important;overflow:visible!important}
+.search-bar,.tool-search-shell{position:relative!important;z-index:1000!important;overflow:visible!important}
+#tool-search-results,.tool-search-results{position:absolute!important;top:100%!important;left:0!important;width:100%!important;right:auto!important;z-index:9999!important;background:var(--surface,#fff)!important;box-shadow:0 10px 25px rgba(0,0,0,.15)!important;max-height:350px!important;overflow-y:auto!important;overflow-x:hidden!important}
+.ledger-hero .hero-panel{z-index:1!important}
