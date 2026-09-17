@@ -1,0 +1,7 @@
+/* Generated from calculators.js — do not edit directly. */
+window.CALCULATORS=window.CALCULATORS||[];window.CALCULATORS.push({
+    id:"fixed-deposit",slug:"fixed-deposit-calculator",title:"Fixed Deposit Calculator",category:"banking",
+    short:"Estimate fixed-deposit maturity and interest.",desc:"Project a one-time deposit using an annual rate, term and compounding frequency.",
+    fields:[{id:"principal",label:"Deposit amount",type:"number",min:0,step:100},{id:"rate",label:"Annual interest rate",type:"number",min:0,max:1000,step:.1,suffix:"%"},{id:"years",label:"Term",type:"number",min:.1,max:200,step:.1,suffix:"yrs"},{id:"inflation",label:"Expected annual inflation",type:"number",default:6,min:0,max:30,step:.1,suffix:"%"},{id:"freq",label:"Compounding",type:"select",default:"4",options:[{value:"1",label:"Annually"},{value:"4",label:"Quarterly"},{value:"12",label:"Monthly"}]}],
+    compute(v){const P=Math.max(v.principal,0),rate=Math.max(v.rate,0),years=Math.max(v.years,0),inflation=Math.max(v.inflation,0),n=Math.max(1,Number(v.freq)||1),A=P*Math.pow(1+rate/100/n,n*years),real=A/Math.pow(1+inflation/100,years);return[{label:"Deposit",value:P,format:"currency"},{label:"Interest earned",value:A-P,format:"currency",emphasis:"positive"},{label:"Maturity value (future money)",value:A,format:"currency",emphasis:"neutral"},{label:"Value in today's purchasing power",value:real,format:"currency",emphasis:"neutral"}]}
+  });
