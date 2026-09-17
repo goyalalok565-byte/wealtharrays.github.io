@@ -1,4 +1,4 @@
-const VERSION='wealtharrays-pwa-6';
+const VERSION='wealtharrays-pwa-7';
 const STATIC_CACHE=VERSION+'-static';
 const RUNTIME_CACHE=VERSION+'-runtime';
 const STATIC_ASSETS=['/','/index.html','/tools.html','/styles.css','/cls-fixes.css','/wa-core.js','/site-runtime.js','/wa-calculator-runtime.js','/manifest.webmanifest','/favicon-v2.svg','/icon-192.png','/icon-512.png','/offline.html'];
