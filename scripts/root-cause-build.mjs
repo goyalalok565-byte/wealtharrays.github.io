@@ -5,7 +5,7 @@ import crypto from 'node:crypto';
 const root=process.cwd();
 const stamp=new Date().toISOString().slice(0,10).replaceAll('-','');
 const siteSources=['wa-core.js','site-runtime.js','final-polish.js','wa-enhancements.js','theme-fix.js','phase3-seo.js','phase4-premium.js'];
-const calcSources=['widget.js',...siteSources,'calculator-safety.js','calculator-page-init.js','calculator-enhancements.js'];
+const calcSources=['widget.js','calculator-search.js',...siteSources,'calculator-safety.js','calculator-page-init.js','calculator-enhancements.js'];
 const calculatorPages=['sip-calculator.html','compound-interest-calculator.html','mortgage-emi-calculator.html','roi-calculator.html','simple-interest-calculator.html','retirement-calculator.html','salary-to-hourly-calculator.html','profit-margin-calculator.html','fixed-deposit-calculator.html','recurring-deposit-calculator.html','lumpsum-calculator.html','cagr-calculator.html','car-loan-calculator.html','personal-loan-calculator.html','debt-payoff-calculator.html','inflation-calculator.html','net-worth-calculator.html','overtime-pay-calculator.html','freelance-rate-calculator.html','income-tax-scenario-calculator.html'];
 const slugs=calculatorPages.map(x=>x.replace(/\.html$/,''));
 const required=[...new Set([...siteSources,...calcSources,'calculators.js'])];
@@ -28,6 +28,10 @@ for(const obj of objects){const id=obj.match(/\bid:\s*["']([^"']+)["']/)?.[1];if
 const allHtml=[];function walk(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){const f=path.join(dir,e.name);if(e.isDirectory()){if(!['.git','node_modules'].includes(e.name))walk(f);}else if(e.name.endsWith('.html'))allHtml.push(f);}}walk(root);
 const managed=new Set([...required,'wa-site-runtime.js','wa-calculator-runtime.js']);
 for(const full of allHtml){let html=fs.readFileSync(full,'utf8');const isCalc=/<html[^>]+data-wa-calculator=/i.test(html);html=html.replace(/\s*<script\s+src=["']([^"']+)[^>]*><\/script>/gi,(tag,src)=>managed.has(path.basename(src.split('?',1)[0]))?'':tag);html=html.replace(/\s*<!-- WA-(?:SITE|CANONICAL)-RUNTIME:[^>]+-->\s*/g,'\n');
+// Canonicalize the base stylesheet. Relative styles.css breaks on pretty calculator URLs such as /sip-calculator/.
+html=html.replace(/(<link\s+[^>]*rel=["'](?:preload|stylesheet)["'][^>]*href=["'])\/?styles\.css(["'][^>]*>)/gi,'$1/styles.css$2');
+html=html.replace(/(<link\s+[^>]*href=["'])styles\.css(["'][^>]*rel=["'](?:preload|stylesheet)["'][^>]*>)/gi,'$1/styles.css$2');
+if(!html.includes('href="/styles.css"')&&!html.includes("href='/styles.css'"))html=html.replace('</head>','<link rel="stylesheet" href="/styles.css"></head>');
 if(isCalc){const id=html.match(/data-wa-calculator="([^"]+)"/i)?.[1];if(!id)throw new Error(`Calculator page missing data-wa-calculator: ${full}`);const def=`<script src="/calculator-definitions/${id}.js?v=${stamp}" defer></script>`;const runtime=`<script src="/wa-calculator-runtime.js?v=${stamp}" defer></script>`;html=html.replace(/\s*<script[^>]+wa-calculator-runtime\.js[^>]*><\/script>/gi,'');html=html.replace('</body>',`${def}${runtime}</body>`);html=html.replace(/(<body[^>]*>)/i,'$1\n<!-- WA-CANONICAL-RUNTIME:v3 -->');}
 else{if(!html.includes('wa-site-runtime.js'))html=html.replace('</body>',`<script src="/wa-site-runtime.js?v=${stamp}" defer></script></body>`);html=html.replace(/(<body[^>]*>)/i,'$1\n<!-- WA-SITE-RUNTIME:v3 -->');}
 if(!html.includes('/cls-fixes.css'))html=html.replace('</head>','<link rel="stylesheet" href="/cls-fixes.css?v=20260917" media="all"></head>');
@@ -36,4 +40,4 @@ fs.writeFileSync(full,html,'utf8');}
 const routes=['/','/tools','/articles','/faq','/about','/contact','/privacy','/terms','/disclaimer','/methodology','/editorial-policy','/advertising-policy','/category-investment','/category-loan','/category-banking','/category-retirement','/category-salary','/category-business',...slugs.map(s=>`/${s}/`)];
 for(const full of allHtml){const rel=path.relative(root,full).replaceAll(path.sep,'/');if(/^articles\/[^/]+\.html$/.test(rel))routes.push('/'+rel.replace(/\.html$/,''));}
 const unique=[...new Set(routes)];const today=new Date().toISOString().slice(0,10);const sitemap=['<?xml version="1.0" encoding="UTF-8"?>','<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',...unique.map(u=>`  <url><loc>https://wealtharrays.com${u}</loc><lastmod>${today}</lastmod></url>`),'</urlset>',''].join('\n');fs.writeFileSync(path.join(root,'sitemap.xml'),sitemap,'utf8');
-console.log(`Root-cause build complete: single canonical runtime ownership, 20 split definitions, CLS reservation, deterministic sitemap, ${allHtml.length} HTML files normalized.`);
+console.log(`Root-cause build complete: single canonical runtime ownership, dedicated calculator search, 20 split definitions, absolute styles, CLS reservation, deterministic sitemap, ${allHtml.length} HTML files normalized.`);
