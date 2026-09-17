@@ -40,7 +40,7 @@ for (const file of guides) {
   assert(/<link[^>]+rel=["']canonical["'][^>]+href=["']https:\/\/wealtharrays\.com\/articles\//i.test(html), `${full}: missing canonical`);
   assert(/BreadcrumbList/i.test(html), `${full}: missing BreadcrumbList JSON-LD`);
   assert(/Article/i.test(html), `${full}: missing Article JSON-LD`);
-  const calculatorLinks = count(/href=["'][^"']*calculator[^"']*\.html["']/gi, html);
+  const calculatorLinks = count(/href=["'][^"']*(?:calculator(?:\/|["'#?\s])|(?:sip|compound-interest|mortgage-emi|roi|simple-interest|retirement|salary-to-hourly|profit-margin|fixed-deposit|recurring-deposit|lumpsum|cagr|car-loan|personal-loan|debt-payoff|inflation|net-worth|overtime-pay|freelance-rate|income-tax-scenario)-calculator(?:\/|["'#?\s]))/gi, html);
   if (calculatorLinks < 1) warnings.push(`${full}: no calculator link detected`);
   for (const old of stale) assert(!html.includes(old), `${full}: stale retired URL ${old}`);
 }
