@@ -31,11 +31,19 @@ if(!styles.includes('z-index:1000'))throw new Error('Homepage search parent z-in
 const calcSearch=fs.readFileSync('calculator-search.js','utf8');
 for(const needle of ['toLowerCase().trim()','addEventListener(\'input\'', 'k=normalize(c[3])','s=normalize(c[1])'])if(!calcSearch.includes(needle))throw new Error(`Calculator search regression missing: ${needle}`);
 if(!calcSearch.includes('new MutationObserver'))throw new Error('Calculator search must recover when widget markup mounts late');
-if(!calcSearch.includes('setTimeout(install,2500)'))throw new Error('Calculator search retry window missing');
+if(!/setTimeout\(install,\s*(?:ms|2500)/.test(calcSearch))throw new Error('Calculator search retry window missing');
 
 const enhancement=fs.readFileSync('calculator-enhancements.js','utf8');
 if(!enhancement.includes("new URL('/icon-512.png',window.location.origin).href"))throw new Error('PDF export must use current icon-512.png');
 if(!enhancement.includes('id="wa-pdf-logo"'))throw new Error('PDF report logo element missing');
+
+const hotfix=fs.readFileSync('production-hotfix.js','utf8');
+if(!hotfix.includes("production-hotfix"))throw new Error('Production hotfix loader missing');
+if(!hotfix.includes("#currency-select"))throw new Error('Header dedupe hotfix missing');
+if(!hotfix.includes("calculator-search.js"))throw new Error('Calculator search hotfix loader missing');
+if(!hotfix.includes("pdf-export-fix.js"))throw new Error('PDF hotfix loader missing');
+const themeInit=fs.readFileSync('theme-init.js','utf8');
+if(!themeInit.includes('/production-hotfix.js?v=20260918'))throw new Error('Theme bootstrap must load production hotfix');
 
 const favicon=fs.readFileSync('favicon.svg','utf8');
 if(!favicon.includes('width="512"')||!favicon.includes('height="512"')||!favicon.includes('viewBox="0 0 512 512"'))throw new Error('favicon.svg must declare a 512x512 viewBox and dimensions');
@@ -43,4 +51,4 @@ if(!favicon.includes('width="512"')||!favicon.includes('height="512"')||!favicon
 const sitemap=fs.readFileSync('sitemap.xml','utf8');if(!sitemap.includes('<urlset'))throw new Error('Sitemap root missing');if(sitemap.includes('calculator.html</loc>'))throw new Error('Legacy calculator URL leaked into sitemap');if(!sitemap.includes('/sip-calculator/</loc>'))throw new Error('Canonical calculator route missing from sitemap');
 const redirects=fs.readFileSync('_redirects','utf8');for(const slug of calculators.map(x=>x.replace('.html','')))if(!redirects.includes(`/${slug} /${slug}/ 301`))throw new Error(`Missing slash redirect: ${slug}`);
 const runtime=fs.readFileSync('wa-calculator-runtime.js','utf8');if(runtime.includes('WA CANONICAL MODULE | calculator | calculators.js'))throw new Error('All 20 definitions are still bundled');
-console.log(`Root-cause audit PASS — ${calculators.length} calculators, ${guides.length} guides, search stacking/matching, current PDF branding, favicon metadata, schemas, canonical routes and generated sitemap verified.`);
+console.log(`Root-cause audit PASS — ${calculators.length} calculators, ${guides.length} guides, search stacking/matching, current PDF branding, production hotfix, favicon metadata, schemas, canonical routes and generated sitemap verified.`);
