@@ -8,8 +8,8 @@ const calculatorPages = ['sip-calculator.html','compound-interest-calculator.htm
 const siteMatch = BUILD.match(/const siteSources = \[([^\]]+)\]/);
 if (!siteMatch) throw new Error('Cannot locate siteSources in stabilization build');
 const siteSources = [...siteMatch[1].matchAll(/'([^']+)'/g)].map(m => m[1]);
-const sources = ['calculators.js','widget.js',...siteSources,'calculator-safety.js','calculator-page-init.js','calculator-enhancements.js'];
-if (sources.length !== 14) throw new Error(`Expected 14 canonical source modules, found ${sources.length}`);
+const sources = ['widget.js',...siteSources,'calculator-safety.js','calculator-page-init.js','calculator-enhancements.js'];
+if (sources.length !== 11) throw new Error(`Expected 11 canonical source modules, found ${sources.length}`);
 
 for (const file of sources) {
   if (!fs.existsSync(file)) throw new Error(`Missing canonical source: ${file}`);
@@ -24,11 +24,13 @@ if (markerCount !== sources.length) throw new Error(`Expected ${sources.length} 
 for (const page of calculatorPages) {
   const html = fs.readFileSync(page,'utf8');
   if ((html.match(/wa-calculator-runtime\.js(?:\?[^"']*)?/g) || []).length !== 1) throw new Error(`${page}: canonical runtime ownership violation`);
-  const scriptNames = [...html.matchAll(/<script\s+src=["']([^"']+)["'][^>]*><\/script>/gi)].map(m=>m[1].split('?')[0].split('/').pop());
+  const id = html.match(/data-wa-calculator="([^"]+)"/i)?.[1];
+  if (!id || !fs.existsSync(`calculator-definitions/${id}.js`)) throw new Error(`${page}: missing split calculator definition`);
+  const scriptNames = [...html.matchAll(/<script\s+src=["']([^"']+)[^>]*><\/script>/gi)].map(m=>m[1].split('?')[0].split('/').pop());
   for (const file of sources) if (scriptNames.includes(file)) throw new Error(`${page}: source module must not be directly page-loaded: ${file}`);
 }
 
 if (fs.statSync('wa-calculator-runtime.js').size > 750_000) throw new Error('Canonical runtime exceeded 750 KB budget');
 if (fs.statSync('wa-site-runtime.js').size > 750_000) throw new Error('Canonical site runtime exceeded 750 KB budget');
 if (fs.existsSync('node_modules')) throw new Error('node_modules must never be present in the deployable tree');
-console.log(`Architecture audit PASS — ${sources.length} canonical source modules, fresh hash-provenance bundles, and ${calculatorPages.length}/20 calculators with single runtime ownership.`);
+console.log(`Architecture audit PASS — ${sources.length} canonical source modules, fresh hash-provenance bundles, split calculator definitions, and ${calculatorPages.length}/20 calculators with single runtime ownership.`);
