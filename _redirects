@@ -7,12 +7,34 @@
 /p/privacy.html /privacy.html 301
 /p/terms.html /terms.html 301
 
+# Calculator .html -> clean slash routes.
+/sip-calculator.html /sip-calculator/ 301
+/compound-interest-calculator.html /compound-interest-calculator/ 301
+/mortgage-emi-calculator.html /mortgage-emi-calculator/ 301
+/roi-calculator.html /roi-calculator/ 301
+/simple-interest-calculator.html /simple-interest-calculator/ 301
+/retirement-calculator.html /retirement-calculator/ 301
+/salary-to-hourly-calculator.html /salary-to-hourly-calculator/ 301
+/profit-margin-calculator.html /profit-margin-calculator/ 301
+/fixed-deposit-calculator.html /fixed-deposit-calculator/ 301
+/recurring-deposit-calculator.html /recurring-deposit-calculator/ 301
+/lumpsum-calculator.html /lumpsum-calculator/ 301
+/cagr-calculator.html /cagr-calculator/ 301
+/car-loan-calculator.html /car-loan-calculator/ 301
+/personal-loan-calculator.html /personal-loan-calculator/ 301
+/debt-payoff-calculator.html /debt-payoff-calculator/ 301
+/inflation-calculator.html /inflation-calculator/ 301
+/net-worth-calculator.html /net-worth-calculator/ 301
+/overtime-pay-calculator.html /overtime-pay-calculator/ 301
+/freelance-rate-calculator.html /freelance-rate-calculator/ 301
+/income-tax-scenario-calculator.html /income-tax-scenario-calculator/ 301
+
 # Known obsolete legacy content: redirect only where a close, useful replacement exists.
-/p/pricing-freelance-projects-how.html /freelance-rate-calculator.html 301
+/p/pricing-freelance-projects-how.html /freelance-rate-calculator/ 301
 /p/demystifying-geometric-compound.html /articles/compound-interest-guide.html 301
-/p/decoding-profit-margins-gross-operating.html /profit-margin-calculator.html 301
+/p/decoding-profit-margins-gross-operating.html /profit-margin-calculator/ 301
 /p/mastering-return-on-investment-roi-how.html /articles/roi-guide.html 301
-/p/understanding-cpi-currency-degradation.html /inflation-calculator.html 301
+/p/understanding-cpi-currency-degradation.html /inflation-calculator/ 301
 
 # Keep repository-only QA scripts from being served as public pages.
 /qa/* /404.html 302
