@@ -6,7 +6,6 @@
   const esc=v=>String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
   const format=(v,f)=>window.waFormatValue?window.waFormatValue(v,f):String(v??'');
   function report(calc,values,results){
-    // favicon.svg is the canonical current Wealth Arrays mark. Never use favicon-v2/v3 here.
     const logo=new URL('/favicon.svg',window.location.origin).href;
     const inputs=calc.fields.map(f=>`<tr><td>${esc(f.label)}</td><td>${esc(values[f.id]??'')}</td></tr>`).join('');
     const rows=results.map(r=>`<tr><td>${esc(r.label)}</td><td>${esc(format(r.value,r.format))}</td></tr>`).join('');
@@ -17,10 +16,14 @@
   }
   function findCalculator(id){const list=window.CALCULATORS||[];return list.find(c=>c.id===id)||list.find(c=>c.slug===id)||list.find(c=>c.title?.toLowerCase()===document.querySelector('.calc-title')?.textContent.trim().toLowerCase());}
   document.addEventListener('click',function(event){
-    const button=event.target.closest('[id$="-export"]');if(!button)return;
+    const button=event.target.closest('button,a,[role="button"]');
+    if(!button)return;
+    const text=(button.textContent||'').trim();
+    const isPdf=/\b(pdf|print report|export report)\b/i.test(text)||/pdf|export/i.test(button.id||'')||/pdf|export/i.test(button.getAttribute('data-action')||'');
+    if(!isPdf||button.classList.contains('no-print'))return;
     const calc=findCalculator(document.documentElement.dataset.waCalculator||'');if(!calc)return;
     event.preventDefault();event.stopImmediatePropagation();
-    const values={};calc.fields.forEach(f=>{const el=document.getElementById(`f-${f.id}`);if(el)values[f.id]=f.type==='select'?el.value:(String(el.value).trim()===''?NaN:Number(el.value));});
+    const values={};calc.fields.forEach(f=>{const el=document.getElementById(`f-${f.id}`)||document.querySelector(`[name="${CSS.escape(f.id)}"]`);if(el)values[f.id]=f.type==='select'?el.value:(String(el.value).trim()===''?NaN:Number(el.value));});
     let results=[];try{results=calc.compute(values)||[]}catch(e){return;}if(results.length)report(calc,values,results);
   },true);
 })();
