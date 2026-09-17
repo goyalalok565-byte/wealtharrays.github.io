@@ -9,7 +9,8 @@ const write=(f,s)=>fs.writeFileSync(path.join(root,f),s,'utf8');
 for(const name of ['about.html','404.html','privacy-policy.html','editorial-standards.html','income-tax-planner.html','decoding-auto-financing-how-car-loan.html']){
   let s=read(name);
   if(!s.includes('href="/styles.css"') && !s.includes("href='/styles.css'")){
-    s=s.replace('<link rel="stylesheet" href="/phase3-seo.css?v=20260915-1">','<link rel="preload" as="style" href="/styles.css"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/phase3-seo.css?v=20260915-1">');
+    s=s.replace('</head>','<link rel="preload" as="style" href="/styles.css"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/phase3-seo.css?v=20260915-1"></head>');
+    s=s.replace(/<link rel="stylesheet" href=["']\/phase3-seo\.css\?v=20260915-1["']>/g,'');
     write(name,s);
   }
 }
