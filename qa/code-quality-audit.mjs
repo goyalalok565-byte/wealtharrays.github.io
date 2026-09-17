@@ -3,7 +3,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 
 const root = process.cwd();
-const canonicalSources = ['calculators.js','widget.js','wa-core.js','site-runtime.js','final-polish.js','wa-enhancements.js','theme-fix.js','phase2-intelligence.js','phase2-retirement.js','phase3-seo.js','calculator-page-init.js','phase4-premium.js'];
+const canonicalSources = ['widget.js','wa-core.js','site-runtime.js','final-polish.js','wa-enhancements.js','theme-fix.js','phase3-seo.js','calculator-page-init.js','phase4-premium.js'];
 const siteSources = ['wa-core.js','site-runtime.js','final-polish.js','wa-enhancements.js','theme-fix.js','phase3-seo.js','phase4-premium.js'];
 const supportSources = ['theme-init.js','404-runtime.js'];
 const sourceFiles = [...canonicalSources,...supportSources];
@@ -21,6 +21,7 @@ for(const file of ['phase2-intelligence.js','phase2-retirement.js']){const hash=
 
 const pages=fs.readdirSync(root).filter(f=>f.endsWith('.html')).filter(f=>fs.readFileSync(f,'utf8').includes('wa-calculator-runtime.js'));
 if(pages.length!==20) throw new Error(`Expected 20 calculator runtime pages, found ${pages.length}`);
+for(const page of pages){const id=fs.readFileSync(page,'utf8').match(/data-wa-calculator="([^"]+)"/i)?.[1];if(!id||!fs.existsSync(path.join(root,'calculator-definitions',`${id}.js`))) throw new Error(`${page}: missing split calculator definition for ${id||'unknown'}`);}
 for(const page of pages){const html=fs.readFileSync(page,'utf8');const srcs=[...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi)].map(m=>m[1]);const loadedBasenames=new Set(srcs.map(src=>src.split('?')[0].split('#')[0].split('/').pop()));for(const file of canonicalSources) if(loadedBasenames.has(file)) throw new Error(`${page}: direct calculator runtime dependency ${file}`);}
 
 if(fs.existsSync('calculator-runtime.js')) throw new Error('Retired calculator-runtime.js must not exist');
