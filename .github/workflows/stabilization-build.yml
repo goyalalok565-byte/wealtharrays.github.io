@@ -47,7 +47,9 @@ jobs:
         run: |
           set -euo pipefail
           for file in styles.css phase3-seo.css phase4-premium.css cls-fixes.css; do
-            npx --yes clean-css-cli@5 --level 2 --output "$file" -- "$file"
+            tmp="${file}.min"
+            npx --yes clean-css-cli@5 -O2 -o "$tmp" "$file"
+            mv "$tmp" "$file"
           done
       - name: Version runtime assets by content hash
         run: node scripts/version-runtime-assets.mjs
