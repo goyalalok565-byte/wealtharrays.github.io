@@ -18,22 +18,35 @@ function walk(dir) {
 }
 walk(root);
 
-const read = (file) => fs.readFileSync(file, 'utf8');
-const rel = (file) => path.relative(root, file).replaceAll(path.sep, '/') || 'index.html';
+const read = file => fs.readFileSync(file, 'utf8');
+const rel = file => path.relative(root, file).replaceAll(path.sep, '/') || 'index.html';
 const attr = (html, name, value) => {
   const re = new RegExp(`<meta[^>]+${name}=["']${value}["'][^>]+content=["']([^"']*)["']|<meta[^>]+content=["']([^"']*)["'][^>]+${name}=["']${value}["']`, 'i');
   const m = html.match(re);
   return (m?.[1] || m?.[2] || '').trim();
 };
-const canonical = (html) => html.match(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i)?.[1]?.trim() || '';
-const title = (html) => html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]?.trim() || '';
-const h1Count = (html) => (html.match(/<h1\b/gi) || []).length;
-const robots = (html) => attr(html, 'name', 'robots');
-const indexable = (html) => !/noindex/i.test(robots(html));
-const canonicalHost = (url) => url.startsWith(publicUrl);
+const canonical = html => html.match(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i)?.[1]?.trim() || '';
+const title = html => html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]?.trim() || '';
+const h1Count = html => (html.match(/<h1\b/gi) || []).length;
+const robots = html => attr(html, 'name', 'robots');
+const indexable = html => !/noindex/i.test(robots(html));
+const canonicalHost = url => url.startsWith(publicUrl);
+
+function repositoryFileForUrl(url) {
+  const pathname = new URL(url).pathname.replace(/^\//, '');
+  const candidates = [pathname || 'index.html'];
+  if (pathname && pathname.endsWith('/')) candidates.unshift(path.join(pathname, 'index.html'));
+  else if (pathname && !path.extname(pathname)) candidates.push(`${pathname}.html`, path.join(pathname, 'index.html'));
+  for (const candidate of candidates) {
+    const target = path.join(root, candidate);
+    if (fs.existsSync(target) && fs.statSync(target).isFile()) return target;
+  }
+  return null;
+}
 
 const seenTitles = new Map();
 const seenDescriptions = new Map();
+const pageByCanonical = new Map();
 for (const file of htmlFiles) {
   const html = read(file);
   const name = rel(file);
@@ -41,6 +54,7 @@ for (const file of htmlFiles) {
   const d = attr(html, 'name', 'description');
   const c = canonical(html);
   const isIndexable = indexable(html);
+  const canonicalKey = c || `file:${name}`;
 
   if (isIndexable) {
     if (!t) errors.push(`${name}: missing title`);
@@ -48,21 +62,29 @@ for (const file of htmlFiles) {
     if (!c) errors.push(`${name}: indexable page missing canonical`);
     if (c && !canonicalHost(c)) errors.push(`${name}: canonical is outside wealtharrays.com`);
     if (h1Count(html) !== 1) errors.push(`${name}: expected exactly one H1, found ${h1Count(html)}`);
+    const pages = pageByCanonical.get(canonicalKey) || [];
+    pages.push(name); pageByCanonical.set(canonicalKey, pages);
   }
 
   if (isIndexable && t) {
     const list = seenTitles.get(t) || [];
-    list.push(name); seenTitles.set(t, list);
+    list.push({ name, canonical: canonicalKey }); seenTitles.set(t, list);
   }
   if (isIndexable && d) {
     const list = seenDescriptions.get(d) || [];
-    list.push(name); seenDescriptions.set(d, list);
+    list.push({ name, canonical: canonicalKey }); seenDescriptions.set(d, list);
   }
   if (/smart\.js/i.test(html)) errors.push(`${name}: retired smart.js reference found`);
 }
 
-for (const [value, pages] of seenTitles) if (pages.length > 1) errors.push(`Duplicate title: ${pages.join(', ')}`);
-for (const [value, pages] of seenDescriptions) if (pages.length > 1) warnings.push(`Duplicate meta description: ${pages.join(', ')}`);
+for (const [value, pages] of seenTitles) {
+  const canonicalGroups = new Set(pages.map(p => p.canonical));
+  if (canonicalGroups.size > 1) errors.push(`Duplicate title across canonical pages: ${pages.map(p => p.name).join(', ')}`);
+}
+for (const [value, pages] of seenDescriptions) {
+  const canonicalGroups = new Set(pages.map(p => p.canonical));
+  if (canonicalGroups.size > 1) warnings.push(`Duplicate meta description across canonical pages: ${pages.map(p => p.name).join(', ')}`);
+}
 
 const sitemapPath = path.join(root, 'sitemap.xml');
 const robotsPath = path.join(root, 'robots.txt');
@@ -81,10 +103,9 @@ if (fs.existsSync(sitemapPath)) {
     if (seen.has(url)) errors.push(`Duplicate sitemap URL: ${url}`);
     seen.add(url);
     if (!canonicalHost(url)) errors.push(`Sitemap URL outside canonical host: ${url}`);
-    const pathname = new URL(url).pathname.replace(/^\//, '') || 'index.html';
-    const target = path.join(root, pathname);
-    if (!fs.existsSync(target)) errors.push(`Sitemap URL has no repository file: ${url}`);
-    else if (target.endsWith('.html') && !indexable(read(target))) errors.push(`Sitemap contains noindex page: ${url}`);
+    const target = repositoryFileForUrl(url);
+    if (!target) errors.push(`Sitemap URL has no repository file/route: ${url}`);
+    else if (!indexable(read(target))) errors.push(`Sitemap contains noindex page: ${url}`);
   }
   if (sitemapLocs.length < 20) warnings.push(`Sitemap has only ${sitemapLocs.length} URLs; verify intentional coverage.`);
 }
@@ -108,15 +129,14 @@ for (const requiredFile of ['about.html', 'contact.html', 'privacy.html', 'terms
 
 const calculatorUrls = sitemapLocs.filter(url => {
   try {
-    const pathname = new URL(url).pathname.replace(/^\//, '');
-    return pathname.endsWith('-calculator.html') && !pathname.includes('/');
+    const pathname = new URL(url).pathname;
+    return /^\/[a-z0-9-]+-calculator\/$/i.test(pathname);
   } catch { return false; }
 });
 if (calculatorUrls.length !== 20) errors.push(`Expected 20 calculator pages in sitemap, found ${calculatorUrls.length}`);
 for (const url of calculatorUrls) {
-  const pathname = new URL(url).pathname.replace(/^\//, '');
-  const file = path.join(root, pathname);
-  if (!fs.existsSync(file)) continue;
+  const file = repositoryFileForUrl(url);
+  if (!file) continue;
   const html = read(file);
   const name = rel(file);
   if (!/wa-calculator-runtime\.js/i.test(html)) errors.push(`${name}: canonical calculator runtime missing`);
