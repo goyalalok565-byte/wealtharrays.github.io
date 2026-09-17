@@ -4,7 +4,7 @@ import crypto from 'node:crypto';
 
 const root = process.cwd();
 const canonicalSources = ['calculators.js','widget.js','wa-core.js','site-runtime.js','final-polish.js','wa-enhancements.js','theme-fix.js','phase2-intelligence.js','phase2-retirement.js','phase3-seo.js','calculator-page-init.js','phase4-premium.js'];
-const siteSources = ['wa-core.js','site-runtime.js','final-polish.js','wa-enhancements.js','theme-fix.js','phase2-intelligence.js','phase2-retirement.js','phase3-seo.js','phase4-premium.js'];
+const siteSources = ['wa-core.js','site-runtime.js','final-polish.js','wa-enhancements.js','theme-fix.js','phase3-seo.js','phase4-premium.js'];
 const supportSources = ['theme-init.js','404-runtime.js'];
 const sourceFiles = [...canonicalSources,...supportSources];
 for(const file of sourceFiles) if(!fs.existsSync(path.join(root,file))) throw new Error(`Missing source: ${file}`);
@@ -26,4 +26,4 @@ if(fs.existsSync('calculator-runtime.js')) throw new Error('Retired calculator-r
 if(fs.statSync('wa-calculator-runtime.js').size>750_000) throw new Error(`Canonical calculator runtime exceeds 750 KB`);
 if(fs.statSync('wa-site-runtime.js').size>750_000) throw new Error(`Canonical site runtime exceeds 750 KB`);
 if(fs.existsSync('node_modules')) throw new Error('node_modules must not exist in deployable tree');
-console.log(`Code-quality audit PASS — ${canonicalSources.length} canonical source modules plus ${supportSources.length} support modules are unique; calculator/site provenance is fresh; calculator pages are isolated from direct source dependencies; deploy-tree hygiene is clean.`);
+console.log(`Code-quality audit PASS — ${canonicalSources.length} canonical calculator source modules plus ${supportSources.length} support modules are unique; calculator/site provenance is fresh; calculator pages are isolated from direct source dependencies; deploy-tree hygiene is clean.`);
