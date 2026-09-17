@@ -1,6 +1,6 @@
 /* Wealth Arrays canonical site runtime bundle.
  * Generated from CURRENT main sources by scripts/phase-stabilization-build.mjs.
- * Build date: 20260916
+ * Build date: 20260917
  */
 (function(){
   const key = "__WA_CANONICAL_SITE_RUNTIME_BUNDLE__";

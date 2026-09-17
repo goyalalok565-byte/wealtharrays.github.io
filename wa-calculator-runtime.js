@@ -1,6 +1,6 @@
 /* Wealth Arrays canonical calculator runtime bundle.
  * Generated from CURRENT main sources by scripts/phase-stabilization-build.mjs.
- * Build date: 20260916
+ * Build date: 20260917
  */
 (function(){
   const key = "__WA_CANONICAL_CALCULATOR_RUNTIME_BUNDLE__";
