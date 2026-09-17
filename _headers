@@ -17,6 +17,12 @@
 /*.js
   Cache-Control: public, max-age=3600, stale-while-revalidate
 
+/wa-site-runtime.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/wa-calculator-runtime.js
+  Cache-Control: public, max-age=0, must-revalidate
+
 /*.svg
   Cache-Control: public, max-age=86400, stale-while-revalidate
 
