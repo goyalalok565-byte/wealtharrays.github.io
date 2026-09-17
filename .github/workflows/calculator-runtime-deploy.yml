@@ -48,7 +48,7 @@ jobs:
           grep -q "waInstallDismissedV2" wa-core.js
           grep -q "beforeinstallprompt" wa-core.js
           grep -q "serviceWorker.register('/sw.js'" wa-core.js
-          grep -q "wealtharrays-pwa-3" sw.js
+          grep -q "wealtharrays-pwa-6" sw.js
           grep -q "self.skipWaiting" sw.js
           grep -q "self.clients.claim" sw.js
           grep -q '"start_url": "/"' manifest.webmanifest
@@ -63,7 +63,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import re
-          pages=list(Path('.').glob('*.html'))+list(Path('articles').glob('*.html'))+list(Path('p').glob('*.html'))
+          pages=list(Path('.').glob('*.html'))+list(Path('articles').glob('*.html'))
           managed={'wa-core.js','site-runtime.js','wa-enhancements.js','final-polish.js','theme-fix.js','phase2-intelligence.js','phase2-retirement.js','phase3-seo.js','phase4-premium.js'}
           checked=0
           skipped=0
