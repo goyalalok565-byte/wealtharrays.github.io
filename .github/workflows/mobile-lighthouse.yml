@@ -1,0 +1,60 @@
+name: Mobile Lighthouse 95+ Gate
+
+on:
+  workflow_run:
+    workflows: ["Wealth Arrays Stabilization Build"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for production
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 60); do
+            if curl -fsSL https://wealtharrays.com/ >/dev/null; then
+              echo "Production is reachable."
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Production did not become reachable."
+          exit 1
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Lighthouse
+        run: npm install --no-save lighthouse@13.0.1
+      - name: Run mobile Lighthouse
+        run: |
+          npx lighthouse https://wealtharrays.com/ \
+            --form-factor=mobile \
+            --screenEmulation.mobile=true \
+            --only-categories=performance,accessibility,best-practices,seo \
+            --output=json \
+            --output-path=/tmp/lighthouse.json \
+            --chrome-flags='--headless --no-sandbox'
+      - name: Enforce 95+ category scores
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const r=JSON.parse(fs.readFileSync('/tmp/lighthouse.json','utf8'));
+          const cats=r.categories||{};
+          const names=['performance','accessibility','best-practices','seo'];
+          const scores=Object.fromEntries(names.map(n=>[n,Math.round((cats[n]?.score||0)*100)]));
+          console.log(JSON.stringify(scores,null,2));
+          const failures=names.filter(n=>scores[n]<95);
+          if(failures.length){
+            console.error('95+ gate failed:',failures.map(n=>`${n}=${scores[n]}`).join(', '));
+            process.exit(1);
+          }
+          console.log('Mobile Lighthouse 95+ gate passed.');
+          NODE
