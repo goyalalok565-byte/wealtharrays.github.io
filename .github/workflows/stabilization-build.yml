@@ -31,6 +31,8 @@ jobs:
         run: node qa/calculator-regression.mjs
       - name: Build canonical runtime
         run: node scripts/phase-stabilization-build.mjs
+      - name: Split calculator-only Phase 2 code from site runtime
+        run: node scripts/strip-site-phase2.mjs
       - name: Normalize legacy route alias links
         run: node scripts/fix-route-alias-links.mjs
       - name: Normalize nested canonical links
