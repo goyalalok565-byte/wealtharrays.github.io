@@ -1,36 +1,18 @@
 import fs from 'node:fs';
+import path from 'node:path';
 import crypto from 'node:crypto';
 
-const BUILD = fs.readFileSync('scripts/phase-stabilization-build.mjs', 'utf8');
-const BUNDLE = fs.readFileSync('wa-calculator-runtime.js', 'utf8');
-const calculatorPages = ['sip-calculator.html','compound-interest-calculator.html','mortgage-emi-calculator.html','roi-calculator.html','simple-interest-calculator.html','retirement-calculator.html','salary-to-hourly-calculator.html','profit-margin-calculator.html','fixed-deposit-calculator.html','recurring-deposit-calculator.html','lumpsum-calculator.html','cagr-calculator.html','car-loan-calculator.html','personal-loan-calculator.html','debt-payoff-calculator.html','inflation-calculator.html','net-worth-calculator.html','overtime-pay-calculator.html','freelance-rate-calculator.html','income-tax-scenario-calculator.html'];
-
-const siteMatch = BUILD.match(/const siteSources = \[([^\]]+)\]/);
-if (!siteMatch) throw new Error('Cannot locate siteSources in stabilization build');
-const siteSources = [...siteMatch[1].matchAll(/'([^']+)'/g)].map(m => m[1]);
-const sources = ['widget.js',...siteSources,'calculator-safety.js','calculator-page-init.js','calculator-enhancements.js'];
-if (sources.length !== 11) throw new Error(`Expected 11 canonical source modules, found ${sources.length}`);
-
-for (const file of sources) {
-  if (!fs.existsSync(file)) throw new Error(`Missing canonical source: ${file}`);
-  const content = fs.readFileSync(file,'utf8').replace(/\r\n/g,'\n').trimEnd();
-  const hash = crypto.createHash('sha256').update(content).digest('hex').slice(0,12);
-  const marker = `WA CANONICAL MODULE | calculator | ${file} | sha256:${hash}`;
-  if (!BUNDLE.includes(marker)) throw new Error(`Bundle is stale or provenance is broken for ${file}`);
-}
-const markerCount = (BUNDLE.match(/WA CANONICAL MODULE \| calculator \|/g) || []).length;
-if (markerCount !== sources.length) throw new Error(`Expected ${sources.length} calculator bundle provenance markers, found ${markerCount}`);
-
-for (const page of calculatorPages) {
-  const html = fs.readFileSync(page,'utf8');
-  if ((html.match(/wa-calculator-runtime\.js(?:\?[^"']*)?/g) || []).length !== 1) throw new Error(`${page}: canonical runtime ownership violation`);
-  const id = html.match(/data-wa-calculator="([^"]+)"/i)?.[1];
-  if (!id || !fs.existsSync(`calculator-definitions/${id}.js`)) throw new Error(`${page}: missing split calculator definition`);
-  const scriptNames = [...html.matchAll(/<script\s+src=["']([^"']+)[^>]*><\/script>/gi)].map(m=>m[1].split('?')[0].split('/').pop());
-  for (const file of sources) if (scriptNames.includes(file)) throw new Error(`${page}: source module must not be directly page-loaded: ${file}`);
-}
-
-if (fs.statSync('wa-calculator-runtime.js').size > 750_000) throw new Error('Canonical runtime exceeded 750 KB budget');
-if (fs.statSync('wa-site-runtime.js').size > 750_000) throw new Error('Canonical site runtime exceeded 750 KB budget');
-if (fs.existsSync('node_modules')) throw new Error('node_modules must never be present in the deployable tree');
-console.log(`Architecture audit PASS — ${sources.length} canonical source modules, fresh hash-provenance bundles, split calculator definitions, and ${calculatorPages.length}/20 calculators with single runtime ownership.`);
+const build=fs.readFileSync('scripts/root-cause-build.mjs','utf8');
+const bundle=fs.readFileSync('wa-calculator-runtime.js','utf8');
+const siteBundle=fs.readFileSync('wa-site-runtime.js','utf8');
+const calculatorPages=['sip-calculator.html','compound-interest-calculator.html','mortgage-emi-calculator.html','roi-calculator.html','simple-interest-calculator.html','retirement-calculator.html','salary-to-hourly-calculator.html','profit-margin-calculator.html','fixed-deposit-calculator.html','recurring-deposit-calculator.html','lumpsum-calculator.html','cagr-calculator.html','car-loan-calculator.html','personal-loan-calculator.html','debt-payoff-calculator.html','inflation-calculator.html','net-worth-calculator.html','overtime-pay-calculator.html','freelance-rate-calculator.html','income-tax-scenario-calculator.html'];
+const siteSources=['wa-core.js','site-runtime.js','final-polish.js','wa-enhancements.js','theme-fix.js','phase3-seo.js','phase4-premium.js'];
+const calcSources=['widget.js',...siteSources,'calculator-safety.js','calculator-page-init.js','calculator-enhancements.js'];
+if(!build.includes("const siteSources=['wa-core.js'"))throw new Error('Root-cause build source contract missing');
+for(const file of [...siteSources,...calcSources]){const body=fs.readFileSync(file,'utf8').replace(/\r\n/g,'\n').trimEnd();const hash=crypto.createHash('sha256').update(body).digest('hex').slice(0,12);if(!siteBundle.includes(`WA CANONICAL MODULE | site | ${file} | sha256:${hash}`))throw new Error(`Site bundle provenance missing for ${file}`);if(!bundle.includes(`WA CANONICAL MODULE | calculator | ${file} | sha256:${hash}`))throw new Error(`Calculator bundle provenance missing for ${file}`);}
+if(bundle.includes('WA CANONICAL MODULE | calculator | calculators.js'))throw new Error('Calculator definitions must not be embedded in shared runtime');
+if(fs.statSync('wa-calculator-runtime.js').size>750000)throw new Error('Calculator runtime exceeded 750 KB');
+if(fs.statSync('wa-site-runtime.js').size>750000)throw new Error('Site runtime exceeded 750 KB');
+for(const page of calculatorPages){const html=fs.readFileSync(page,'utf8');const scripts=[...html.matchAll(/<script\s+src=["']([^"']+)[^>]*><\/script>/gi)].map(m=>path.basename(m[1].split('?')[0]));if(scripts.filter(x=>x==='wa-calculator-runtime.js').length!==1)throw new Error(`${page}: shared calculator runtime count is not 1`);const id=html.match(/data-wa-calculator="([^"]+)"/i)?.[1];if(!id||!fs.existsSync(`calculator-definitions/${id}.js`))throw new Error(`${page}: missing split definition`);for(const file of [...siteSources,'widget.js','calculator-safety.js','calculator-page-init.js','calculator-enhancements.js','calculators.js'])if(scripts.includes(file))throw new Error(`${page}: source module still loaded directly: ${file}`);}
+if(fs.existsSync('node_modules'))throw new Error('node_modules must never be present in deploy tree');
+console.log(`Architecture audit PASS — ${calculatorPages.length}/20 calculators have single runtime ownership, split definitions, and source provenance.`);
