@@ -35,8 +35,12 @@ jobs:
         run: node scripts/fix-route-alias-links.mjs
       - name: Normalize nested canonical links
         run: node scripts/normalize-nested-links.mjs
+      - name: Normalize accessible names
+        run: node scripts/fix-accessible-names.mjs
       - name: Optimize critical resource hints
         run: node scripts/optimize-resource-hints.mjs
+      - name: Minify production site bundle
+        run: npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output wa-site-runtime.js -- wa-site-runtime.js
       - name: Minify production calculator bundle
         run: npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output wa-calculator-runtime.js -- wa-calculator-runtime.js
       - name: Version runtime assets by content hash
