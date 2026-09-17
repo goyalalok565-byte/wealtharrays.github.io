@@ -4,8 +4,9 @@ import crypto from 'node:crypto';
 
 const root=process.cwd();
 const hash=file=>crypto.createHash('sha256').update(fs.readFileSync(path.join(root,file))).digest('hex').slice(0,12);
-const siteVersion=hash('wa-site-runtime.js');
-const calculatorVersion=hash('wa-calculator-runtime.js');
+const RUNTIME_CACHE_EPOCH='20260917-2';
+const siteVersion=`${hash('wa-site-runtime.js')}-${RUNTIME_CACHE_EPOCH}`;
+const calculatorVersion=`${hash('wa-calculator-runtime.js')}-${RUNTIME_CACHE_EPOCH}`;
 const htmlFiles=[];
 const walk=dir=>{for(const entry of fs.readdirSync(dir,{withFileTypes:true})){const full=path.join(dir,entry.name);if(entry.isDirectory()){if(!['.git','node_modules'].includes(entry.name))walk(full);}else if(/\.html$/i.test(entry.name))htmlFiles.push(full);}};
 walk(root);
