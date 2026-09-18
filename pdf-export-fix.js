@@ -1,29 +1,187 @@
-/* Wealth Arrays — canonical PDF export branding fix. */
+/* Wealth Arrays — direct PDF download layer.
+ * Keeps the existing calculator report data and live SVG graph/pie chart.
+ * No print dialog, no text-only fallback, no external libraries.
+ */
 (function(){
   'use strict';
-  if(window.__WA_PDF_EXPORT_FIX__)return;
-  window.__WA_PDF_EXPORT_FIX__=true;
-  const esc=v=>String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
-  const format=(v,f)=>window.waFormatValue?window.waFormatValue(v,f):String(v??'');
-  function report(calc,values,results){
-    const logo=new URL('/favicon.svg',window.location.origin).href;
-    const inputs=calc.fields.map(f=>`<tr><td>${esc(f.label)}</td><td>${esc(values[f.id]??'')}</td></tr>`).join('');
-    const rows=results.map(r=>`<tr><td>${esc(r.label)}</td><td>${esc(format(r.value,r.format))}</td></tr>`).join('');
-    const html=`<!doctype html><html><head><meta charset="utf-8"><title>${esc(calc.title)} Report · Wealth Arrays</title><style>body{font-family:Arial,sans-serif;max-width:760px;margin:36px auto;padding:0 24px;color:#101828;background:#fff}header{display:flex;align-items:center;gap:14px;padding-bottom:18px;border-bottom:1px solid #e4e7ec;margin-bottom:24px}header img{width:56px;height:56px;object-fit:contain}header strong{display:block;font-size:17px}header span{display:block;margin-top:3px;color:#667085;font-size:10px;letter-spacing:.12em}h1{font-size:30px;margin:0 0 6px}h2{font-size:17px;margin:28px 0 8px}p{color:#667085}table{width:100%;border-collapse:collapse;margin:10px 0 24px;border:1px solid #e4e7ec}td{padding:11px;border-bottom:1px solid #eaecf0}td:last-child{text-align:right;font-weight:700}.no-print{padding:10px 16px;border:0;border-radius:8px;cursor:pointer}@media print{body{margin:18px auto;padding:0}.no-print{display:none}}</style></head><body><header><img id="wa-current-logo" src="${esc(logo)}" alt="Wealth Arrays logo" width="56" height="56"><div><strong>Wealth Arrays</strong><span>CALCULATION REPORT</span></div></header><h1>${esc(calc.title)}</h1><p>Generated from the assumptions you entered.</p><h2>Your inputs</h2><table>${inputs}</table><h2>Your calculated results</h2><table>${rows}</table><p>Educational estimate only. Not financial, tax, legal or investment advice.</p><button class="no-print" type="button" onclick="window.print()">Save as PDF</button><script>const logo=document.getElementById('wa-current-logo');function go(){setTimeout(()=>{try{window.focus();window.print()}catch(e){}},180)}if(logo.complete)go();else logo.addEventListener('load',go,{once:true});<\/script></body></html>`;
-    const win=window.open('','_blank');
-    if(!win){alert('Your browser blocked the PDF report window. Please allow pop-ups for Wealth Arrays and try again.');return;}
-    win.document.open();win.document.write(html);win.document.close();
+  if(window.__WA_DIRECT_PDF_EXPORT__)return;
+  window.__WA_DIRECT_PDF_EXPORT__=true;
+
+  const escText=v=>String(v??'')
+    .replace(/\\/g,'\\\\').replace(/\\(/g,'\\\\(').replace(/\\)/g,'\\\\)')
+    .replace(/[\\u0080-\\uFFFF]/g,'?');
+  const pdfText=v=>String(v??'')
+    .replace(/₹/g,'INR ').replace(/€/g,'EUR ').replace(/£/g,'GBP ')
+    .replace(/¥/g,'JPY ').replace(/₩/g,'KRW ').replace(/﷼/g,'SAR ')
+    .replace(/₺/g,'TRY ').replace(/₽/g,'RUB ').replace(/₦/g,'NGN ')
+    .replace(/[^\\x20-\\x7E]/g,'?');
+
+  function bytesFromBase64(data){
+    const raw=atob(data), out=new Uint8Array(raw.length);
+    for(let i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);
+    return out;
   }
-  function findCalculator(id){const list=window.CALCULATORS||[];return list.find(c=>c.id===id)||list.find(c=>c.slug===id)||list.find(c=>c.title?.toLowerCase()===document.querySelector('.calc-title')?.textContent.trim().toLowerCase());}
-  document.addEventListener('click',function(event){
-    const button=event.target.closest('button,a,[role="button"]');
-    if(!button)return;
-    const text=(button.textContent||'').trim();
-    const isPdf=/\b(pdf|print report|export report)\b/i.test(text)||/pdf|export/i.test(button.id||'')||/pdf|export/i.test(button.getAttribute('data-action')||'');
-    if(!isPdf||button.classList.contains('no-print'))return;
-    const calc=findCalculator(document.documentElement.dataset.waCalculator||'');if(!calc)return;
-    event.preventDefault();event.stopImmediatePropagation();
-    const values={};calc.fields.forEach(f=>{const el=document.getElementById(`f-${f.id}`)||document.querySelector(`[name="${CSS.escape(f.id)}"]`);if(el)values[f.id]=f.type==='select'?el.value:(String(el.value).trim()===''?NaN:Number(el.value));});
-    let results=[];try{results=calc.compute(values)||[]}catch(e){return;}if(results.length)report(calc,values,results);
-  },true);
+  function joinBytes(parts){
+    let n=0;parts.forEach(p=>n+=p.length);
+    const out=new Uint8Array(n);let o=0;
+    parts.forEach(p=>{out.set(p,o);o+=p.length;});
+    return out;
+  }
+  function ascii(s){return new TextEncoder().encode(s);}
+  function pdfObject(body){return ascii(body);}
+  function lineWrap(value,max){
+    const words=pdfText(value).split(/\\s+/), lines=[];let line='';
+    words.forEach(w=>{
+      if(!w)return;
+      const next=line?line+' '+w:w;
+      if(next.length>max&&line){lines.push(line);line=w;}else line=next;
+    });
+    if(line||!lines.length)lines.push(line);
+    return lines;
+  }
+
+  function makePdf(calc,values,results,chartData){
+    const W=595,H=842,M=42,CW=W-M*2;
+    const pages=[],current=[];
+    let y=H-48;
+
+    function newPage(){if(current.length)pages.push(current.splice(0));y=H-48;}
+    function ensure(h){if(y-h<42)newPage();}
+    function txt(text,size=10,bold=false){
+      const lines=lineWrap(text,Math.max(24,Math.floor(CW/(size*.53))));
+      lines.forEach((line,i)=>{
+        ensure(size+7);current.push(`BT /F${bold?2:1} ${size} Tf ${M} ${y} Td (\${escText(line)}) Tj ET`);y-=size+7;
+      });y-=2;
+    }
+    function centered(text,size=9,bold=false){
+      const t=pdfText(text),w=t.length*size*.5;
+      ensure(size+7);current.push(`BT /F${bold?2:1} ${size} Tf ${Math.max(M,(W-w)/2)} ${y} Td (\${escText(t)}) Tj ET`);y-=size+7;
+    }
+    function rule(){ensure(12);current.push(`0.88 0.89 0.92 RG 0.7 w ${M} ${y} m ${W-M} ${y} l S`);y-=14;}
+    function table(title,rows){
+      ensure(34);txt(title,15,true);y-=3;
+      const rowH=24;
+      rows.forEach((r,i)=>{
+        ensure(rowH+2);
+        if(i%2===0){current.push(`0.97 0.98 0.99 rg ${M} ${y-rowH+5} ${CW} ${rowH} re f`);}
+        current.push(`0.86 0.88 0.91 RG 0.5 w ${M} ${y-rowH+5} ${CW} ${rowH} re S`);
+        const left=pdfText(r[0]),right=pdfText(r[1]);
+        current.push(`BT /F1 9 Tf ${M+8} ${y-11} Td (\${escText(left.slice(0,70))}) Tj ET`);
+        const rw=Math.min(230,right.length*4.7);
+        current.push(`BT /F2 9 Tf ${W-M-8-rw} ${y-11} Td (\${escText(right.slice(0,50))}) Tj ET`);
+        y-=rowH;
+      });
+      y-=10;
+    }
+
+    centered('WEALTH ARRAYS',18,true);centered('CALCULATION REPORT',8,true);rule();
+    txt(calc.title,21,true);txt('Generated from the assumptions you entered.',9,false);y-=4;
+
+    table('Your inputs',calc.fields.map(f=>[f.label,values[f.id]??'']));
+    table('Your calculated results',results.map(r=>[r.label,window.waFormatValue?window.waFormatValue(r.value,r.format):r.value]));
+
+    if(chartData){
+      ensure(270);txt(chartData.kind==='pie'?'Result breakdown':'Calculation summary',15,true);
+      txt(chartData.kind==='pie'?'Visualised from the same calculation shown on the calculator page.':'Bars use the actual calculated values from this calculator.',9,false);
+      y-=4;
+      const imgW=Math.min(CW,430),imgH=chartData.height?imgW*chartData.height/chartData.width:220;
+      ensure(imgH+18);
+      chartData._place={x:(W-imgW)/2,y:y-imgH,w:imgW,h:imgH};
+      current.push('IMAGE_PLACEHOLDER');
+      y-=imgH+18;
+    }
+    txt('Educational estimate only. Not financial, tax, legal or investment advice.',8,false);
+    if(current.length)pages.push(current.splice(0));
+
+    const objects=[];
+    objects.push(null);
+    objects.push(pdfObject('<< /Type /Catalog /Pages 2 0 R >>'));
+    const pageNums=[],contentNums=[],imageNums=[];
+    const font1=objects.length;objects.push(pdfObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>'));
+    const font2=objects.length;objects.push(pdfObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>'));
+    let imgBytes=null,imgW=0,imgH=0;
+    if(chartData&&chartData.base64){imgBytes=bytesFromBase64(chartData.base64);imgW=chartData.width;imgH=chartData.height;}
+    const imgObj=imgBytes?objects.length:null;
+    if(imgBytes)objects.push(null);
+
+    pages.forEach((cmds,pi)=>{
+      const pageNo=objects.length;pageNums.push(pageNo);objects.push(null);
+      const contentNo=objects.length;contentNums.push(contentNo);objects.push(null);
+      if(imgBytes&&pi===0){imageNums[pi]=imgObj;}
+    });
+    const pagesObj=objects.length;objects[2]=null;objects[2]=pdfObject('<< /Type /Pages /Kids ['+pageNums.map(n=>n+' 0 R').join(' ') + '] /Count '+pages.length+' >>');
+
+    if(imgBytes){
+      objects[imgObj]=joinBytes([ascii(`<< /Type /XObject /Subtype /Image /Width ${imgW} /Height ${imgH} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${imgBytes.length} >>\\nstream\\n`),imgBytes,ascii('\\nendstream')]);
+    }
+
+    pages.forEach((cmds,pi)=>{
+      const commands=cmds.map(c=>{
+        if(c!=='IMAGE_PLACEHOLDER')return c;
+        const pos=chartData._place;
+        return `q ${pos.w} 0 0 ${pos.h} ${pos.x} ${pos.y} cm /Im1 Do Q`;
+      }).join('\\n')+'\\n';
+      const cb=ascii(commands);
+      objects[contentNums[pi]]=joinBytes([ascii(`<< /Length ${cb.length} >>\\nstream\\n`),cb,ascii('endstream')]);
+      const xobj=imgBytes?' /XObject << /Im1 '+imgObj+' 0 R >>':'';
+      objects[pageNums[pi]]=pdfObject(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 ${font1} 0 R /F2 ${font2} 0 R >>${xobj} >> /Contents ${contentNums[pi]} 0 R >>`);
+    });
+
+    const chunks=[ascii('%PDF-1.4\\n%\\xFF\\xFF\\xFF\\xFF\\n')],offsets=[0];let offset=chunks[0].length;
+    for(let i=1;i<objects.length;i++){
+      offsets[i]=offset;
+      const head=ascii(i+' 0 obj\\n'),tail=ascii('\\nendobj\\n');
+      chunks.push(head,objects[i],tail);offset+=head.length+objects[i].length+tail.length;
+    }
+    const xref=offset;
+    chunks.push(ascii('xref\\n0 '+objects.length+'\\n0000000000 65535 f \\n'));
+    for(let i=1;i<objects.length;i++)chunks.push(ascii(String(offsets[i]).padStart(10,'0')+' 00000 n \\n'));
+    chunks.push(ascii(`trailer\\n<< /Size ${objects.length} /Root 1 0 R >>\\nstartxref\\n${xref}\\n%%EOF`));
+    return joinBytes(chunks);
+  }
+
+  async function svgToJpeg(svg){
+    if(!svg)return null;
+    const clone=svg.cloneNode(true);
+    clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
+    clone.setAttribute('width','520');clone.setAttribute('height','320');
+    clone.setAttribute('viewBox',svg.getAttribute('viewBox')||'0 0 100 100');
+    const xml=new XMLSerializer().serializeToString(clone);
+    const blob=new Blob([xml],{type:'image/svg+xml;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    try{
+      const img=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=url;});
+      const canvas=document.createElement('canvas');canvas.width=1040;canvas.height=640;
+      const ctx=canvas.getContext('2d');ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);
+      const data=canvas.toDataURL('image/jpeg',0.94).split(',')[1];
+      return {base64:data,width:canvas.width,height:canvas.height};
+    }finally{URL.revokeObjectURL(url);}
+  }
+
+  function valuesFor(calc){
+    const values={};
+    calc.fields.forEach(f=>{
+      const el=document.getElementById('f-'+f.id)||document.querySelector('[name="'+CSS.escape(f.id)+'"]');
+      if(el)values[f.id]=f.type==='select'?el.value:(String(el.value).trim()===''?NaN:Number(el.value));
+    });
+    return values;
+  }
+  function getCalc(id){
+    const list=window.CALCULATORS||[];
+    return list.find(c=>c.id===id)||list.find(c=>c.slug===id);
+  }
+  async function download(calc,values,results){
+    const graph=document.querySelector('.wa-portfolio-card svg');
+    const chart=graph?await svgToJpeg(graph):null;
+    const pdf=makePdf(calc,values,results,chart);
+    const blob=new Blob([pdf],{type:'application/pdf'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=(calc.slug||calc.id||'wealth-arrays')+'-report.pdf';
+    a.style.display='none';document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),3000);
+  }
+
+  window.waOpenPrintReport=download;
+  window.WA_DIRECT_PDF_EXPORT={download};
 })();
