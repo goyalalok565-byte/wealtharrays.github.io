@@ -93,9 +93,7 @@
     txt('Educational estimate only. Not financial, tax, legal or investment advice.',8,false);
     if(current.length)pages.push(current.splice(0));
 
-    const objects=[];
-    objects.push(null);
-    objects.push(pdfObject('<< /Type /Catalog /Pages 2 0 R >>'));
+    const objects=[null,pdfObject('<< /Type /Catalog /Pages 2 0 R >>'),null];
     const pageNums=[],contentNums=[],imageNums=[];
     const font1=objects.length;objects.push(pdfObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>'));
     const font2=objects.length;objects.push(pdfObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>'));
