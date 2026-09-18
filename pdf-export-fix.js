@@ -8,7 +8,7 @@
   window.__WA_DIRECT_PDF_EXPORT__=true;
 
   const escText=v=>String(v??'')
-    .replace(/\\/g,'\\\\').replace(/\\(/g,'\\\\(').replace(/\\)/g,'\\\\)')
+    .replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)')
     .replace(/[\\u0080-\\uFFFF]/g,'?');
   const pdfText=v=>String(v??'')
     .replace(/₹/g,'INR ').replace(/€/g,'EUR ').replace(/£/g,'GBP ')
