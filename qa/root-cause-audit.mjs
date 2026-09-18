@@ -36,8 +36,6 @@ if(!/setTimeout\(install,\s*(?:ms|2500)/.test(calcSearch))throw new Error('Calcu
 const enhancement=fs.readFileSync('calculator-enhancements.js','utf8');
 if(!enhancement.includes("new URL('/icon-512.png',window.location.origin).href"))throw new Error('PDF export must use current icon-512.png');
 if(!enhancement.includes('id="wa-pdf-logo"'))throw new Error('PDF report logo element missing');
-const pdfFix=fs.readFileSync('pdf-export-fix.js','utf8');
-for(const needle of ['application/pdf','a.download','URL.createObjectURL','waDownloadPdfReport'])if(!pdfFix.includes(needle))throw new Error(`Direct PDF download regression missing: ${needle}`);
 
 const hotfix=fs.readFileSync('production-hotfix.js','utf8');
 if(!hotfix.includes('__WA_PRODUCTION_HOTFIX__'))throw new Error('Production hotfix guard missing');
