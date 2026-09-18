@@ -39,7 +39,7 @@ for (const file of indexable) {
   if (!canonical) fail(`${file}: missing canonical`);
   if (titles.has(title)) fail(`Duplicate title: ${title} (${titles.get(title)} and ${file})`);
   titles.set(title, file);
-  const scripts = [...html.matchAll(/<script\s+src=["']([^"']+)["'][^>]*><\/script>/gi)].map(m => path.basename(m[1].split('?')[0]));
+  const scripts = [...html.matchAll(/<script\s+src=["']([^"']+)["'][^>]*><\/script>/gi)].map(m => m[1].split('?')[0]);
   if (new Set(scripts).size !== scripts.length) fail(`${file}: duplicate script source`);
 }
 
