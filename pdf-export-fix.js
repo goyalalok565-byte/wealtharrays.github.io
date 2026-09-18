@@ -1,156 +1,29 @@
-/* Wealth Arrays — canonical direct PDF download fix.
-   Generates a real PDF Blob in-browser instead of opening the print dialog.
-   Self-contained: no CDN, popup, print-preview, or external library.
-*/
+/* Wealth Arrays — canonical PDF export branding fix. */
 (function(){
   'use strict';
   if(window.__WA_PDF_EXPORT_FIX__)return;
   window.__WA_PDF_EXPORT_FIX__=true;
-
-  const pdfText=v=>String(v??'')
-    .replace(/₹/g,'INR ')
-    .replace(/€/g,'EUR ')
-    .replace(/£/g,'GBP ')
-    .replace(/¥/g,'JPY ')
-    .replace(/[“”„]/g,'"')
-    .replace(/[‘’]/g,"'")
-    .replace(/[–—]/g,'-')
-    .replace(/×/g,'x')
-    .replace(/→/g,'->')
-    .replace(/…/g,'...')
-    .replace(/[^\x20-\x7E\r\n]/g,'');
-
+  const esc=v=>String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
   const format=(v,f)=>window.waFormatValue?window.waFormatValue(v,f):String(v??'');
-
-  function wrap(text,max){
-    const words=pdfText(text).split(/\s+/).filter(Boolean);
-    const lines=[];let line='';
-    for(const word of words){
-      if((line+' '+word).trim().length>max&&line){lines.push(line);line=word;}
-      else line=(line+' '+word).trim();
-    }
-    if(line)lines.push(line);
-    return lines.length?lines:[''];
+  function report(calc,values,results){
+    const logo=new URL('/favicon.svg',window.location.origin).href;
+    const inputs=calc.fields.map(f=>`<tr><td>${esc(f.label)}</td><td>${esc(values[f.id]??'')}</td></tr>`).join('');
+    const rows=results.map(r=>`<tr><td>${esc(r.label)}</td><td>${esc(format(r.value,r.format))}</td></tr>`).join('');
+    const html=`<!doctype html><html><head><meta charset="utf-8"><title>${esc(calc.title)} Report · Wealth Arrays</title><style>body{font-family:Arial,sans-serif;max-width:760px;margin:36px auto;padding:0 24px;color:#101828;background:#fff}header{display:flex;align-items:center;gap:14px;padding-bottom:18px;border-bottom:1px solid #e4e7ec;margin-bottom:24px}header img{width:56px;height:56px;object-fit:contain}header strong{display:block;font-size:17px}header span{display:block;margin-top:3px;color:#667085;font-size:10px;letter-spacing:.12em}h1{font-size:30px;margin:0 0 6px}h2{font-size:17px;margin:28px 0 8px}p{color:#667085}table{width:100%;border-collapse:collapse;margin:10px 0 24px;border:1px solid #e4e7ec}td{padding:11px;border-bottom:1px solid #eaecf0}td:last-child{text-align:right;font-weight:700}.no-print{padding:10px 16px;border:0;border-radius:8px;cursor:pointer}@media print{body{margin:18px auto;padding:0}.no-print{display:none}}</style></head><body><header><img id="wa-current-logo" src="${esc(logo)}" alt="Wealth Arrays logo" width="56" height="56"><div><strong>Wealth Arrays</strong><span>CALCULATION REPORT</span></div></header><h1>${esc(calc.title)}</h1><p>Generated from the assumptions you entered.</p><h2>Your inputs</h2><table>${inputs}</table><h2>Your calculated results</h2><table>${rows}</table><p>Educational estimate only. Not financial, tax, legal or investment advice.</p><button class="no-print" type="button" onclick="window.print()">Save as PDF</button><script>const logo=document.getElementById('wa-current-logo');function go(){setTimeout(()=>{try{window.focus();window.print()}catch(e){}},180)}if(logo.complete)go();else logo.addEventListener('load',go,{once:true});<\/script></body></html>`;
+    const win=window.open('','_blank');
+    if(!win){alert('Your browser blocked the PDF report window. Please allow pop-ups for Wealth Arrays and try again.');return;}
+    win.document.open();win.document.write(html);win.document.close();
   }
-
-  function escapePdfText(text){
-    return pdfText(text).replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
-  }
-
-  function makePdf(calc,values,results){
-    const lines=[];
-    const add=(text,bold=false)=>wrap(text,92).forEach(line=>lines.push({text,bold}));
-    add('WEALTH ARRAYS',true);
-    add('CALCULATION REPORT');
-    add(calc.title,true);
-    add('Generated from the assumptions you entered.');
-    add('');
-    add('YOUR INPUTS',true);
-    calc.fields.forEach(f=>add(f.label+': '+(values[f.id]??'')));
-    add('');
-    add('YOUR CALCULATED RESULTS',true);
-    results.forEach(r=>add(r.label+': '+format(r.value,r.format)));
-    add('');
-    add('Educational estimate only. Not financial, tax, legal or investment advice.');
-
-    const lineHeight=14;
-    const linesPerPage=49;
-    const pages=[];
-    for(let i=0;i<lines.length;i+=linesPerPage)pages.push(lines.slice(i,i+linesPerPage));
-
-    const objects=[];
-    const pageIds=[];
-    const fontId=3;
-    objects[1]='<< /Type /Catalog /Pages 2 0 R >>';
-    objects[2]='<< /Type /Pages /Kids [PAGE_IDS] /Count '+pages.length+' >>';
-    objects[3]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';
-
-    pages.forEach((page,index)=>{
-      const pageId=4+index*2;
-      const contentId=pageId+1;
-      pageIds.push(pageId+' 0 R');
-      const commands=['BT','1 0 0 1 50 750 Tm'];
-      let first=true;
-      for(const item of page){
-        commands.push('/F1 '+(item.bold?12:10)+' Tf');
-        if(!first)commands.push('0 -'+lineHeight+' Td');
-        commands.push('('+escapePdfText(item.text)+') Tj');
-        first=false;
-      }
-      commands.push('ET');
-      const stream=commands.join('\n')+'\n';
-      objects[pageId]='<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 '+fontId+' 0 R >> >> /Contents '+contentId+' 0 R >>';
-      objects[contentId]='<< /Length '+stream.length+' >>\nstream\n'+stream+'endstream';
-    });
-
-    objects[2]=objects[2].replace('PAGE_IDS',pageIds.join(' '));
-
-    let pdf='%PDF-1.4\n%\xE2\xE3\xCF\xD3\n';
-    const offsets=[0];
-    for(let i=1;i<objects.length;i++){
-      offsets[i]=pdf.length;
-      pdf+=i+' 0 obj\n'+objects[i]+'\nendobj\n';
-    }
-    const xref=pdf.length;
-    pdf+='xref\n0 '+objects.length+'\n0000000000 65535 f \n';
-    for(let i=1;i<objects.length;i++)pdf+=String(offsets[i]).padStart(10,'0')+' 00000 n \n';
-    pdf+='trailer\n<< /Size '+objects.length+' /Root 1 0 R >>\nstartxref\n'+xref+'\n%%EOF';
-    return new Blob([pdf],{type:'application/pdf'});
-  }
-
-  function findCalculator(id){
-    const list=window.CALCULATORS||[];
-    return list.find(c=>c.id===id)||list.find(c=>c.slug===id);
-  }
-
-  function readCurrent(calc){
-    const values={};
-    calc.fields.forEach(f=>{
-      const el=document.getElementById('f-'+f.id)||document.querySelector('[name="'+CSS.escape(f.id)+'"]')||document.querySelector('[data-field="'+CSS.escape(f.id)+'"]');
-      if(!el)return;
-      values[f.id]=f.type==='select'?el.value:(String(el.value).trim()===''?NaN:Number(el.value));
-    });
-    return values;
-  }
-
-  function compute(calc,values){
-    try{return calc.compute(values)||[]}catch(e){console.error('PDF export calculation failed',e);return[];}
-  }
-
-  function download(calc,values,results){
-    if(!results.length){
-      alert('Please calculate your result first, then export the PDF report.');
-      return;
-    }
-    const blob=makePdf(calc,values,results);
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    a.href=url;
-    a.download=(calc.slug||calc.id||'wealth-arrays')+'-report.pdf';
-    a.style.display='none';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(()=>URL.revokeObjectURL(url),1500);
-  }
-
-  window.waDownloadPdfReport=function(calc,values,results){
-    if(!calc)return;
-    const currentValues=values||readCurrent(calc);
-    download(calc,currentValues,results||compute(calc,currentValues));
-  };
-
+  function findCalculator(id){const list=window.CALCULATORS||[];return list.find(c=>c.id===id)||list.find(c=>c.slug===id)||list.find(c=>c.title?.toLowerCase()===document.querySelector('.calc-title')?.textContent.trim().toLowerCase());}
   document.addEventListener('click',function(event){
     const button=event.target.closest('button,a,[role="button"]');
     if(!button)return;
-    const label=((button.textContent||'')+' '+(button.id||'')+' '+(button.getAttribute('data-action')||'')).trim();
-    if(!/\b(pdf|print report|export report)\b/i.test(label)&&!/pdf|export/i.test(label))return;
-    if(button.classList.contains('no-print'))return;
-    const calc=findCalculator(document.documentElement.dataset.waCalculator||'');
-    if(!calc)return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    const values=readCurrent(calc);
-    download(calc,values,compute(calc,values));
+    const text=(button.textContent||'').trim();
+    const isPdf=/\b(pdf|print report|export report)\b/i.test(text)||/pdf|export/i.test(button.id||'')||/pdf|export/i.test(button.getAttribute('data-action')||'');
+    if(!isPdf||button.classList.contains('no-print'))return;
+    const calc=findCalculator(document.documentElement.dataset.waCalculator||'');if(!calc)return;
+    event.preventDefault();event.stopImmediatePropagation();
+    const values={};calc.fields.forEach(f=>{const el=document.getElementById(`f-${f.id}`)||document.querySelector(`[name="${CSS.escape(f.id)}"]`);if(el)values[f.id]=f.type==='select'?el.value:(String(el.value).trim()===''?NaN:Number(el.value));});
+    let results=[];try{results=calc.compute(values)||[]}catch(e){return;}if(results.length)report(calc,values,results);
   },true);
 })();
