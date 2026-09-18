@@ -1,185 +1,179 @@
-/* Wealth Arrays — direct PDF download layer.
- * Keeps the existing calculator report data and live SVG graph/pie chart.
- * No print dialog, no text-only fallback, no external libraries.
+/* Wealth Arrays — deterministic PDF download.
+ * Generates the same report data directly in a real PDF Blob.
+ * The chart is drawn as PDF vector geometry, so pie charts survive export
+ * without print dialogs, async image conversion, or external libraries.
  */
 (function(){
   'use strict';
   if(window.__WA_DIRECT_PDF_EXPORT__)return;
   window.__WA_DIRECT_PDF_EXPORT__=true;
 
-  const escText=v=>String(v??'')
-    .replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)')
-    .replace(/[\\u0080-\\uFFFF]/g,'?');
-  const pdfText=v=>String(v??'')
+  const text=v=>String(v??'')
     .replace(/₹/g,'INR ').replace(/€/g,'EUR ').replace(/£/g,'GBP ')
-    .replace(/¥/g,'JPY ').replace(/₩/g,'KRW ').replace(/﷼/g,'SAR ')
-    .replace(/₺/g,'TRY ').replace(/₽/g,'RUB ').replace(/₦/g,'NGN ')
-    .replace(/[^\\x20-\\x7E]/g,'?');
+    .replace(/¥/g,'JPY ').replace(/₩/g,'KRW ').replace(/₺/g,'TRY ')
+    .replace(/₽/g,'RUB ').replace(/₦/g,'NGN ')
+    .replace(/[^\x20-\x7E]/g,'?');
 
-  function bytesFromBase64(data){
-    const raw=atob(data), out=new Uint8Array(raw.length);
-    for(let i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);
-    return out;
-  }
-  function joinBytes(parts){
-    let n=0;parts.forEach(p=>n+=p.length);
-    const out=new Uint8Array(n);let o=0;
-    parts.forEach(p=>{out.set(p,o);o+=p.length;});
-    return out;
-  }
-  function ascii(s){return new TextEncoder().encode(s);}
-  function pdfObject(body){return ascii(body);}
-  function lineWrap(value,max){
-    const words=pdfText(value).split(/\\s+/), lines=[];let line='';
-    words.forEach(w=>{
-      if(!w)return;
-      const next=line?line+' '+w:w;
-      if(next.length>max&&line){lines.push(line);line=w;}else line=next;
-    });
-    if(line||!lines.length)lines.push(line);
-    return lines;
+  const esc=v=>text(v).replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
+  const enc=s=>new TextEncoder().encode(s);
+  const join=parts=>{let n=0;parts.forEach(p=>n+=p.length);const o=new Uint8Array(n);let at=0;parts.forEach(p=>{o.set(p,at);at+=p.length});return o};
+
+  function fmt(r){
+    const n=Number(r?.value);
+    if(!Number.isFinite(n))return '—';
+    if(r.format==='percent')return n.toFixed(2)+'%';
+    if(r.format==='years')return n.toFixed(1)+' yrs';
+    if(r.format==='number')return Math.round(n).toLocaleString('en-US');
+    return window.waFormatValue?window.waFormatValue(n,r.format):n.toLocaleString('en-US',{maximumFractionDigits:2});
   }
 
-  function makePdf(calc,values,results,chartData){
+  function partsFor(calc,values,rows){
+    const num=x=>Number.isFinite(Number(x))?Number(x):0;
+    const row=re=>rows.find(r=>re.test(String(r.label)));
+    const total=()=>rows.find(r=>/future value|maturity value|total amount|final value|estimated corpus|total repayment/i.test(String(r.label)));
+    const p=(label,value)=>({label,value:Math.max(0,num(value))});
+    let parts=null;
+    if(calc.id==='sip'||calc.id==='investment'){
+      const inv=row(/you put in|invested amount/i),gain=row(/growth|profit|returns/i);
+      if(inv&&gain)parts=[p('Money invested',inv.value),p('Growth / returns',gain.value)];
+    }else if(calc.id==='compound-interest'||calc.id==='lumpsum'||calc.id==='fixed-deposit'){
+      const t=total(),i=row(/interest earned|growth|returns/i);
+      if(t&&i)parts=[p('Original investment',num(t.value)-num(i.value)),p('Growth / interest',i.value)];
+    }else if(calc.id==='recurring-deposit'){
+      const t=total(),invested=num(values.monthly)*12*num(values.years);
+      if(t)parts=[p('Money deposited',invested),p('Interest earned',num(t.value)-invested)];
+    }else if(['mortgage','car-loan','personal-loan'].includes(calc.id)){
+      const repay=row(/total repayment/i),interest=row(/total interest/i);
+      if(repay&&interest)parts=[p('Loan amount',num(repay.value)-num(interest.value)),p('Total interest',interest.value)];
+    }else if(calc.id==='simple-interest'){
+      const t=row(/total amount/i),i=row(/^interest$/i);
+      if(t&&i)parts=[p('Original amount',num(t.value)-num(i.value)),p('Interest',i.value)];
+    }else if(calc.id==='roi'){
+      const cost=num(values.cost),finalValue=num(values.finalValue);
+      if(finalValue>=cost&&cost>0)parts=[p('Original investment',cost),p('Profit',finalValue-cost)];
+    }else if(calc.id==='profit-margin'){
+      const revenue=num(values.revenue),cogs=num(values.cogs),expenses=num(values.expenses),net=revenue-cogs-expenses;
+      if(revenue>0&&net>=0)parts=[p('Cost of goods',cogs),p('Operating expenses',expenses),p('Net profit',net)];
+    }else if(calc.id==='net-worth'){
+      const assets=num(values.cash)+num(values.investments)+num(values.property),debt=num(values.debt);
+      if(assets>0)parts=[p('Cash',values.cash),p('Investments',values.investments),p('Property',values.property),p('Debt reduction',Math.min(debt,assets))].filter(x=>x.value>0);
+    }else if(calc.id==='overtime'){
+      const regular=row(/regular pay/i),overtime=row(/overtime pay/i);
+      if(regular&&overtime)parts=[p('Regular pay',regular.value),p('Overtime pay',overtime.value)];
+    }else if(calc.id==='debt-payoff'){
+      const balance=num(values.balance),interest=Math.max(0,num(row(/total interest/i)?.value));
+      if(balance>0&&interest>=0)parts=[p('Debt principal',balance),p('Estimated interest',interest)];
+    }else if(calc.id==='income-tax-planner'){
+      const income=num(values.income),tax=Math.max(0,num(row(/tax/i)?.value));
+      if(income>0)parts=[p('Tax',Math.min(tax,income)),p('After-tax income',Math.max(0,income-tax))];
+    }
+    if(!parts||parts.length<2||parts.some(x=>x.value<0)||parts.reduce((s,x)=>s+x.value,0)<=0)return null;
+    return parts;
+  }
+
+  function makePdf(calc,values,results){
     const W=595,H=842,M=42,CW=W-M*2;
-    const pages=[],current=[];
-    let y=H-48;
-
-    function newPage(){if(current.length)pages.push(current.splice(0));y=H-48;}
-    function ensure(h){if(y-h<42)newPage();}
-    function txt(text,size=10,bold=false){
-      const lines=lineWrap(text,Math.max(24,Math.floor(CW/(size*.53))));
-      lines.forEach((line,i)=>{
-        ensure(size+7);current.push(`BT /F${bold?2:1} ${size} Tf ${M} ${y} Td (\${escText(line)}) Tj ET`);y-=size+7;
-      });y-=2;
-    }
-    function centered(text,size=9,bold=false){
-      const t=pdfText(text),w=t.length*size*.5;
-      ensure(size+7);current.push(`BT /F${bold?2:1} ${size} Tf ${Math.max(M,(W-w)/2)} ${y} Td (\${escText(t)}) Tj ET`);y-=size+7;
-    }
-    function rule(){ensure(12);current.push(`0.88 0.89 0.92 RG 0.7 w ${M} ${y} m ${W-M} ${y} l S`);y-=14;}
-    function table(title,rows){
-      ensure(34);txt(title,15,true);y-=3;
-      const rowH=24;
+    const pages=[],cmd=[];let y=H-46;
+    const flush=()=>{if(cmd.length)pages.push(cmd.splice(0));y=H-46};
+    const ensure=h=>{if(y-h<42)flush()};
+    const line=(s,size=9,bold=false)=>{
+      const words=text(s).split(/\s+/);let cur='',lines=[];
+      words.forEach(w=>{const next=cur?cur+' '+w:w;if(next.length>Math.max(30,Math.floor(CW/(size*.52)))&&cur){lines.push(cur);cur=w}else cur=next});
+      if(cur||!lines.length)lines.push(cur);
+      lines.forEach(v=>{ensure(size+8);cmd.push('BT /F'+(bold?2:1)+' '+size+' Tf '+M+' '+y+' Td ('+esc(v)+') Tj ET');y-=size+8});
+      y-=2;
+    };
+    const center=(s,size=9,bold=false)=>{const v=text(s),w=v.length*size*.5;ensure(size+8);cmd.push('BT /F'+(bold?2:1)+' '+size+' Tf '+Math.max(M,(W-w)/2)+' '+y+' Td ('+esc(v)+') Tj ET');y-=size+8};
+    const table=(title,rows)=>{
+      ensure(38);line(title,15,true);y-=2;
       rows.forEach((r,i)=>{
-        ensure(rowH+2);
-        if(i%2===0){current.push(`0.97 0.98 0.99 rg ${M} ${y-rowH+5} ${CW} ${rowH} re f`);}
-        current.push(`0.86 0.88 0.91 RG 0.5 w ${M} ${y-rowH+5} ${CW} ${rowH} re S`);
-        const left=pdfText(r[0]),right=pdfText(r[1]);
-        current.push(`BT /F1 9 Tf ${M+8} ${y-11} Td (\${escText(left.slice(0,70))}) Tj ET`);
-        const rw=Math.min(230,right.length*4.7);
-        current.push(`BT /F2 9 Tf ${W-M-8-rw} ${y-11} Td (\${escText(right.slice(0,50))}) Tj ET`);
-        y-=rowH;
+        ensure(25);
+        if(i%2===0)cmd.push('0.97 0.98 0.99 rg '+M+' '+(y-19)+' '+CW+' 23 re f');
+        cmd.push('0.86 0.88 0.91 RG 0.5 w '+M+' '+(y-19)+' '+CW+' 23 re S');
+        const a=text(r[0]).slice(0,68),b=text(r[1]).slice(0,48),rw=Math.min(220,b.length*4.5);
+        cmd.push('BT /F1 9 Tf '+(M+8)+' '+(y-13)+' Td ('+esc(a)+') Tj ET');
+        cmd.push('BT /F2 9 Tf '+(W-M-8-rw)+' '+(y-13)+' Td ('+esc(b)+') Tj ET');
+        y-=23;
       });
-      y-=10;
-    }
+      y-=9;
+    };
+    const pie=(parts)=>{
+      ensure(290);line('Result breakdown',15,true);line('The same genuine components shown by the calculator pie chart.',9,false);y-=4;
+      const cx=W/2,cy=y-118,r=86,total=parts.reduce((s,p)=>s+p.value,0);
+      const rgb=['0.15 0.39 0.92','0.08 0.72 0.65','0.49 0.24 0.93','0.96 0.62 0.04'];
+      let angle=-Math.PI/2;
+      parts.forEach((p,i)=>{
+        const end=angle+(p.value/total)*Math.PI*2;
+        const pts=[[cx,cy]];
+        const steps=Math.max(8,Math.ceil(Math.abs(end-angle)*18));
+        for(let k=0;k<=steps;k++){const a=angle+(end-angle)*k/steps;pts.push([cx+r*Math.cos(a),cy+r*Math.sin(a)])}
+        cmd.push(rgb[i%rgb.length]+' rg');
+        cmd.push(pts.map((q,j)=>(j?'L ':'M ')+q[0].toFixed(2)+' '+q[1].toFixed(2)).join(' ')+' h f');
+        angle=end;
+      });
+      let ly=cy-r+8;
+      parts.forEach((p,i)=>{
+        const pct=p.value/total*100;
+        cmd.push(rgb[i%rgb.length]+' rg '+(M)+' '+(ly-3)+' 9 9 re f');
+        cmd.push('BT /F1 8 Tf '+(M+15)+' '+ly+' Td ('+esc(p.label)+' — '+esc(fmt({value:p.value,format:'currency'}))+' — '+pct.toFixed(pct<10?1:0)+'%) Tj ET');
+        ly-=18;
+      });
+      y=cy-r-12;
+    };
+    const bars=(rows)=>{
+      ensure(260);line('Calculation summary',15,true);line('The bars use the actual calculated values.',9,false);y-=5;
+      const numeric=rows.filter(r=>Number.isFinite(Number(r.value))&&Number(r.value)>=0).slice(0,6),max=Math.max(...numeric.map(r=>Number(r.value)),1);
+      numeric.forEach(r=>{
+        ensure(30);const label=text(r.label).slice(0,30),v=Number(r.value),bw=250*v/max;
+        cmd.push('0.92 0.93 0.95 rg '+(M+145)+' '+(y-8)+' 250 10 re f');
+        cmd.push('0.15 0.39 0.92 rg '+(M+145)+' '+(y-8)+' '+Math.max(4,bw).toFixed(1)+' 10 re f');
+        cmd.push('BT /F1 8 Tf '+M+' '+(y-6)+' Td ('+esc(label)+') Tj ET');
+        cmd.push('BT /F2 8 Tf '+(M+405)+' '+(y-6)+' Td ('+esc(fmt(r))+') Tj ET');
+        y-=27;
+      });
+      y-=8;
+    };
 
-    centered('WEALTH ARRAYS',18,true);centered('CALCULATION REPORT',8,true);rule();
-    txt(calc.title,21,true);txt('Generated from the assumptions you entered.',9,false);y-=4;
-
+    center('WEALTH ARRAYS',18,true);center('CALCULATION REPORT',8,true);
+    cmd.push('0.86 0.88 0.91 RG 0.7 w '+M+' '+y+' m '+(W-M)+' '+y+' l S');y-=16;
+    line(calc.title,21,true);line('Generated from the assumptions you entered.',9);y-=3;
     table('Your inputs',calc.fields.map(f=>[f.label,values[f.id]??'']));
-    table('Your calculated results',results.map(r=>[r.label,window.waFormatValue?window.waFormatValue(r.value,r.format):r.value]));
+    table('Your calculated results',results.map(r=>[r.label,fmt(r)]));
+    const parts=partsFor(calc,values,results);
+    if(parts)pie(parts);else bars(results);
+    line('Educational estimate only. Not financial, tax, legal or investment advice.',8);
+    flush();
 
-    if(chartData){
-      ensure(270);txt(chartData.kind==='pie'?'Result breakdown':'Calculation summary',15,true);
-      txt(chartData.kind==='pie'?'Visualised from the same calculation shown on the calculator page.':'Bars use the actual calculated values from this calculator.',9,false);
-      y-=4;
-      const imgW=Math.min(CW,430),imgH=chartData.height?imgW*chartData.height/chartData.width:220;
-      ensure(imgH+18);
-      chartData._place={x:(W-imgW)/2,y:y-imgH,w:imgW,h:imgH};
-      current.push('IMAGE_PLACEHOLDER');
-      y-=imgH+18;
-    }
-    txt('Educational estimate only. Not financial, tax, legal or investment advice.',8,false);
-    if(current.length)pages.push(current.splice(0));
-
-    const objects=[null,pdfObject('<< /Type /Catalog /Pages 2 0 R >>'),null];
-    const pageNums=[],contentNums=[],imageNums=[];
-    const font1=objects.length;objects.push(pdfObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>'));
-    const font2=objects.length;objects.push(pdfObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>'));
-    let imgBytes=null,imgW=0,imgH=0;
-    if(chartData&&chartData.base64){imgBytes=bytesFromBase64(chartData.base64);imgW=chartData.width;imgH=chartData.height;}
-    const imgObj=imgBytes?objects.length:null;
-    if(imgBytes)objects.push(null);
-
-    pages.forEach((cmds,pi)=>{
-      const pageNo=objects.length;pageNums.push(pageNo);objects.push(null);
-      const contentNo=objects.length;contentNums.push(contentNo);objects.push(null);
-      if(imgBytes&&pi===0){imageNums[pi]=imgObj;}
+    const objects=[null,enc('<< /Type /Catalog /Pages 2 0 R >>'),null];
+    const f1=objects.length;objects.push(enc('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>'));
+    const f2=objects.length;objects.push(enc('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>'));
+    const pageRefs=[],contentRefs=[];
+    pages.forEach(c=>{
+      const p=objects.length;pageRefs.push(p);objects.push(null);
+      const co=objects.length;contentRefs.push(co);
+      const body=enc(c.join('\n')+'\n');objects.push(join([enc('<< /Length '+body.length+' >>\nstream\n'),body,enc('endstream')]));
     });
-    const pagesObj=objects.length;objects[2]=null;objects[2]=pdfObject('<< /Type /Pages /Kids ['+pageNums.map(n=>n+' 0 R').join(' ') + '] /Count '+pages.length+' >>');
+    objects[2]=enc('<< /Type /Pages /Kids ['+pageRefs.map(n=>n+' 0 R').join(' ')+'] /Count '+pageRefs.length+' >>');
+    pageRefs.forEach((p,i)=>{objects[p]=enc('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+W+' '+H+'] /Resources << /Font << /F1 '+f1+' 0 R /F2 '+f2+' 0 R >> >> /Contents '+contentRefs[i]+' 0 R >>')});
 
-    if(imgBytes){
-      objects[imgObj]=joinBytes([ascii(`<< /Type /XObject /Subtype /Image /Width ${imgW} /Height ${imgH} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${imgBytes.length} >>\\nstream\\n`),imgBytes,ascii('\\nendstream')]);
-    }
-
-    pages.forEach((cmds,pi)=>{
-      const commands=cmds.map(c=>{
-        if(c!=='IMAGE_PLACEHOLDER')return c;
-        const pos=chartData._place;
-        return `q ${pos.w} 0 0 ${pos.h} ${pos.x} ${pos.y} cm /Im1 Do Q`;
-      }).join('\\n')+'\\n';
-      const cb=ascii(commands);
-      objects[contentNums[pi]]=joinBytes([ascii(`<< /Length ${cb.length} >>\\nstream\\n`),cb,ascii('endstream')]);
-      const xobj=imgBytes?' /XObject << /Im1 '+imgObj+' 0 R >>':'';
-      objects[pageNums[pi]]=pdfObject(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 ${font1} 0 R /F2 ${font2} 0 R >>${xobj} >> /Contents ${contentNums[pi]} 0 R >>`);
-    });
-
-    const chunks=[ascii('%PDF-1.4\\n%\\xFF\\xFF\\xFF\\xFF\\n')],offsets=[0];let offset=chunks[0].length;
-    for(let i=1;i<objects.length;i++){
-      offsets[i]=offset;
-      const head=ascii(i+' 0 obj\\n'),tail=ascii('\\nendobj\\n');
-      chunks.push(head,objects[i],tail);offset+=head.length+objects[i].length+tail.length;
-    }
-    const xref=offset;
-    chunks.push(ascii('xref\\n0 '+objects.length+'\\n0000000000 65535 f \\n'));
-    for(let i=1;i<objects.length;i++)chunks.push(ascii(String(offsets[i]).padStart(10,'0')+' 00000 n \\n'));
-    chunks.push(ascii(`trailer\\n<< /Size ${objects.length} /Root 1 0 R >>\\nstartxref\\n${xref}\\n%%EOF`));
-    return joinBytes(chunks);
+    const chunks=[enc('%PDF-1.4\n%\xFF\xFF\xFF\xFF\n')],off=[0];let pos=chunks[0].length;
+    for(let i=1;i<objects.length;i++){off[i]=pos;const h=enc(i+' 0 obj\n'),t=enc('\nendobj\n');chunks.push(h,objects[i],t);pos+=h.length+objects[i].length+t.length}
+    const xref=pos;chunks.push(enc('xref\n0 '+objects.length+'\n0000000000 65535 f \n'));
+    for(let i=1;i<objects.length;i++)chunks.push(enc(String(off[i]).padStart(10,'0')+' 00000 n \n'));
+    chunks.push(enc('trailer\n<< /Size '+objects.length+' /Root 1 0 R >>\nstartxref\n'+xref+'\n%%EOF'));
+    return join(chunks);
   }
 
-  async function svgToJpeg(svg){
-    if(!svg)return null;
-    const clone=svg.cloneNode(true);
-    clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
-    clone.setAttribute('width','520');clone.setAttribute('height','320');
-    clone.setAttribute('viewBox',svg.getAttribute('viewBox')||'0 0 100 100');
-    const xml=new XMLSerializer().serializeToString(clone);
-    const blob=new Blob([xml],{type:'image/svg+xml;charset=utf-8'});
-    const url=URL.createObjectURL(blob);
-    try{
-      const img=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=url;});
-      const canvas=document.createElement('canvas');canvas.width=1040;canvas.height=640;
-      const ctx=canvas.getContext('2d');ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);
-      const data=canvas.toDataURL('image/jpeg',0.94).split(',')[1];
-      return {base64:data,width:canvas.width,height:canvas.height};
-    }finally{URL.revokeObjectURL(url);}
-  }
-
-  function valuesFor(calc){
-    const values={};
-    calc.fields.forEach(f=>{
-      const el=document.getElementById('f-'+f.id)||document.querySelector('[name="'+CSS.escape(f.id)+'"]');
-      if(el)values[f.id]=f.type==='select'?el.value:(String(el.value).trim()===''?NaN:Number(el.value));
-    });
-    return values;
-  }
-  function getCalc(id){
-    const list=window.CALCULATORS||[];
-    return list.find(c=>c.id===id)||list.find(c=>c.slug===id);
-  }
-  async function download(calc,values,results){
-    const graph=document.querySelector('.wa-portfolio-card svg');
-    const chart=graph?await svgToJpeg(graph):null;
-    const pdf=makePdf(calc,values,results,chart);
+  function download(calc,values,results){
+    const pdf=makePdf(calc,values,results);
     const blob=new Blob([pdf],{type:'application/pdf'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    a.href=url;a.download=(calc.slug||calc.id||'wealth-arrays')+'-report.pdf';
-    a.style.display='none';document.body.appendChild(a);a.click();a.remove();
-    setTimeout(()=>URL.revokeObjectURL(url),3000);
+    const url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download=(calc.slug||calc.id||'wealth-arrays')+'-report.pdf';a.rel='noopener';a.style.display='none';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
   }
-
   window.waOpenPrintReport=download;
   window.WA_DIRECT_PDF_EXPORT={download};
 })();
