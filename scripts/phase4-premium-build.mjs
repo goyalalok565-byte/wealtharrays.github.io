@@ -48,7 +48,14 @@ for(const file of htmlFiles){
   if(!s.includes('/phase4-premium.css')) s=s.replace('</head>',`${phase4Css}</head>`);
   if(!s.includes('/phase4-premium.js')) s=s.replace('</body>',`${phase4Js}</body>`);
   if(!s.includes('name="referrer"')) s=s.replace('</head>',`<meta name="referrer" content="strict-origin-when-cross-origin"></head>`);
-  if(!s.includes('ca-pub-6507600103785450')) s=s.replace('</head>',`${adsenseJs}</head>`);
+  // AdSense is intentionally excluded from 404.html and widget.html.
+  // 404 is an error/low-value page; widget.html may be embedded on third-party domains.
+  const adsenseExcluded=['404.html','widget.html'].includes(base);
+  if(adsenseExcluded){
+    s=s.replace(new RegExp('\\s*'+adsenseJs.replace(/[.*+?^${}()|[\\]\\\\]/g,'\\  if(!s.includes('ca-pub-6507600103785450')) s=s.replace('</head>',`${adsenseJs}</head>`);'),'g'),'');
+  } else if(!s.includes('ca-pub-6507600103785450')) {
+    s=s.replace('</head>',`${adsenseJs}</head>`);
+  }
   if(s!==before){fs.writeFileSync(file,s);changed++;}
 }
 console.log(`Phase 4 premium build updated ${changed} HTML files (${htmlFiles.length} public HTML files scanned).`);
