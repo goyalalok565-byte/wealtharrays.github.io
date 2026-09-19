@@ -2,6 +2,11 @@
 # Each public route has one canonical destination; calculator routes always end in /.
 
 # Legacy static pages
+/about-us.html /about 301
+/contact-us.html /contact 301
+/disclaimer.html /disclaimer 301
+/terms-and-conditions.html /terms 301
+/articles.html /articles 301
 /privacy-policy.html /privacy 301
 /privacy.html /privacy 301
 /p/about-us.html /about 301
