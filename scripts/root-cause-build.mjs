@@ -41,7 +41,7 @@ else{if(!html.includes('wa-site-runtime.js'))html=html.replace('</body>',`<scrip
 const relPath=path.relative(root,full).replaceAll(path.sep,'/');
 const isArticle=/^articles\/[^/]+\.html$/.test(relPath);
 if(isArticle){
-  html=html.replace(/<script type="application\\/ld\\+json">([\\s\\S]*?)<\\/script>/gi,(tag,json)=>{
+  html=html.replace(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/gi,(tag,json)=>{
     try{
       const data=JSON.parse(json);
       if(data && data["@type"]==="Article"){
