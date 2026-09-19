@@ -12,7 +12,7 @@ for(const file of htmlFiles){let html=fs.readFileSync(file,'utf8');const before=
   }
   // Skip AdSense preconnect hints on pages that must never carry AdSense.
   const base=path.basename(file);
-  const adsenseExcluded=['404.html','widget.html'].includes(base);
+  const adsenseExcluded=['404.html','widget.html','privacy-policy.html'].includes(base);
   if(adsenseExcluded){
     html=html.replace(/<link rel="preconnect" href="https:\/\/pagead2\.googlesyndication\.com" crossorigin>/g,'');
     html=html.replace(/<link rel="preconnect" href="https:\/\/googleads\.g\.doubleclick\.net" crossorigin>/g,'');

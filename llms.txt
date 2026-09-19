@@ -1,42 +1,78 @@
 # Wealth Arrays
 
-> Wealth Arrays is a browser-first financial calculator and financial education website. It provides deterministic calculators, transparent formulas, assumptions, worked examples, and practical money guides. Results are educational estimates, not personalized financial, tax, legal, or investment advice.
+> Wealth Arrays is a browser-first financial calculator and financial education website. It provides transparent formulas, assumptions, worked examples, and practical money guides. Results are educational estimates, not personalized financial, tax, legal, or investment advice.
 
 ## Primary pages
+
 - https://wealtharrays.com/ — Home and calculator library overview
-- https://wealtharrays.com/tools.html — Full calculator library
-- https://wealtharrays.com/articles.html — Financial education guides
-- https://wealtharrays.com/about.html — Publisher, editorial ownership, calculator review process
-- https://wealtharrays.com/methodology.html — Calculator formulas, assumptions, accuracy and limitations
-- https://wealtharrays.com/editorial-policy.html — Originality, accuracy review and corrections policy
-- https://wealtharrays.com/privacy.html — Privacy, analytics and advertising disclosures
-- https://wealtharrays.com/advertising-policy.html — Advertising and editorial independence policy
-- https://wealtharrays.com/disclaimer.html — Financial, tax and legal disclaimer
-- https://wealtharrays.com/contact.html — Corrections and contact
+- https://wealtharrays.com/tools — Full calculator library
+- https://wealtharrays.com/articles — Financial education guides
+- https://wealtharrays.com/about — Publisher, editorial ownership, and site purpose
+- https://wealtharrays.com/methodology — Calculator formulas, assumptions, accuracy and limitations
+- https://wealtharrays.com/editorial-policy — Originality, accuracy review and corrections policy
+- https://wealtharrays.com/privacy — Privacy, analytics and advertising disclosures
+- https://wealtharrays.com/advertising-policy — Advertising and editorial independence policy
+- https://wealtharrays.com/disclaimer — Financial, tax and legal disclaimer
+- https://wealtharrays.com/contact — Corrections and contact
+- https://wealtharrays.com/faq — Frequently asked questions
 
-## Calculator categories
-- https://wealtharrays.com/category-investment.html — SIP, compound interest, lump sum, CAGR and ROI
-- https://wealtharrays.com/category-loan.html — Mortgage/EMI, car loan, personal loan and debt payoff
-- https://wealtharrays.com/category-banking.html — Fixed deposit, recurring deposit, simple interest and inflation
-- https://wealtharrays.com/category-retirement.html — Retirement and financial-independence planning
-- https://wealtharrays.com/category-salary.html — Salary, hourly pay and overtime
-- https://wealtharrays.com/category-business.html — Profit margin, freelance rate and tax scenario planning
+## Calculator library
 
-## Core calculators
-- https://wealtharrays.com/sip-calculator.html
-- https://wealtharrays.com/compound-interest-calculator.html
-- https://wealtharrays.com/mortgage-emi-calculator.html
-- https://wealtharrays.com/roi-calculator.html
-- https://wealtharrays.com/retirement-calculator.html
-- https://wealtharrays.com/income-tax-scenario-calculator.html — Jurisdiction-neutral income-tax scenario planning using a user-entered effective tax-rate assumption; not official tax software
+- https://wealtharrays.com/sip-calculator/
+- https://wealtharrays.com/compound-interest-calculator/
+- https://wealtharrays.com/mortgage-emi-calculator/
+- https://wealtharrays.com/roi-calculator/
+- https://wealtharrays.com/simple-interest-calculator/
+- https://wealtharrays.com/retirement-calculator/
+- https://wealtharrays.com/salary-to-hourly-calculator/
+- https://wealtharrays.com/profit-margin-calculator/
+- https://wealtharrays.com/fixed-deposit-calculator/
+- https://wealtharrays.com/recurring-deposit-calculator/
+- https://wealtharrays.com/lumpsum-calculator/
+- https://wealtharrays.com/cagr-calculator/
+- https://wealtharrays.com/car-loan-calculator/
+- https://wealtharrays.com/personal-loan-calculator/
+- https://wealtharrays.com/debt-payoff-calculator/
+- https://wealtharrays.com/inflation-calculator/
+- https://wealtharrays.com/net-worth-calculator/
+- https://wealtharrays.com/overtime-pay-calculator/
+- https://wealtharrays.com/freelance-rate-calculator/
+- https://wealtharrays.com/income-tax-scenario-calculator/
+
+## Guide library
+
+- https://wealtharrays.com/articles/compound-interest-guide
+- https://wealtharrays.com/articles/how-to-build-an-emergency-fund
+- https://wealtharrays.com/articles/how-to-calculate-real-return-after-inflation
+- https://wealtharrays.com/articles/how-to-compare-sip-scenarios-properly
+- https://wealtharrays.com/articles/how-to-stress-test-a-retirement-goal
+- https://wealtharrays.com/articles/how-to-use-a-debt-payoff-calculator
+- https://wealtharrays.com/articles/how-to-use-a-net-worth-calculator
+- https://wealtharrays.com/articles/how-to-use-a-salary-to-hourly-calculator
+- https://wealtharrays.com/articles/how-to-use-an-inflation-calculator
+- https://wealtharrays.com/articles/how-to-use-financial-calculators
+- https://wealtharrays.com/articles/loan-emi-guide
+- https://wealtharrays.com/articles/roi-guide
+- https://wealtharrays.com/articles/sip-calculator-guide
+- https://wealtharrays.com/articles/step-up-sip-calculator-guide
+- https://wealtharrays.com/articles/when-cagr-can-mislead-you
+- https://wealtharrays.com/articles/why-a-lower-emi-can-cost-you-more-overall
+- https://wealtharrays.com/articles/why-compounding-looks-slow-before-it-looks-powerful
+- https://wealtharrays.com/articles/why-one-crore-in-the-future-may-not-mean-what-you-think
 
 ## Editorial principles
+
 - Prefer transparent mathematics over black-box financial claims.
 - Distinguish assumptions from facts and projections from guarantees.
 - Do not imply live FX conversion when currency selection only changes display formatting.
-- Do not present the income-tax scenario tool as a jurisdiction-specific tax engine.
+- Do not present the income-tax scenario tool as jurisdiction-specific tax software.
 - Financial content should be independently useful even without advertising.
 - Corrections should be reproducible from the exact inputs, formula and expected result.
 
 ## Machine-readable note
-This file is provided as a convenience for AI systems and other tools that choose to use it. It is not required for Google Search and is not intended to manipulate search rankings.
+
+This file is supplemental documentation for AI systems and other tools that choose to consume it. It is not required for Google Search and is not intended to manipulate rankings. Normal robots.txt, sitemap, crawlability, indexing, content quality, and site reputation remain the primary discovery signals.
+
+## Contact
+
+Corrections and content questions: goyalalok565@gmail.com

@@ -50,7 +50,7 @@ for(const file of htmlFiles){
   if(!s.includes('name="referrer"')) s=s.replace('</head>',`<meta name="referrer" content="strict-origin-when-cross-origin"></head>`);
   // AdSense is intentionally excluded from 404.html and widget.html.
   // 404 is an error/low-value page; widget.html may be embedded on third-party domains.
-  const adsenseExcluded=['404.html','widget.html'].includes(base);
+  const adsenseExcluded=['404.html','widget.html','privacy-policy.html'].includes(base);
   if(adsenseExcluded){
     s=s.replace(new RegExp('\\s*'+adsenseJs.replace(/[.*+?^${}()|[\\]\\\\]/g,'\\  if(!s.includes('ca-pub-6507600103785450')) s=s.replace('</head>',`${adsenseJs}</head>`);'),'g'),'');
   } else if(!s.includes('ca-pub-6507600103785450')) {
