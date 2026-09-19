@@ -10,7 +10,13 @@ for(const file of htmlFiles){let html=fs.readFileSync(file,'utf8');const before=
   if(/<link[^>]+rel=["']stylesheet["'][^>]+href=["'][^"']*styles\.css/i.test(html)&&!html.includes('rel="preload" as="style" href="/styles.css"')){
     html=html.replace(/(<link[^>]+rel=["']stylesheet["'][^>]+href=["'][^"']*styles\.css[^>]*>)/i,'<link rel="preload" as="style" href="/styles.css">$1');
   }
-  if(!html.includes('rel="preconnect" href="https://pagead2.googlesyndication.com"')){
+  // Skip AdSense preconnect hints on pages that must never carry AdSense.
+  const base=path.basename(file);
+  const adsenseExcluded=['404.html','widget.html'].includes(base);
+  if(adsenseExcluded){
+    html=html.replace(/<link rel="preconnect" href="https:\/\/pagead2\.googlesyndication\.com" crossorigin>/g,'');
+    html=html.replace(/<link rel="preconnect" href="https:\/\/googleads\.g\.doubleclick\.net" crossorigin>/g,'');
+  } else if(!html.includes('rel="preconnect" href="https://pagead2.googlesyndication.com"')){
     const hints='<link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin><link rel="preconnect" href="https://googleads.g.doubleclick.net" crossorigin>';
     html=html.replace(/<link[^>]+rel=["']stylesheet["'][^>]+href=["'][^"']*styles\.css[^>]*>/i,m=>`${hints}${m}`);
   }
