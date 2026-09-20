@@ -5,6 +5,7 @@
     if(typeof window.mountCalculator!=='function') return;
     var host=document.getElementById('calc-widget');
     var id=document.documentElement.getAttribute('data-wa-calculator');
+    if(!id && host){ id=new URLSearchParams(location.search).get('calc')||''; }
     if(!host||!id||host.dataset.waBooted==='1'||typeof window.CALCULATORS==='undefined') return;
     var def=window.CALCULATORS.find(function(c){return c.id===id;});
     if(def){
