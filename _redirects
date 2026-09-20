@@ -77,9 +77,5 @@
 /qa/* /404.html 302
 /RELEASE-AUDIT.json /404.html 302
 
-# Embeddable calculator widget
-/widget.html /widget 301
-/widget /widget.html 200
-
 # Canonical homepage
 /index.html /
