@@ -32,13 +32,27 @@ for(const {obj,id} of definitions)fs.writeFileSync(path.join(defDir,`${id}.js`),
 
 const allHtml=[];function walk(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){const f=path.join(dir,e.name);if(e.isDirectory()){if(!['.git','node_modules'].includes(e.name))walk(f);}else if(e.name.endsWith('.html'))allHtml.push(f);}}walk(root);
 const managed=new Set([...required,'wa-site-runtime.js','wa-calculator-runtime.js']);
-for(const full of allHtml){let html=fs.readFileSync(full,'utf8');const isCalc=/<html[^>]+data-wa-calculator=/i.test(html);html=html.replace(/\s*<script\s+src=["']([^"']+)[^>]*><\/script>/gi,(tag,src)=>managed.has(path.basename(src.split('?',1)[0]))?'':tag);html=html.replace(/\s*<!-- WA-(?:SITE|CANONICAL)-RUNTIME:[^>]+-->\s*/g,'\n');
+for(const full of allHtml){
+  let html=fs.readFileSync(full,'utf8');
+  const relPath=path.relative(root,full).replaceAll(path.sep,'/');
+  const isWidget=relPath==='widget.html';
+  const isCalc=/<html[^>]+data-wa-calculator=/i.test(html);
+  html=html.replace(/\s*<script\s+src=["']([^"']+)[^>]*><\/script>/gi,(tag,src)=>{
+    const base=path.basename(src.split('?',1)[0]);
+    const keep=managed.has(base)||(isWidget&&['calculators.js','wa-calculator-runtime.js'].includes(base));
+    return keep?'':tag;
+  });html=html.replace(/\s*<!-- WA-(?:SITE|CANONICAL)-RUNTIME:[^>]+-->\s*/g,'\n');
 html=html.replace(/(<link\s+[^>]*rel=["'](?:preload|stylesheet)["'][^>]*href=["'])\/?styles\.css(["'][^>]*>)/gi,'$1/styles.css$2');html=html.replace(/(<link\s+[^>]*href=["'])styles\.css(["'][^>]*rel=["'](?:preload|stylesheet)["'][^>]*>)/gi,'$1/styles.css$2');if(!html.includes('href="/styles.css"')&&!html.includes("href='/styles.css'"))html=html.replace('</head>','<link rel="stylesheet" href="/styles.css"></head>');
 html=html.replace(/\s*<link\s+[^>]*rel=["'](?:icon|shortcut icon|apple-touch-icon)["'][^>]*>/gi,'');
 html=html.replace('</head>','<link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="48x48" href="/icon-192.png"><link rel="apple-touch-icon" sizes="180x180" href="/icon-512.png"></head>');
 if(isCalc){const rawId=html.match(/data-wa-calculator="([^"]+)"/i)?.[1];if(!rawId)throw new Error(`Calculator page missing data-wa-calculator: ${full}`);const base=path.basename(full).toLowerCase()==='index.html'?path.basename(path.dirname(full)):path.basename(full,'.html');const id=byId.get(rawId)||bySlug.get(base)||pageAliases.get(base);if(!id)throw new Error(`No calculator definition matches ${full} (${rawId}, ${base})`);html=html.replace(/data-wa-calculator="[^"]+"/i,`data-wa-calculator="${id}"`);html=html.replace(/\s*<script[^>]+calculator-definitions[^>]*><\/script>/gi,'');const def=`<script src="/calculator-definitions/${id}.js?v=${stamp}" defer></script>`;const runtime=`<script src="/wa-calculator-runtime.js?v=${stamp}" defer></script>`;html=html.replace(/\s*<script[^>]+wa-calculator-runtime\.js[^>]*><\/script>/gi,'');html=html.replace('</body>',`${def}${runtime}</body>`);html=html.replace(/(<body[^>]*>)/i,'$1\n<!-- WA-CANONICAL-RUNTIME:v3 -->');}
 else{if(!html.includes('wa-site-runtime.js'))html=html.replace('</body>',`<script src="/wa-site-runtime.js?v=${stamp}" defer></script></body>`);html=html.replace(/(<body[^>]*>)/i,'$1\n<!-- WA-SITE-RUNTIME:v3 -->');}
-const relPath=path.relative(root,full).replaceAll(path.sep,'/');
+if(isWidget){
+  const widgetCalculators='<script src="/calculators.js?v='+stamp+'" defer></script>';
+  const widgetRuntime='<script src="/wa-calculator-runtime.js?v='+stamp+'" defer></script>';
+  if(!html.includes('/calculators.js')) html=html.replace('</body>',widgetCalculators+'</body>');
+  if(!html.includes('/wa-calculator-runtime.js')) html=html.replace('</body>',widgetRuntime+'</body>');
+}
 const isArticle=/^articles\/[^/]+\.html$/.test(relPath);
 if(isArticle){
   html=html.replace(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/gi,(tag,json)=>{
