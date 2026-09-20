@@ -34,7 +34,7 @@ for(const file of htmlFiles){
   const base=path.basename(file);
   const canonicalId=calcIds[base];
   const id=canonicalId||mountId;
-  if(id && s.includes('id="calc-widget"')){
+  if(id && s.includes('id="calc-widget"') && base!=='widget.html'){
     s=s.replace(/<html\s+data-wa-calculator="[^"]*"/i,'<html');
     s=s.replace(/<html\s+/,`<html data-wa-calculator="${id}" `);
     if(!s.includes('/calculator-page-init.js')) s=s.replace('</body>',`${calcInitJs}</body>`);
