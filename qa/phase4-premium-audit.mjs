@@ -46,9 +46,9 @@ const widgetSource=fs.readFileSync('widget.js','utf8');
 if(!widgetSource.includes('new URL(`/widget?calc=${encodeURIComponent(calc.id)}`,document.baseURI).href')) failures.push('widget.js: embed URL must use the root /widget route');
 const headers=fs.existsSync('_headers')?fs.readFileSync('_headers','utf8'):'';
 for(const rule of ['/widget','/widget.html']){
-  const marker=rule+'\\n';
+  const marker=rule+'\n';
   const start=headers.indexOf(marker);
-  const next=start>=0?headers.indexOf('\\n/',start+marker.length):-1;
+  const next=start>=0?headers.indexOf('\n/',start+marker.length):-1;
   const block=start>=0?headers.slice(start,next>=0?next:headers.length):'';
   if(!block.includes('! X-Frame-Options')) failures.push(rule+': X-Frame-Options must be detached for embeds');
   if(!block.includes('! Cross-Origin-Resource-Policy')) failures.push(rule+': Cross-Origin-Resource-Policy must be detached for embeds');
