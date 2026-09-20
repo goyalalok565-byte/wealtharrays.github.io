@@ -68,6 +68,11 @@
 /p/mastering-return-on-investment-roi-how.html /articles/roi-guide 301
 /p/understanding-cpi-currency-degradation.html /inflation-calculator/ 301
 
+# Legacy indexed /p/ content with no surviving source file
+/p/building-corporate-personal-cash.html /category-business 301
+/p/optimizing-fixed-term-certificates.html /fixed-deposit-calculator/ 301
+/p/the-ultimate-guide-to-systematic.html /articles/sip-calculator-guide 301
+
 # Keep repository-only QA scripts from being served as public pages
 /qa/* /404.html 302
 /RELEASE-AUDIT.json /404.html 302
