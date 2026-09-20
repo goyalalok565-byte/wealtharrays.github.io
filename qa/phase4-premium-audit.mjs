@@ -42,7 +42,19 @@ for(const full of publicFiles){
   const apple=(s.match(/<link\s+[^>]*rel=["']apple-touch-icon["'][^>]*>/gi)||[]).length;
   if(apple>1) failures.push(r+': duplicate apple-touch-icon tags ('+apple+')');
 }
+const widgetSource=fs.readFileSync('widget.js','utf8');
+if(!widgetSource.includes('new URL(`/widget?calc=${encodeURIComponent(calc.id)}`,document.baseURI).href')) failures.push('widget.js: embed URL must use the root /widget route');
 const headers=fs.existsSync('_headers')?fs.readFileSync('_headers','utf8'):'';
+for(const rule of ['/widget','/widget.html']){
+  const marker=rule+'\\n';
+  const start=headers.indexOf(marker);
+  const next=start>=0?headers.indexOf('\\n/',start+marker.length):-1;
+  const block=start>=0?headers.slice(start,next>=0?next:headers.length):'';
+  if(!block.includes('! X-Frame-Options')) failures.push(rule+': X-Frame-Options must be detached for embeds');
+  if(!block.includes('! Cross-Origin-Resource-Policy')) failures.push(rule+': Cross-Origin-Resource-Policy must be detached for embeds');
+  if(!block.includes('frame-ancestors *')) failures.push(rule+': CSP must allow external iframe embedding');
+}
+
 if(!headers.includes('Strict-Transport-Security')) failures.push('_headers: HSTS missing');
 if(!headers.includes('X-Content-Type-Options: nosniff')) failures.push('_headers: nosniff missing');
 if(!headers.includes('Referrer-Policy: strict-origin-when-cross-origin')) failures.push('_headers: referrer policy missing');
