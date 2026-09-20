@@ -31,6 +31,11 @@ for(const name of ['404.html','widget.html']){
   const s=read(name);
   if(s.includes('adsbygoogle.js')||s.includes('ca-pub-6507600103785450')) failures.push(name+': AdSense must not be present');
   if(s.includes('pagead2.googlesyndication.com')||s.includes('googleads.g.doubleclick.net')) failures.push(name+': AdSense preconnect must not be present');
+  if(name==='widget.html'){
+    if(!s.includes('/calculators.js')) failures.push(name+': calculators.js bootstrap missing');
+    if(!s.includes('/wa-calculator-runtime.js')) failures.push(name+': calculator runtime bootstrap missing');
+    if(/<html\s+data-wa-calculator=/i.test(s)) failures.push(name+': widget must not be converted into calculator-page bootstrap mode');
+  }
 }
 for(const full of publicFiles){
   const r=path.relative(root,full).replaceAll(path.sep,'/'), s=fs.readFileSync(full,'utf8');
