@@ -47,7 +47,7 @@ if(!widgetSource.includes('new URL(`/widget.html?calc=${encodeURIComponent(calc.
 const headers=fs.existsSync('_headers')?fs.readFileSync('_headers','utf8'):'';
 for(const rule of ['/widget','/widget.html']){
   const marker=rule+'\n';
-  const start=headers.indexOf(marker);
+  const start=headers.lastIndexOf(marker);
   const next=start>=0?headers.indexOf('\n/',start+marker.length):-1;
   const block=start>=0?headers.slice(start,next>=0?next:headers.length):'';
   if(!block.includes('! X-Frame-Options')) failures.push(rule+': X-Frame-Options must be detached for embeds');
