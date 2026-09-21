@@ -1,3 +1,7 @@
+# Embeddable calculator widget — one-way rewrite, never redirect
+/widget /widget.html 200
+/widget/ /widget.html 200
+
 # Canonical legacy URL redirects
 # Each public route has one canonical destination; calculator routes always end in /.
 
