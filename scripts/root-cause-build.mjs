@@ -62,7 +62,10 @@ if(isArticle){
         if(!data.image)data.image="https://wealtharrays.com/og-image.png";
         if(!data.datePublished && data.dateModified)data.datePublished=data.dateModified;
       }
-      if(data && data["@type"]==="Organization" && !data.logo)data.logo="https://wealtharrays.com/favicon-v2.svg";
+      const logoUrl="https://wealtharrays.com/favicon-v2.svg";
+      if(data && data["@type"]==="Organization" && !data.logo)data.logo=logoUrl;
+      if(data && data.author && data.author["@type"]==="Organization" && !data.author.logo)data.author.logo=logoUrl;
+      if(data && data.publisher && data.publisher["@type"]==="Organization" && !data.publisher.logo)data.publisher.logo=logoUrl;
       return '<script type="application/ld+json">'+JSON.stringify(data)+'</script>';
     }catch{return tag;}
   });
