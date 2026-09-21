@@ -2,16 +2,28 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Wealth Arrays Calculator Widget</title><meta name="description" content="Embeddable Wealth Arrays calculator widget.">
-<meta name="robots" content="noindex,follow">
-
-<link rel="preload" as="style" href="/styles.css"><link rel="stylesheet" href="/styles.css">
-<meta property="og:image" content="https://wealtharrays.com/og-image.png"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/phase3-seo.css?v=20260915-1"><script src="/theme-init.js?v=20260915-1"></script><meta name="referrer" content="strict-origin-when-cross-origin"><link rel="stylesheet" href="/phase4-premium.css?v=20260915-1"><link rel="stylesheet" href="/cls-fixes.css?v=20260917" media="all"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="48x48" href="/icon-192.png"><link rel="apple-touch-icon" sizes="180x180" href="/icon-512.png"></head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wealth Arrays Calculator Widget</title>
+<style>html,body{margin:0;padding:0;background:transparent;font-family:system-ui,-apple-system,Segoe UI,sans-serif}#calc-widget{min-height:500px}</style>
+</head>
 <body>
-<!-- WA-SITE-RUNTIME:v3 -->
-<main class="static-page" style="max-width:900px;margin:0 auto;padding:18px"><h1>Wealth Arrays Calculator Widget</h1><p class="calc-desc">Embeddable access to the Wealth Arrays calculator library.</p>
-  <div id="calc-widget" aria-label="Wealth Arrays calculator widget"></div>
-</main>
-<footer class="site-footer premium-footer"><div class="site-footer-inner"><div class="footer-brand-row"><a class="footer-logo" href="/" aria-label="Wealth Arrays"><img src="/favicon-v2.svg" alt="Wealth Arrays logo" width="44" height="44"><span><b>Wealth Arrays</b><small>Financial tools that make numbers clearer.</small></span></a><p class="footer-brand-copy">Fast, browser-first financial calculators for clearer decisions. Results are educational estimates and not financial, tax, legal or investment advice.</p></div><nav class="footer-nav-box" aria-label="Company and legal pages"><a class="footer-link" href="/privacy">Privacy Policy</a><a class="footer-link" href="/terms">Terms &amp; Conditions</a><a class="footer-link" href="/disclaimer">Disclaimer</a><a class="footer-link" href="/about">About Us</a><a class="footer-link" href="/contact">Contact Us</a><a class="footer-link" href="/methodology">Methodology</a><a class="footer-link" href="/editorial-policy">Editorial Standards</a><a class="footer-link" href="/advertising-policy">Advertising Policy</a><a class="footer-link" href="/faq">FAQ</a></nav><div class="footer-bottom"><span>© 2026 Wealth Arrays</span><span>Questions or corrections: <a href="mailto:goyalalok565@gmail.com">goyalalok565@gmail.com</a></span></div></div></footer><script src="/wa-site-runtime.js?v=8b464d853d19-20260917-2" defer></script><script src="/calculators.js?v=20260921" defer></script><script src="/wa-calculator-runtime.js?v=850bb4b3cd74-20260917-2" defer></script></body>
+<div id="calc-widget"></div>
+
+<script src="/calculators.js" defer></script>
+<script src="/wa-calculator-runtime.js" defer></script>
+<script>
+(function(){
+ function boot(){
+  var host=document.getElementById('calc-widget');
+  if(!host||host.dataset.waBooted==='1'||host.children.length)return;
+  if(typeof mountCalculator!=='function'||typeof CALCULATORS==='undefined')return;
+  var id=new URLSearchParams(location.search).get('calc')||'sip';
+  var calc=CALCULATORS.find(function(x){return x.id===id||x.slug===id;})||CALCULATORS.find(function(x){return x.id==='sip';})||CALCULATORS[0];
+  if(calc){host.dataset.waBooted='1';try{mountCalculator(calc,'calc-widget')}catch(e){host.dataset.waBooted='';console.error(e)}}
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+ window.addEventListener('load',boot,{once:true});
+})();
+</script>
+</body>
 </html>
