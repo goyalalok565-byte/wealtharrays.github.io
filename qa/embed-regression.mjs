@@ -1,0 +1,18 @@
+import fs from 'node:fs';
+const defs=fs.readFileSync('calculators.js','utf8');
+const widgetSource=fs.readFileSync('widget.js','utf8');
+const runtime=fs.readFileSync('wa-calculator-runtime.js','utf8');
+const widgetHtml=fs.readFileSync('widget.html','utf8');
+const pageInit=fs.readFileSync('calculator-page-init.js','utf8');
+const ids=[...defs.matchAll(/\bid:\s*"([^"]+)"/g)].map(m=>m[1]);
+if(ids.length!==20) throw new Error(`Expected 20 calculator definitions, found ${ids.length}`);
+if(new Set(ids).size!==20) throw new Error('Calculator definition IDs are not unique');
+if(!widgetSource.includes('async function waCopyEmbed(calc)')) throw new Error('widget.js missing Copy Embed implementation');
+if(!widgetSource.includes('/widget?calc=${encodeURIComponent(calc.id)}')) throw new Error('widget.js must use canonical /widget embed route');
+if(!widgetSource.includes("document.execCommand('copy')")) throw new Error('Copy Embed must have synchronous clipboard fallback');
+if(!runtime.includes('/widget?calc=${encodeURIComponent(e.id)}')) throw new Error('Generated calculator runtime has stale embed route');
+if(!runtime.includes('class="tool-action" id="${t}-embed"')) throw new Error('Calculator mount must render Copy embed action');
+if(!widgetHtml.includes('/calculators.js') || !widgetHtml.includes('/wa-calculator-runtime.js')) throw new Error('Widget must load calculator definitions and canonical runtime');
+if(/document\.addEventListener\("DOMContentLoaded", \(\) =>/.test(widgetHtml)) throw new Error('Widget must not use the pre-runtime racing bootstrap');
+if(!pageInit.includes('new URLSearchParams(location.search).get("calc")')) throw new Error('Calculator bootstrap must resolve widget calc query parameter');
+console.log(`Embed regression PASS — all ${ids.length} calculators share the canonical Copy Embed path, widget bootstrap, and clipboard fallback.`);
