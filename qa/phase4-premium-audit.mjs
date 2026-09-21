@@ -43,7 +43,7 @@ for(const full of publicFiles){
   if(apple>1) failures.push(r+': duplicate apple-touch-icon tags ('+apple+')');
 }
 const widgetSource=fs.readFileSync('widget.js','utf8');
-if(!widgetSource.includes('new URL(`/widget.html?calc=${encodeURIComponent(calc.id)}`,location.origin).href')) failures.push('widget.js: embed URL must use the root /widget route');
+if(!widgetSource.includes('new URL(`/widget?calc=${encodeURIComponent(calc.id)}`,location.origin).href')) failures.push('widget.js: embed URL must use the root /widget route');
 const headers=fs.existsSync('_headers')?fs.readFileSync('_headers','utf8'):'';
 for(const rule of ['/widget','/widget.html']){
   const marker=rule+'\n';
