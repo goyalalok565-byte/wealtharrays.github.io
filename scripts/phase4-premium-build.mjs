@@ -50,7 +50,8 @@ for(const file of htmlFiles){
   if(!s.includes('name="referrer"')) s=s.replace('</head>',`<meta name="referrer" content="strict-origin-when-cross-origin"></head>`);
   // AdSense is intentionally excluded from 404.html and widget.html.
   // 404 is an error/low-value page; widget.html may be embedded on third-party domains.
-  const adsenseExcluded=['404.html','widget.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html'].includes(base);
+  const noindex=/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(s);
+  const adsenseExcluded=['404.html','widget.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html'].includes(base) || noindex;
   if(adsenseExcluded){
     const escaped=adsenseJs.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
     s=s.replace(new RegExp('\\s*'+escaped),'');
