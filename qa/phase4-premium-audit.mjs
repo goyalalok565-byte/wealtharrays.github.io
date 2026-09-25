@@ -26,7 +26,8 @@ for(const full of publicFiles){
  if(!s.includes('name="referrer" content="strict-origin-when-cross-origin"')) failures.push(`${r}: missing referrer policy meta`);
  if(/<script[^>]+src=["']\/?(?:phase4-premium|calculator-page-init|site-runtime|wa-core|final-polish|theme-fix|phase2-intelligence|phase2-retirement|phase3-seo)\.js(?:[?#][^"']*)?["']/i.test(s)) failures.push(`${r}: legacy runtime source loaded directly; use canonical bundle`);
 }
-for(const f of calc){const s=read(f);if(!/<h1\b/i.test(s)) failures.push(`${f}: missing H1`);if(!s.includes('/wa-calculator-runtime.js')) failures.push(`${f}: missing canonical calculator runtime`);}\nfor(const f of calc){const s=read(f);const m=s.match(/<article class=[\"']tool-article[\"']>([\\s\\S]*?)<\\/article>/i);if(m){const text=m[1].replace(/<[^>]+>/g,' ').replace(/&[^;]+;/g,' ').replace(/\\s+/g,' ').trim();const words=text?text.split(/\\s+/).length:0;if(words<400) failures.push(`${f}: calculator educational content below 400 words (${words})`);}}
+for(const f of calc){const s=read(f);if(!/<h1\b/i.test(s)) failures.push(`${f}: missing H1`);if(!s.includes('/wa-calculator-runtime.js')) failures.push(`${f}: missing canonical calculator runtime`);}
+for(const f of calc){const s=read(f);const m=s.match(/<article class=[\"']tool-article[\"']>([\\s\\S]*?)<\\/article>/i);if(m){const text=m[1].replace(/<[^>]+>/g,' ').replace(/&[^;]+;/g,' ').replace(/\\s+/g,' ').trim();const words=text?text.split(/\\s+/).length:0;if(words<400) failures.push(`${f}: calculator educational content below 400 words (${words})`);}}
 for(const name of ['404.html','widget.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html']){
   const s=read(name);
   if(s.includes('adsbygoogle.js')||s.includes('ca-pub-6507600103785450')) failures.push(name+': AdSense must not be present');
