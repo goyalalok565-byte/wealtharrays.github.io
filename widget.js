@@ -53,7 +53,7 @@ function waOpenPrintReport(calc,values,results){
  setTimeout(()=>{try{win.focus();win.print();}catch(e){const b=win.document.querySelector('.no-print');if(b)b.style.display='inline-block';}},250);
 }
 async function waCopyEmbed(calc){
-  const src=new URL(`/widget?calc=${encodeURIComponent(calc.id)}`,location.origin).href;
+  const src=new URL(`/widget.html?calc=${encodeURIComponent(calc.id)}`,location.origin).href;
   const code=`<iframe title="${esc(calc.title)} — Wealth Arrays" src="${src}" width="100%" height="620" loading="lazy" style="border:0;border-radius:16px;max-width:900px"></iframe>`;
   const ta=document.createElement('textarea');
   ta.value=code;
