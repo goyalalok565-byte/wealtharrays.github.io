@@ -28,6 +28,12 @@ for(const full of publicFiles){
 }
 for(const f of calc){const s=read(f);if(!/<h1\b/i.test(s)) failures.push(`${f}: missing H1`);if(!s.includes('/wa-calculator-runtime.js')) failures.push(`${f}: missing canonical calculator runtime`);}
 for(const f of calc){const s=read(f);const m=s.match(/<article class=[\"']tool-article[\"']>([\s\S]*?)<\/article>/i);if(m){const text=m[1].replace(/<[^>]+>/g,' ').replace(/&[^;]+;/g,' ').replace(/\s+/g,' ').trim();const words=text?text.split(/\s+/).length:0;if(words<400) failures.push(`${f}: calculator educational content below 400 words (${words})`);}}
+for(const full of publicFiles){
+  const r=path.relative(root,full).replaceAll(path.sep,'/'), s=fs.readFileSync(full,'utf8');
+  if(/<meta\\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(s) && /ca-pub-6507600103785450|adsbygoogle\\.js/i.test(s)){
+    failures.push(r+': noindex pages must not carry AdSense');
+  }
+}
 for(const name of ['404.html','widget.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html']){
   const s=read(name);
   if(s.includes('adsbygoogle.js')||s.includes('ca-pub-6507600103785450')) failures.push(name+': AdSense must not be present');
