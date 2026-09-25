@@ -52,7 +52,7 @@ for(const file of htmlFiles){
   // 404 is an error/low-value page; widget.html may be embedded on third-party domains.
   const adsenseExcluded=['404.html','widget.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html'].includes(base);
   if(adsenseExcluded){
-    const escaped=adsenseJs.replace(/[.*+?^${}()|[\]\\]/g,'\\const escaped=adsenseJs.replace(/[.*+?^${}()|[\\]\\\\]/g,'\\$&');');
+    const escaped=adsenseJs.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
     s=s.replace(new RegExp('\\s*'+escaped),'');
   } else if(!s.includes('ca-pub-6507600103785450')) {
     s=s.replace('</head>',`${adsenseJs}</head>`);
