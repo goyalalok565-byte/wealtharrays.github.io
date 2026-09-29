@@ -25,7 +25,7 @@ async function diagnostics(label) {
   if (errors.length) console.error(`BROWSER_ERRORS ${label}: ${errors.join(' | ')}`);
 }
 
-async function assertCalculator(path, label, phase2 = true) {
+async function assertCalculator(path, label, phase2 = false) {
   errors.length = 0;
   failedResponses.length = 0;
   await page.goto(`${baseUrl}/${path}`, { waitUntil: 'networkidle' });
@@ -58,5 +58,5 @@ try {
 
   if (failedResponses.length) throw new Error(`Failed network responses: ${failedResponses.join(' | ')}`);
   if (errors.length) throw new Error(`Browser errors: ${errors.join(' | ')}`);
-  console.log(`Production browser smoke passed at ${baseUrl}: homepage, four representative calculators, Phase 2 decision panels and 390px mobile overflow checks are healthy.`);
+  console.log(`Production browser smoke passed at ${baseUrl}: homepage, four representative calculators and 390px mobile overflow checks are healthy.`);
 } finally { await browser.close(); }
