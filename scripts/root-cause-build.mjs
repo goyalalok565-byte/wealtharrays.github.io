@@ -49,7 +49,8 @@ if(isCalc){const rawId=html.match(/data-wa-calculator="([^"]+)"/i)?.[1];if(!rawI
 else{if(!html.includes('wa-site-runtime.js'))html=html.replace('</body>',`<script src="/wa-site-runtime.js?v=${stamp}" defer></script></body>`);html=html.replace(/(<body[^>]*>)/i,'$1\n<!-- WA-SITE-RUNTIME:v3 -->');}
 if(isCalc){
   const m=relPath.match(/^([^/]+)\/index\.html$/);
-  const calculatorContentMap={
+  const calculatorValueContent=JSON.parse(fs.readFileSync(path.join(root,'calculator-value-content.json'),'utf8'));
+const calculatorContentMap={
     'sip-calculator':'sip-calculator.html','compound-interest-calculator':'compound-interest-calculator.html','mortgage-emi-calculator':'mortgage-emi-calculator.html','roi-calculator':'roi-calculator.html','simple-interest-calculator':'simple-interest-calculator.html','retirement-calculator':'retirement-calculator.html','salary-to-hourly-calculator':'salary-to-hourly-calculator.html','profit-margin-calculator':'profit-margin-calculator.html','fixed-deposit-calculator':'fixed-deposit-calculator.html','recurring-deposit-calculator':'recurring-deposit-calculator.html','lumpsum-calculator':'lumpsum-calculator.html','cagr-calculator':'cagr-calculator.html','car-loan-calculator':'car-loan-calculator.html','personal-loan-calculator':'personal-loan-calculator.html','debt-payoff-calculator':'debt-payoff-calculator.html','inflation-calculator':'inflation-calculator.html','net-worth-calculator':'net-worth-calculator.html','overtime-pay-calculator':'overtime-pay-calculator.html','freelance-rate-calculator':'freelance-rate-calculator.html','income-tax-scenario-calculator':'income-tax-scenario-calculator.html'
   };
   if(m && calculatorContentMap[m[1]]){
@@ -59,6 +60,11 @@ if(isCalc){
       const sourceArticle=sourceHtml.match(/<article class="tool-article">[\s\S]*?<\/article>/i)?.[0];
       if(sourceArticle) html=html.replace(/<article class="tool-article">[\s\S]*?<\/article>/i,sourceArticle);
     }
+  }
+  const value=m && calculatorValueContent[m[1]];
+  if(value && !html.includes('WA-CALCULATOR-VALUE-GUIDE')){
+    const block='<section class="calculator-value-guide" aria-labelledby="calculator-value-guide-title"><h2 id="calculator-value-guide-title">'+value.heading+'</h2><p>'+value.body+'</p></section>';
+    html=html.replace(/<\/article>/i,block+'</article>');
   }
 }
 if(isWidget){
