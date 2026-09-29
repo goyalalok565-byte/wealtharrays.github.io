@@ -34,6 +34,8 @@ const allHtml=[];function walk(dir){for(const e of fs.readdirSync(dir,{withFileT
 const managed=new Set([...required,'wa-site-runtime.js','wa-calculator-runtime.js']);
 for(const full of allHtml){
   let html=fs.readFileSync(full,'utf8');
+  // Normalize legacy empty navigation targets at source/build level so future generated pages never emit dead self-links.
+  html=html.replace(/href=[\"']{2}/g, 'href="/"');
   const relPath=path.relative(root,full).replaceAll(path.sep,'/');
   const isWidget=relPath==='widget.html';
   const isCalc=/<html[^>]+data-wa-calculator=/i.test(html);
