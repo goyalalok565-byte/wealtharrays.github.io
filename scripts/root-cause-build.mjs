@@ -63,7 +63,7 @@ const calculatorContentMap={
   }
   const value=m && calculatorValueContent[m[1]];
   if(value && !html.includes('WA-CALCULATOR-VALUE-GUIDE')){
-    const block='<section class="calculator-value-guide" aria-labelledby="calculator-value-guide-title"><h2 id="calculator-value-guide-title">'+value.heading+'</h2><p>'+value.body+'</p></section>';
+    const block='<!-- WA-CALCULATOR-VALUE-GUIDE --> <section class="calculator-value-guide" aria-labelledby="calculator-value-guide-title"><h2 id="calculator-value-guide-title">'+value.heading+'</h2><p>'+value.body+'</p></section>';
     html=html.replace(/<\/article>/i,block+'</article>');
   }
 }
