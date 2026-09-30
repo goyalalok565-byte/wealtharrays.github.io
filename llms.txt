@@ -4,6 +4,7 @@
 
 - https://wealtharrays.com/scenario-lab — deterministic scenario comparison and sensitivity tool
 - https://wealtharrays.com/goal-planner — goal-to-gap-to-contribution scenario planner
+- https://wealtharrays.com/financial-workspace — browser-first multi-scenario financial workspace
 
 ## Primary pages
 
