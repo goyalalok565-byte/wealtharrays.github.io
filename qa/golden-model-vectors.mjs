@@ -24,7 +24,7 @@ const cases={
  'net-worth':[{cash:10000,investments:20000,property:100000,debt:50000},x=>80000],
  'salary-hourly':[{direction:'toHourly',amount:60000,hoursPerWeek:40,weeksPerYear:48},x=>31.25],
  overtime:[{hourly:20,regular:160,overtime:20,multiplier:1.5},x=>3800],
- 'freelance-rate':[{income:60000,expenses:12000,hours:20,weeks:48},x=>72],
+ 'freelance-rate':[{income:60000,expenses:12000,hours:20,weeks:48},x=>75],
  'profit-margin':[{revenue:50000,cogs:28000,expenses:9000},x=>26],
  'income-tax-planner':[{income:100000,deductions:10000,rate:20},x=>18000]
 };
