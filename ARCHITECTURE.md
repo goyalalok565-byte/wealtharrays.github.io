@@ -44,3 +44,7 @@ The source modules remain separately versioned because they represent distinct r
 **No test = no intentional production change.**
 
 Do not manually patch generated calculator HTML when the change belongs to the canonical build. Do not modify AdSense/CMP/ads.txt as part of unrelated calculator, SEO, performance, or UX work. Keep release metadata synchronized whenever production architecture or monetization state changes.
+
+
+## Decision Engine layer
+The existing 20 calculator definitions remain protected. `financial-engine.js` is a separate deterministic scenario layer used by `scenario-lab.html`; `scenario-lab.js` is presentation-only. Future calculator adapters must prove equivalence against existing calculator outputs before replacing any stable model. `qa/decision-engine-audit.mjs` is a mandatory CI gate.
