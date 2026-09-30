@@ -1,27 +1,29 @@
-/* Wealth Arrays Decision Adapters v1. These wrap the new engine without replacing legacy calculators. */
+/* Wealth Arrays Decision Adapters v2. Certified wrappers around deterministic math.
+   These do not replace legacy calculator runtime. */
 (function(root){
-'use strict';
-var E=root.WA_FINANCIAL_ENGINE;
-if(!E)return;
-function sip(v){
- var monthly=Number(v.monthly)||0,rate=Number(v.rate)||0,years=Number(v.years)||0,inflation=Number(v.inflation)||0;
- var fv=E.futureValueSeries(monthly,rate,years,'beginning'),invested=monthly*Math.round(years*12);
- return {futureValue:fv,invested:invested,growth:fv-invested,todayValue:E.inflationAdjusted(fv,inflation,years)};
-}
-function compound(v){
- var principal=Math.max(Number(v.principal)||0,0),rate=Number(v.rate)||0,years=Math.max(Number(v.years)||0,0),freq=Math.max(1,Number(v.freq)||1),inflation=Number(v.inflation)||0;
- var amount=principal*Math.pow(1+rate/100/freq,freq*years);
- return {principal:principal,interest:amount-principal,futureValue:amount,todayValue:E.inflationAdjusted(amount,inflation,years)};
-}
-function inflation(v){
- var amount=Math.max(Number(v.amount)||0,0),rate=Math.max(Number(v.rate)||0,0),years=Math.max(Number(v.years)||0,0);
- var factor=Math.pow(1+rate/100,years),futureAmount=amount*factor;
- return {futureAmount:futureAmount,priceIncrease:futureAmount-amount,purchasingPower:amount/factor};
-}
-function retirement(v){
- var expenses=Math.max(Number(v.expenses)||0,0),withdrawal=Math.max(Number(v.withdrawal)||0,0),current=Math.max(Number(v.current)||0,0);
- var target=withdrawal>0?expenses/(withdrawal/100):0,remaining=Math.max(target-current,0),progress=target>0?Math.min(current/target*100,100):0;
- return {targetCorpus:target,remaining:remaining,progress:progress};
-}
-root.WA_DECISION_ADAPTERS=Object.freeze({sip:sip,compound:compound,inflation:inflation,retirement:retirement});
-})(window);
+'use strict';var E=root.WA_FINANCIAL_ENGINE;if(!E)return;
+var n=function(x){return Number(x)||0},pos=function(x){return Math.max(n(x),0)},months=function(y){return Math.max(1,Math.round(pos(y)*12))};
+function sip(v){var monthly=pos(v.monthly),rate=n(v.rate),years=pos(v.years),inflation=pos(v.inflation),fv=E.futureValueSeries(monthly,rate,years,'beginning'),invested=monthly*Math.round(years*12);return{futureValue:fv,invested:invested,growth:fv-invested,todayValue:E.inflationAdjusted(fv,inflation,years)}}
+function compound(v){var principal=pos(v.principal),rate=n(v.rate),years=pos(v.years),freq=Math.max(1,n(v.freq)||1),inflation=pos(v.inflation),amount=principal*Math.pow(1+rate/100/freq,freq*years);return{principal:principal,interest:amount-principal,futureValue:amount,todayValue:E.inflationAdjusted(amount,inflation,years)}}
+function inflation(v){var amount=pos(v.amount),rate=pos(v.rate),years=pos(v.years),factor=Math.pow(1+rate/100,years);return{futureAmount:amount*factor,priceIncrease:amount*(factor-1),purchasingPower:amount/factor}}
+function retirement(v){var expenses=pos(v.expenses),withdrawal=pos(v.withdrawal),current=pos(v.current),target=withdrawal>0?expenses/(withdrawal/100):0,remaining=Math.max(target-current,0);return{targetCorpus:target,remaining:remaining,progress:target>0?Math.min(current/target*100,100):0}}
+function cagr(v){var start=pos(v.start),end=pos(v.end),years=pos(v.years),gain=end-start;return{gain:gain,totalGrowth:start?(gain/start)*100:0,cagr:start>0&&years>0?((Math.pow(end/start,1/years)-1)*100):0}}
+function roi(v){var cost=pos(v.cost),finalValue=pos(v.finalValue),years=pos(v.years),gain=finalValue-cost;return{gain:gain,roi:cost?gain/cost*100:0,annualized:cost&&years?Math.pow(finalValue/cost,1/years)*100-100:0}}
+function lumpsum(v){var principal=pos(v.principal),rate=n(v.rate),years=pos(v.years),inflation=pos(v.inflation),future=principal*Math.pow(1+rate/100,years);return{principal:principal,gain:future-principal,futureValue:future,todayValue:E.inflationAdjusted(future,inflation,years)}}
+function fixedDeposit(v){var principal=pos(v.principal),rate=pos(v.rate),years=pos(v.years),inflation=pos(v.inflation),freq=Math.max(1,n(v.freq)||1),future=principal*Math.pow(1+rate/100/freq,freq*years);return{principal:principal,interest:future-principal,maturity:future,todayValue:E.inflationAdjusted(future,inflation,years)}}
+function recurringDeposit(v){var monthly=pos(v.monthly),rate=pos(v.rate),years=pos(v.years),inflation=pos(v.inflation),m=Math.max(0,Math.round(years*12)),i=rate/1200,future=i===0?monthly*m:monthly*((Math.pow(1+i,m)-1)/i);return{months:m,totalDeposits:monthly*m,interest:future-monthly*m,maturity:future,todayValue:E.inflationAdjusted(future,inflation,years)}}
+function simpleInterest(v){var principal=pos(v.principal),rate=pos(v.rate),years=pos(v.years),interest=principal*rate*years/100;return{interest:interest,total:principal+interest}}
+function emi(v){var P=pos(v.principal),rate=pos(v.rate),years=pos(v.years),m=months(years),r=Math.max(rate,0)/1200,payment=P===0?0:r===0?P/m:P*r*Math.pow(1+r,m)/(Math.pow(1+r,m)-1),total=payment*m;return{principal:P,months:m,payment:payment,total:total,interest:total-P}}
+function carLoan(v){var price=pos(v.price),down=Math.min(pos(v.down),price),x=emi({principal:price-down,rate:v.rate,years:v.years});return Object.assign(x,{vehiclePrice:price,downPayment:down,totalCost:x.total+down})}
+function debtPayoff(v){var balance=pos(v.balance),payment=pos(v.payment),r=pos(v.rate)/1200;if(balance===0)return{months:0,years:0,interest:0};if(payment<=balance*r)return{monthlyInterest:balance*r,payment:payment,paymentGap:Math.max(balance*r-payment,0),months:Infinity};var exact=r===0?balance/payment:-Math.log(1-r*balance/payment)/Math.log(1+r),m=Math.max(1,Math.ceil(exact));let remaining=balance,total=0;for(let i=1;i<=m;i++){remaining*=1+r;var due=Math.min(payment,remaining);total+=due;remaining=Math.max(remaining-due,0);if(remaining<=1e-8)break}return{months:m,years:m/12,interest:Math.max(total-balance,0)}}
+function netWorth(v){var assets=pos(v.cash)+pos(v.investments)+pos(v.property),debt=pos(v.debt);return{assets:assets,liabilities:debt,netWorth:assets-debt}}
+function salaryHourly(v){var hours=pos(v.hoursPerWeek),weeks=pos(v.weeksPerYear),amount=pos(v.amount),totalHours=hours*weeks;return v.direction==='toSalary'?{hoursPerYear:totalHours,salary:amount*totalHours}:{hoursPerYear:totalHours,hourly:totalHours?amount/totalHours:0}}
+function overtime(v){var hourly=pos(v.hourly),regular=pos(v.regular),overtime=pos(v.overtime),multiplier=Math.max(n(v.multiplier),1),regularPay=hourly*regular,otPay=hourly*overtime*multiplier;return{regularPay:regularPay,overtimePay:otPay,total:regularPay+otPay}}
+function freelance(v){var income=pos(v.income),expenses=pos(v.expenses),hours=pos(v.hours),weeks=pos(v.weeks),billable=hours*weeks;return{annualAmount:income+expenses,billableHours:billable,hourlyRate:billable?(income+expenses)/billable:0}}
+function profitMargin(v){var revenue=pos(v.revenue),cogs=pos(v.cogs),expenses=pos(v.expenses),gross=revenue-cogs,net=gross-expenses;return{grossProfit:gross,grossMargin:revenue?gross/revenue*100:0,netProfit:net,netMargin:revenue?net/revenue*100:0}}
+function incomeTaxPlanner(v){var income=pos(v.income),deductions=Math.min(pos(v.deductions),income),taxable=income-deductions,rate=pos(v.rate),tax=taxable*rate/100;return{taxableIncome:taxable,tax:tax,effectiveRate:income?tax/income*100:0,afterTaxIncome:income-tax}}
+const adapters={sip,compound,inflation,retirement,cagr,roi,lumpsum,'fixed-deposit':fixedDeposit,'recurring-deposit':recurringDeposit,'simple-interest':simpleInterest,'car-loan':carLoan,mortgage:v=>emi({principal:v.principal,rate:v.rate,years:v.years}),'personal-loan':v=>emi({principal:v.principal,rate:v.rate,years:v.years}),'debt-payoff':debtPayoff,'net-worth':netWorth,'salary-hourly':salaryHourly,overtime, 'freelance-rate':freelance,'profit-margin':profitMargin,'income-tax-planner':incomeTaxPlanner,'freedom-milestone':retirement};
+const registry=Object.freeze(Object.fromEntries(Object.keys(adapters).map(id=>[id,{status:'certified',adapter:adapters[id],version:'1.0'}])));
+root.WA_DECISION_ADAPTERS=Object.freeze(adapters);root.WA_DECISION_REGISTRY=registry;
+if(typeof module!=='undefined'&&module.exports)module.exports={adapters,registry};
+})(typeof window!=='undefined'?window:globalThis);
