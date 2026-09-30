@@ -19,7 +19,7 @@ Updated: 2026-09-30
 **Next:** multi-goal, debt, income and expense timeline model.
 
 ## Phase 5 — Global Country Engine
-**Implemented:** country-module contract and metadata registry for India, US, UK, UAE, Canada, Australia and Singapore.
+**Implemented:** country-module contract and metadata registry for India, US, UK, UAE, Canada, Australia and Singapore. India now has a source-versioned AY 2026-27 new-regime personal income-tax module with official-source provenance and golden-vector QA.
 **Rule:** jurisdiction-specific tax/retirement calculations require authoritative source provenance and year/effective-date versioning.
 
 ## Phase 6 — Multilingual
