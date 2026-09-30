@@ -10,5 +10,5 @@ const ai=JSON.parse(fs.readFileSync('ai-contract.json','utf8'));if(ai.rule.index
 const api=fs.readFileSync('api/openapi.yml','utf8');if(!api.includes('/v1/calculate')||!api.includes('/v1/models'))throw new Error('API contract incomplete');
 const workspace=fs.readFileSync('financial-workspace.html','utf8');for(const x of ['/financial-engine.js','/financial-workspace.js','Scenario'])if(!workspace.includes(x))throw new Error('Workspace contract missing: '+x);
 const build=fs.readFileSync('scripts/root-cause-build.mjs','utf8');for(const x of ['financial-workspace.js','isWorkspacePage','/financial-workspace'])if(!build.includes(x))throw new Error('Build preservation missing: '+x);
-const bad=fs.readFileSync('financial-workspace.js','utf8');if(/password|token|authorization/i.test(bad))throw new Error('Workspace contains credential-like fields');
+const ws=fs.readFileSync('financial-workspace.js','utf8');for(const x of ['localStorage','fw-save','fw-load','fw-delete'])if(!ws.includes(x))throw new Error('Local workspace contract missing: '+x);const bad=ws;if(/password|token|authorization/i.test(bad))throw new Error('Workspace contains credential-like fields');
 console.log('Global platform audit PASS: engine, adapters, reports, country layer, i18n, AI contract, API contract, privacy contract, workspace and build preservation.');
