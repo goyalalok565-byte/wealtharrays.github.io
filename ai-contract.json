@@ -1,0 +1,11 @@
+{
+  "schema_version":"1.0",
+  "purpose":"AI intent layer contract for Wealth Arrays",
+  "rule":"AI may select/explain deterministic models but may not invent numerical results.",
+  "flow":["intent_parse","jurisdiction_resolve","model_select","deterministic_calculation","validation","scenario_generation","explanation"],
+  "required_fields":["intent","country","currency","inputs","assumptions"],
+  "result_requirements":["model_id","model_version","inputs","assumptions","results","limitations"],
+  "unknown_input_policy":"ask_or_mark_unknown",
+  "tax_policy":"never infer jurisdiction/year-specific tax rules without an approved country module and source provenance",
+  "recommendation_policy":"return calculations and trade-offs; do not present unsupported personalized financial advice"
+}
