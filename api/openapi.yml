@@ -1,0 +1,35 @@
+openapi: 3.0.3
+info:
+  title: Wealth Arrays Financial Engine API
+  version: 1.0.0
+  description: Deterministic financial calculations with reproducible inputs and model versions.
+paths:
+  /v1/calculate:
+    post:
+      summary: Calculate a registered financial model
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [model, inputs]
+              properties:
+                model: {type: string}
+                model_version: {type: string}
+                inputs: {type: object}
+                assumptions: {type: object}
+                country: {type: string}
+                currency: {type: string}
+      responses:
+        '200':
+          description: Deterministic result
+        '400':
+          description: Invalid or incomplete input
+        '422':
+          description: Unsupported model, country rule or version
+  /v1/models:
+    get:
+      summary: List available calculation models
+      responses:
+        '200': {description: Model registry}
