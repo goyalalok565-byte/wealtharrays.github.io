@@ -1,4 +1,5 @@
-const fs=require('node:fs'),vm=require('node:vm');
+import fs from 'node:fs';
+import vm from 'node:vm';
 const ctx={window:{},console};vm.createContext(ctx);
 for(const f of ['financial-engine.js','decision-adapters.js','formula-registry.js'])vm.runInContext(fs.readFileSync(f,'utf8'),ctx,{filename:f});
 const A=ctx.window.WA_DECISION_ADAPTERS,R=ctx.window.WA_DECISION_REGISTRY,F=ctx.window.WA_FORMULA_REGISTRY,E=ctx.window.WA_FINANCIAL_ENGINE;
