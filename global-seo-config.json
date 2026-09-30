@@ -1,0 +1,9 @@
+{
+  "defaultLanguage":"en",
+  "supportedLanguages":["en","hi","es","ar","fr","de","pt","ja"],
+  "countryCodes":["IN","US","GB","AE","CA","AU","SG"],
+  "strategy":"language-and-jurisdiction are separate dimensions",
+  "canonicalRule":"one canonical URL per language-country-content combination",
+  "hreflangRule":"emit only when translated/localized equivalent exists",
+  "indexingRule":"do not mass-generate thin country/language pages"
+}
