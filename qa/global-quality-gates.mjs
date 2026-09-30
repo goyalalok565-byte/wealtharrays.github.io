@@ -5,7 +5,7 @@ for(const f of requiredRoutes)if(!fs.existsSync(f))throw new Error('Missing rout
 for(const f of htmlFiles){
  const s=fs.readFileSync(f,'utf8');
  if(/<img(?![^>]*\balt=)/i.test(s))throw new Error('Image without alt contract: '+f);
- if(/<button(?![^>]*(?:aria-label|>\s*[^<]+\s*<\/button>))/i.test(s))throw new Error('Potential unnamed button: '+f);
+ const buttons=[...s.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/gi)];for(const b of buttons){const attrs=b[1],text=b[2].replace(/<[^>]+>/g,'').replace(/&(?:nbsp|#160);/g,' ').trim();if(!/\baria-label\s*=|\btitle\s*=/i.test(attrs)&&!text)throw new Error('Potential unnamed button: '+f)}
  if(/href=["']{2}/i.test(s))throw new Error('Empty href: '+f);
 }
 const sitemap=fs.readFileSync('sitemap.xml','utf8');for(const r of ['/scenario-lab','/goal-planner','/financial-workspace'])if(!sitemap.includes('https://wealtharrays.com'+r))throw new Error('Sitemap route missing: '+r);
