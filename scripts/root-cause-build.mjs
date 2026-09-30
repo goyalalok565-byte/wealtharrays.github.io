@@ -31,7 +31,7 @@ const defDir=path.join(root,'calculator-definitions');fs.mkdirSync(defDir,{recur
 for(const {obj,id} of definitions)fs.writeFileSync(path.join(defDir,`${id}.js`),`/* Generated from calculators.js — do not edit directly. */\nwindow.CALCULATORS=window.CALCULATORS||[];window.CALCULATORS.push(${obj});\n`,'utf8');
 
 const allHtml=[];function walk(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){const f=path.join(dir,e.name);if(e.isDirectory()){if(!['.git','node_modules'].includes(e.name))walk(f);}else if(e.name.endsWith('.html'))allHtml.push(f);}}walk(root);
-const managed=new Set([...required,'wa-site-runtime.js','wa-calculator-runtime.js']);
+const managed=new Set([...required,'wa-site-runtime.js','wa-calculator-runtime.js','financial-engine.js','scenario-lab.js']);
 const isScenarioLabPage=(rel)=>rel==='scenario-lab.html';
 for(const full of allHtml){
   let html=fs.readFileSync(full,'utf8');
