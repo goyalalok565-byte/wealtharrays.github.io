@@ -4,7 +4,7 @@ for(const f of must)if(!fs.existsSync(f))throw new Error('Missing platform asset
 const engine=fs.readFileSync('financial-engine.js','utf8');
 for(const fn of ['futureValue','futureValueSeries','project','scenarios','sensitivity','stressTests','projectWithPause','requiredMonthlyContribution'])if(!engine.includes('function '+fn))throw new Error('Engine function missing: '+fn);
 const adapters=fs.readFileSync('decision-adapters.js','utf8');
-for(const name of ['sip','compound','inflation','retirement'])if(!new RegExp('(?:^|[,{])'+name+'\\s*[:=]').test(adapters))throw new Error('Adapter missing: '+name);
+for(const name of ['sip','compound','inflation','retirement'])if(!new RegExp('function\\s+'+name+'\\s*\\(').test(adapters))throw new Error('Adapter missing: '+name);
 const report=fs.readFileSync('report-engine.js','utf8');for(const x of ['schemaVersion','modelVersion','inputs','assumptions','scenarios','stressTests','sources','limitations','fingerprint'])if(!report.includes(x))throw new Error('Report contract missing: '+x);
 const ai=JSON.parse(fs.readFileSync('ai-contract.json','utf8'));if(ai.rule.indexOf('may not invent')<0)throw new Error('AI numerical safety contract missing');
 const api=fs.readFileSync('api/openapi.yml','utf8');if(!api.includes('/v1/calculate')||!api.includes('/v1/models'))throw new Error('API contract incomplete');
