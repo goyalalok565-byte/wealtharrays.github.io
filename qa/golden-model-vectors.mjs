@@ -24,7 +24,7 @@ const cases={
  'salary-hourly':[{direction:'toHourly',amount:60000,hoursPerWeek:40,weeksPerYear:48},x=>31.25],
  overtime:[{hourly:20,regular:160,overtime:20,multiplier:1.5},x=>3800],
  'freelance-rate':[{income:60000,expenses:12000,hours:20,weeks:48},x=>72],
- 'profit-margin':[{revenue:50000,cogs:28000,expenses:9000},x=>44],
+ 'profit-margin':[{revenue:50000,cogs:28000,expenses:9000},x=>26],
  'income-tax-planner':[{income:100000,deductions:10000,rate:20},x=>18000]
 };
 for(const [id,[input,expected]] of Object.entries(cases)){const out=A[id](input), keys=Object.keys(out);if(!keys.length)throw new Error('No output '+id);const val=id==='compound'?out.futureValue:id==='sip'?out.futureValue:id==='inflation'?out.futureAmount:id==='freedom-milestone'?out.targetCorpus:id==='cagr'?out.cagr:id==='roi'?out.roi:id==='lumpsum'?out.futureValue:id==='fixed-deposit'?out.maturity:id==='recurring-deposit'?out.maturity:id==='simple-interest'?out.interest:id==='car-loan'?out.payment:id==='mortgage'?out.payment:id==='personal-loan'?out.payment:id==='debt-payoff'?out.months:id==='net-worth'?out.netWorth:id==='salary-hourly'?out.hourly:id==='overtime'?out.total:id==='freelance-rate'?out.hourlyRate:id==='profit-margin'?out.netMargin:out.tax;if(!close(val,expected(input)))throw new Error('Golden vector failed '+id+': '+val+' vs '+expected(input))}
