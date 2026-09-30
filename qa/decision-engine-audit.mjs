@@ -19,5 +19,9 @@ const retirement=A.retirement({expenses:30000,withdrawal:4,current:20000});
 if(Math.abs(retirement.targetCorpus-750000)>1e-8||Math.abs(retirement.remaining-730000)>1e-8)throw new Error('Retirement equivalence failed');const adapted=A.sip(legacy);const legacyFV=200*((Math.pow(1+10/100/12,15*12)-1)/(10/100/12))*(1+10/100/12);if(Math.abs(adapted.futureValue-legacyFV)>1e-8)throw new Error('SIP equivalence failed');
 const s=E.scenarios(base);if(s.length!==3)throw new Error('Scenario set failed');const stress=E.stressTests(base);if(stress.length!==4||stress.some(x=>!Number.isFinite(x.result.futureValue)))throw new Error('Stress tests failed');const m=E.sensitivity(base,[7,10,13]);if(m.length!==3)throw new Error('Sensitivity failed');
 const need=E.requiredMonthlyContribution(250000,10000,10,20,5);if(!Number.isFinite(need)||need<=0)throw new Error('Goal solver failed');
-const page=fs.readFileSync('scenario-lab.html','utf8');for(const x of ['/financial-engine.js','/decision-adapters.js','/scenario-lab.js','Compare scenarios' ,"Today's value"])if(!page.includes(x))throw new Error('Scenario Lab contract missing: '+x);
+const page=fs.readFileSync('scenario-lab.html','utf8');for(const x of ['/financial-engine.js','/decision-adapters.js','/scenario-lab.js','Compare scenarios','Share scenario','sl-stress',"Today's value"])if(!page.includes(x))throw new Error('Scenario Lab contract missing: '+x);
 console.log('Decision engine audit PASS — deterministic projection, scenarios, sensitivity, inflation adjustment and goal solver validated.');
+
+const goal=fs.readFileSync('goal-planner.html','utf8');for(const x of ['/financial-engine.js','/decision-adapters.js','/goal-planner.js','Build my scenarios','Share goal'])if(!goal.includes(x))throw new Error('Goal Planner contract missing: '+x);
+if(!fs.readFileSync('scenario-lab.js','utf8').includes('URLSearchParams'))throw new Error('Scenario share contract missing');
+if(!fs.readFileSync('goal-planner.js','utf8').includes('URLSearchParams'))throw new Error('Goal share contract missing');
