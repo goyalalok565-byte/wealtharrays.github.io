@@ -55,7 +55,7 @@ jobs:
           node qa/phase4-premium-audit.mjs
           node qa/value-content-audit.mjs
           node qa/decision-engine-audit.mjs
-      node qa/global-platform-audit.mjs
+          node qa/global-platform-audit.mjs
           node scripts/site-integrity.mjs
           node scripts/launch-readiness.mjs
           node scripts/phase10-qa.mjs
