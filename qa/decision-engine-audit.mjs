@@ -8,5 +8,5 @@ const p=E.project(base);if(!Number.isFinite(p.futureValue)||p.futureValue<=p.tot
 if(Math.abs(E.realReturn(10,6)-3.7735849056603774)>1e-9)throw new Error('Real return failed');
 const s=E.scenarios(base);if(s.length!==3)throw new Error('Scenario set failed');const m=E.sensitivity(base,[7,10,13]);if(m.length!==3)throw new Error('Sensitivity failed');
 const need=E.requiredMonthlyContribution(250000,10000,10,20,5);if(!Number.isFinite(need)||need<=0)throw new Error('Goal solver failed');
-const page=fs.readFileSync('scenario-lab.html','utf8');for(const x of ['/financial-engine.js','/scenario-lab.js','Compare scenarios','Today's value'])if(!page.includes(x))throw new Error('Scenario Lab contract missing: '+x);
+const page=fs.readFileSync('scenario-lab.html','utf8');for(const x of ['/financial-engine.js','/scenario-lab.js','Compare scenarios' ,"Today's value"])if(!page.includes(x))throw new Error('Scenario Lab contract missing: '+x);
 console.log('Decision engine audit PASS — deterministic projection, scenarios, sensitivity, inflation adjustment and goal solver validated.');
