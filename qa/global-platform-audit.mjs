@@ -1,0 +1,14 @@
+import fs from 'node:fs';
+const must=['formula-registry.js','financial-engine.js','decision-adapters.js','report-engine.js','i18n.js','analytics.js','accessibility.js','visualization.js','ai-contract.json','api/openapi.yml','country-modules/index.js','privacy/README.md','financial-workspace.html','financial-workspace.js','reports/README.md'];
+for(const f of must)if(!fs.existsSync(f))throw new Error('Missing platform asset: '+f);
+const engine=fs.readFileSync('financial-engine.js','utf8');
+for(const fn of ['futureValue','futureValueSeries','project','scenarios','sensitivity','stressTests','projectWithPause','requiredMonthlyContribution'])if(!engine.includes('function '+fn))throw new Error('Engine function missing: '+fn);
+const adapters=fs.readFileSync('decision-adapters.js','utf8');
+for(const name of ['sip','compound','inflation','retirement'])if(!new RegExp('(?:^|[,{])'+name+'\\s*[:=]').test(adapters))throw new Error('Adapter missing: '+name);
+const report=fs.readFileSync('report-engine.js','utf8');for(const x of ['schemaVersion','modelVersion','inputs','assumptions','scenarios','stressTests','sources','limitations','fingerprint'])if(!report.includes(x))throw new Error('Report contract missing: '+x);
+const ai=JSON.parse(fs.readFileSync('ai-contract.json','utf8'));if(ai.rule.indexOf('may not invent')<0)throw new Error('AI numerical safety contract missing');
+const api=fs.readFileSync('api/openapi.yml','utf8');if(!api.includes('/v1/calculate')||!api.includes('/v1/models'))throw new Error('API contract incomplete');
+const workspace=fs.readFileSync('financial-workspace.html','utf8');for(const x of ['/financial-engine.js','/financial-workspace.js','Scenario'])if(!workspace.includes(x))throw new Error('Workspace contract missing: '+x);
+const build=fs.readFileSync('scripts/root-cause-build.mjs','utf8');for(const x of ['financial-workspace.js','isWorkspacePage','/financial-workspace'])if(!build.includes(x))throw new Error('Build preservation missing: '+x);
+const bad=fs.readFileSync('financial-workspace.js','utf8');if(/password|token|authorization/i.test(bad))throw new Error('Workspace contains credential-like fields');
+console.log('Global platform audit PASS: engine, adapters, reports, country layer, i18n, AI contract, API contract, privacy contract, workspace and build preservation.');
