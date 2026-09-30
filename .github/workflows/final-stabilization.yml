@@ -57,6 +57,7 @@ jobs:
           node qa/decision-engine-audit.mjs
           node qa/global-platform-audit.mjs
           node qa/global-quality-gates.mjs
+          node qa/golden-model-vectors.mjs
           node scripts/site-integrity.mjs
           node scripts/launch-readiness.mjs
           node scripts/phase10-qa.mjs
