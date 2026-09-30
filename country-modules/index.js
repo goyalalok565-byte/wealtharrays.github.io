@@ -1,7 +1,7 @@
 /* Country layer registry. Rules are metadata-first and versioned; universal arithmetic stays in financial-engine.js. */
 (function(root){'use strict';
 const countries=Object.freeze({
- IN:{name:'India',currency:'INR',locale:'en-IN',status:'metadata',ruleVersion:'0.1',effectiveFrom:null,sources:[]},
+ IN:{name:'India',currency:'INR',locale:'en-IN',status:'tax-module-new-regime-ay2026-27',ruleVersion:'1.0',effectiveFrom:'2025-04-01',sources:['https://www.incometax.gov.in/iec/foportal/help/individual/return-applicable-1']},
  US:{name:'United States',currency:'USD',locale:'en-US',status:'metadata',ruleVersion:'0.1',effectiveFrom:null,sources:[]},
  GB:{name:'United Kingdom',currency:'GBP',locale:'en-GB',status:'metadata',ruleVersion:'0.1',effectiveFrom:null,sources:[]},
  AE:{name:'United Arab Emirates',currency:'AED',locale:'en-AE',status:'metadata',ruleVersion:'0.1',effectiveFrom:null,sources:[]},
