@@ -31,8 +31,9 @@ const defDir=path.join(root,'calculator-definitions');fs.mkdirSync(defDir,{recur
 for(const {obj,id} of definitions)fs.writeFileSync(path.join(defDir,`${id}.js`),`/* Generated from calculators.js — do not edit directly. */\nwindow.CALCULATORS=window.CALCULATORS||[];window.CALCULATORS.push(${obj});\n`,'utf8');
 
 const allHtml=[];function walk(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){const f=path.join(dir,e.name);if(e.isDirectory()){if(!['.git','node_modules'].includes(e.name))walk(f);}else if(e.name.endsWith('.html'))allHtml.push(f);}}walk(root);
-const managed=new Set([...required,'wa-site-runtime.js','wa-calculator-runtime.js','financial-engine.js','scenario-lab.js']);
+const managed=new Set([...required,'wa-site-runtime.js','wa-calculator-runtime.js','financial-engine.js','scenario-lab.js','goal-planner.js']);
 const isScenarioLabPage=(rel)=>rel==='scenario-lab.html';
+const isGoalPlannerPage=(rel)=>rel==='goal-planner.html';
 for(const full of allHtml){
   let html=fs.readFileSync(full,'utf8');
   // Normalize legacy empty navigation targets at source/build level so future generated pages never emit dead self-links.
@@ -40,10 +41,11 @@ for(const full of allHtml){
   const relPath=path.relative(root,full).replaceAll(path.sep,'/');
   const isWidget=relPath==='widget.html';
   const isScenarioLab=isScenarioLabPage(relPath);
+  const isGoalPlanner=isGoalPlannerPage(relPath);
   const isCalc=/<html[^>]+data-wa-calculator=/i.test(html);
   html=html.replace(/\s*<script\s+src=["']([^"']+)[^>]*><\/script>/gi,(tag,src)=>{
     const base=path.basename(src.split('?',1)[0]);
-    const keep=managed.has(base)||(isWidget&&['calculators.js','wa-calculator-runtime.js'].includes(base))||(isScenarioLab&&['financial-engine.js','scenario-lab.js'].includes(base));
+    const keep=managed.has(base)||(isWidget&&['calculators.js','wa-calculator-runtime.js'].includes(base))||(isScenarioLab&&['financial-engine.js','scenario-lab.js'].includes(base))||(isGoalPlanner&&['financial-engine.js','goal-planner.js'].includes(base));
     return keep?'':tag;
   });html=html.replace(/\s*<!-- WA-(?:SITE|CANONICAL)-RUNTIME:[^>]+-->\s*/g,'\n');
 html=html.replace(/(<link\s+[^>]*rel=["'](?:preload|stylesheet)["'][^>]*href=["'])\/?styles\.css(["'][^>]*>)/gi,'$1/styles.css$2');html=html.replace(/(<link\s+[^>]*href=["'])styles\.css(["'][^>]*rel=["'](?:preload|stylesheet)["'][^>]*>)/gi,'$1/styles.css$2');if(!html.includes('href="/styles.css"')&&!html.includes("href='/styles.css'"))html=html.replace('</head>','<link rel="stylesheet" href="/styles.css"></head>');
@@ -52,6 +54,7 @@ html=html.replace('</head>','<link rel="icon" type="image/svg+xml" href="/favico
 if(isCalc){const rawId=html.match(/data-wa-calculator="([^"]+)"/i)?.[1];if(!rawId)throw new Error(`Calculator page missing data-wa-calculator: ${full}`);const base=path.basename(full).toLowerCase()==='index.html'?path.basename(path.dirname(full)):path.basename(full,'.html');const id=byId.get(rawId)||bySlug.get(base)||pageAliases.get(base);if(!id)throw new Error(`No calculator definition matches ${full} (${rawId}, ${base})`);html=html.replace(/data-wa-calculator="[^"]+"/i,`data-wa-calculator="${id}"`);html=html.replace(/\s*<script[^>]+calculator-definitions[^>]*><\/script>/gi,'');const def=`<script src="/calculator-definitions/${id}.js?v=${stamp}" defer></script>`;const runtime=`<script src="/wa-calculator-runtime.js?v=${stamp}" defer></script>`;html=html.replace(/\s*<script[^>]+wa-calculator-runtime\.js[^>]*><\/script>/gi,'');html=html.replace('</body>',`${def}${runtime}</body>`);html=html.replace(/(<body[^>]*>)/i,'$1\n<!-- WA-CANONICAL-RUNTIME:v3 -->');}
 else{if(!html.includes('wa-site-runtime.js'))html=html.replace('</body>',`<script src="/wa-site-runtime.js?v=${stamp}" defer></script></body>`);html=html.replace(/(<body[^>]*>)/i,'$1\n<!-- WA-SITE-RUNTIME:v3 -->');}
 if(isScenarioLab){html=html.replace(/\s*<script\s+src=["']\/financial-engine\.js[^>]*><\/script>/gi,'').replace(/\s*<script\s+src=["']\/scenario-lab\.js[^>]*><\/script>/gi,'');html=html.replace('</body>','<script src="/financial-engine.js"></script><script src="/scenario-lab.js"></script></body>');}
+if(isGoalPlanner){html=html.replace(/\s*<script\s+src=["']\/financial-engine\.js[^>]*><\/script>/gi,'').replace(/\s*<script\s+src=["']\/goal-planner\.js[^>]*><\/script>/gi,'');html=html.replace('</body>','<script src="/financial-engine.js"></script><script src="/goal-planner.js"></script></body>');}
 if(isCalc){
   const m=relPath.match(/^([^/]+)\/index\.html$/);
   const calculatorValueContent=JSON.parse(fs.readFileSync(path.join(root,'calculator-value-content.json'),'utf8'));
@@ -108,5 +111,5 @@ if(isArticle){
 }
 if(isArticle){html=html.replace(/<p>\s*<strong>Written and maintained by Wealth Arrays\.<\/strong>[\s\S]*?<\/p>/i,'');if(!/Written and maintained by Alok Goyal/i.test(html))html=html.replace(/(<h1[^>]*>[\s\S]*?<\/h1>)/i,'$1<p class="article-byline"><strong>Written and maintained by Alok Goyal, founder and creator of Wealth Arrays.</strong> This guide is educational and not personalised financial advice.</p>');}const adsExcluded=isWidget||relPath==='404.html';if(adsExcluded)html=html.replace(/\s*<script[^>]+adsbygoogle\.js[^>]*><\/script>/gi,'').replace(/\s*<link[^>]+(?:pagead2\.googlesyndication\.com|googleads\.g\.doubleclick\.net)[^>]*>/gi,'').replace(/\s*<link[^>]+(?:pagead2\.googlesyndication\.com|googleads\.g\.doubleclick\.net)[^>]*>/gi,'');if(!html.includes('/cls-fixes.css'))html=html.replace('</head>','<link rel="stylesheet" href="/cls-fixes.css?v=20260917" media="all"></head>');fs.writeFileSync(full,html,'utf8');}
 
-const routes=['/','/tools','/scenario-lab','/articles','/faq','/about','/contact','/privacy','/terms','/disclaimer','/methodology','/editorial-policy','/advertising-policy','/category-investment','/category-loan','/category-banking','/category-retirement','/category-salary','/category-business',...slugs.map(s=>`/${s}/`)];for(const full of allHtml){const rel=path.relative(root,full).replaceAll(path.sep,'/');if(/^articles\/[^/]+\.html$/.test(rel))routes.push('/'+rel.replace(/\.html$/,''));}
+const routes=['/','/tools','/scenario-lab','/goal-planner','/articles','/faq','/about','/contact','/privacy','/terms','/disclaimer','/methodology','/editorial-policy','/advertising-policy','/category-investment','/category-loan','/category-banking','/category-retirement','/category-salary','/category-business',...slugs.map(s=>`/${s}/`)];for(const full of allHtml){const rel=path.relative(root,full).replaceAll(path.sep,'/');if(/^articles\/[^/]+\.html$/.test(rel))routes.push('/'+rel.replace(/\.html$/,''));}
 const unique=[...new Set(routes)];const today=new Date().toISOString().slice(0,10);const sitemap=['<?xml version="1.0" encoding="UTF-8"?>','<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',...unique.map(u=>`  <url><loc>https://wealtharrays.com${u}</loc><lastmod>${today}</lastmod></url>`),'</urlset>',''].join('\n');fs.writeFileSync(path.join(root,'sitemap.xml'),sitemap,'utf8');console.log(`Root-cause build complete: canonical site search, calculator search, current favicon, 20 split definitions, normalized calculator IDs, legacy route aliases, nested route support, absolute styles, CLS reservation, deterministic sitemap, ${allHtml.length} HTML files normalized.`);
