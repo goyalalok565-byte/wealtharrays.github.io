@@ -3,6 +3,7 @@
 > Wealth Arrays is a browser-first financial calculator and financial education website. It provides transparent formulas, assumptions, worked examples, and practical money guides. Results are educational estimates, not personalized financial, tax, legal, or investment advice.
 
 - https://wealtharrays.com/scenario-lab — deterministic scenario comparison and sensitivity tool
+- https://wealtharrays.com/goal-planner — goal-to-gap-to-contribution scenario planner
 
 ## Primary pages
 
