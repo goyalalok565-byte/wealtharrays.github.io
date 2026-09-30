@@ -1,6 +1,6 @@
 # Privacy-first product contract
 
-Default principle: calculations run in the browser and do not require an account.
+Default principle: calculations run in the browser and do not require an account. Financial Workspace currently supports local browser save/load/delete via localStorage; saved inputs are not sent to a Wealth Arrays server by this feature.
 
 Before adding saved financial workspaces:
 - collect only data necessary for the requested feature;
