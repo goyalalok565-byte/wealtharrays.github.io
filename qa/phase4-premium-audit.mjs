@@ -34,7 +34,7 @@ for(const full of publicFiles){
     failures.push(r+': noindex pages must not carry AdSense');
   }
 }
-for(const file of htmlFiles){
+for(const file of publicFiles){
   const base=path.basename(file);
   const html=fs.readFileSync(file,'utf8');
   if(base==='404.html'||base==='widget.html'){
