@@ -31,7 +31,8 @@ for(const file of htmlFiles){
   // Replace every inline calculator bootstrap, including legacy formatting variants.
   const mountId=(s.match(/mountCalculator\(\s*CALCULATORS\.find\(\s*c\s*=>\s*c\.id\s*===\s*['"]([^'"]+)['"]/i)||[])[1];
   if(mountId) s=s.replace(/<script>[^<]*mountCalculator\([^<]*<\/script>/gi,'');
-  const base=path.basename(file);\n  const rel=path.relative(root,file).replaceAll(path.sep,'/');
+  const base=path.basename(file);
+  const rel=path.relative(root,file).replaceAll(path.sep,'/');
   const canonicalId=calcIds[base];
   const id=canonicalId||mountId;
   if(id && s.includes('id="calc-widget"') && base!=='widget.html'){
