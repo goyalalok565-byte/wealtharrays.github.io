@@ -9,6 +9,11 @@ await page.route('**/*', async route => {
   return route.continue();
 });
 const errors = [];
+await page.addInitScript(() => {
+  window.__WA_BROWSER_ERRORS__ = [];
+  window.addEventListener('error', event => window.__WA_BROWSER_ERRORS__.push(event.error?.stack || event.message || 'unknown window error'));
+  window.addEventListener('unhandledrejection', event => window.__WA_BROWSER_ERRORS__.push(String(event.reason?.stack || event.reason || 'unknown rejection')));
+});
 page.on('pageerror', error => {
   const message = String(error);
   // Google ad-quality/consent code can emit an empty rejected promise in production.
@@ -40,7 +45,8 @@ try {
   const taxHref = await results.first().getAttribute('href');
   if (new URL(taxHref, page.url()).pathname !== '/income-tax-scenario-calculator/') throw new Error(`Unexpected tax result href: ${taxHref}`);
 
-  if (errors.length) throw new Error(`Browser page errors: ${errors.join(' | ')}`);
+  const browserErrors = await page.evaluate(() => window.__WA_BROWSER_ERRORS__ || []);
+  if (browserErrors.length) throw new Error(`Browser page errors:\n${browserErrors.join('\n---\n')}\nPlaywright: ${errors.join(' | ')}`);
   console.log(`Homepage calculator search smoke test passed at ${baseUrl}.`);
 } finally {
   await browser.close();
