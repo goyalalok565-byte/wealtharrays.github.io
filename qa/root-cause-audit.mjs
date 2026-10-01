@@ -33,6 +33,6 @@ const redirects=fs.readFileSync('_redirects','utf8');for(const slug of calculato
 if(!fs.existsSync('terms-and-conditions.html'))throw new Error('Legacy terms URL file missing');
 if(!fs.existsSync('p/README.md'))throw new Error('Legacy /p namespace marker missing; ZIP exports would omit the directory');
 for(const [legacy,target] of [['/p/building-corporate-personal-cash.html','/category-business.html'],['/p/optimizing-fixed-term-certificates.html','/fixed-deposit-calculator/'],['/p/the-ultimate-guide-to-systematic.html','/articles/sip-calculator-guide.html']])if(!redirects.includes(`${legacy} ${target} 301`))throw new Error(`Missing hardened legacy /p redirect: ${legacy}`);
-const widget=fs.readFileSync('widget.html','utf8');if(!widget.includes('/calculators.js')||!widget.includes('/wa-calculator-runtime.js'))throw new Error('Widget must load calculator definitions and canonical runtime');
+const widget=fs.readFileSync('widget.html','utf8');if(!widget.includes('/calculators.js')||!widget.includes('/widget.js'))throw new Error('Widget must load calculator definitions and canonical runtime');
 const runtime=fs.readFileSync('wa-calculator-runtime.js','utf8');if(runtime.includes('WA CANONICAL MODULE | calculator | calculators.js'))throw new Error('All 20 definitions are still bundled');
 console.log(`Root-cause audit PASS — ${calculators.length} calculators, ${guides.length} guides, search stacking/matching, current PDF branding, production hotfix, favicon metadata, schemas, canonical routes and generated sitemap verified.`);
