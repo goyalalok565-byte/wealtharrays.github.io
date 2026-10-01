@@ -17,6 +17,7 @@ const phase4Css='<link rel="stylesheet" href="/phase4-premium.css?v=20260915-1">
 const themeJs='<script src="/theme-init.js?v=20260915-1"></script>';
 const redirectJs='<script src="/404-runtime.js?v=20260915-1" defer></script>';
 const adsenseJs='<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6507600103785450" crossorigin="anonymous"></script>';
+const consentJs='<script src="/consent-loader.js" defer></script>';
 const calcIds={
  'sip-calculator.html':'sip','compound-interest-calculator.html':'compound-interest','mortgage-emi-calculator.html':'mortgage','roi-calculator.html':'roi','simple-interest-calculator.html':'simple-interest','retirement-calculator.html':'freedom-milestone','salary-to-hourly-calculator.html':'salary-hourly','profit-margin-calculator.html':'profit-margin','fixed-deposit-calculator.html':'fixed-deposit','recurring-deposit-calculator.html':'recurring-deposit','lumpsum-calculator.html':'lumpsum','cagr-calculator.html':'cagr','car-loan-calculator.html':'car-loan','personal-loan-calculator.html':'personal-loan','debt-payoff-calculator.html':'debt-payoff','inflation-calculator.html':'inflation','net-worth-calculator.html':'net-worth','overtime-pay-calculator.html':'overtime','freelance-rate-calculator.html':'freelance-rate','income-tax-scenario-calculator.html':'income-tax-planner'
 };
@@ -49,6 +50,7 @@ for(const file of htmlFiles){
   // 404 is an error/low-value page; widget.html may be embedded on third-party domains.
   const noindex=/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(s);
   const adsenseExcluded=['404.html','widget.html','widget/index.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html'].includes(base) || noindex;
+  if(!['404.html','widget.html','widget/index.html'].includes(base) && !s.includes('/consent-loader.js')) s=s.replace('</head>',`${consentJs}</head>`);
   if(adsenseExcluded){
     const escaped=adsenseJs.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
     s=s.replace(new RegExp('\\s*'+escaped),'');
