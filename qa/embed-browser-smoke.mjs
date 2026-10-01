@@ -4,6 +4,8 @@ const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:4173';
 const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
 const page = await context.newPage();
+const responseLog = [];
+page.on('response', response => { if (response.status() >= 400) responseLog.push(`${response.status()} ${response.url()}`); });
 const errors = [];
 page.on('pageerror', error => {
   const message = String(error);
@@ -29,8 +31,12 @@ try {
     if (!copied.includes(`/widget.html?calc=${item.id}`)) throw new Error(`Clipboard embed URL is incorrect on ${item.slug}: ${copied}`);
     const widgetPath = '/widget.html';
     const widgetUrl = `${baseUrl.replace(/\/$/,'')}${widgetPath}?calc=${item.id}`;
-    await page.goto(widgetUrl, {waitUntil:'networkidle'});
-    await page.locator('#calc-widget input, #calc-widget select').first().waitFor({state:'visible',timeout:8000});
+    const widgetResponse = await page.goto(widgetUrl, {waitUntil:'networkidle'});
+    if (!widgetResponse || !widgetResponse.ok()) throw new Error(`Widget HTTP response was not OK for ${item.id}: ${widgetResponse?.status()} ${widgetUrl}`);
+    await page.locator('#calc-widget input, #calc-widget select').first().waitFor({state:'visible',timeout:8000}).catch(async () => {
+      const diagnostics = await page.evaluate(() => ({title:document.title, url:location.href, body:(document.body?.innerText||'').slice(0,1200), widget:document.querySelector('#calc-widget')?.outerHTML?.slice(0,1200)||null, scripts:[...document.scripts].map(s=>s.src).filter(Boolean)}));
+      throw new Error(`Widget did not become visible for ${item.id}: ${JSON.stringify(diagnostics)} HTTP_ERRORS=${JSON.stringify(responseLog)}`);
+    });
     if (!(await page.locator('#calc-widget').isVisible())) throw new Error(`Widget container not visible for ${item.id}`);
   }
   if (errors.length) throw new Error(`Browser page errors:\n${errors.join('\n---\n')}`);
