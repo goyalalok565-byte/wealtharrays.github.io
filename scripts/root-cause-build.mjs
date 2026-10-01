@@ -40,7 +40,7 @@ for(const full of allHtml){
   // Normalize legacy empty navigation targets at source/build level so future generated pages never emit dead self-links.
   html=html.replace(/href=[\"']{2}/g, 'href="/"');
   const relPath=path.relative(root,full).replaceAll(path.sep,'/');
-  const isWidget=relPath==='widget.html';
+  const isWidget=relPath==='widget.html'||relPath==='widget/index.html';
   const isScenarioLab=isScenarioLabPage(relPath);
   const isGoalPlanner=isGoalPlannerPage(relPath);
   const isCalc=/<html[^>]+data-wa-calculator=/i.test(html);
