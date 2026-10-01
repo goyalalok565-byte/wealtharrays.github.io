@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0",
+  "study_id": "sip-contribution-timing",
+  "model_id": "sip",
+  "model_version": "1.0",
+  "title": "SIP contribution timing mechanics",
+  "method": "Deterministic monthly compounding with identical contribution, rate and horizon; only contribution timing changes.",
+  "assumptions": {
+    "monthlyContribution": 1000,
+    "annualRate": 10,
+    "compounding": "monthly"
+  },
+  "rows": [
+    {
+      "timing": "beginning",
+      "monthly": 1000,
+      "annualRate": 10,
+      "years": 5,
+      "futureValue": 78082.38110821,
+      "totalContributions": 60000
+    },
+    {
+      "timing": "beginning",
+      "monthly": 1000,
+      "annualRate": 10,
+      "years": 10,
+      "futureValue": 206552.02039433,
+      "totalContributions": 120000
+    },
+    {
+      "timing": "beginning",
+      "monthly": 1000,
+      "annualRate": 10,
+      "years": 20,
+      "futureValue": 765696.90962321,
+      "totalContributions": 240000
+    },
+    {
+      "timing": "end",
+      "monthly": 1000,
+      "annualRate": 10,
+      "years": 5,
+      "futureValue": 77437.07217343,
+      "totalContributions": 60000
+    },
+    {
+      "timing": "end",
+      "monthly": 1000,
+      "annualRate": 10,
+      "years": 10,
+      "futureValue": 204844.97890347,
+      "totalContributions": 120000
+    },
+    {
+      "timing": "end",
+      "monthly": 1000,
+      "annualRate": 10,
+      "years": 20,
+      "futureValue": 759368.83598996,
+      "totalContributions": 240000
+    }
+  ],
+  "limitations": [
+    "Mathematical timing study, not an investment-return forecast."
+  ]
+}
