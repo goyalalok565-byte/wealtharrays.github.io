@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "study_id": "inflation-purchasing-power",
+  "model_id": "inflation",
+  "model_version": "1.0",
+  "title": "Inflation and future purchasing power",
+  "method": "Constant annual inflation applied to a fixed present amount.",
+  "assumptions": {
+    "presentAmount": 100000,
+    "annualInflation": 6
+  },
+  "rows": [
+    {
+      "years": 1,
+      "presentAmount": 100000,
+      "futureCost": 106000,
+      "futurePurchasingPower": 94339.62264151
+    },
+    {
+      "years": 5,
+      "presentAmount": 100000,
+      "futureCost": 133822.55776,
+      "futurePurchasingPower": 74725.81728661
+    },
+    {
+      "years": 10,
+      "presentAmount": 100000,
+      "futureCost": 179084.76965429,
+      "futurePurchasingPower": 55839.47769151
+    },
+    {
+      "years": 20,
+      "presentAmount": 100000,
+      "futureCost": 320713.54722128,
+      "futurePurchasingPower": 31180.47268861
+    },
+    {
+      "years": 30,
+      "presentAmount": 100000,
+      "futureCost": 574349.11729133,
+      "futurePurchasingPower": 17411.01309106
+    }
+  ],
+  "limitations": [
+    "Constant inflation is a simplifying assumption."
+  ]
+}
