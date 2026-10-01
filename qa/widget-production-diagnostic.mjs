@@ -1,0 +1,13 @@
+import { chromium } from 'playwright';
+const browser=await chromium.launch({headless:true});
+const page=await browser.newPage();
+const logs=[],errors=[],failed=[],responses=[];
+page.on('console',m=>logs.push(m.type()+': '+m.text()));
+page.on('pageerror',e=>errors.push(String(e)));
+page.on('requestfailed',r=>failed.push(r.url()+' :: '+(r.failure()?.errorText||'')));
+page.on('response',r=>{if(/widget|calculators\.js|wa-calculator-runtime|widget-bootstrap/.test(r.url()))responses.push({url:r.url(),status:r.status(),type:r.request().resourceType(),contentType:r.headers()['content-type']||''})});
+await page.goto('https://wealtharrays.com/widget.html?calc=sip',{waitUntil:'networkidle',timeout:30000});
+await page.waitForTimeout(3000);
+const state=await page.evaluate(()=>({mount:typeof window.mountCalculator,calculators:typeof window.CALCULATORS,widget:document.getElementById('calc-widget')?.innerHTML||'',scripts:[...document.scripts].map(s=>s.src||'inline'),booted:document.getElementById('calc-widget')?.dataset.waBooted||''}));
+console.log(JSON.stringify({state,responses,logs,errors,failed},null,2));
+await browser.close();
