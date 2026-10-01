@@ -88,7 +88,7 @@ const calculatorContentMap={
 }
 if(isWidget){
   const widgetCalculators='<script src="/calculators.js?v='+stamp+'" defer></script>';
-  const widgetRuntime='<script src="/wa-calculator-runtime.js?v='+stamp+'" defer></script>';
+  const widgetRuntime='<script src="/wa-calculator-runtime.js?v='+stamp+'"></script>';
   if(!html.includes('/calculators.js')) html=html.replace('</body>',widgetCalculators+'</body>');
   if(!html.includes('/wa-calculator-runtime.js')) html=html.replace('</body>',widgetRuntime+'</body>');
 }
