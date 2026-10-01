@@ -1,0 +1,19 @@
+{
+  "investment": [
+    {"name":"SEBI Investor Education","url":"https://investor.sebi.gov.in/iematerial.html","reason":"Official investor-education material covering securities, mutual funds and financial planning."},
+    {"name":"SEBI Investor Education Programme — Mutual Funds","url":"https://www.sebi.gov.in/sebi_data/commondocs/siep_h.html","reason":"Official SEBI educational material on mutual funds, risks and investor decisions."}
+  ],
+  "inflation": [
+    {"name":"Government of India — Consumer Price Index","url":"https://cpi.mospi.gov.in/","reason":"Official CPI information from the Ministry of Statistics and Programme Implementation."}
+  ],
+  "banking": [
+    {"name":"Reserve Bank of India — Master Circulars","url":"https://www.rbi.org.in/commonperson/english/scripts/MasterCircular.aspx","reason":"Official RBI source for banking, deposits, lending and related regulatory material."}
+  ],
+  "tax": [
+    {"name":"Income Tax Department — e-Filing Portal","url":"https://www.incometax.gov.in/iec/foportal/","reason":"Official Government of India source for current income-tax information and taxpayer services."}
+  ],
+  "general": [
+    {"name":"SEBI Investor Education","url":"https://investor.sebi.gov.in/iematerial.html","reason":"Official investor-education and financial-planning material."},
+    {"name":"Reserve Bank of India","url":"https://www.rbi.org.in/","reason":"Official central-bank source for Indian banking and monetary information."}
+  ]
+}
