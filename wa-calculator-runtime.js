@@ -1,4 +1,4 @@
-/* Wealth Arrays canonical calculator runtime. Generated 20261001110207. */
+/* Wealth Arrays canonical calculator runtime. Generated 20261001110539. */
 (function(){const k='__WA_CANONICAL_CALCULATOR_RUNTIME__';if(window[k])return;window[k]=true;})();
 /* ===== WA CANONICAL MODULE | calculator | widget.js | sha256:014c39ac0fe1 ===== */
 /* Wealth Arrays — lightweight calculator UI */
