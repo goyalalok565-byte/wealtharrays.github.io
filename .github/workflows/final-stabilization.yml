@@ -62,6 +62,7 @@ jobs:
           node qa/golden-model-vectors.mjs
           node qa/report-reproducibility-audit.mjs
           node qa/india-tax-module-audit.mjs
+          node qa/phase1-20-roadmap-audit.mjs
           node scripts/site-integrity.mjs
           node scripts/launch-readiness.mjs
           node scripts/phase10-qa.mjs
