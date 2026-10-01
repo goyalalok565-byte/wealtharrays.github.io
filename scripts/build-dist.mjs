@@ -32,11 +32,11 @@ function copyFile(src, rel) {
 }
 function walkPublicDir(srcDir, relDir) {
   for (const e of fs.readdirSync(srcDir, { withFileTypes: true })) {
-    if (e.name.startsWith('.') || EXCLUDE_DIRS.has(e.name)) continue;
+    if (e.name.startsWith('.') || EXCLUDE_DIRS.has(e.name) || e.name.toLowerCase().endsWith('.md')) continue;
     const src = path.join(srcDir, e.name);
     const rel = path.join(relDir, e.name);
     if (e.isDirectory()) walkPublicDir(src, rel);
-    else copyFile(src, rel);
+    else if (PUBLIC_ROOT_EXTS.has(path.extname(e.name).toLowerCase()) || PUBLIC_ROOT_EXACT.has(e.name)) copyFile(src, rel);
   }
 }
 
