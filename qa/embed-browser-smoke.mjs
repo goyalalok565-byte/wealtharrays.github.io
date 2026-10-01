@@ -26,8 +26,8 @@ try {
     const label = (await button.innerText()).trim();
     const copied = await page.evaluate(() => navigator.clipboard.readText().catch(() => ''));
     if (!/Embed copied/.test(label)) throw new Error(`Copy Embed did not report success on ${item.slug}: ${label}`);
-    if (!copied.includes(`/widget.html?calc=${item.id}`)) throw new Error(`Clipboard embed URL is incorrect on ${item.slug}: ${copied}`);
-    await page.goto(`${baseUrl.replace(/\/$/,'')}/widget.html?calc=${item.id}`, {waitUntil:'networkidle'});
+    if (!copied.includes(`/widget?calc=${item.id}`)) throw new Error(`Clipboard embed URL is incorrect on ${item.slug}: ${copied}`);
+    await page.goto(`${baseUrl.replace(/\/$/,'')}/widget?calc=${item.id}`, {waitUntil:'networkidle'});
     await page.locator('#calc-widget input, #calc-widget select').first().waitFor({state:'visible',timeout:8000});
     if (!(await page.locator('#calc-widget').isVisible())) throw new Error(`Widget container not visible for ${item.id}`);
   }
