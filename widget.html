@@ -14,13 +14,20 @@
  function boot(){
   var host=document.getElementById('calc-widget');
   if(!host||host.dataset.waBooted==='1'||host.children.length)return;
-  if(typeof mountCalculator!=='function'||typeof CALCULATORS==='undefined')return;
+  if(typeof mountCalculator!=='function'||typeof CALCULATORS==='undefined')return false;
   var id=new URLSearchParams(location.search).get('calc')||'sip';
   var calc=CALCULATORS.find(function(x){return x.id===id||x.slug===id;})||CALCULATORS.find(function(x){return x.id==='sip';})||CALCULATORS[0];
-  if(calc){host.dataset.waBooted='1';try{mountCalculator(calc,'calc-widget')}catch(e){host.dataset.waBooted='';console.error(e)}}
+  if(calc){host.dataset.waBooted='1';try{mountCalculator(calc,'calc-widget');return true}catch(e){host.dataset.waBooted='';console.error(e)}}
+  return false;
  }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
- window.addEventListener('load',boot,{once:true});
+ function start(){
+  if(boot()) return;
+  var tries=0;
+  var timer=setInterval(function(){if(boot()||++tries>=100)clearInterval(timer)},50);
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+ window.addEventListener('wa:calculator-runtime-ready',start);
+ window.addEventListener('load',start,{once:true});
 })();
 </script><script src="/wa-site-runtime.js?v=e74f2d1338a0-20260917-2" defer></script><script src="/financial-engine.js"></script><script src="/report-engine.js"></script><script src="/financial-workspace.js"></script><script src="/calculators.js?v=20261001" defer></script><script src="/wa-calculator-runtime.js?v=3d63904c9ad6-20260917-2" defer></script></body>
 </html>
