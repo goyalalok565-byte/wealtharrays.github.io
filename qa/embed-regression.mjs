@@ -8,7 +8,7 @@ const ids=[...defs.matchAll(/\bid:\s*"([^"]+)"/g)].map(m=>m[1]);
 if(ids.length!==20) throw new Error(`Expected 20 calculator definitions, found ${ids.length}`);
 if(new Set(ids).size!==20) throw new Error('Calculator definition IDs are not unique');
 if(!widgetSource.includes('async function waCopyEmbed(calc)')) throw new Error('widget.js missing Copy Embed implementation');
-if(!widgetSource.includes('/widget.html?calc=${encodeURIComponent(calc.id)}')) throw new Error('widget.js must use canonical /widget.html embed route');
+if(!widgetSource.includes('/widget?calc=${encodeURIComponent(calc.id)}')) throw new Error('widget.js must use canonical /widget.html embed route');
 if(!widgetSource.includes("document.execCommand('copy')")) throw new Error('Copy Embed must have synchronous clipboard fallback');
 if(!runtime.includes('/widget.html?calc=${encodeURIComponent(e.id)}')) throw new Error('Generated calculator runtime has stale direct widget route');
 if(!runtime.includes('class="tool-action" id="${t}-embed"')) throw new Error('Calculator mount must render Copy embed action');
