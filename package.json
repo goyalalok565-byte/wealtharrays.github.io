@@ -7,6 +7,6 @@
     "qa:dist": "SITE_ROOT=dist node scripts/site-integrity.mjs",
     "build": "npm run build:dist",
     "research:generate": "node scripts/generate-research-datasets.mjs",
-    "qa:platform": "node qa/platform-phase1-20-audit.mjs && node qa/research-data-audit.mjs && node qa/accessibility-static-audit.mjs && node qa/performance-budget-audit.mjs"
+    "qa:platform": "node qa/platform-phase1-20-audit.mjs && node qa/phase1-20-roadmap-audit.mjs && node qa/research-data-audit.mjs && node qa/accessibility-static-audit.mjs && node qa/performance-budget-audit.mjs"
   }
 }

@@ -23,5 +23,6 @@ const page=fs.readFileSync('scenario-lab.html','utf8');for(const x of ['/financi
 console.log('Decision engine audit PASS — deterministic projection, scenarios, sensitivity, inflation adjustment and goal solver validated.');
 
 const goal=fs.readFileSync('goal-planner.html','utf8');for(const x of ['/financial-engine.js','/decision-adapters.js','/goal-planner.js','Build my scenarios','Share goal'])if(!goal.includes(x))throw new Error('Goal Planner contract missing: '+x);
-if(!fs.readFileSync('scenario-lab.js','utf8').includes('URLSearchParams'))throw new Error('Scenario share contract missing');
-if(!fs.readFileSync('goal-planner.js','utf8').includes('URLSearchParams'))throw new Error('Goal share contract missing');
+if(!fs.readFileSync('scenario-lab.js','utf8').includes('location.hash'))throw new Error('Scenario share contract missing');
+if(!fs.readFileSync('goal-planner.js','utf8').includes('location.hash'))throw new Error('Goal share contract missing');
+if(/URLSearchParams\\(location\\.search\\)/.test(fs.readFileSync('scenario-lab.js','utf8')+fs.readFileSync('goal-planner.js','utf8')))throw new Error('Financial share state must not use query parameters');

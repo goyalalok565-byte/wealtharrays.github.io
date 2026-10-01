@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "study_id": "cagr-endpoint-limitation",
+  "model_id": "cagr",
+  "model_version": "1.0",
+  "title": "Why CAGR can hide the path",
+  "method": "Two deterministic investment paths share the same start, end and horizon; CAGR is identical because it uses endpoints only.",
+  "assumptions": {
+    "start": 100,
+    "end": 121,
+    "years": 2
+  },
+  "rows": [
+    {
+      "path": "steady",
+      "start": 100,
+      "end": 121,
+      "years": 2,
+      "cagr": 10
+    },
+    {
+      "path": "volatile",
+      "start": 100,
+      "end": 121,
+      "years": 2,
+      "cagr": 10
+    }
+  ],
+  "limitations": [
+    "CAGR does not describe interim volatility, drawdowns or cash-flow timing."
+  ]
+}

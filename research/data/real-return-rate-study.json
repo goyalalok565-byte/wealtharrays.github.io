@@ -1,0 +1,107 @@
+{
+  "schema_version": "1.0",
+  "study_id": "real-return-rate",
+  "model_id": "inflation",
+  "model_version": "1.0",
+  "title": "Nominal return versus real return",
+  "method": "Fisher-style exact real return from explicit nominal return and inflation assumptions.",
+  "assumptions": {
+    "nominalRates": [
+      4,
+      6,
+      8,
+      10
+    ],
+    "inflationRates": [
+      2,
+      4,
+      6,
+      8
+    ]
+  },
+  "rows": [
+    {
+      "nominalRate": 4,
+      "inflationRate": 2,
+      "realRate": 1.96078431
+    },
+    {
+      "nominalRate": 4,
+      "inflationRate": 4,
+      "realRate": 0
+    },
+    {
+      "nominalRate": 4,
+      "inflationRate": 6,
+      "realRate": -1.88679245
+    },
+    {
+      "nominalRate": 4,
+      "inflationRate": 8,
+      "realRate": -3.7037037
+    },
+    {
+      "nominalRate": 6,
+      "inflationRate": 2,
+      "realRate": 3.92156863
+    },
+    {
+      "nominalRate": 6,
+      "inflationRate": 4,
+      "realRate": 1.92307692
+    },
+    {
+      "nominalRate": 6,
+      "inflationRate": 6,
+      "realRate": 0
+    },
+    {
+      "nominalRate": 6,
+      "inflationRate": 8,
+      "realRate": -1.85185185
+    },
+    {
+      "nominalRate": 8,
+      "inflationRate": 2,
+      "realRate": 5.88235294
+    },
+    {
+      "nominalRate": 8,
+      "inflationRate": 4,
+      "realRate": 3.84615385
+    },
+    {
+      "nominalRate": 8,
+      "inflationRate": 6,
+      "realRate": 1.88679245
+    },
+    {
+      "nominalRate": 8,
+      "inflationRate": 8,
+      "realRate": 0
+    },
+    {
+      "nominalRate": 10,
+      "inflationRate": 2,
+      "realRate": 7.84313725
+    },
+    {
+      "nominalRate": 10,
+      "inflationRate": 4,
+      "realRate": 5.76923077
+    },
+    {
+      "nominalRate": 10,
+      "inflationRate": 6,
+      "realRate": 3.77358491
+    },
+    {
+      "nominalRate": 10,
+      "inflationRate": 8,
+      "realRate": 1.85185185
+    }
+  ],
+  "limitations": [
+    "Real return is a mathematical relationship and does not predict future market returns."
+  ]
+}

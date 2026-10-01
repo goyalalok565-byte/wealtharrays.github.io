@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "project": "Wealth Arrays",
+  "roadmap": "Phase 1-20",
+  "execution_rule": "inspect -> root cause -> implement -> automated QA -> lock",
+  "repository": {
+    "production_branch": "main",
+    "build_output": "dist",
+    "deployment_target": "Cloudflare Pages"
+  },
+  "phases": {
+    "1": "calculation-engine",
+    "2": "scenario-engine",
+    "3": "cross-calculator-intelligence",
+    "4": "financial-workspace",
+    "5": "country-engine",
+    "6": "multilingual",
+    "7": "reproducible-reports",
+    "8": "ai-interface",
+    "9": "privacy-and-saved-workspace",
+    "10": "api-contract",
+    "11": "trust-and-authority",
+    "12": "seo-and-discovery",
+    "13": "accessibility",
+    "14": "performance",
+    "15": "visualization",
+    "16": "financial-education",
+    "17": "monetization",
+    "18": "analytics",
+    "19": "global-brand-and-distribution",
+    "20": "research-data-and-moa"
+  },
+  "external_boundaries": [
+    "Cloudflare dashboard settings",
+    "Google/Bing account outcomes",
+    "AdSense approval/revenue",
+    "external backlinks and partnerships",
+    "real-device accessibility/performance review",
+    "hosted API infrastructure"
+  ]
+}
