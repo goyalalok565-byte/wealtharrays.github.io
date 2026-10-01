@@ -33,9 +33,16 @@ jobs:
 
       - name: Run homepage search smoke against exact checkout
         run: node qa/home-search-smoke.mjs
+      - name: Run embed browser smoke against exact checkout
+        run: node qa/embed-browser-smoke.mjs
 
       - name: Run visual and calculator smoke against exact checkout
         run: node qa/production-browser-smoke.mjs
+
+      - name: Verify production embed browser smoke
+        env:
+          BASE_URL: https://wealtharrays.com
+        run: node qa/embed-browser-smoke.mjs
 
       - name: Verify production homepage search
         env:
