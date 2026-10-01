@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "study_id": "emi-term-cost",
+  "model_id": "mortgage",
+  "model_version": "1.0",
+  "title": "Loan term versus total borrowing cost",
+  "method": "Standard fixed-rate monthly amortization with identical principal and rate.",
+  "assumptions": {
+    "principal": 1000000,
+    "annualRate": 9,
+    "currency": "INR"
+  },
+  "rows": [
+    {
+      "years": 5,
+      "principal": 1000000,
+      "monthlyPayment": 20758.35522635,
+      "totalPaid": 1245501.31358123,
+      "interest": 245501.31358123
+    },
+    {
+      "years": 10,
+      "principal": 1000000,
+      "monthlyPayment": 12667.57737502,
+      "totalPaid": 1520109.28500299,
+      "interest": 520109.28500299
+    },
+    {
+      "years": 15,
+      "principal": 1000000,
+      "monthlyPayment": 10142.66584162,
+      "totalPaid": 1825679.85149121,
+      "interest": 825679.85149121
+    },
+    {
+      "years": 20,
+      "principal": 1000000,
+      "monthlyPayment": 8997.2595585,
+      "totalPaid": 2159342.29404041,
+      "interest": 1159342.29404041
+    },
+    {
+      "years": 25,
+      "principal": 1000000,
+      "monthlyPayment": 8391.96363635,
+      "totalPaid": 2517589.09090453,
+      "interest": 1517589.09090453
+    }
+  ],
+  "limitations": [
+    "Excludes taxes, fees, insurance and lender-specific charges."
+  ]
+}
