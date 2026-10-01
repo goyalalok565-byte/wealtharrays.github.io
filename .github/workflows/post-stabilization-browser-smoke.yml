@@ -1,8 +1,6 @@
 name: Homepage search browser smoke
 
 on:
-  push:
-    branches: [main]
   workflow_run:
     workflows: ["Wealth Arrays Canonical CI"]
     types: [completed]
