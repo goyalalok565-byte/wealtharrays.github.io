@@ -64,7 +64,7 @@ for(const full of publicFiles){
 }
 const widgetSource=fs.readFileSync('widget.js','utf8');
 if(!widgetSource.includes('new URL(`/widget.html?calc=${encodeURIComponent(calc.id)}`,location.origin).href')) failures.push('widget.js: embed URL must use canonical /widget.html route');
-const consentHeaders=fs.existsSync('_headers')?fs.readFileSync('_headers','utf8'):'';
+const headers=fs.existsSync('_headers')?fs.readFileSync('_headers','utf8'):'';
 for(const rule of ['/widget','/widget.html']){
   const marker=rule+'\n';
   const start=headers.lastIndexOf(marker);
