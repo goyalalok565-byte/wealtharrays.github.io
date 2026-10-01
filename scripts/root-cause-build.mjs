@@ -139,7 +139,7 @@ if(isArticle){
   if(isWidget){
     html=html.replace(/\s*<script[^>]+(?:wa-site-runtime|wa-calculator-runtime|calculators\.js|widget\.js|financial-engine|report-engine|financial-workspace)[^>]*><\/script>/gi,'');
     html=html.replace(/\s*<!-- WA-(?:SITE|CANONICAL|WIDGET)-RUNTIME:[^>]+-->/g,'');
-    html=html.replace('</body>',`<script src="/calculators.js?v=${stamp}"></script><script src="/widget.js?v=${stamp}"></script></body>`);
+    html=html.replace('</body>',`<script src="/calculators.js?v=${stamp}"></script><script src="/widget.js?v=${stamp}"></script><script src="/wa-calculator-runtime.js?v=${stamp}" defer></script></body>`);
   }
   fs.writeFileSync(full,html,'utf8');}
 
