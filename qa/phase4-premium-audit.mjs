@@ -34,7 +34,7 @@ for(const full of publicFiles){
     failures.push(r+': noindex pages must not carry AdSense');
   }
 }
-for(const name of ['404.html','widget.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html']){
+for(const name of ['404.html','widget.html','widget/index.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html']){
   const s=read(name);
   if(s.includes('adsbygoogle.js')||s.includes('ca-pub-6507600103785450')) failures.push(name+': AdSense must not be present');
   if(s.includes('pagead2.googlesyndication.com')||s.includes('googleads.g.doubleclick.net')) failures.push(name+': AdSense preconnect must not be present');
@@ -50,7 +50,7 @@ for(const full of publicFiles){
   if(apple>1) failures.push(r+': duplicate apple-touch-icon tags ('+apple+')');
 }
 const widgetSource=fs.readFileSync('widget.js','utf8');
-if(!widgetSource.includes('new URL(`/widget.html?calc=${encodeURIComponent(calc.id)}`,location.origin).href')) failures.push('widget.js: embed URL must use direct /widget.html route');
+if(!widgetSource.includes('new URL(`/widget?calc=${encodeURIComponent(calc.id)}`,location.origin).href')) failures.push('widget.js: embed URL must use direct /widget.html route');
 const headers=fs.existsSync('_headers')?fs.readFileSync('_headers','utf8'):'';
 for(const rule of ['/widget','/widget.html']){
   const marker=rule+'\n';
