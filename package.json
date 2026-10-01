@@ -1,0 +1,9 @@
+{
+  "name": "wealth-arrays",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build:dist": "node scripts/build-dist.mjs",
+    "qa:dist": "SITE_ROOT=dist node scripts/site-integrity.mjs"
+  }
+}
