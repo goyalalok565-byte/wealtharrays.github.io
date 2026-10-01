@@ -11,7 +11,6 @@
   var script = document.createElement('script');
   script.async = true;
   script.src = 'https://fundingchoicesmessages.google.com/i/pub-6507600103785450?ers=1';
-  script.crossOrigin = 'anonymous';
   document.head.appendChild(script);
 
   function signalGooglefcPresent() {
