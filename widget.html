@@ -8,26 +8,5 @@
 <meta name="robots" content="noindex,follow"><link rel="canonical" href="https://wealtharrays.com/widget.html"><link rel="stylesheet" href="/cls-fixes.css?v=20260917"><meta name="referrer" content="strict-origin-when-cross-origin"><link rel="stylesheet" href="/styles.css"><script src="/theme-init.js?v=20260915-1"></script><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="48x48" href="/icon-192.png"><link rel="apple-touch-icon" sizes="180x180" href="/icon-512.png"><link rel="stylesheet" href="/phase4-premium.css?v=20260915-1"></head>
 <body>
 <div id="calc-widget"></div>
-<script>
-(function(){
- function boot(){
-  var host=document.getElementById('calc-widget');
-  if(window.parent!==window) document.documentElement.dataset.waEmbed='1';
-  if(!host||host.dataset.waBooted==='1'||host.children.length)return;
-  if(typeof mountCalculator!=='function'||typeof CALCULATORS==='undefined')return false;
-  var id=new URLSearchParams(location.search).get('calc')||'sip';
-  var calc=CALCULATORS.find(function(x){return x.id===id||x.slug===id;})||CALCULATORS.find(function(x){return x.id==='sip';})||CALCULATORS[0];
-  if(calc){host.dataset.waBooted='1';try{mountCalculator(calc,'calc-widget');return true}catch(e){host.dataset.waBooted='';console.error(e)}}
-  return false;
- }
- function start(){
-  if(boot()) return;
-  var tries=0;
-  var timer=setInterval(function(){if(boot()||++tries>=100)clearInterval(timer)},50);
- }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
- window.addEventListener('wa:calculator-runtime-ready',start);
- window.addEventListener('load',start,{once:true});
-})();
-</script><script src="/calculators.js?v=20261001111343"></script><script src="/wa-calculator-runtime.js?v=20261001111343" defer></script></body>
+<script src="/calculators.js?v=20261001111343"></script><script src="/wa-calculator-runtime.js?v=20261001111343" defer></script><script src="/widget-bootstrap.js"></script></body>
 </html>
