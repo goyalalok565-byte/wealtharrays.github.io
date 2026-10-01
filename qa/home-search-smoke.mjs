@@ -3,6 +3,11 @@ import { chromium } from 'playwright';
 const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:4173';
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage();
+await page.route('**/*', async route => {
+  const u = route.request().url();
+  if (/googlesyndication|google-analytics|googletagmanager|doubleclick|adtrafficquality|cloudflareinsights/.test(u)) return route.abort();
+  return route.continue();
+});
 const errors = [];
 page.on('pageerror', error => {
   const message = String(error);
