@@ -60,4 +60,14 @@ for(const file of htmlFiles){
   }
   if(s!==before){fs.writeFileSync(file,s);changed++;}
 }
+for(const [file] of Object.entries(calcIds)){
+  if(!fs.existsSync(path.join(root,file))) continue;
+  let s=fs.readFileSync(path.join(root,file),'utf8');
+  if(!s.includes('/wa-calculator-runtime.js')){
+    s=s.replace('</body>','<script src="/wa-calculator-runtime.js" defer></script></body>');
+    fs.writeFileSync(path.join(root,file),s,'utf8');
+    changed++;
+  }
+}
+
 console.log(`Phase 4 premium build updated ${changed} HTML files (${htmlFiles.length} public HTML files scanned).`);
