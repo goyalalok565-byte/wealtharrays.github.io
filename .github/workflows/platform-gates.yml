@@ -30,6 +30,8 @@ jobs:
         run: node scripts/generate-research-datasets.mjs
       - name: Phase 1-20 platform audit
         run: node qa/platform-phase1-20-audit.mjs
+      - name: Phase 1-20 roadmap audit
+        run: node qa/phase1-20-roadmap-audit.mjs
       - name: Research data audit
         run: node qa/research-data-audit.mjs
       - name: Accessibility static audit
