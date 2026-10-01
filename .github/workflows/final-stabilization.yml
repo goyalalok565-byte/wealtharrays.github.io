@@ -30,6 +30,8 @@ jobs:
         run: node qa/calculator-regression.mjs
       - name: Build canonical runtime, split definitions and sitemap
         run: node scripts/root-cause-build.mjs
+      - name: Run Phase 4 premium normalization
+        run: node scripts/phase4-premium-build.mjs
       - name: Normalize route aliases and accessibility
         run: node scripts/fix-route-alias-links.mjs && node scripts/normalize-nested-links.mjs && node scripts/fix-accessible-names.mjs
       - name: Repair static pages and redirect shells
