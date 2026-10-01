@@ -55,6 +55,9 @@ for(const file of htmlFiles){
   } else if(!s.includes('ca-pub-6507600103785450')) {
     s=s.replace('</head>',`${adsenseJs}</head>`);
   }
+  if(id && s.includes('id="calc-widget"') && base!=='widget.html'){
+    if(!s.includes('/wa-calculator-runtime.js')) s=s.replace('</body>','<script src="/wa-calculator-runtime.js" defer></script></body>');
+  }
   if(s!==before){fs.writeFileSync(file,s);changed++;}
 }
 console.log(`Phase 4 premium build updated ${changed} HTML files (${htmlFiles.length} public HTML files scanned).`);
