@@ -33,7 +33,7 @@ for(const file of htmlFiles){
   const rel=path.relative(root,file).replaceAll(path.sep,'/');
   const canonicalId=calcIds[base];
   const id=canonicalId||mountId;
-  if(id && s.includes('id="calc-widget"') && base!=='widget.html'){
+  if(canonicalId && base!=='widget.html'){
     s=s.replace(/<html\s+data-wa-calculator="[^"]*"/i,'<html');
     s=s.replace(/<html\s+/,`<html data-wa-calculator="${id}" `);
   }
