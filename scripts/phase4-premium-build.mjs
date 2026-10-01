@@ -15,7 +15,6 @@ walk(root);
 
 const phase4Css='<link rel="stylesheet" href="/phase4-premium.css?v=20260915-1">';
 const themeJs='<script src="/theme-init.js?v=20260915-1"></script>';
-const calcInitJs='<script src="/calculator-page-init.js?v=20260915-1" defer></script>';
 const redirectJs='<script src="/404-runtime.js?v=20260915-1" defer></script>';
 const adsenseJs='<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6507600103785450" crossorigin="anonymous"></script>';
 const calcIds={
@@ -37,7 +36,6 @@ for(const file of htmlFiles){
   if(id && s.includes('id="calc-widget"') && base!=='widget.html'){
     s=s.replace(/<html\s+data-wa-calculator="[^"]*"/i,'<html');
     s=s.replace(/<html\s+/,`<html data-wa-calculator="${id}" `);
-    if(!s.includes('/calculator-page-init.js')) s=s.replace('</body>',`${calcInitJs}</body>`);
   }
   if(base==='404.html'){
     s=s.replace(/<script>\(function\(\)\{var p=location\.pathname[\s\S]*?<\/script>/,'');
