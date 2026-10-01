@@ -1,4 +1,4 @@
-/* Wealth Arrays canonical calculator runtime. Generated 20261001111343. */
+/* Wealth Arrays canonical calculator runtime. Generated 20261001111613. */
 (function(){const k='__WA_CANONICAL_CALCULATOR_RUNTIME__';if(window[k])return;window[k]=true;})();
 /* ===== WA CANONICAL MODULE | calculator | widget.js | sha256:014c39ac0fe1 ===== */
 /* Wealth Arrays — lightweight calculator UI */
@@ -185,6 +185,27 @@ function initSearch(inputId,listSelector,headingId,totalLabel){const input=docum
   document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,0);});
   window.addEventListener('load',function(){setTimeout(boot,0);});
   setTimeout(boot,0);
+})();
+
+/* ===== WA CANONICAL MODULE | calculator | widget-bootstrap.js | sha256:07552f02a6e0 ===== */
+(function(){
+'use strict';
+function boot(){
+  var host=document.getElementById('calc-widget');
+  if(window.parent!==window) document.documentElement.dataset.waEmbed='1';
+  if(!host||host.dataset.waBooted==='1'||host.children.length)return false;
+  if(typeof mountCalculator!=='function'||typeof CALCULATORS==='undefined')return false;
+  var id=new URLSearchParams(location.search).get('calc')||'sip';
+  var calc=CALCULATORS.find(function(x){return x.id===id||x.slug===id;})||CALCULATORS.find(function(x){return x.id==='sip';})||CALCULATORS[0];
+  if(calc){host.dataset.waBooted='1';try{mountCalculator(calc,'calc-widget');return true}catch(e){host.dataset.waBooted='';console.error(e)}}
+  return false;
+}
+if(!boot()){
+  var tries=0;
+  var timer=setInterval(function(){if(boot()||++tries>=100)clearInterval(timer)},50);
+}
+window.addEventListener('wa:calculator-runtime-ready',boot);
+window.addEventListener('load',boot,{once:true});
 })();
 
 /* ===== WA CANONICAL MODULE | calculator | wa-core.js | sha256:5e2efc7e2d57 ===== */
