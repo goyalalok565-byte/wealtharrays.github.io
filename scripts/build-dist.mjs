@@ -11,7 +11,7 @@ const PUBLIC_ROOT_EXTS = new Set([
 const PUBLIC_ROOT_EXACT = new Set([
   '_headers','_redirects','ads.txt','robots.txt','sitemap.xml','sw.js','manifest.webmanifest'
 ]);
-const PUBLIC_DIRS = new Set(['articles']);
+const PUBLIC_DIRS = new Set(['articles','research']);
 const EXCLUDE_DIRS = new Set([
   '.git','.github','node_modules','qa','scripts','calculator-definitions',
   'country-modules','api','p','privacy','reports','dist'
