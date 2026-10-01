@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "build:dist": "node scripts/build-dist.mjs",
+    "build:dist": "node scripts/root-cause-build.mjs && node scripts/phase4-premium-build.mjs && node scripts/fix-route-alias-links.mjs && node scripts/normalize-nested-links.mjs && node scripts/fix-accessible-names.mjs && node scripts/repair-site-integrity.mjs && node scripts/build-dist.mjs",
     "qa:dist": "SITE_ROOT=dist node scripts/site-integrity.mjs",
     "build": "npm run build:dist"
   }
