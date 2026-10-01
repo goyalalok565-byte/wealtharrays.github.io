@@ -46,7 +46,7 @@ for (const e of fs.readdirSync(root, { withFileTypes: true })) {
   if (e.isDirectory()) continue;
   if (PUBLIC_ROOT_EXACT.has(e.name) || PUBLIC_ROOT_EXTS.has(path.extname(e.name).toLowerCase())) {
     // JSON is intentionally limited to known browser-facing files.
-    if (path.extname(e.name).toLowerCase() === '.json' && !['ai-contract.json','global-seo-config.json','calculator-value-content.json'].includes(e.name)) continue;
+    if (path.extname(e.name).toLowerCase() === '.json' && !['ai-contract.json','global-seo-config.json','calculator-value-content.json','model-registry.json'].includes(e.name)) continue;
     copyFile(path.join(root, e.name), e.name);
   }
 }
