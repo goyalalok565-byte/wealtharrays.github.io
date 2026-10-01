@@ -1,7 +1,6 @@
 # Embeddable calculator widget — clean route serves the canonical widget document without a redirect loop.
 /widget /widget.html 200
 /widget/ /widget.html 200
-/widget.html /widget 301
 
 # Canonical legacy URL redirects
 # Each public route has one canonical destination; calculator routes always end in /.
