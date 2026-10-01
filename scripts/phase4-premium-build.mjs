@@ -49,7 +49,7 @@ for(const file of htmlFiles){
   // AdSense is intentionally excluded from 404.html and widget.html.
   // 404 is an error/low-value page; widget.html may be embedded on third-party domains.
   const noindex=/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(s);
-  const adsenseExcluded=['404.html','widget.html','widget/index.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html'].includes(base) || noindex;
+  const adsenseExcluded=['404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html'].includes(base) || noindex;
   const consentExcluded=['404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html'];
   if(consentExcluded.includes(base)){
     s=s.replace(/<script[^>]+src=["']\/consent-loader\.js[^>]*><\/script>/gi,'');
