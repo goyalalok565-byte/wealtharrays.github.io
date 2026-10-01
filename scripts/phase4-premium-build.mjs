@@ -31,7 +31,7 @@ for(const file of htmlFiles){
   // Replace every inline calculator bootstrap, including legacy formatting variants.
   const mountId=(s.match(/mountCalculator\(\s*CALCULATORS\.find\(\s*c\s*=>\s*c\.id\s*===\s*['"]([^'"]+)['"]/i)||[])[1];
   if(mountId) s=s.replace(/<script>[^<]*mountCalculator\([^<]*<\/script>/gi,'');
-  const base=path.basename(file);
+  const base=path.basename(file);\n  const rel=path.relative(root,file).replaceAll(path.sep,'/');
   const canonicalId=calcIds[base];
   const id=canonicalId||mountId;
   if(id && s.includes('id="calc-widget"') && base!=='widget.html'){
@@ -51,7 +51,7 @@ for(const file of htmlFiles){
   // AdSense is intentionally excluded from 404.html and widget.html.
   // 404 is an error/low-value page; widget.html may be embedded on third-party domains.
   const noindex=/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(s);
-  const adsenseExcluded=['404.html','widget.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html'].includes(base) || noindex;
+  const adsenseExcluded=['404.html','widget.html','widget/index.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html'].includes(base) || noindex;
   if(adsenseExcluded){
     const escaped=adsenseJs.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
     s=s.replace(new RegExp('\\s*'+escaped),'');
