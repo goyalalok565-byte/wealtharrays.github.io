@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const root = process.cwd();
+const root = process.env.SITE_ROOT ? path.resolve(process.env.SITE_ROOT) : process.cwd();
 const htmlFiles = [];
 function walk(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
