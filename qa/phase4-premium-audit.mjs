@@ -48,7 +48,7 @@ const fundingHeaders=read('_headers');
 if(!fundingHeaders.includes('https://fundingchoicesmessages.google.com')) failures.push('_headers: Funding Choices CSP allowlist missing');
 if(!read('privacy.html').includes('Google Privacy &amp; Messaging')) failures.push('privacy.html: Funding Choices disclosure missing');
 
-for(const name of ['404.html','widget.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html']){
+for(const name of ['404.html','widget.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html']){
   const s=read(name);
   if(s.includes('adsbygoogle.js')||s.includes('ca-pub-6507600103785450')) failures.push(name+': AdSense must not be present');
   if(s.includes('pagead2.googlesyndication.com')||s.includes('googleads.g.doubleclick.net')) failures.push(name+': AdSense preconnect must not be present');
