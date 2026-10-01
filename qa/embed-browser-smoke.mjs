@@ -11,20 +11,25 @@ page.on('pageerror', error => {
     errors.push(message + (error?.stack ? `\n${error.stack}` : ''));
   }
 });
+const cases = [
+  { slug:'sip-calculator', id:'sip' },
+  { slug:'cagr-calculator', id:'cagr' },
+  { slug:'mortgage-emi-calculator', id:'mortgage' }
+];
 try {
-  for (const calc of ['sip','cagr','mortgage']) {
-    await page.goto(`${baseUrl.replace(/\/$/,'')}/sip-calculator.html`, {waitUntil:'networkidle'});
+  for (const item of cases) {
+    await page.goto(`${baseUrl.replace(/\/$/,'')}/${item.slug}.html`, {waitUntil:'networkidle'});
     const button = page.locator('#calc-widget-embed');
     await button.waitFor({state:'visible',timeout:8000});
     await button.click();
     await page.waitForTimeout(100);
     const label = (await button.innerText()).trim();
     const copied = await page.evaluate(() => navigator.clipboard.readText().catch(() => ''));
-    if (!/Embed copied/.test(label)) throw new Error(`Copy Embed did not report success for ${calc}: ${label}`);
-    if (!copied.includes('/widget.html?calc=sip')) throw new Error(`Clipboard embed URL is incorrect: ${copied}`);
-    await page.goto(`${baseUrl.replace(/\/$/,'')}/widget.html?calc=${calc}`, {waitUntil:'networkidle'});
+    if (!/Embed copied/.test(label)) throw new Error(`Copy Embed did not report success on ${item.slug}: ${label}`);
+    if (!copied.includes(`/widget.html?calc=${item.id}`)) throw new Error(`Clipboard embed URL is incorrect on ${item.slug}: ${copied}`);
+    await page.goto(`${baseUrl.replace(/\/$/,'')}/widget.html?calc=${item.id}`, {waitUntil:'networkidle'});
     await page.locator('#calc-widget input, #calc-widget select').first().waitFor({state:'visible',timeout:8000});
-    if (!(await page.locator('#calc-widget').isVisible())) throw new Error(`Widget container not visible for ${calc}`);
+    if (!(await page.locator('#calc-widget').isVisible())) throw new Error(`Widget container not visible for ${item.id}`);
   }
   if (errors.length) throw new Error(`Browser page errors:\n${errors.join('\n---\n')}`);
   console.log(`Embed browser smoke PASS at ${baseUrl}: copy/embed flow and representative widgets work.`);
