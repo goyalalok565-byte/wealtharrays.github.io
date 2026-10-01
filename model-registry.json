@@ -1,0 +1,321 @@
+{
+  "schema_version": "1.0",
+  "registry_version": "1.0",
+  "purpose": "Machine-readable identity, inputs, assumptions, limitations and provenance contract for every Wealth Arrays calculator model.",
+  "rule": "A model is not production-complete unless its calculation identity, input contract, assumptions, limitations and regression coverage are versioned.",
+  "models": [
+    {
+      "id": "sip",
+      "version": "1.0",
+      "family": "investment",
+      "timing": "monthly contributions at beginning of period",
+      "formula": "FV of monthly contribution series",
+      "inputs": [
+        "monthly",
+        "rate",
+        "years",
+        "inflation"
+      ],
+      "limitations": [
+        "Educational deterministic model; assumptions do not constitute a forecast or personalized advice."
+      ]
+    },
+    {
+      "id": "compound",
+      "version": "1.0",
+      "family": "investment",
+      "timing": "periodic compounding",
+      "formula": "P(1+r/n)^(nt)",
+      "inputs": [
+        "principal",
+        "rate",
+        "years",
+        "freq",
+        "inflation"
+      ],
+      "limitations": [
+        "Educational deterministic model; assumptions do not constitute a forecast or personalized advice."
+      ]
+    },
+    {
+      "id": "inflation",
+      "version": "1.0",
+      "family": "purchasing-power",
+      "timing": "annual inflation compounding",
+      "formula": "PV(1+i)^t",
+      "inputs": [
+        "amount",
+        "rate",
+        "years"
+      ],
+      "limitations": [
+        "Educational deterministic model; assumptions do not constitute a forecast or personalized advice."
+      ]
+    },
+    {
+      "id": "freedom-milestone",
+      "version": "1.0",
+      "family": "retirement",
+      "timing": "annual spending / withdrawal rate",
+      "formula": "expenses / withdrawal rate",
+      "inputs": [
+        "expenses",
+        "withdrawal",
+        "current"
+      ],
+      "limitations": [
+        "Educational deterministic model; assumptions do not constitute a forecast or personalized advice."
+      ]
+    },
+    {
+      "id": "cagr",
+      "version": "1.0",
+      "family": "investment",
+      "timing": "annualized endpoints",
+      "formula": "(end/start)^(1/years)-1",
+      "inputs": [
+        "start",
+        "end",
+        "years"
+      ],
+      "limitations": [
+        "Educational deterministic model; assumptions do not constitute a forecast or personalized advice."
+      ]
+    },
+    {
+      "id": "roi",
+      "version": "1.0",
+      "family": "investment",
+      "timing": "endpoint comparison",
+      "formula": "(final-cost)/cost",
+      "inputs": [
+        "cost",
+        "finalValue",
+        "years"
+      ],
+      "limitations": [
+        "Educational deterministic model; assumptions do not constitute a forecast or personalized advice."
+      ]
+    },
+    {
+      "id": "lumpsum",
+      "version": "1.0",
+      "family": "investment",
+      "timing": "annual compounding",
+      "formula": "P(1+r)^t",
+      "inputs": [
+        "principal",
+        "rate",
+        "years",
+        "inflation"
+      ],
+      "limitations": [
+        "Educational deterministic model; assumptions do not constitute a forecast or personalized advice."
+      ]
+    },
+    {
+      "id": "fixed-deposit",
+      "version": "1.0",
+      "family": "deposit",
+      "timing": "periodic compounding",
+      "formula": "P(1+r/n)^(nt)",
+      "inputs": [
+        "principal",
+        "rate",
+        "years",
+        "freq",
+        "inflation"
+      ],
+      "limitations": [
+        "Educational deterministic model; assumptions do not constitute a forecast or personalized advice."
+      ]
+    },
+    {
+      "id": "recurring-deposit",
+      "version": "1.0",
+      "family": "deposit",
+      "timing": "monthly end-of-period deposits",
+      "formula": "P[((1+i)^n-1)/i]",
+      "inputs": [
+        "monthly",
+        "rate",
+        "years",
+        "inflation"
+      ],
+      "limitations": [
+        "Educational deterministic model; assumptions do not constitute a forecast or personalized advice."
+      ]
+    },
+    {
+      "id": "simple-interest",
+      "version": "1.0",
+      "family": "interest",
+      "timing": "linear annual interest",
+      "formula": "P*r*t",
+      "inputs": [
+        "principal",
+        "rate",
+        "years"
+      ],
+      "limitations": [
+        "Educational deterministic model; assumptions do not constitute a forecast or personalized advice."
+      ]
+    },
+    {
+      "id": "car-loan",
+      "version": "1.0",
+      "family": "debt",
+      "timing": "monthly amortization",
+      "formula": "EMI amortization",
+      "inputs": [
+        "price",
+        "down",
+        "rate",
+        "years"
+      ],
+      "limitations": [
+        "Educational deterministic model; assumptions do not constitute a forecast or personalized advice."
+      ]
+    },
+    {
+      "id": "mortgage",
+      "version": "1.0",
+      "family": "debt",
+      "timing": "monthly amortization",
+      "formula": "EMI amortization",
+      "inputs": [
+        "principal",
+        "rate",
+        "years"
+      ],
+      "limitations": [
+        "Educational deterministic model; assumptions do not constitute a forecast or personalized advice."
+      ]
+    },
+    {
+      "id": "personal-loan",
+      "version": "1.0",
+      "family": "debt",
+      "timing": "monthly amortization",
+      "formula": "EMI amortization",
+      "inputs": [
+        "principal",
+        "rate",
+        "years"
+      ],
+      "limitations": [
+        "Educational deterministic model; assumptions do not constitute a forecast or personalized advice."
+      ]
+    },
+    {
+      "id": "debt-payoff",
+      "version": "1.0",
+      "family": "debt",
+      "timing": "monthly amortization",
+      "formula": "fixed payment payoff",
+      "inputs": [
+        "balance",
+        "payment",
+        "rate"
+      ],
+      "limitations": [
+        "Educational deterministic model; assumptions do not constitute a forecast or personalized advice."
+      ]
+    },
+    {
+      "id": "net-worth",
+      "version": "1.0",
+      "family": "balance-sheet",
+      "timing": "point-in-time balance sheet",
+      "formula": "assets-liabilities",
+      "inputs": [
+        "cash",
+        "investments",
+        "property",
+        "debt"
+      ],
+      "limitations": [
+        "Educational deterministic model; assumptions do not constitute a forecast or personalized advice."
+      ]
+    },
+    {
+      "id": "salary-hourly",
+      "version": "1.0",
+      "family": "income",
+      "timing": "annual work-hours conversion",
+      "formula": "salary/(hours*weeks)",
+      "inputs": [
+        "amount",
+        "hoursPerWeek",
+        "weeksPerYear",
+        "direction"
+      ],
+      "limitations": [
+        "Educational deterministic model; assumptions do not constitute a forecast or personalized advice."
+      ]
+    },
+    {
+      "id": "overtime",
+      "version": "1.0",
+      "family": "income",
+      "timing": "hourly pay periods",
+      "formula": "regular + overtime*multiplier",
+      "inputs": [
+        "hourly",
+        "regular",
+        "overtime",
+        "multiplier"
+      ],
+      "limitations": [
+        "Educational deterministic model; assumptions do not constitute a forecast or personalized advice."
+      ]
+    },
+    {
+      "id": "freelance-rate",
+      "version": "1.0",
+      "family": "income",
+      "timing": "annual billable capacity",
+      "formula": "(income+expenses)/(hours*weeks)",
+      "inputs": [
+        "income",
+        "expenses",
+        "hours",
+        "weeks"
+      ],
+      "limitations": [
+        "Educational deterministic model; assumptions do not constitute a forecast or personalized advice."
+      ]
+    },
+    {
+      "id": "profit-margin",
+      "version": "1.0",
+      "family": "business",
+      "timing": "period revenue accounting",
+      "formula": "profit/revenue",
+      "inputs": [
+        "revenue",
+        "cost"
+      ],
+      "limitations": [
+        "Educational deterministic model; assumptions do not constitute a forecast or personalized advice."
+      ]
+    },
+    {
+      "id": "income-tax-planner",
+      "version": "1.0",
+      "family": "tax",
+      "timing": "planning-rate model",
+      "formula": "(income-deductions)*rate",
+      "inputs": [
+        "income",
+        "deductions",
+        "rate",
+        "country",
+        "taxYear"
+      ],
+      "limitations": [
+        "Educational deterministic model; assumptions do not constitute a forecast or personalized advice."
+      ]
+    }
+  ]
+}
