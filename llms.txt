@@ -64,6 +64,10 @@
 - https://wealtharrays.com/articles/why-compounding-looks-slow-before-it-looks-powerful
 - https://wealtharrays.com/articles/why-one-crore-in-the-future-may-not-mean-what-you-think
 
+## Original research
+
+- https://wealtharrays.com/research — Reproducible Wealth Arrays calculation studies and methodology
+
 ## Editorial principles
 
 - Prefer transparent mathematics over black-box financial claims.
