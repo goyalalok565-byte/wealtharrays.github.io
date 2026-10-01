@@ -5,6 +5,8 @@
   "studies": [
     "sip-contribution-timing-study.json",
     "inflation-purchasing-power-study.json",
-    "emi-term-cost-study.json"
+    "emi-term-cost-study.json",
+    "cagr-endpoint-study.json",
+    "real-return-rate-study.json"
   ]
 }
