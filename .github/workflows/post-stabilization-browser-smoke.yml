@@ -38,6 +38,8 @@ jobs:
 
       - name: Homepage search browser smoke
         run: node qa/home-search-smoke.mjs
+      - name: Embed browser smoke
+        run: node qa/embed-browser-smoke.mjs
 
       - name: Visual and calculator browser smoke
         run: node qa/production-browser-smoke.mjs
@@ -58,6 +60,11 @@ jobs:
           done
           echo "Production did not expose canonical runtime bundles within the wait window."
           exit 1
+
+      - name: Production embed browser smoke
+        env:
+          BASE_URL: https://wealtharrays.com
+        run: node qa/embed-browser-smoke.mjs
 
       - name: Production homepage search smoke
         env:
