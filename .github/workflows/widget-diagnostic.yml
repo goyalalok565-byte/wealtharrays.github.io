@@ -1,0 +1,27 @@
+name: Wealth Arrays Widget Diagnostic
+
+on:
+  workflow_run:
+    workflows: ["Wealth Arrays Canonical CI"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  diagnostic:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Diagnose production widget
+        run: node qa/widget-production-diagnostic.mjs
