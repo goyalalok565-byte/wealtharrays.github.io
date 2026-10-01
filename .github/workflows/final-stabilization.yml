@@ -74,5 +74,9 @@ jobs:
           git add -A
           if git diff --cached --quiet; then echo "No generated changes needed"; exit 0; fi
           git commit -m "chore: apply canonical production build [canonical-build]"
-          git pull --rebase origin main
+          git fetch origin main
+          if [ "$(git rev-parse HEAD^)" != "$(git rev-parse origin/main)" ]; then
+            echo "Remote main advanced during this build; leaving generated commit to the newer canonical run."
+            exit 0
+          fi
           git push origin HEAD:main
