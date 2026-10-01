@@ -36,9 +36,11 @@ for(const full of publicFiles){
 }
 for(const file of publicFiles){
   const base=path.basename(file);
+  const rel=path.relative(root,file).replaceAll(path.sep,'/');
+  const routeName=rel==='widget/index.html'?'widget/index.html':base;
   const html=fs.readFileSync(file,'utf8');
-  const consentExcluded=['404.html','widget.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html'];
-  if(consentExcluded.includes(base)){
+  const consentExcluded=['404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html'];
+  if(consentExcluded.includes(routeName)){
     if(html.includes('/consent-loader.js')) failures.push(base+': Funding Choices loader must not run on disclosure/legal document');
   }else if(!html.includes('/consent-loader.js')){
     failures.push(base+': Funding Choices consent loader missing');
