@@ -28,8 +28,8 @@ try {
     const label = (await button.innerText()).trim();
     const copied = await page.evaluate(() => navigator.clipboard.readText().catch(() => ''));
     if (!/Embed copied/.test(label)) throw new Error(`Copy Embed did not report success on ${item.slug}: ${label}`);
-    if (!copied.includes(`/widget.html?calc=${item.id}`)) throw new Error(`Clipboard embed URL is incorrect on ${item.slug}: ${copied}`);
-    const widgetPath = '/widget.html';
+    if (!copied.includes(`/widget?calc=${item.id}`)) throw new Error(`Clipboard embed URL is incorrect on ${item.slug}: ${copied}`);
+    const widgetPath = '/widget';
     const widgetUrl = `${baseUrl.replace(/\/$/,'')}${widgetPath}?calc=${item.id}`;
     const widgetResponse = await page.goto(widgetUrl, {waitUntil:'networkidle'});
     if (!widgetResponse || !widgetResponse.ok()) throw new Error(`Widget HTTP response was not OK for ${item.id}: ${widgetResponse?.status()} ${widgetUrl}`);
