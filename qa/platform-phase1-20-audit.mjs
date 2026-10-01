@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+const required=['model-registry.json','formula-registry.js','financial-engine.js','decision-adapters.js','report-engine.js','i18n.js','analytics.js','accessibility.js','visualization.js','ai-contract.json','api/openapi.yml','country-modules/index.js','privacy/README.md','reports/README.md','financial-workspace.html','scenario-lab.html','goal-planner.html','research.html','research/data/sip-contribution-timing-study.json','research/data/inflation-purchasing-power-study.json','research/data/emi-term-cost-study.json'];
+for(const f of required)if(!fs.existsSync(f))throw new Error('Missing phase 1-20 asset: '+f);
+const r=JSON.parse(fs.readFileSync('model-registry.json','utf8')); if(r.models.length!==20)throw new Error('Expected 20 registered calculator models');
+const ids=new Set(r.models.map(x=>x.id)); if(ids.size!==20)throw new Error('Duplicate model IDs');
+for(const m of r.models)for(const k of ['id','version','family','timing','formula','inputs','limitations'])if(m[k]===undefined)throw new Error('Model contract missing '+k+': '+m.id);
+const ai=JSON.parse(fs.readFileSync('ai-contract.json','utf8'));if(!/may not invent/i.test(ai.rule))throw new Error('AI numerical safety contract missing');
+const api=fs.readFileSync('api/openapi.yml','utf8');for(const p of ['/v1/calculate','/v1/models'])if(!api.includes(p))throw new Error('API contract missing '+p);
+const privacy=fs.readFileSync('privacy/README.md','utf8');if(!/raw financial inputs/i.test(privacy))throw new Error('Privacy contract missing financial-input rule');
+console.log('Wealth Arrays phase 1-20 platform audit PASS.');
