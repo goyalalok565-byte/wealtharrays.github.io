@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "storage": "browser-local",
+  "purpose": "Versioned local financial workspace contract for Wealth Arrays.",
+  "privacy": {
+    "server_upload_required": false,
+    "analytics_raw_financial_values": false,
+    "advertising_access": false,
+    "delete_supported": true,
+    "export_supported": true
+  },
+  "fields": {
+    "startingAmount": "number",
+    "monthlyContribution": "number",
+    "annualStepUp": "number",
+    "annualReturn": "number",
+    "inflation": "number",
+    "years": "number"
+  },
+  "future": {
+    "multiGoal": "schema-compatible extension point",
+    "income": "schema-compatible extension point",
+    "expenses": "schema-compatible extension point",
+    "debt": "schema-compatible extension point"
+  }
+}
