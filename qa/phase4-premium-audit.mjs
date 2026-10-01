@@ -44,7 +44,7 @@ for(const file of publicFiles){
   }
 }
 const headers=read('_headers');
-if(!headers.includes('https://fundingchoicesmessages.google.com')) failures.push('_headers: Funding Choices CSP allowlist missing');
+if(!consentHeaders.includes('https://fundingchoicesmessages.google.com')) failures.push('_headers: Funding Choices CSP allowlist missing');
 if(!read('privacy.html').includes('Google Privacy &amp; Messaging')) failures.push('privacy.html: Funding Choices disclosure missing');
 
 for(const name of ['404.html','widget.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html']){
@@ -64,7 +64,7 @@ for(const full of publicFiles){
 }
 const widgetSource=fs.readFileSync('widget.js','utf8');
 if(!widgetSource.includes('new URL(`/widget.html?calc=${encodeURIComponent(calc.id)}`,location.origin).href')) failures.push('widget.js: embed URL must use canonical /widget.html route');
-const headers=fs.existsSync('_headers')?fs.readFileSync('_headers','utf8'):'';
+const consentHeaders=fs.existsSync('_headers')?fs.readFileSync('_headers','utf8'):'';
 for(const rule of ['/widget','/widget.html']){
   const marker=rule+'\n';
   const start=headers.lastIndexOf(marker);
