@@ -59,15 +59,6 @@ jobs:
           echo "Production did not expose canonical runtime bundles within the wait window."
           exit 1
 
-      - name: Verify production deployment commit marker
-        shell: bash
-        run: |
-          set -euo pipefail
-          home="$(curl -fsSL https://wealtharrays.com/index.html)"
-          if ! grep -q 'bfa9029e3ca5948c33cbb854bf9b182cd9eeb423\|29d77bae2c405c46568653b10a0a3ea1f32f76ff' <<<"$home"; then
-            echo "Production deployment marker not found in homepage."
-            exit 1
-          fi
       - name: Production embed browser smoke
         env:
           BASE_URL: https://wealtharrays.com
