@@ -34,6 +34,19 @@ for(const full of publicFiles){
     failures.push(r+': noindex pages must not carry AdSense');
   }
 }
+for(const file of htmlFiles){
+  const base=path.basename(file);
+  const html=fs.readFileSync(file,'utf8');
+  if(base==='404.html'||base==='widget.html'){
+    if(html.includes('/consent-loader.js')) failures.push(base+': Funding Choices loader must not run on error/embed document');
+  }else if(!html.includes('/consent-loader.js')){
+    failures.push(base+': Funding Choices consent loader missing');
+  }
+}
+const headers=read('_headers');
+if(!headers.includes('https://fundingchoicesmessages.google.com')) failures.push('_headers: Funding Choices CSP allowlist missing');
+if(!read('privacy.html').includes('Google Privacy &amp; Messaging')) failures.push('privacy.html: Funding Choices disclosure missing');
+
 for(const name of ['404.html','widget.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html']){
   const s=read(name);
   if(s.includes('adsbygoogle.js')||s.includes('ca-pub-6507600103785450')) failures.push(name+': AdSense must not be present');
