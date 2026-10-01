@@ -37,8 +37,9 @@ for(const full of publicFiles){
 for(const file of publicFiles){
   const base=path.basename(file);
   const html=fs.readFileSync(file,'utf8');
-  if(base==='404.html'||base==='widget.html'){
-    if(html.includes('/consent-loader.js')) failures.push(base+': Funding Choices loader must not run on error/embed document');
+  const consentExcluded=['404.html','widget.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html'];
+  if(consentExcluded.includes(base)){
+    if(html.includes('/consent-loader.js')) failures.push(base+': Funding Choices loader must not run on disclosure/legal document');
   }else if(!html.includes('/consent-loader.js')){
     failures.push(base+': Funding Choices consent loader missing');
   }
