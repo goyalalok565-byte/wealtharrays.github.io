@@ -52,7 +52,7 @@ for(const file of htmlFiles){
   const adsenseExcluded=['404.html','widget.html','widget/index.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html'].includes(base) || noindex;
   const consentExcluded=['404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html'];
   if(consentExcluded.includes(base)){
-    s=s.replace(/<script[^>]+src=["']\\/consent-loader\\.js[^>]*><\\/script>/gi,'');
+    s=s.replace(/<script[^>]+src=["']\/consent-loader\.js[^>]*><\/script>/gi,'');
   }else if(!s.includes('/consent-loader.js')) s=s.replace('</head>',consentJs+'</head>');
 
   if(adsenseExcluded){
