@@ -141,6 +141,7 @@ if(isArticle){
     html=html.replace(/\s*<!-- WA-(?:SITE|CANONICAL|WIDGET)-RUNTIME:[^>]+-->/g,'');
     html=html.replace('</body>',`<script src="/calculators.js?v=${stamp}"></script><script src="/widget.js?v=${stamp}"></script><script src="/wa-calculator-runtime.js?v=${stamp}" defer></script></body>`);
   }
+  if(isCalc && !html.includes('/wa-calculator-runtime.js')) html=html.replace('</body>','<script src="/wa-calculator-runtime.js" defer></script></body>');
   fs.writeFileSync(full,html,'utf8');}
 
 const routes=['/','/tools','/scenario-lab','/goal-planner','/financial-workspace','/articles','/faq','/about','/contact','/privacy','/terms','/disclaimer','/methodology','/editorial-policy','/advertising-policy','/category-investment','/category-loan','/category-banking','/category-retirement','/category-salary','/category-business',...slugs.map(s=>`/${s}/`)];for(const full of allHtml){const rel=path.relative(root,full).replaceAll(path.sep,'/');if(/^articles\/[^/]+\.html$/.test(rel))routes.push('/'+rel.replace(/\.html$/,''));}
