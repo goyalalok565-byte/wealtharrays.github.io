@@ -2,34 +2,103 @@ openapi: 3.0.3
 info:
   title: Wealth Arrays Financial Engine API
   version: 1.0.0
-  description: Deterministic financial calculations with reproducible inputs and model versions.
+  description: Deterministic financial calculations with reproducible inputs, assumptions, model versions and provenance. This is an integration contract; hosting, authentication and rate limiting are external infrastructure concerns.
 paths:
   /v1/calculate:
     post:
       summary: Calculate a registered financial model
+      operationId: calculateModel
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required: [model, inputs]
-              properties:
-                model: {type: string}
-                model_version: {type: string}
-                inputs: {type: object}
-                assumptions: {type: object}
-                country: {type: string}
-                currency: {type: string}
+              $ref: '#/components/schemas/CalculationRequest'
       responses:
         '200':
           description: Deterministic result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculationResponse'
         '400':
           description: Invalid or incomplete input
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ErrorResponse'}
         '422':
           description: Unsupported model, country rule or version
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ErrorResponse'}
   /v1/models:
     get:
       summary: List available calculation models
+      operationId: listModels
       responses:
-        '200': {description: Model registry}
+        '200':
+          description: Model registry
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [models]
+                properties:
+                  models:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ModelSummary'
+components:
+  schemas:
+    CalculationRequest:
+      type: object
+      required: [model, inputs]
+      properties:
+        model: {type: string, description: Registered model ID}
+        model_version: {type: string, description: Optional exact model version; server must reject unsupported versions}
+        inputs: {type: object, additionalProperties: true}
+        assumptions: {type: object, additionalProperties: true}
+        country: {type: string, description: ISO 3166-1 alpha-2 country code when jurisdiction matters}
+        currency: {type: string, description: ISO 4217 currency code}
+    CalculationResponse:
+      type: object
+      required: [model, model_version, inputs, assumptions, results, limitations]
+      properties:
+        model: {type: string}
+        model_version: {type: string}
+        inputs: {type: object, additionalProperties: true}
+        assumptions: {type: object, additionalProperties: true}
+        results: {type: object, additionalProperties: true}
+        limitations:
+          type: array
+          items: {type: string}
+        sources:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        reproducibility:
+          type: object
+          additionalProperties: true
+    ModelSummary:
+      type: object
+      required: [id, version, family, timing, formula, inputs, limitations]
+      properties:
+        id: {type: string}
+        version: {type: string}
+        family: {type: string}
+        timing: {type: string}
+        formula: {type: string}
+        inputs:
+          type: array
+          items: {type: string}
+        limitations:
+          type: array
+          items: {type: string}
+    ErrorResponse:
+      type: object
+      required: [error, message]
+      properties:
+        error: {type: string}
+        message: {type: string}
+        details: {type: object, additionalProperties: true}
