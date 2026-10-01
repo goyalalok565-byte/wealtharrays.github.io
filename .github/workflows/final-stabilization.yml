@@ -65,6 +65,8 @@ jobs:
           node scripts/site-integrity.mjs
           node scripts/launch-readiness.mjs
           node scripts/phase10-qa.mjs
+          npm run build:dist
+          npm run qa:dist
           git diff --check
       - name: Commit deterministic build
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
