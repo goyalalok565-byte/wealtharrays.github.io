@@ -43,8 +43,8 @@ for(const file of publicFiles){
     failures.push(base+': Funding Choices consent loader missing');
   }
 }
-const consentHeaders=read('_headers');
-if(!consentHeaders.includes('https://fundingchoicesmessages.google.com')) failures.push('_headers: Funding Choices CSP allowlist missing');
+const fundingHeaders=read('_headers');
+if(!fundingHeaders.includes('https://fundingchoicesmessages.google.com')) failures.push('_headers: Funding Choices CSP allowlist missing');
 if(!read('privacy.html').includes('Google Privacy &amp; Messaging')) failures.push('privacy.html: Funding Choices disclosure missing');
 
 for(const name of ['404.html','widget.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html']){
