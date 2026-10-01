@@ -1,0 +1,44 @@
+name: Wealth Arrays Platform Gates
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wealtharrays-platform-gates-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  platform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Validate JavaScript
+        run: find . -maxdepth 2 -type f -name '*.js' -print0 | xargs -0 -n1 node --check
+      - name: Generate research datasets
+        run: node scripts/generate-research-datasets.mjs
+      - name: Phase 1-20 platform audit
+        run: node qa/platform-phase1-20-audit.mjs
+      - name: Research data audit
+        run: node qa/research-data-audit.mjs
+      - name: Accessibility static audit
+        run: node qa/accessibility-static-audit.mjs
+      - name: Performance budget audit
+        run: node qa/performance-budget-audit.mjs
+      - name: Build production dist
+        run: npm run build:dist
+      - name: Dist integrity
+        run: npm run qa:dist
+      - name: Diff check
+        run: git diff --check
