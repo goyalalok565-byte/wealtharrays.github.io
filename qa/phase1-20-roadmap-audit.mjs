@@ -30,11 +30,13 @@ const adapters = (() => {
   return ctx.window.WA_DECISION_ADAPTERS;
 })();
 const modelIds = new Set(models.map(x=>x.id));
+const modelAlias = Object.freeze({'compound-interest':'compound'});
 if (modelIds.size !== 20) fail('Phase 1: model registry must contain 20 unique IDs');
 for (const c of calculators) {
-  if (!modelIds.has(c.id)) fail('Phase 1/3: calculator missing model registry entry: '+c.id);
-  if (!formulas[c.id]) fail('Phase 1: formula registry missing: '+c.id);
-  if (typeof adapters[c.id] !== 'function') fail('Phase 3: decision adapter missing: '+c.id);
+  const modelId=modelAlias[c.id]||c.id;
+  if (!modelIds.has(modelId)) fail('Phase 1/3: calculator missing model registry entry: '+c.id);
+  if (!formulas[modelId]) fail('Phase 1: formula registry missing: '+c.id);
+  if (typeof adapters[modelId] !== 'function') fail('Phase 3: decision adapter missing: '+c.id);
 }
 for (const m of models) {
   for (const k of ['id','version','family','timing','formula','inputs','limitations']) if (m[k] === undefined) fail('Phase 1: incomplete model contract: '+m.id);
