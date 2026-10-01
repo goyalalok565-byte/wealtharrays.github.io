@@ -32,6 +32,7 @@ for(const file of htmlFiles){
   if(mountId) s=s.replace(/<script>[^<]*mountCalculator\([^<]*<\/script>/gi,'');
   const base=path.basename(file);
   const rel=path.relative(root,file).replaceAll(path.sep,'/');
+  const routeName=rel==='widget/index.html'?'widget/index.html':base;
   const canonicalId=calcIds[base];
   const id=canonicalId||mountId;
   if(canonicalId && base!=='widget.html'){
@@ -49,9 +50,9 @@ for(const file of htmlFiles){
   // AdSense is intentionally excluded from 404.html and widget.html.
   // 404 is an error/low-value page; widget.html may be embedded on third-party domains.
   const noindex=/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(s);
-  const adsenseExcluded=['404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html'].includes(base) || noindex;
+  const adsenseExcluded=['404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html'].includes(routeName) || noindex;
   const consentExcluded=['404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html'];
-  if(consentExcluded.includes(base)){
+  if(consentExcluded.includes(routeName)){
     s=s.replace(/<script[^>]+src=["']\/consent-loader\.js[^>]*><\/script>/gi,'');
   }else if(!s.includes('/consent-loader.js')) s=s.replace('</head>',consentJs+'</head>');
 
