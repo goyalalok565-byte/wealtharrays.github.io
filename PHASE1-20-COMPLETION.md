@@ -2,6 +2,8 @@
 
 Updated: 2026-10-01
 
+Automated release note: accessibility source normalization is enforced by the canonical build and verified by the phase-wide static gate.
+
 This document is the production completion matrix for the platform roadmap. "Complete" means the repository contains a deterministic implementation, machine-readable contract, or automated gate for the capability. External outcomes such as rankings, backlinks, ad approval, Cloudflare account settings, Search Console access, partnerships and user growth are not represented as code-complete.
 
 | Phase | Production deliverable | Status |
