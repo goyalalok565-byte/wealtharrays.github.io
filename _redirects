@@ -1,7 +1,6 @@
-# Embeddable calculator widget — one-way rewrite, never redirect
-# Clean widget endpoint backed by a directory index (avoids .html ↔ clean-URL redirect loops).
-/widget /widget/index.html 200
-/widget/ /widget/index.html 200
+# Embeddable calculator widget — clean route serves the canonical widget document without a redirect loop.
+/widget /widget.html 200
+/widget/ /widget.html 200
 /widget.html /widget 301
 
 # Canonical legacy URL redirects
