@@ -14,7 +14,6 @@ function walk(dir){
 walk(root);
 
 const phase4Css='<link rel="stylesheet" href="/phase4-premium.css?v=20260915-1">';
-const phase4Js='<script src="/phase4-premium.js?v=20260915-1" defer></script>';
 const themeJs='<script src="/theme-init.js?v=20260915-1"></script>';
 const calcInitJs='<script src="/calculator-page-init.js?v=20260915-1" defer></script>';
 const redirectJs='<script src="/404-runtime.js?v=20260915-1" defer></script>';
@@ -47,7 +46,6 @@ for(const file of htmlFiles){
   s=s.replace(/<link rel="stylesheet" href="\/phase4-premium\.css[^>]*>/g,'');
   s=s.replace(/<script src="\/phase4-premium\.js[^>]*><\/script>/g,'');
   if(!s.includes('/phase4-premium.css')) s=s.replace('</head>',`${phase4Css}</head>`);
-  if(!s.includes('/phase4-premium.js')) s=s.replace('</body>',`${phase4Js}</body>`);
   if(!s.includes('name="referrer"')) s=s.replace('</head>',`<meta name="referrer" content="strict-origin-when-cross-origin"></head>`);
   // AdSense is intentionally excluded from 404.html and widget.html.
   // 404 is an error/low-value page; widget.html may be embedded on third-party domains.
