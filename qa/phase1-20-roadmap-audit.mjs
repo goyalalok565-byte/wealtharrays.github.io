@@ -104,7 +104,7 @@ const analytics=must('analytics.js');
 if (!/ALLOWED/.test(analytics) || !/sanitize/.test(analytics) || !/localStorage/.test(analytics)) fail('Phase 18: privacy-safe analytics contract missing');
 for (const p of ['GLOBAL-PLATFORM-SPEC.md','GLOBAL-PRODUCT-ROADMAP.md','api/openapi.yml']) must(p);
 
-for (const p of ['research/data/sip-contribution-timing-study.json','research/data/inflation-purchasing-power-study.json','research/data/emi-term-cost-study.json']) {
+for (const p of ['research/data/sip-contribution-timing-study.json','research/data/inflation-purchasing-power-study.json','research/data/emi-term-cost-study.json','research/data/cagr-endpoint-study.json','research/data/real-return-rate-study.json']) {
   const d=json(p);
   for (const k of ['schema_version','study_id','model_id','model_version','method','assumptions','rows','limitations']) if (d[k]===undefined) fail('Phase 20: research dataset missing '+k+': '+p);
   if (!d.rows.length) fail('Phase 20: empty dataset: '+p);
