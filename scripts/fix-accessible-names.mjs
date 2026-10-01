@@ -11,7 +11,11 @@ function walk(dir) {
     if (entry.isDirectory()) walk(full);
     else if (entry.isFile() && entry.name.endsWith('.html')) {
       const before = fs.readFileSync(full, 'utf8');
-      const after = before.replaceAll('aria-label="Wealth Arrays home"', 'aria-label="Wealth Arrays"').replaceAll('<select id="currency-select">','<select id="currency-select" aria-label="Currency">');
+      let after = before.replaceAll('aria-label="Wealth Arrays home"', 'aria-label="Wealth Arrays"').replaceAll('<select id="currency-select">','<select id="currency-select" aria-label="Currency">');
+      if(entry.name==='widget.html'){
+        after=after.replace(/\s*<script[^>]+src=["']\/calculators\.js[^>]*><\/script>/gi,'').replace(/\s*<script[^>]+src=["']\/wa-calculator-runtime\.js[^>]*><\/script>/gi,'').replace(/\s*<script[^>]+src=["']\/widget-bootstrap\.js[^>]*><\/script>/gi,'');
+        after=after.replace('</body>','<script src="/calculators.js"></script><script src="/wa-calculator-runtime.js"></script><script src="/widget-bootstrap.js"></script></body>');
+      }
       if (after !== before) {
         fs.writeFileSync(full, after);
         changed += 1;
