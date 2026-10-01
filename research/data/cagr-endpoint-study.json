@@ -16,14 +16,14 @@
       "start": 100,
       "end": 121,
       "years": 2,
-      "cagr": 10
+      "cagr": 0.1
     },
     {
       "path": "volatile",
       "start": 100,
       "end": 121,
       "years": 2,
-      "cagr": 10
+      "cagr": 0.1
     }
   ],
   "limitations": [
