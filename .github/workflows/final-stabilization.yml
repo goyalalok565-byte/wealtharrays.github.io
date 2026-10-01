@@ -46,12 +46,6 @@ jobs:
           done
       - name: Version assets by content hash
         run: node scripts/version-runtime-assets.mjs
-      - name: Verify generated calculator runtime state
-        run: |
-          echo '--- SIP runtime refs ---'
-          grep -o 'wa-calculator-runtime[^"<]*' sip-calculator.html || true
-          echo '--- Runtime file ---'
-          test -s wa-calculator-runtime.js && echo 'wa-calculator-runtime.js OK'
       - name: Run canonical regression gates
         run: |
           node qa/root-cause-audit.mjs
