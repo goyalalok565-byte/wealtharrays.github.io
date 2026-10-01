@@ -41,6 +41,9 @@ jobs:
       - name: Run visual and calculator smoke against exact checkout
         run: node qa/production-browser-smoke.mjs
 
+      - name: Wait for Pages CDN propagation
+        run: sleep 180
+
       - name: Verify production embed browser smoke
         env:
           BASE_URL: https://wealtharrays.com
