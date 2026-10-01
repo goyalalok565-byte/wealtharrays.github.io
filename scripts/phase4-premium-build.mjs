@@ -50,7 +50,8 @@ for(const file of htmlFiles){
   // 404 is an error/low-value page; widget.html may be embedded on third-party domains.
   const noindex=/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(s);
   const adsenseExcluded=['404.html','widget.html','widget/index.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html'].includes(base) || noindex;
-  if(!['404.html','widget.html','widget/index.html'].includes(base) && !s.includes('/consent-loader.js')) s=s.replace('</head>',`${consentJs}</head>`);
+  const consentExcluded=['404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html'];
+  if(!consentExcluded.includes(base) && !s.includes('/consent-loader.js')) s=s.replace('</head>',`${consentJs}</head>`);
   if(adsenseExcluded){
     const escaped=adsenseJs.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
     s=s.replace(new RegExp('\\s*'+escaped),'');
