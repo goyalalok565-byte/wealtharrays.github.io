@@ -1,4 +1,4 @@
-/* Wealth Arrays canonical site runtime. Generated 20261005072007. */
+/* Wealth Arrays canonical site runtime. Generated 20261005072036. */
 (function(){const k='__WA_CANONICAL_SITE_RUNTIME__';if(window[k])return;window[k]=true;})();
 /* ===== WA CANONICAL MODULE | site | wa-core.js | sha256:5e2efc7e2d57 ===== */
 /* Wealth Arrays core runtime — one owner for shared site behaviour. */
