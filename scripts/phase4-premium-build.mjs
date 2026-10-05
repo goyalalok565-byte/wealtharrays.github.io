@@ -19,8 +19,8 @@ const redirectJs='<script src="/404-runtime.js?v=20260915-1" defer></script>';
 const adsenseJs='<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6507600103785450" crossorigin="anonymous"></script>';
 const consentJs='<script data-cfasync="false" src="/consent-loader.js" defer></script>';
 const calcIds={
- 'sip-calculator.html':'sip','compound-interest-calculator.html':'compound-interest','mortgage-emi-calculator.html':'mortgage','roi-calculator.html':'roi','simple-interest-calculator.html':'simple-interest','retirement-calculator.html':'freedom-milestone','salary-to-hourly-calculator.html':'salary-hourly','profit-margin-calculator.html':'profit-margin','fixed-deposit-calculator.html':'fixed-deposit','recurring-deposit-calculator.html':'recurring-deposit','lumpsum-calculator.html':'lumpsum','cagr-calculator.html':'cagr','car-loan-calculator.html':'car-loan','personal-loan-calculator.html':'personal-loan','debt-payoff-calculator.html':'debt-payoff','inflation-calculator.html':'inflation','net-worth-calculator.html':'net-worth','overtime-pay-calculator.html':'overtime','freelance-rate-calculator.html':'freelance-rate','income-tax-scenario-calculator.html':'income-tax-planner'
-};
+ 'sip-calculator/index.html':'sip', 'compound-interest-calculator/index.html':'compound-interest', 'mortgage-emi-calculator/index.html':'mortgage', 'roi-calculator/index.html':'roi', 'simple-interest-calculator/index.html':'simple-interest', 'retirement-calculator/index.html':'freedom-milestone', 'salary-to-hourly-calculator/index.html':'salary-hourly', 'profit-margin-calculator/index.html':'profit-margin', 'fixed-deposit-calculator/index.html':'fixed-deposit', 'recurring-deposit-calculator/index.html':'recurring-deposit', 'lumpsum-calculator/index.html':'lumpsum', 'cagr-calculator/index.html':'cagr', 'car-loan-calculator/index.html':'car-loan', 'personal-loan-calculator/index.html':'personal-loan', 'debt-payoff-calculator/index.html':'debt-payoff', 'inflation-calculator/index.html':'inflation', 'net-worth-calculator/index.html':'net-worth', 'overtime-pay-calculator/index.html':'overtime', 'freelance-rate-calculator/index.html':'freelance-rate', 'income-tax-scenario-calculator/index.html':'income-tax-planner'
+ };
 let changed=0;
 for(const file of htmlFiles){
   let s=fs.readFileSync(file,'utf8');
@@ -32,8 +32,8 @@ for(const file of htmlFiles){
   if(mountId) s=s.replace(/<script>[^<]*mountCalculator\([^<]*<\/script>/gi,'');
   const base=path.basename(file);
   const rel=path.relative(root,file).replaceAll(path.sep,'/');
-  const routeName=rel==='widget/index.html'?'widget/index.html':base;
-  const canonicalId=calcIds[base];
+  const routeName=rel==='widget/index.html'?'widget/index.html':rel;
+  const canonicalId=calcIds[rel] || calcIds[base];
   const id=canonicalId||mountId;
   if(canonicalId && base!=='widget.html'){
     s=s.replace(/<html\s+data-wa-calculator="[^"]*"/i,'<html');
@@ -50,7 +50,7 @@ for(const file of htmlFiles){
   // AdSense is intentionally excluded from 404.html and widget.html.
   // 404 is an error/low-value page; widget.html may be embedded on third-party domains.
   const noindex=/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(s);
-  const adsenseExcluded=['404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html'].includes(routeName) || noindex;
+  const adsenseExcluded=['404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','category-investment.html','category-loan.html','category-banking.html','category-retirement.html','category-salary.html','category-business.html','financial-workspace.html','goal-planner.html','scenario-lab.html'].includes(routeName) || noindex;
   const consentExcluded=['404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html'].includes(routeName) || noindex;
   if(consentExcluded){
     s=s.replace(/<script[^>]+src=["']\/consent-loader\.js[^>]*><\/script>/gi,'');
