@@ -39,7 +39,7 @@ for(const file of publicFiles){
   const rel=path.relative(root,file).replaceAll(path.sep,'/');
   const routeName=rel==='widget/index.html'?'widget/index.html':base;
   const html=fs.readFileSync(file,'utf8');
-  const noindex=/<meta\\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html);
+  const noindex=/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html);
   const consentExcluded=['404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html'].includes(routeName) || noindex;
   if(consentExcluded){
     if(html.includes('/consent-loader.js')) failures.push(base+': Funding Choices loader must not run on disclosure/legal document');
