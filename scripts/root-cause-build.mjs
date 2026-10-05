@@ -80,6 +80,12 @@ if(isCalc){
       html=html.replace(/<h2>Worked scenario<\\/h2>\\s*<p>Use the calculator above to build a baseline from your own numbers\\. Then open comparison mode and create a second scenario with a different rate, time period or amount\\. The difference between the two outputs is often more useful than either output alone because it shows how sensitive the decision is to your assumptions\\.<\\/p>/i,'<h2>Worked scenario</h2><p>'+value.worked+'</p>');
     }
   }
+  const calcDefinition=definitions.find(x=>x.id===id);
+  const faqMatch=calcDefinition?.obj.match(/faqs:\[([\\s\\S]*?)\](?=\\s*\\},\\s*fields)/);
+  if(faqMatch){
+    const faqItems=[...faqMatch[1].matchAll(/\\{q:"([^"]*)",a:"([^"]*)"\\}/g)].map(m=>'<div class="faq-item"><h3>'+m[1]+'</h3><p>'+m[2]+'</p></div>').join('');
+    if(faqItems) html=html.replace(/<h2>Frequently asked questions<\\/h2>[\\s\\S]*?(?=<h2>Related calculators<\\/h2>)/i,'<h2>Frequently asked questions</h2>'+faqItems);
+  }
 }
 if(isWidget){
   const widgetCalculators='<script src="/calculators.js?v='+stamp+'"></script>';
