@@ -20,7 +20,7 @@ const cases = [
 ];
 try {
   for (const item of cases) {
-    await page.goto(`${baseUrl.replace(/\/$/,'')}/${item.slug}.html`, {waitUntil:'networkidle'});
+    await page.goto(`${baseUrl.replace(/\/$/,'')}/${item.slug}.html`, {waitUntil:'domcontentloaded'});
     const button = page.locator('#calc-widget-embed');
     await button.waitFor({state:'visible',timeout:8000});
     await button.click();
@@ -31,7 +31,7 @@ try {
     if (!copied.includes(`/widget?calc=${item.id}`)) throw new Error(`Clipboard embed URL is incorrect on ${item.slug}: ${copied}`);
     const widgetPath = '/widget.html';
     const widgetUrl = `${baseUrl.replace(/\/$/,'')}${widgetPath}?calc=${item.id}`;
-    const widgetResponse = await page.goto(widgetUrl, {waitUntil:'networkidle'});
+    const widgetResponse = await page.goto(widgetUrl, {waitUntil:'domcontentloaded'});
     if (!widgetResponse || !widgetResponse.ok()) throw new Error(`Widget HTTP response was not OK for ${item.id}: ${widgetResponse?.status()} ${widgetUrl}`);
     await page.locator('#calc-widget input, #calc-widget select').first().waitFor({state:'visible',timeout:8000}).catch(async () => {
       const diagnostics = await page.evaluate(() => ({title:document.title, url:location.href, body:(document.body?.innerText||'').slice(0,1200), widget:document.querySelector('#calc-widget')?.outerHTML?.slice(0,1200)||null, scripts:[...document.scripts].map(s=>s.src).filter(Boolean)}));
