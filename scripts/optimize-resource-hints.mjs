@@ -13,7 +13,7 @@ for(const file of htmlFiles){let html=fs.readFileSync(file,'utf8');const before=
   // Skip AdSense preconnect hints on pages that must never carry AdSense.
   const base=path.basename(file);
   const noindex=/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html);
-  const adsenseExcluded=['404.html','widget.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html'].includes(base) || noindex;
+  const adsenseExcluded=['404.html','widget.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','category-investment.html','category-loan.html','category-banking.html','category-retirement.html','category-salary.html','category-business.html','financial-workspace.html','goal-planner.html','scenario-lab.html'].includes(base) || noindex;
   if(adsenseExcluded){
     html=html.replace(/<link rel="preconnect" href="https:\/\/pagead2\.googlesyndication\.com" crossorigin>/g,'');
     html=html.replace(/<link rel="preconnect" href="https:\/\/googleads\.g\.doubleclick\.net" crossorigin>/g,'');
