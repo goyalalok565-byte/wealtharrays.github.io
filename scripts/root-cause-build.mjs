@@ -42,7 +42,7 @@ for(const full of allHtml){
   html=html.replace(/href=[\"']{2}/g, 'href="/"');
   const relPath=path.relative(root,full).replaceAll(path.sep,'/');
   const isWidget=relPath==='widget.html'||relPath==='widget/index.html';
-  if(isUtilityNoindexPage(relPath) && !/<meta\\s+name=[\"']robots[\"']/i.test(html)) html=html.replace('</head>','<meta name="robots" content="noindex,follow"></head>');
+  if(isUtilityNoindexPage(relPath) && !/<meta\s+name=[\"']robots[\"']/i.test(html)) html=html.replace('</head>','<meta name="robots" content="noindex,follow"></head>');
   const isScenarioLab=isScenarioLabPage(relPath);
   const isGoalPlanner=isGoalPlannerPage(relPath);
   const isCalc=/<html[^>]+data-wa-calculator=/i.test(html);
