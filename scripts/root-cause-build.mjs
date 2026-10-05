@@ -6,7 +6,7 @@ const root=process.cwd();
 const stamp=new Date().toISOString().replace(/\D/g,'').slice(0,14);
 const siteSources=['wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js','homepage-search.js','calculator-search.js'];
 const calcSources=['widget.js','widget-bootstrap.js',...siteSources,'calculator-safety.js','calculator-page-init.js','calculator-enhancements.js','pdf-export-fix.js'];
-const calculatorPages=['sip-calculator.html','compound-interest-calculator.html','mortgage-emi-calculator.html','roi-calculator.html','simple-interest-calculator.html','retirement-calculator.html','salary-to-hourly-calculator.html','profit-margin-calculator.html','fixed-deposit-calculator.html','recurring-deposit-calculator.html','lumpsum-calculator.html','cagr-calculator.html','car-loan-calculator.html','personal-loan-calculator.html','debt-payoff-calculator.html','inflation-calculator.html','net-worth-calculator.html','overtime-pay-calculator.html','freelance-rate-calculator.html','income-tax-scenario-calculator.html'];
+const calculatorPages=['sip-calculator/index.html','compound-interest-calculator/index.html','mortgage-emi-calculator/index.html','roi-calculator/index.html','simple-interest-calculator/index.html','retirement-calculator/index.html','salary-to-hourly-calculator/index.html','profit-margin-calculator/index.html','fixed-deposit-calculator/index.html','recurring-deposit-calculator/index.html','lumpsum-calculator/index.html','cagr-calculator/index.html','car-loan-calculator/index.html','personal-loan-calculator/index.html','debt-payoff-calculator/index.html','inflation-calculator/index.html','net-worth-calculator/index.html','overtime-pay-calculator/index.html','freelance-rate-calculator/index.html','income-tax-scenario-calculator/index.html'];
 const slugs=calculatorPages.map(x=>x.replace(/\.html$/,''));
 const required=[...new Set([...siteSources,...calcSources,'calculators.js'])];
 for(const f of required)if(!fs.existsSync(path.join(root,f)))throw new Error(`Missing runtime source: ${f}`);
@@ -69,17 +69,6 @@ if(isGoalPlanner){html=html.replace(/\s*<script\s+src=["']\/financial-engine\.js
 if(isCalc){
   const m=relPath.match(/^([^/]+)\/index\.html$/);
   const calculatorValueContent=JSON.parse(fs.readFileSync(path.join(root,'calculator-value-content.json'),'utf8'));
-const calculatorContentMap={
-    'sip-calculator':'sip-calculator.html','compound-interest-calculator':'compound-interest-calculator.html','mortgage-emi-calculator':'mortgage-emi-calculator.html','roi-calculator':'roi-calculator.html','simple-interest-calculator':'simple-interest-calculator.html','retirement-calculator':'retirement-calculator.html','salary-to-hourly-calculator':'salary-to-hourly-calculator.html','profit-margin-calculator':'profit-margin-calculator.html','fixed-deposit-calculator':'fixed-deposit-calculator.html','recurring-deposit-calculator':'recurring-deposit-calculator.html','lumpsum-calculator':'lumpsum-calculator.html','cagr-calculator':'cagr-calculator.html','car-loan-calculator':'car-loan-calculator.html','personal-loan-calculator':'personal-loan-calculator.html','debt-payoff-calculator':'debt-payoff-calculator.html','inflation-calculator':'inflation-calculator.html','net-worth-calculator':'net-worth-calculator.html','overtime-pay-calculator':'overtime-pay-calculator.html','freelance-rate-calculator':'freelance-rate-calculator.html','income-tax-scenario-calculator':'income-tax-scenario-calculator.html'
-  };
-  if(m && calculatorContentMap[m[1]]){
-    const sourcePath=path.join(root,calculatorContentMap[m[1]]);
-    if(fs.existsSync(sourcePath)){
-      const sourceHtml=fs.readFileSync(sourcePath,'utf8');
-      const sourceArticle=sourceHtml.match(/<article class="tool-article">[\s\S]*?<\/article>/i)?.[0];
-      if(sourceArticle) html=html.replace(/<article class="tool-article">[\s\S]*?<\/article>/i,sourceArticle);
-    }
-  }
   const value=m && calculatorValueContent[m[1]];
   if(value && !html.includes('WA-CALCULATOR-VALUE-GUIDE')){
     const block='<!-- WA-CALCULATOR-VALUE-GUIDE --> <section class="calculator-value-guide" aria-labelledby="calculator-value-guide-title"><h2 id="calculator-value-guide-title">'+value.heading+'</h2><p>'+value.body+'</p></section>';
