@@ -4,11 +4,11 @@ import path from 'node:path';
 const root = process.cwd();
 const failures = [];
 const calc = [
-  'sip-calculator.html','compound-interest-calculator.html','mortgage-emi-calculator.html','roi-calculator.html',
-  'simple-interest-calculator.html','retirement-calculator.html','salary-to-hourly-calculator.html','profit-margin-calculator.html',
-  'fixed-deposit-calculator.html','recurring-deposit-calculator.html','lumpsum-calculator.html','cagr-calculator.html',
-  'car-loan-calculator.html','personal-loan-calculator.html','debt-payoff-calculator.html','inflation-calculator.html',
-  'net-worth-calculator.html','overtime-pay-calculator.html','freelance-rate-calculator.html','income-tax-scenario-calculator.html'
+  'sip-calculator/index.html','compound-interest-calculator/index.html','mortgage-emi-calculator/index.html','roi-calculator/index.html',
+  'simple-interest-calculator/index.html','retirement-calculator/index.html','salary-to-hourly-calculator/index.html','profit-margin-calculator/index.html',
+  'fixed-deposit-calculator/index.html','recurring-deposit-calculator/index.html','lumpsum-calculator/index.html','cagr-calculator/index.html',
+  'car-loan-calculator/index.html','personal-loan-calculator/index.html','debt-payoff-calculator/index.html','inflation-calculator/index.html',
+  'net-worth-calculator/index.html','overtime-pay-calculator/index.html','freelance-rate-calculator/index.html','income-tax-scenario-calculator/index.html'
 ];
 const read=f=>fs.readFileSync(path.join(root,f),'utf8');
 const walk=(dir, out=[])=>{for(const e of fs.readdirSync(dir,{withFileTypes:true})){if(e.name.startsWith('.')||e.name==='node_modules')continue;const full=path.join(dir,e.name);if(e.isDirectory())walk(full,out);else if(e.name.endsWith('.html'))out.push(full)}return out};
