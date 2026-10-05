@@ -6,16 +6,16 @@
 
   const C = 'https://wealtharrays.com';
   const calculators = {
-    sip: ['SIP Calculator', '/sip-calculator.html'], 'compound-interest': ['Compound Interest Calculator', '/compound-interest-calculator.html'],
-    mortgage: ['Mortgage / Loan EMI Calculator', '/mortgage-emi-calculator.html'], roi: ['ROI Calculator', '/roi-calculator.html'],
-    'simple-interest': ['Simple Interest Calculator', '/simple-interest-calculator.html'], 'freedom-milestone': ['Retirement Calculator', '/retirement-calculator.html'],
-    'salary-conversion': ['Salary to Hourly Calculator', '/salary-to-hourly-calculator.html'], 'profit-margin': ['Profit Margin Calculator', '/profit-margin-calculator.html'],
-    'fixed-deposit': ['Fixed Deposit Calculator', '/fixed-deposit-calculator.html'], 'recurring-deposit': ['Recurring Deposit Calculator', '/recurring-deposit-calculator.html'],
-    lumpsum: ['Lumpsum Calculator', '/lumpsum-calculator.html'], cagr: ['CAGR Calculator', '/cagr-calculator.html'],
-    'car-loan': ['Car Loan Calculator', '/car-loan-calculator.html'], 'personal-loan': ['Personal Loan Calculator', '/personal-loan-calculator.html'],
-    'debt-payoff': ['Debt Payoff Calculator', '/debt-payoff-calculator.html'], inflation: ['Inflation Calculator', '/inflation-calculator.html'],
-    'net-worth': ['Net Worth Calculator', '/net-worth-calculator.html'], overtime: ['Overtime Pay Calculator', '/overtime-pay-calculator.html'],
-    'freelance-rate': ['Freelance Rate Calculator', '/freelance-rate-calculator.html'], 'income-tax-scenario': ['Income Tax Scenario Calculator', '/income-tax-scenario-calculator.html']
+    sip: ['SIP Calculator', '/sip-calculator/'], 'compound-interest': ['Compound Interest Calculator', '/compound-interest-calculator/'],
+    mortgage: ['Mortgage / Loan EMI Calculator', '/mortgage-emi-calculator/'], roi: ['ROI Calculator', '/roi-calculator/'],
+    'simple-interest': ['Simple Interest Calculator', '/simple-interest-calculator/'], 'freedom-milestone': ['Retirement Calculator', '/retirement-calculator/'],
+    'salary-conversion': ['Salary to Hourly Calculator', '/salary-to-hourly-calculator/'], 'profit-margin': ['Profit Margin Calculator', '/profit-margin-calculator/'],
+    'fixed-deposit': ['Fixed Deposit Calculator', '/fixed-deposit-calculator/'], 'recurring-deposit': ['Recurring Deposit Calculator', '/recurring-deposit-calculator/'],
+    lumpsum: ['Lumpsum Calculator', '/lumpsum-calculator/'], cagr: ['CAGR Calculator', '/cagr-calculator/'],
+    'car-loan': ['Car Loan Calculator', '/car-loan-calculator/'], 'personal-loan': ['Personal Loan Calculator', '/personal-loan-calculator/'],
+    'debt-payoff': ['Debt Payoff Calculator', '/debt-payoff-calculator/'], inflation: ['Inflation Calculator', '/inflation-calculator/'],
+    'net-worth': ['Net Worth Calculator', '/net-worth-calculator/'], overtime: ['Overtime Pay Calculator', '/overtime-pay-calculator/'],
+    'freelance-rate': ['Freelance Rate Calculator', '/freelance-rate-calculator/'], 'income-tax-scenario': ['Income Tax Scenario Calculator', '/income-tax-scenario-calculator/']
   };
   const guides = {
     sip: ['SIP Calculator Guide', '/articles/sip-calculator-guide.html'], compound: ['Compound Interest Guide', '/articles/compound-interest-guide.html'],
