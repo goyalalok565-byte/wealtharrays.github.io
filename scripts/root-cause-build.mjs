@@ -70,9 +70,13 @@ if(isCalc){
   const m=relPath.match(/^([^/]+)\/index\.html$/);
   const calculatorValueContent=JSON.parse(fs.readFileSync(path.join(root,'calculator-value-content.json'),'utf8'));
   const value=m && calculatorValueContent[m[1]];
-  if(value && !html.includes('WA-CALCULATOR-VALUE-GUIDE')){
+  if(value){
     const block='<!-- WA-CALCULATOR-VALUE-GUIDE --> <section class="calculator-value-guide" aria-labelledby="calculator-value-guide-title"><h2 id="calculator-value-guide-title">'+value.heading+'</h2><p>'+value.body+'</p></section>';
-    html=html.replace(/<\/article>/i,block+'</article>');
+    if(html.includes('WA-CALCULATOR-VALUE-GUIDE')) html=html.replace(/<!-- WA-CALCULATOR-VALUE-GUIDE -->\\s*<section class="calculator-value-guide"[\\s\\S]*?<\\/section>/i,block);
+    else html=html.replace(/<\\/article>/i,block+'</article>');
+    if(value.worked){
+      html=html.replace(/<h2>Worked scenario<\\/h2>\\s*<p>Use the calculator above to build a baseline from your own numbers\\. Then open comparison mode and create a second scenario with a different rate, time period or amount\\. The difference between the two outputs is often more useful than either output alone because it shows how sensitive the decision is to your assumptions\\.<\\/p>/i,'<h2>Worked scenario</h2><p>'+value.worked+'</p>');
+    }
   }
 }
 if(isWidget){
