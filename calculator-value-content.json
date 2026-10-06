@@ -89,5 +89,10 @@
   "income-tax-scenario-calculator": {
     "heading": "Why this tax tool is deliberately a scenario model",
     "body": "Tax outcomes are jurisdiction-specific and can depend on brackets, deductions, credits, filing status, residency, income type and rules that change over time. This calculator deliberately asks you for an effective tax-rate assumption instead of pretending to reproduce every country's current tax system. Use it to compare conservative, middle and high-tax scenarios and to understand sensitivity to income and deductions. Do not use the result as a filing calculation or compliance determination. For an actual tax obligation, use the current guidance from the relevant tax authority or qualified professional and reconcile the result with the applicable rules."
+  },
+  "income-tax-planner": {
+    "heading": "Use a concrete tax-planning scenario",
+    "body": "For example, suppose annual gross income is ₹12,00,000, estimated deductions are ₹1,50,000, and the assumed effective tax rate is 15%. This simplified model applies the rate to ₹10,50,000 of modeled taxable income. It is useful for comparing assumptions, but actual tax can differ because real tax systems may use slabs, credits, exemptions and jurisdiction-specific rules.",
+    "worked": "With ₹12,00,000 of gross income, ₹1,50,000 of modeled deductions and a 15% assumed effective rate, the calculator estimates ₹10,50,000 of taxable income, ₹1,57,500 of tax and ₹10,42,500 after tax. Change one input at a time to see which assumption drives the result."
   }
 }
