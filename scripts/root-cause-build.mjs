@@ -38,6 +38,9 @@ const isWorkspacePage=(rel)=>rel==='financial-workspace.html';
 const isUtilityNoindexPage=(rel)=>isScenarioLabPage(rel)||isGoalPlannerPage(rel)||isWorkspacePage(rel);
 for(const full of allHtml){
   let html=fs.readFileSync(full,'utf8');
+  // Normalize the public contact identity across every generated HTML page.
+  // This prevents stale legacy Gmail addresses from surviving in footers or structured data.
+  html=html.replaceAll('goyalalok565@gmail.com','contact@wealtharrays.com');
   // Normalize legacy empty navigation targets at source/build level so future generated pages never emit dead self-links.
   html=html.replace(/href=[\"']{2}/g, 'href="/"');
   const relPath=path.relative(root,full).replaceAll(path.sep,'/');
