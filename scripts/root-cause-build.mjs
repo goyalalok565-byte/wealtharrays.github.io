@@ -45,6 +45,7 @@ for(const full of allHtml){
   if(isUtilityNoindexPage(relPath) && !/<meta\s+name=[\"']robots[\"']/i.test(html)) html=html.replace('</head>','<meta name="robots" content="noindex,follow"></head>');
   const isScenarioLab=isScenarioLabPage(relPath);
   const isGoalPlanner=isGoalPlannerPage(relPath);
+  const isWorkspacePageCurrent=isWorkspacePage(relPath);
   const isCalc=/<html[^>]+data-wa-calculator=/i.test(html);
   // Add a static skip link and target so accessibility does not depend on JavaScript execution.
   if(!/class=["'][^"']*wa-skip-link/i.test(html)){
@@ -70,7 +71,7 @@ for(const full of allHtml){
   if(isCalc) html=html.replace(/<script\b(?=[^>]*type=["']application\/ld\+json["'])[^>]*>[\s\S]*?<\/script>/gi,tag=>/"@type"\s*:\s*"FAQPage"/.test(tag)?'':tag);
   html=html.replace(/\s*<script\s+src=["']([^"']+)[^>]*><\/script>/gi,(tag,src)=>{
     const base=path.basename(src.split('?',1)[0]);
-    const keep=managed.has(base)||(isWidget&&['calculators.js','widget.js','widget-bootstrap.js','wa-calculator-runtime.js'].includes(base))||(isScenarioLab&&['financial-engine.js','decision-adapters.js','scenario-lab.js'].includes(base))||(isGoalPlanner&&['financial-engine.js','decision-adapters.js','goal-planner.js'].includes(base))||(isWorkspacePage&&['financial-engine.js','report-engine.js','financial-workspace.js'].includes(base));
+    const keep=managed.has(base)||(isWidget&&['calculators.js','widget.js','widget-bootstrap.js','wa-calculator-runtime.js'].includes(base))||(isScenarioLab&&['financial-engine.js','decision-adapters.js','scenario-lab.js'].includes(base))||(isGoalPlanner&&['financial-engine.js','decision-adapters.js','goal-planner.js'].includes(base))||(isWorkspacePageCurrent&&['financial-engine.js','report-engine.js','financial-workspace.js'].includes(base));
     return keep?'':tag;
   });html=html.replace(/\s*<!-- WA-(?:SITE|CANONICAL)-RUNTIME:[^>]+-->\s*/g,'\n');
 html=html.replace(/(<link\s+[^>]*rel=["'](?:preload|stylesheet)["'][^>]*href=["'])\/?styles\.css(["'][^>]*>)/gi,'$1/styles.css$2');html=html.replace(/(<link\s+[^>]*href=["'])styles\.css(["'][^>]*rel=["'](?:preload|stylesheet)["'][^>]*>)/gi,'$1/styles.css$2');if(!html.includes('href="/styles.css"')&&!html.includes("href='/styles.css'"))html=html.replace('</head>','<link rel="stylesheet" href="/styles.css"></head>');
@@ -88,7 +89,7 @@ else{
   }
 }
 if(isScenarioLab){html=html.replace(/\s*<script\s+src=["']\/financial-engine\.js[^>]*><\/script>/gi,'').replace(/\s*<script\s+src=["']\/scenario-lab\.js[^>]*><\/script>/gi,'');html=html.replace('</body>','<script src="/financial-engine.js"></script><script src="/decision-adapters.js"></script><script src="/scenario-lab.js"></script></body>');}
-if(isWorkspacePage){html=html.replace(/\s*<script\s+src=["']\/financial-engine\.js[^>]*><\/script>/gi,'').replace(/\s*<script\s+src=["']\/report-engine\.js[^>]*><\/script>/gi,'').replace(/\s*<script\s+src=["']\/financial-workspace\.js[^>]*><\/script>/gi,'');html=html.replace('</body>','<script src="/financial-engine.js"></script><script src="/report-engine.js"></script><script src="/financial-workspace.js"></script></body>');}
+if(isWorkspacePageCurrent){html=html.replace(/\s*<script\s+src=["']\/financial-engine\.js[^>]*><\/script>/gi,'').replace(/\s*<script\s+src=["']\/report-engine\.js[^>]*><\/script>/gi,'').replace(/\s*<script\s+src=["']\/financial-workspace\.js[^>]*><\/script>/gi,'');html=html.replace('</body>','<script src="/financial-engine.js"></script><script src="/report-engine.js"></script><script src="/financial-workspace.js"></script></body>');}
 if(isGoalPlanner){html=html.replace(/\s*<script\s+src=["']\/financial-engine\.js[^>]*><\/script>/gi,'').replace(/\s*<script\s+src=["']\/goal-planner\.js[^>]*><\/script>/gi,'');html=html.replace('</body>','<script src="/financial-engine.js"></script><script src="/decision-adapters.js"></script><script src="/goal-planner.js"></script></body>');}
 if(isCalc){
   const m=relPath.match(/^([^/]+)\/index\.html$/);
