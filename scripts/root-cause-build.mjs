@@ -104,7 +104,7 @@ if(isCalc){
   }
   const pageCalcId=html.match(/data-wa-calculator="([^"]+)"/i)?.[1];
   const calcDefinition=definitions.find(x=>x.id===pageCalcId);
-  const faqMatch=calcDefinition?.obj.match(/faqs\s*:\s*\[([\s\S]*?)\](?=\s*\},\s*fields)/);
+  const faqMatch=calcDefinition?.obj.match(/faqs\s*:\s*\[([\s\S]*?)\](?=,\s*\},\s*fields)/);
   if(faqMatch){
     const faqItems=[...faqMatch[1].matchAll(/\{\s*q:\s*"([^"]*)",\s*a:\s*"([^"]*)"\s*\}/g)].map(m=>'<div class="faq-item"><h3>'+m[1]+'</h3><p>'+m[2]+'</p></div>').join('');
     if(faqItems) html=html.replace(/<h2>Frequently asked questions<\/h2>[\s\S]*?(?=<h2>Related calculators<\/h2>)/i,'<h2>Frequently asked questions</h2>'+faqItems);
