@@ -51,7 +51,7 @@ if (!read('index.html').match(/rel=["']manifest["']/i)) fail('Homepage manifest 
 if (!read('robots.txt').includes('Sitemap: https://wealtharrays.com/sitemap.xml')) fail('robots.txt sitemap contract missing');
 if (!read('sitemap.xml').includes('https://wealtharrays.com/')) fail('sitemap root URL missing');
 if (!read('ads.txt').includes('google.com, pub-6507600103785450, DIRECT, f08c47fec0942fa0')) fail('AdSense ads.txt contract changed');
-if (!read('index.html').includes('ca-pub-6507600103785450')) fail('AdSense publisher contract missing from homepage');
+if (read('index.html').includes('ca-pub-6507600103785450') || read('index.html').includes('adsbygoogle.js')) fail('Homepage must remain free of AdSense runtime overhead; ads.txt remains the publisher contract');
 if (!read('_headers').includes('Content-Security-Policy')) fail('CSP header missing');
 if (!read('_headers').includes('Referrer-Policy')) fail('Referrer-Policy header missing');
 if (fs.existsSync('node_modules')) fail('node_modules must never be present in deployable repository');
