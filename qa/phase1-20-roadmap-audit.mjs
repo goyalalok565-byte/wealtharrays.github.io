@@ -12,7 +12,9 @@ const calculators = (() => {
   vm.runInContext(source+';globalThis.__WA_CALCS__=CALCULATORS;',ctx);
   return ctx.__WA_CALCS__;
 })();
-if (!Array.isArray(calculators) || calculators.length !== 20) fail('Phase 1: expected exactly 20 legacy calculators');
+if (!Array.isArray(calculators) || calculators.length !== 37) fail('Phase 1: expected 37 calculators (20 legacy calculators plus 17 additions)');
+const legacyCalculators = calculators.slice(0, 20);
+if (legacyCalculators.length !== 20 || new Set(calculators.map(c => c.id)).size !== 37) fail('Phase 1: legacy calculator baseline or unique 37-calculator registry changed');
 
 const models = json('model-registry.json').models;
 const formulas = (() => {
@@ -32,7 +34,7 @@ const adapters = (() => {
 const modelIds = new Set(models.map(x=>x.id));
 const modelAlias = Object.freeze({'compound-interest':'compound'});
 if (modelIds.size !== 20) fail('Phase 1: model registry must contain 20 unique IDs');
-for (const c of calculators) {
+for (const c of legacyCalculators) {
   const modelId=modelAlias[c.id]||c.id;
   if (!modelIds.has(modelId)) fail('Phase 1/3: calculator missing model registry entry: '+c.id);
   if (!formulas[modelId]) fail('Phase 1: formula registry missing: '+c.id);
