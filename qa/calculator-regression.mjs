@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 
-// Phase 4/5 deterministic calculator regression gate.
+// Deterministic calculator regression + cross-surface catalogue integrity gate.
 const source = fs.readFileSync('calculators.js', 'utf8');
 const context = { console };
 vm.createContext(context);
@@ -10,10 +10,16 @@ const calculators = context.__WA_TEST_CALCULATORS__;
 
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
 assert(Array.isArray(calculators), 'CALCULATORS must be an array');
-assert(calculators.length === 37, `Expected 20 calculators, found ${calculators.length}`);
+assert(calculators.length === 37, `Expected 37 calculators, found ${calculators.length}`);
 const actualSlugs = calculators.map(c => c.slug);
 assert(actualSlugs.every(Boolean), 'Every calculator must have a slug');
 assert(new Set(actualSlugs).size === actualSlugs.length, 'Calculator slugs must be unique');
+
+const homepage = fs.readFileSync('index.html', 'utf8');
+const toolsPage = fs.readFileSync('tools.html', 'utf8');
+const searchSource = fs.readFileSync('calculator-search.js', 'utf8');
+const llms = fs.readFileSync('llms.txt', 'utf8');
+const sitemap = fs.readFileSync('sitemap.xml', 'utf8');
 
 function safeInput(field) {
   if (field.default !== undefined) return field.default;
@@ -26,6 +32,24 @@ for (const calc of calculators) {
   assert(calc.id && calc.slug && calc.title && Array.isArray(calc.fields) && typeof calc.compute === 'function', `${calc.slug}: malformed definition`);
   const ids = calc.fields.map(f => f.id);
   assert(new Set(ids).size === ids.length, `${calc.slug}: duplicate field id`);
+
+  for (const field of calc.fields) {
+    if (field.type === 'number' && typeof field.default === 'number') {
+      if (typeof field.min === 'number') assert(field.default >= field.min, `${calc.slug}/${field.id}: default below minimum`);
+      if (typeof field.max === 'number') assert(field.default <= field.max, `${calc.slug}/${field.id}: default above maximum`);
+    }
+    if (field.type === 'select' && Array.isArray(field.options)) {
+      assert(field.options.some(option => String(option.value) === String(field.default)), `${calc.slug}/${field.id}: default is not an available option`);
+    }
+  }
+
+  const route = `/${calc.slug}/`;
+  assert(homepage.includes(`href="${route}"`), `${calc.slug}: missing from homepage`);
+  assert(toolsPage.includes(`href="${route}"`), `${calc.slug}: missing from /tools library or stale route`);
+  assert(searchSource.includes(`"${route}"`), `${calc.slug}: missing from calculator search catalog or stale route`);
+  assert(llms.includes(`https://wealtharrays.com${route}`), `${calc.slug}: missing from llms.txt`);
+  assert(sitemap.includes(`https://wealtharrays.com${route}`), `${calc.slug}: missing from sitemap`);
+
   const safeDefaults = Object.fromEntries(calc.fields.map(f => [f.id, safeInput(f)]));
   let result;
   try { result = calc.compute(safeDefaults); } catch (error) { throw new Error(`${calc.slug}: valid-input calculation threw: ${error.message}; inputs=${JSON.stringify(safeDefaults)}`); }
@@ -40,4 +64,6 @@ for (const calc of calculators) {
   for (const row of result) assert(typeof row.value === 'number' && Number.isFinite(row.value), `${calc.slug}: zero-boundary non-finite result for ${row.label}; inputs=${JSON.stringify(zeroed)}`);
 }
 
-console.log('Calculator regression PASS — 37/37 calculators, unique schemas, valid-input calculations, zero-boundaries, and finite-output checks passed.');
+assert(!toolsPage.includes('/income-tax-scenario-calculator/'), 'Tools library still points to legacy income-tax route');
+assert(!searchSource.includes('/income-tax-scenario-calculator/'), 'Search catalog still points to legacy income-tax route');
+console.log('Calculator regression PASS — 37/37 definitions, field bounds, defaults, finite outputs, homepage/tools/search/llms/sitemap parity passed.');
