@@ -26,7 +26,7 @@ const cases = [
 const byId = new Map(CALCULATORS.map(c => [c.id, c]));
 const failures = [];
 
-if (CALCULATORS.length !== 20) failures.push(`Expected 20 calculators, found ${CALCULATORS.length}`);
+if (CALCULATORS.length !== 37) failures.push(`Expected 37 calculators, found ${CALCULATORS.length}`);
 if (new Set(CALCULATORS.map(c => c.id)).size !== CALCULATORS.length) failures.push('Calculator IDs are not unique');
 
 for (const [id, values, label, expected] of cases) {
