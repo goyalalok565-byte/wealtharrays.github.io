@@ -8,7 +8,12 @@ for(const f of htmlFiles){
  const buttons=[...s.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/gi)];for(const b of buttons){const attrs=b[1],text=b[2].replace(/<[^>]+>/g,'').replace(/&(?:nbsp|#160);/g,' ').trim();if(!/\baria-label\s*=|\btitle\s*=/i.test(attrs)&&!text)throw new Error('Potential unnamed button: '+f)}
  if(/href=["']{2}/i.test(s))throw new Error('Empty href: '+f);
 }
-const sitemap=fs.readFileSync('sitemap.xml','utf8');for(const r of ['/scenario-lab','/goal-planner','/financial-workspace'])if(!sitemap.includes('https://wealtharrays.com'+r))throw new Error('Sitemap route missing: '+r);
+const sitemap=fs.readFileSync('sitemap.xml','utf8');
+for(const r of ['/scenario-lab','/goal-planner','/financial-workspace']){
+ if(sitemap.includes('<loc>https://wealtharrays.com'+r+'</loc>')||sitemap.includes('<loc>https://wealtharrays.com'+r+'/'+'</loc>'))throw new Error('Noindex utility route leaked into sitemap: '+r);
+ const page=fs.readFileSync(r.slice(1)+'.html','utf8');
+ if(!/<meta\s+name=["']robots["']\s+content=["']noindex,follow["']/i.test(page))throw new Error('Utility page missing noindex: '+r);
+}
 const seo=JSON.parse(fs.readFileSync('global-seo-config.json','utf8'));if(!seo.supportedLanguages.length||!seo.countryCodes.length)throw new Error('Global SEO config incomplete');
 const privacy=fs.readFileSync('privacy/README.md','utf8');for(const x of ['consent','export','deletion','advertising'])if(!privacy.toLowerCase().includes(x))throw new Error('Privacy contract missing: '+x);
 console.log('Global quality gates PASS: route integrity, accessibility baseline, sitemap, localization config and privacy contract.');
