@@ -11,6 +11,8 @@ for(const page of calculators){
  if(!html.includes('/cls-fixes.css?v='))throw new Error(`${page}: CLS stylesheet missing`);
  if(!html.includes('"@type":"WebApplication"')&&!html.includes('"@type": "WebApplication"'))throw new Error(`${page}: WebApplication schema missing`);
  if(html.includes('"@type":"FAQPage"')||html.includes('"@type": "FAQPage"'))throw new Error(`${page}: mismatched FAQPage schema must remain omitted until generated from visible FAQs`);
+ if(!/<h2>Frequently asked questions<\/h2>/i.test(html))throw new Error(`${page}: visible FAQ heading missing`);
+ if((html.match(/class=["']faq-item["']/gi)||[]).length<2)throw new Error(`${page}: too few visible FAQ items`);
  if(!/class=["'][^"']*wa-skip-link/i.test(html))throw new Error(`${page}: static skip link missing`);
  if(!/property=["']og:title["']/i.test(html))throw new Error(`${page}: og:title missing`);
  if(!/name=["']twitter:card["']/i.test(html))throw new Error(`${page}: twitter:card missing`);
