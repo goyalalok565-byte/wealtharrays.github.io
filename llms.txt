@@ -1,86 +1,111 @@
 # Wealth Arrays
 
-> Wealth Arrays is a browser-first financial calculator and financial education website. It provides transparent formulas, assumptions, worked examples, and practical money guides. Results are educational estimates, not personalized financial, tax, legal, or investment advice.
-
-- https://wealtharrays.com/scenario-lab — deterministic scenario comparison and sensitivity tool
-- https://wealtharrays.com/goal-planner — goal-to-gap-to-contribution scenario planner
-- https://wealtharrays.com/financial-workspace — browser-first multi-scenario financial workspace
+> Wealth Arrays is a browser-first financial calculator and financial education website. It offers transparent formulas, editable assumptions, worked examples, comparison tools and practical money guides. Results are educational estimates, not personalized financial, tax, legal or investment advice.
 
 ## Primary pages
 
-- https://wealtharrays.com/ — Home and calculator library overview
+- https://wealtharrays.com/ — Homepage and calculator discovery
 - https://wealtharrays.com/tools — Full calculator library
+- https://wealtharrays.com/advanced-finance-tools/ — Scenario and decision tools
 - https://wealtharrays.com/articles — Financial education guides
-- https://wealtharrays.com/about — Publisher, editorial ownership, and site purpose
-- https://wealtharrays.com/methodology — Calculator formulas, assumptions, accuracy and limitations
-- https://wealtharrays.com/editorial-policy — Originality, accuracy review and corrections policy
-- https://wealtharrays.com/privacy — Privacy, analytics and advertising disclosures
-- https://wealtharrays.com/advertising-policy — Advertising and editorial independence policy
-- https://wealtharrays.com/disclaimer — Financial, tax and legal disclaimer
-- https://wealtharrays.com/contact — Corrections and contact
+- https://wealtharrays.com/research — Reproducible calculation studies
+- https://wealtharrays.com/methodology — Formulas, assumptions and limitations
+- https://wealtharrays.com/editorial-policy — Editorial standards and corrections
+- https://wealtharrays.com/about — Publisher and site purpose
+- https://wealtharrays.com/contact — Questions and corrections
 - https://wealtharrays.com/faq — Frequently asked questions
+- https://wealtharrays.com/privacy — Privacy and data disclosures
+- https://wealtharrays.com/terms — Terms of use
+- https://wealtharrays.com/disclaimer — Financial, tax and legal disclaimer
+- https://wealtharrays.com/advertising-policy — Advertising and editorial independence
 
-## Calculator library
+## All 37 calculators
 
-- https://wealtharrays.com/sip-calculator/
-- https://wealtharrays.com/compound-interest-calculator/
-- https://wealtharrays.com/mortgage-emi-calculator/
-- https://wealtharrays.com/roi-calculator/
-- https://wealtharrays.com/simple-interest-calculator/
-- https://wealtharrays.com/retirement-calculator/
-- https://wealtharrays.com/salary-to-hourly-calculator/
-- https://wealtharrays.com/profit-margin-calculator/
-- https://wealtharrays.com/fixed-deposit-calculator/
-- https://wealtharrays.com/recurring-deposit-calculator/
-- https://wealtharrays.com/lumpsum-calculator/
-- https://wealtharrays.com/cagr-calculator/
-- https://wealtharrays.com/car-loan-calculator/
-- https://wealtharrays.com/personal-loan-calculator/
-- https://wealtharrays.com/debt-payoff-calculator/
-- https://wealtharrays.com/inflation-calculator/
-- https://wealtharrays.com/net-worth-calculator/
-- https://wealtharrays.com/overtime-pay-calculator/
-- https://wealtharrays.com/freelance-rate-calculator/
-- https://wealtharrays.com/income-tax-scenario-calculator/
+- SIP Calculator: https://wealtharrays.com/sip-calculator/
+- Compound Interest: https://wealtharrays.com/compound-interest-calculator/
+- Mortgage / Loan EMI: https://wealtharrays.com/mortgage-emi-calculator/
+- ROI Calculator: https://wealtharrays.com/roi-calculator/
+- Simple Interest: https://wealtharrays.com/simple-interest-calculator/
+- Freedom Milestone: https://wealtharrays.com/retirement-calculator/
+- Salary ↔ Hourly: https://wealtharrays.com/salary-to-hourly-calculator/
+- Profit Margin: https://wealtharrays.com/profit-margin-calculator/
+- Fixed Deposit Calculator: https://wealtharrays.com/fixed-deposit-calculator/
+- Recurring Deposit Calculator: https://wealtharrays.com/recurring-deposit-calculator/
+- Lumpsum Calculator: https://wealtharrays.com/lumpsum-calculator/
+- CAGR Calculator: https://wealtharrays.com/cagr-calculator/
+- Car Loan EMI Calculator: https://wealtharrays.com/car-loan-calculator/
+- Personal Loan Calculator: https://wealtharrays.com/personal-loan-calculator/
+- Debt Payoff Calculator: https://wealtharrays.com/debt-payoff-calculator/
+- Inflation Calculator: https://wealtharrays.com/inflation-calculator/
+- Net Worth Calculator: https://wealtharrays.com/net-worth-calculator/
+- Overtime Pay Calculator: https://wealtharrays.com/overtime-pay-calculator/
+- Freelance Rate Calculator: https://wealtharrays.com/freelance-rate-calculator/
+- Income Tax Planner: https://wealtharrays.com/income-tax-planner/
+- Home Loan EMI Calculator: https://wealtharrays.com/home-loan-emi-calculator/
+- Currency Converter: https://wealtharrays.com/currency-converter/
+- Flat Cost Calculator: https://wealtharrays.com/flat-cost-calculator/
+- Loan EMI Calculator: https://wealtharrays.com/loan-emi-calculator/
+- Capital Gain Calculator: https://wealtharrays.com/capital-gain-calculator/
+- Lumpsum + SIP Calculator: https://wealtharrays.com/lumpsum-sip-calculator/
+- Loan Against Property Calculator: https://wealtharrays.com/loan-against-property-calculator/
+- Home Loan Eligibility Calculator: https://wealtharrays.com/home-loan-eligibility-calculator/
+- Silver Jewelry Calculator: https://wealtharrays.com/silver-jewelry-calculator/
+- Advanced Home Loan Eligibility Calculator: https://wealtharrays.com/advanced-home-loan-eligibility-calculator/
+- Consumer Durable Loan Calculator: https://wealtharrays.com/consumer-durable-loan-calculator/
+- Gold Jewelry Calculator: https://wealtharrays.com/gold-jewelry-calculator/
+- Loan Prepayment vs SIP Calculator: https://wealtharrays.com/loan-prepayment-vs-sip-calculator/
+- Loan-to-Value (LTV) Calculator: https://wealtharrays.com/loan-to-value-ltv-calculator/
+- Stamp Duty Calculator: https://wealtharrays.com/stamp-duty-calculator/
+- Property Calculator: https://wealtharrays.com/property-calculator/
+- Loan Interest Calculator: https://wealtharrays.com/loan-interest-calculator/
+
+## Calculator collections
+
+- https://wealtharrays.com/category-investment
+- https://wealtharrays.com/category-loan
+- https://wealtharrays.com/category-banking
+- https://wealtharrays.com/category-retirement
+- https://wealtharrays.com/category-salary
+- https://wealtharrays.com/category-business
+
+## Advanced scenario tools
+
+- https://wealtharrays.com/scenario-lab — Compare scenarios and test sensitivity
+- https://wealtharrays.com/goal-planner — Convert goals into contribution and gap scenarios
+- https://wealtharrays.com/financial-workspace — Organize browser-first financial scenarios
 
 ## Guide library
 
 - https://wealtharrays.com/articles/compound-interest-guide
+- https://wealtharrays.com/articles/how-inflation-changes-a-retirement-target
+- https://wealtharrays.com/articles/how-to-build-a-realistic-monthly-budget
 - https://wealtharrays.com/articles/how-to-build-an-emergency-fund
 - https://wealtharrays.com/articles/how-to-calculate-real-return-after-inflation
+- https://wealtharrays.com/articles/how-to-compare-loan-offers-beyond-emi
 - https://wealtharrays.com/articles/how-to-compare-sip-scenarios-properly
+- https://wealtharrays.com/articles/how-to-read-an-investment-return-number
 - https://wealtharrays.com/articles/how-to-stress-test-a-retirement-goal
 - https://wealtharrays.com/articles/how-to-use-a-debt-payoff-calculator
 - https://wealtharrays.com/articles/how-to-use-a-net-worth-calculator
 - https://wealtharrays.com/articles/how-to-use-a-salary-to-hourly-calculator
 - https://wealtharrays.com/articles/how-to-use-an-inflation-calculator
 - https://wealtharrays.com/articles/how-to-use-financial-calculators
+- https://wealtharrays.com/articles/how-to-use-scenarios-instead-of-one-financial-forecast
 - https://wealtharrays.com/articles/loan-emi-guide
 - https://wealtharrays.com/articles/roi-guide
 - https://wealtharrays.com/articles/sip-calculator-guide
+- https://wealtharrays.com/articles/sip-calculator-with-inflation-and-tax
 - https://wealtharrays.com/articles/step-up-sip-calculator-guide
 - https://wealtharrays.com/articles/when-cagr-can-mislead-you
 - https://wealtharrays.com/articles/why-a-lower-emi-can-cost-you-more-overall
 - https://wealtharrays.com/articles/why-compounding-looks-slow-before-it-looks-powerful
 - https://wealtharrays.com/articles/why-one-crore-in-the-future-may-not-mean-what-you-think
 
-## Original research
-
-- https://wealtharrays.com/research — Reproducible Wealth Arrays calculation studies and methodology
-
 ## Editorial principles
 
 - Prefer transparent mathematics over black-box financial claims.
-- Distinguish assumptions from facts and projections from guarantees.
-- Do not imply live FX conversion when currency selection only changes display formatting.
-- Do not present the income-tax scenario tool as jurisdiction-specific tax software.
-- Financial content should be independently useful even without advertising.
-- Corrections should be reproducible from the exact inputs, formula and expected result.
-
-## Machine-readable note
-
-This file is supplemental documentation for AI systems and other tools that choose to consume it. It is not required for Google Search and is not intended to manipulate rankings. Normal robots.txt, sitemap, crawlability, indexing, content quality, and site reputation remain the primary discovery signals.
-
-## Contact
-
-Corrections and content questions: goyalalok565@gmail.com
+- Distinguish assumptions from live market data; calculator inputs are not automatically verified rates.
+- Explain methodology, limitations, and the effects of changing assumptions.
+- Encourage users to verify current rates, fees, tax rules, lender conditions and local charges with authoritative providers.
+- Do not present scenario outputs as guaranteed returns or personalized financial advice.
+- Core calculators are designed to calculate in the browser; users should not enter sensitive personal or financial information into a public website.
