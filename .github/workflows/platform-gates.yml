@@ -26,6 +26,8 @@ jobs:
           node-version: 24
       - name: Validate JavaScript
         run: find . -maxdepth 2 -type f -name '*.js' -print0 | xargs -0 -n1 node --check
+      - name: Calculator regression and catalogue parity
+        run: node qa/calculator-regression.mjs
       - name: Generate research datasets
         run: node scripts/generate-research-datasets.mjs
       - name: Phase 1-20 platform audit
