@@ -61,7 +61,7 @@ for(const full of allHtml){
   // Ensure social metadata exists on every HTML route, including older/static pages.
   const pageTitle=(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)||[])[1]?.trim()||'Wealth Arrays';
   const pageDescription=(html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["']/i)||[])[1]||'Financial calculators and practical money guides from Wealth Arrays.';
-  const attrSafe=value=>value.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const attrSafe=value=>value.replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   if(!/<meta[^>]+property=["']og:title["']/i.test(html)) html=html.replace('</head>','<meta property="og:title" content="'+attrSafe(pageTitle)+'"></head>');
   if(!/<meta[^>]+name=["']twitter:card["']/i.test(html)) html=html.replace('</head>','<meta name="twitter:card" content="summary"></head>');
   if(!/<meta[^>]+property=["']og:description["']/i.test(html)) html=html.replace('</head>','<meta property="og:description" content="'+attrSafe(pageDescription)+'"></head>');
