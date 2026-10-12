@@ -25,12 +25,14 @@ function walkCalculatorPages(dir){
     if(entry.isDirectory()) walkCalculatorPages(file);
     else if(entry.name.endsWith('.html')&&entry.name!=='widget.html'){
       const html=fs.readFileSync(file,'utf8');
-      if(/data-wa-calculator=/i.test(html)&&html.includes('wa-calculator-runtime.js')) pages.push(path.relative(root,file));
+      const relative=path.relative(root,file).replaceAll(path.sep,'/');
+      // This legacy directory is an explicit redirect alias; count only active canonical calculator routes.
+      if(relative!=='income-tax-scenario-calculator/index.html'&&/data-wa-calculator=/i.test(html)&&html.includes('wa-calculator-runtime.js')) pages.push(relative);
     }
   }
 }
 walkCalculatorPages(root);
-if(pages.length!==20) throw new Error(`Expected 20 calculator runtime pages, found ${pages.length}`);
+if(pages.length!==37) throw new Error(`Expected 37 active canonical calculator runtime pages, found ${pages.length}`);
 for(const page of pages){const id=fs.readFileSync(path.join(root,page),'utf8').match(/data-wa-calculator="([^"]+)"/i)?.[1];if(!id||!fs.existsSync(path.join(root,'calculator-definitions',`${id}.js`))) throw new Error(`${page}: missing split calculator definition for ${id||'unknown'}`);}
 const widget=fs.readFileSync('widget.html','utf8');
 if(!widget.includes('/calculators.js')||!widget.includes('/wa-calculator-runtime.js')) throw new Error('widget.html: calculator bootstrap scripts missing');
