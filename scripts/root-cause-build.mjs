@@ -38,9 +38,6 @@ const isWorkspacePage=(rel)=>rel==='financial-workspace.html';
 const isUtilityNoindexPage=(rel)=>isScenarioLabPage(rel)||isGoalPlannerPage(rel)||isWorkspacePage(rel);
 for(const full of allHtml){
   let html=fs.readFileSync(full,'utf8');
-  // Normalize the public contact identity across every generated HTML page.
-  // This prevents stale legacy Gmail addresses from surviving in footers or structured data.
-  html=html.replaceAll('goyalalok565@gmail.com','contact@wealtharrays.com');
   // Normalize legacy empty navigation targets at source/build level so future generated pages never emit dead self-links.
   html=html.replace(/href=[\"']{2}/g, 'href="/"');
   const relPath=path.relative(root,full).replaceAll(path.sep,'/');
@@ -150,7 +147,7 @@ if(isArticle){
   }
   if(isCalc && !html.includes('/wa-calculator-runtime.js')) html=html.replace('</body>','<script src="/wa-calculator-runtime.js" defer></script></body>');
   if(isUtilityNoindexPage(relPath) && !html.includes('WA-UTILITY-LEGAL-FOOTER')){
-    html=html.replace('</body>','<footer class="site-footer premium-footer"><div class="site-footer-inner"><nav class="footer-nav-box" aria-label="Company and legal pages"><a class="footer-link" href="/privacy">Privacy Policy</a><a class="footer-link" href="/terms">Terms &amp; Conditions</a><a class="footer-link" href="/disclaimer">Disclaimer</a><a class="footer-link" href="/about">About Us</a><a class="footer-link" href="/contact">Contact Us</a></nav><div class="footer-bottom"><span>© 2026 Wealth Arrays</span><span>Questions or corrections: <a href="mailto:contact@wealtharrays.com">contact@wealtharrays.com</a></span></div></div></footer><!-- WA-UTILITY-LEGAL-FOOTER --></body>');
+    html=html.replace('</body>','<footer class="site-footer premium-footer"><div class="site-footer-inner"><nav class="footer-nav-box" aria-label="Company and legal pages"><a class="footer-link" href="/privacy">Privacy Policy</a><a class="footer-link" href="/terms">Terms &amp; Conditions</a><a class="footer-link" href="/disclaimer">Disclaimer</a><a class="footer-link" href="/about">About Us</a><a class="footer-link" href="/contact">Contact Us</a></nav><div class="footer-bottom"><span>© 2026 Wealth Arrays</span><span>Questions or corrections: <a href="mailto:goyalalok565@gmail.com">goyalalok565@gmail.com</a></span></div></div></footer><!-- WA-UTILITY-LEGAL-FOOTER --></body>');
   }
   fs.writeFileSync(full,html,'utf8');}
 
