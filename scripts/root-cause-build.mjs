@@ -46,6 +46,26 @@ for(const full of allHtml){
   const isScenarioLab=isScenarioLabPage(relPath);
   const isGoalPlanner=isGoalPlannerPage(relPath);
   const isCalc=/<html[^>]+data-wa-calculator=/i.test(html);
+  // Add a static skip link and target so accessibility does not depend on JavaScript execution.
+  if(!/class=["'][^"']*wa-skip-link/i.test(html)){
+    const firstMain=html.match(/<main\b[^>]*>/i);
+    if(firstMain){
+      let target=(firstMain[0].match(/\bid=["']([^"']+)["']/i)||[])[1];
+      if(!target){
+        target='main-content';
+        html=html.replace(firstMain[0],firstMain[0].replace(/<main\b/i,'<main id="main-content"'));
+      }
+      html=html.replace(/<body\b[^>]*>/i,match=>match+'<a class="wa-skip-link" href="#'+target+'">Skip to main content</a>');
+    }
+  }
+  // Ensure social metadata exists on every HTML route, including older/static pages.
+  const pageTitle=(html.match(/<title[^>]*>([\\s\\S]*?)<\\/title>/i)||[])[1]?.trim()||'Wealth Arrays';
+  const pageDescription=(html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["']/i)||[])[1]||'Financial calculators and practical money guides from Wealth Arrays.';
+  const attrSafe=value=>value.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  if(!/<meta[^>]+property=["']og:title["']/i.test(html)) html=html.replace('</head>','<meta property="og:title" content="'+attrSafe(pageTitle)+'"></head>');
+  if(!/<meta[^>]+name=["']twitter:card["']/i.test(html)) html=html.replace('</head>','<meta name="twitter:card" content="summary"></head>');
+  // Calculator FAQPage schema is intentionally omitted until it can be generated from the exact visible FAQ markup.
+  if(isCalc) html=html.replace(/<script\\b(?=[^>]*type=["']application\\/ld\\+json["'])[^>]*>[\\s\\S]*?"@type"\\s*:\\s*"FAQPage"[\\s\\S]*?<\\/script>/gi,'');
   html=html.replace(/\s*<script\s+src=["']([^"']+)[^>]*><\/script>/gi,(tag,src)=>{
     const base=path.basename(src.split('?',1)[0]);
     const keep=managed.has(base)||(isWidget&&['calculators.js','widget.js','widget-bootstrap.js','wa-calculator-runtime.js'].includes(base))||(isScenarioLab&&['financial-engine.js','decision-adapters.js','scenario-lab.js'].includes(base))||(isGoalPlanner&&['financial-engine.js','decision-adapters.js','goal-planner.js'].includes(base))||(isWorkspacePage&&['financial-engine.js','report-engine.js','financial-workspace.js'].includes(base));
