@@ -47,6 +47,18 @@ if (!fs.existsSync('wa-calculator-runtime.js')) fail('Missing canonical runtime 
 const bundleBytes = fs.statSync('wa-calculator-runtime.js').size;
 if (bundleBytes > 750_000) fail(`Canonical runtime bundle is unexpectedly large: ${bundleBytes} bytes`);
 if (!read('wa-calculator-runtime.js').includes('WA CANONICAL MODULE')) fail('Canonical runtime provenance marker missing');
+const homepageHtml = read('index.html');
+for (const heavy of ['/financial-engine.js','/report-engine.js','/financial-workspace.js','/goal-planner.js','/scenario-lab.js']) {
+  if (homepageHtml.includes(`src="${heavy}"`)) fail(`Homepage must not load utility-only runtime: ${heavy}`);
+}
+for (const [file, required] of [
+  ['financial-workspace.html',['/financial-engine.js','/report-engine.js','/financial-workspace.js']],
+  ['goal-planner.html',['/financial-engine.js','/decision-adapters.js','/goal-planner.js']],
+  ['scenario-lab.html',['/financial-engine.js','/decision-adapters.js','/scenario-lab.js']]
+]) {
+  const html = read(file);
+  for (const src of required) if (!html.includes(`src="${src}"`)) fail(`${file}: required utility runtime missing: ${src}`);
+}
 if (!read('index.html').match(/rel=["']manifest["']/i)) fail('Homepage manifest link missing');
 if (!read('robots.txt').includes('Sitemap: https://wealtharrays.com/sitemap.xml')) fail('robots.txt sitemap contract missing');
 if (!read('sitemap.xml').includes('https://wealtharrays.com/')) fail('sitemap root URL missing');
