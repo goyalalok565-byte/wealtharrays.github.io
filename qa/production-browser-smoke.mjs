@@ -55,6 +55,23 @@ try {
   await assertCalculator('mortgage-emi-calculator/', 'Mortgage / EMI calculator');
   await assertCalculator('retirement-calculator/', 'Freedom Milestone calculator');
   await assertCalculator('debt-payoff-calculator/', 'Debt payoff calculator');
+  await assertCalculator('cagr-calculator/', 'CAGR calculator');
+  for (const [field, expected] of [['start','100000'],['end','161051'],['years','5']]) {
+    const actual = await page.locator(`#calc-widget input[data-field="${field}"]`).inputValue();
+    if (actual !== expected) throw new Error(`CAGR default ${field} expected ${expected}, received ${actual}`);
+  }
+  const cagrExample = await page.locator('.tool-article').innerText();
+  if (!cagrExample.includes('₹1,00,000') || !cagrExample.includes('₹1,61,051') || !cagrExample.includes('10.00%')) throw new Error('CAGR worked example is missing key verified values');
+
+  await assertCalculator('income-tax-scenario-calculator/', 'Income tax scenario calculator');
+  for (const [field, expected] of [['income','1200000'],['deductions','150000'],['rate','15']]) {
+    const actual = await page.locator(`#calc-widget input[data-field="${field}"]`).inputValue();
+    if (actual !== expected) throw new Error(`Income tax default ${field} expected ${expected}, received ${actual}`);
+  }
+  const taxExample = await page.locator('.tool-article').innerText();
+  for (const value of ['₹12,00,000','₹1,50,000','₹10,50,000','₹1,57,500','₹10,42,500']) {
+    if (!taxExample.includes(value)) throw new Error(`Income tax worked example is missing ${value}`);
+  }
 
   if (failedResponses.length) throw new Error(`Failed network responses: ${failedResponses.join(' | ')}`);
   if (errors.length) throw new Error(`Browser errors: ${errors.join(' | ')}`);
