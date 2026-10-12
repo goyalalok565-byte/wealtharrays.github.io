@@ -107,7 +107,7 @@ if(isCalc){
   const faqMatch=calcDefinition?.obj.match(/faqs\s*:\s*\[([\s\S]*?)\](?=,\s*\},\s*fields)/);
   if(faqMatch){
     const escapeFaqHtml=value=>value.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const faqItems=[...faqMatch[1].matchAll(/\{\s*q:\s*("(?:\\\\.|[^"\\\\])*")\s*,\s*a:\s*("(?:\\\\.|[^"\\\\])*")\s*\}/g)].map(m=>'<div class="faq-item"><h3>'+escapeFaqHtml(JSON.parse(m[1]))+'</h3><p>'+escapeFaqHtml(JSON.parse(m[2]))+'</p></div>').join('');
+    const faqItems=[...faqMatch[1].matchAll(/\{\s*q:\s*("(?:\\.|[^"\\])*")\s*,\s*a:\s*("(?:\\.|[^"\\])*")\s*\}/g)].map(m=>'<div class="faq-item"><h3>'+escapeFaqHtml(JSON.parse(m[1]))+'</h3><p>'+escapeFaqHtml(JSON.parse(m[2]))+'</p></div>').join('');
     if(faqItems) html=html.replace(/<h2>Frequently asked questions<\/h2>[\s\S]*?(?=<h2>Related calculators<\/h2>)/i,'<h2>Frequently asked questions</h2>'+faqItems);
   }
 }
