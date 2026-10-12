@@ -40,7 +40,7 @@
 /net-worth-calculator.html /net-worth-calculator/ 301
 /overtime-pay-calculator.html /overtime-pay-calculator/ 301
 /freelance-rate-calculator.html /freelance-rate-calculator/ 301
-/income-tax-scenario-calculator.html /income-tax-scenario-calculator/ 301
+/income-tax-scenario-calculator.html /income-tax-planner/ 301
 
 # Calculator slash normalization: no-slash is never canonical
 /sip-calculator /sip-calculator/ 301
@@ -62,7 +62,7 @@
 /net-worth-calculator /net-worth-calculator/ 301
 /overtime-pay-calculator /overtime-pay-calculator/ 301
 /freelance-rate-calculator /freelance-rate-calculator/ 301
-/income-tax-scenario-calculator /income-tax-scenario-calculator/ 301
+/income-tax-scenario-calculator /income-tax-planner/ 301
 
 # Known obsolete legacy content
 /p/pricing-freelance-projects-how.html /freelance-rate-calculator/ 301
