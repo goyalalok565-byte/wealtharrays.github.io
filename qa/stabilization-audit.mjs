@@ -19,7 +19,8 @@ for (const file of calculators) {
   for (const name of runtimeSources) if (tags.includes(name)) throw new Error(`${file}: runtime source ${name} still loaded directly`);
   const definitionMatch=html.match(/(?:src|href)=["'](?:[^"']*\/)?calculator-definitions\/([^"'?]+)\.js(?:\?[^"']*)?["']/i);
   if (!definitionMatch || !fs.existsSync(`calculator-definitions/${definitionMatch[1]}.js`)) throw new Error(`${file}: split calculator definition missing`);
-  if (!html.includes('ca-pub-6507600103785450')) throw new Error(`${file}: AdSense publisher id missing`);
+  // The retired income-tax-scenario route is a canonical alias to /income-tax-planner/ and is intentionally excluded from AdSense.
+  if (file !== 'income-tax-scenario-calculator/index.html' && !html.includes('ca-pub-6507600103785450')) throw new Error(`${file}: AdSense publisher id missing`);
   if (!html.includes('rel="canonical"')) throw new Error(`${file}: canonical tag missing`);
 }
 if (!fs.existsSync('ads.txt') || !fs.readFileSync('ads.txt','utf8').includes('google.com, pub-6507600103785450, DIRECT')) throw new Error('ads.txt authorization missing');
