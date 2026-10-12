@@ -24,10 +24,10 @@ for(const file of guides){const html=fs.readFileSync(path.join('articles',file),
 const allSiteHtml=[];function walkHtml(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){if(e.name==='.git'||e.name==='node_modules')continue;const p=path.join(dir,e.name);if(e.isDirectory())walkHtml(p);else if(e.name.endsWith('.html'))allSiteHtml.push(p)}}walkHtml('.');
 for(const file of allSiteHtml){
  const html=fs.readFileSync(file,'utf8');
- if(/href=["']{2}/.test(html))throw new Error(\`\${file}: empty href target remains\`);
- if(/<main\b/i.test(html)&&!/<a\b[^>]*class=["'][^"']*wa-skip-link/i.test(html))throw new Error(\`\${file}: static skip link missing\`);
- if(!/property=["']og:title["']/i.test(html))throw new Error(\`\${file}: og:title missing\`);
- if(!/name=["']twitter:card["']/i.test(html))throw new Error(\`\${file}: twitter:card missing\`);
+ if(/href=["']{2}/.test(html))throw new Error(`${file}: empty href target remains`);
+ if(/<main\b/i.test(html)&&!/<a\b[^>]*class=["'][^"']*wa-skip-link/i.test(html))throw new Error(`${file}: static skip link missing`);
+ if(!/property=["']og:title["']/i.test(html))throw new Error(`${file}: og:title missing`);
+ if(!/name=["']twitter:card["']/i.test(html))throw new Error(`${file}: twitter:card missing`);
 }
 const privacyHtml=fs.readFileSync('privacy.html','utf8');if(/does not serve Google AdSense advertisements/i.test(privacyHtml))throw new Error('privacy.html contains stale AdSense disclosure');
 const home=fs.readFileSync('index.html','utf8');if(!home.includes('id="tool-search-results"'))throw new Error('Homepage search results container missing');if(!home.includes('href="/favicon.svg"'))throw new Error('Homepage canonical favicon missing');
