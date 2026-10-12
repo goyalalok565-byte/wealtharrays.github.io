@@ -67,7 +67,7 @@ for(const full of allHtml){
   if(!/<meta[^>]+property=["']og:description["']/i.test(html)) html=html.replace('</head>','<meta property="og:description" content="'+attrSafe(pageDescription)+'"></head>');
   if(!/<meta[^>]+name=["']twitter:description["']/i.test(html)) html=html.replace('</head>','<meta name="twitter:description" content="'+attrSafe(pageDescription)+'"></head>');
   // Calculator FAQPage schema is intentionally omitted until it can be generated from the exact visible FAQ markup.
-  if(isCalc) html=html.replace(/<script\b(?=[^>]*type=["']application\/ld\+json["'])[^>]*>[\s\S]*?"@type"\s*:\s*"FAQPage"[\s\S]*?<\/script>/gi,'');
+  if(isCalc) html=html.replace(/<script\b(?=[^>]*type=["']application\/ld\+json["'])[^>]*>[\s\S]*?<\/script>/gi,tag=>/"@type"\s*:\s*"FAQPage"/.test(tag)?'':tag);
   html=html.replace(/\s*<script\s+src=["']([^"']+)[^>]*><\/script>/gi,(tag,src)=>{
     const base=path.basename(src.split('?',1)[0]);
     const keep=managed.has(base)||(isWidget&&['calculators.js','widget.js','widget-bootstrap.js','wa-calculator-runtime.js'].includes(base))||(isScenarioLab&&['financial-engine.js','decision-adapters.js','scenario-lab.js'].includes(base))||(isGoalPlanner&&['financial-engine.js','decision-adapters.js','goal-planner.js'].includes(base))||(isWorkspacePage&&['financial-engine.js','report-engine.js','financial-workspace.js'].includes(base));
