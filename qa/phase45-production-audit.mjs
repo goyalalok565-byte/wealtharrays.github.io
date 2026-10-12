@@ -1,13 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const calculatorPages = [
-  'sip-calculator/index.html','compound-interest-calculator/index.html','mortgage-emi-calculator/index.html','roi-calculator/index.html',
-  'simple-interest-calculator/index.html','retirement-calculator/index.html','salary-to-hourly-calculator/index.html','profit-margin-calculator/index.html',
-  'fixed-deposit-calculator/index.html','recurring-deposit-calculator/index.html','lumpsum-calculator/index.html','cagr-calculator/index.html',
-  'car-loan-calculator/index.html','personal-loan-calculator/index.html','debt-payoff-calculator/index.html','inflation-calculator/index.html',
-  'net-worth-calculator/index.html','overtime-pay-calculator/index.html','freelance-rate-calculator/index.html','income-tax-scenario-calculator/index.html'
-];
+const calculatorPages = ['sip-calculator','compound-interest-calculator','mortgage-emi-calculator','roi-calculator','simple-interest-calculator','retirement-calculator','salary-to-hourly-calculator','profit-margin-calculator','fixed-deposit-calculator','recurring-deposit-calculator','lumpsum-calculator','cagr-calculator','car-loan-calculator','personal-loan-calculator','debt-payoff-calculator','inflation-calculator','net-worth-calculator','overtime-pay-calculator','freelance-rate-calculator','income-tax-planner','home-loan-emi-calculator','currency-converter','flat-cost-calculator','loan-emi-calculator','capital-gain-calculator','lumpsum-sip-calculator','loan-against-property-calculator','home-loan-eligibility-calculator','silver-jewelry-calculator','advanced-home-loan-eligibility-calculator','consumer-durable-loan-calculator','gold-jewelry-calculator','loan-prepayment-vs-sip-calculator','loan-to-value-ltv-calculator','stamp-duty-calculator','property-calculator','loan-interest-calculator'].map(x => `${x}/index.html`);
 const fail = msg => { throw new Error(msg); };
 const read = file => fs.readFileSync(file, 'utf8');
 const allHtml = [

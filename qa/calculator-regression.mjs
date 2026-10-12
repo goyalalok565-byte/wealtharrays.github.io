@@ -10,7 +10,7 @@ const calculators = context.__WA_TEST_CALCULATORS__;
 
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
 assert(Array.isArray(calculators), 'CALCULATORS must be an array');
-assert(calculators.length === 20, `Expected 20 calculators, found ${calculators.length}`);
+assert(calculators.length === 37, `Expected 20 calculators, found ${calculators.length}`);
 const actualSlugs = calculators.map(c => c.slug);
 assert(actualSlugs.every(Boolean), 'Every calculator must have a slug');
 assert(new Set(actualSlugs).size === actualSlugs.length, 'Calculator slugs must be unique');
@@ -40,4 +40,4 @@ for (const calc of calculators) {
   for (const row of result) assert(typeof row.value === 'number' && Number.isFinite(row.value), `${calc.slug}: zero-boundary non-finite result for ${row.label}; inputs=${JSON.stringify(zeroed)}`);
 }
 
-console.log('Calculator regression PASS — 20/20 calculators, unique schemas, valid-input calculations, zero-boundaries, and finite-output checks passed.');
+console.log('Calculator regression PASS — 37/37 calculators, unique schemas, valid-input calculations, zero-boundaries, and finite-output checks passed.');

@@ -7,7 +7,7 @@ const REVIEW_DATE = '2026-09-15';
 const expectedIds = [
   'sip','compound-interest','mortgage','roi','simple-interest','freedom-milestone','salary-hourly','profit-margin',
   'fixed-deposit','recurring-deposit','lumpsum','cagr','car-loan','personal-loan','debt-payoff','inflation','net-worth',
-  'overtime','freelance-rate','income-tax-planner'
+  'overtime','freelance-rate','income-tax-planner','home-loan-emi','currency-converter','flat-cost','loan-emi','capital-gain','lumpsum-sip','loan-against-property','home-loan-eligibility','silver-jewelry','advanced-home-loan-eligibility','consumer-durable-loan','gold-jewelry','loan-prepayment-vs-sip','ltv','stamp-duty','property-calculator','loan-interest'
 ];
 
 function approx(a,b,tol=Math.max(EPS,Math.abs(b)*1e-9)) {
@@ -62,7 +62,24 @@ function reference(id,v) {
     case 'net-worth': { const assets=Math.max(v.cash,0)+Math.max(v.investments,0)+Math.max(v.property,0),debt=Math.max(v.debt,0);return {'Total assets':assets,'Total liabilities':debt,'Net worth':assets-debt}; }
     case 'overtime': { const hourly=Math.max(v.hourly,0),regular=Math.max(v.regular,0),ot=Math.max(v.overtime,0),mult=Math.max(v.multiplier,1),reg=hourly*regular,over=hourly*ot*mult;return {'Regular pay':reg,'Overtime pay':over,'Total gross pay':reg+over}; }
     case 'freelance-rate': { const hours=Math.max(v.hours,0),weeks=Math.max(v.weeks,0),income=Math.max(v.income,0),expenses=Math.max(v.expenses,0),billable=hours*weeks,needed=income+expenses;return {'Annual amount to cover':needed,'Billable hours / year':billable,'Target hourly rate':billable?needed/billable:0}; }
-    case 'income-tax-planner': { const income=Math.max(v.income,0),ded=Math.min(Math.max(v.deductions,0),income),taxable=income-ded,tax=taxable*Math.max(v.rate,0)/100;return {'Estimated taxable income':taxable,'Estimated tax':tax,'Effective tax on gross income':income?tax/income*100:0,'Estimated after-tax income':income-tax}; }
+    case 'income-tax-planner': { const income=Math.max(v.income,0),ded=Math.min(Math.max(v.deductions,0),income),taxable=income-ded,tax=taxable*Math.max(v.rate,0)/100;return {'Estimated taxable income':taxable,'Estimated tax':tax,'Effective tax on gross income':income?tax/income*100:0,'Estimated after-tax income':income-tax}; }    case 'home-loan-emi': { const P=Math.max(v.principal,0),n=Math.max(1,Math.round(v.years*12)),r=Math.max(v.rate,0)/1200,emi=P===0?0:r===0?P/n:P*r*(1+r)**n/((1+r)**n-1),total=emi*n;return {'Monthly home-loan EMI':emi,'Total repayment':total,'Total interest':total-P}; }
+    case 'currency-converter': { const a=Math.max(v.amount,0),r=Math.max(v.rate,0);return {[v.from+' amount']:a,['Converted amount in '+v.to]:a*r}; }
+    case 'flat-cost': { const p=Math.max(v.price,0),st=p*Math.max(v.stamp,0)/100,re=p*Math.max(v.registration,0)/100,f=Math.max(v.furnishing,0),o=Math.max(v.other,0);return {'Stamp duty':st,'Registration / transfer':re,'Other purchase costs':f+o,'Estimated all-in purchase cost':p+st+re+f+o}; }
+    case 'loan-emi': { const P=Math.max(v.principal,0),n=Math.max(1,Math.round(v.years*12)),r=Math.max(v.rate,0)/1200,emi=P===0?0:r===0?P/n:P*r*(1+r)**n/((1+r)**n-1),total=emi*n;return {'Monthly EMI':emi,'Total repayment':total,'Total interest':total-P}; }
+    case 'capital-gain': { const g=Math.max(v.sale-v.purchase-Math.max(v.buyCosts,0)-Math.max(v.sellCosts,0),0),t=g*Math.max(v.taxRate,0)/100;return {'Estimated capital gain':g,'Assumed tax':t,'Estimated gain after assumed tax':g-t}; }
+    case 'lumpsum-sip': { const P=Math.max(v.lumpsum,0),m=Math.max(v.monthly,0),i=Math.max(v.rate,0)/1200,n=Math.max(1,Math.round(v.years*12)),l=P*(1+i)**n,s=i===0?m*n:m*((1+i)**n-1)/i*(1+i),inv=P+m*n,total=l+s;return {'Total invested':inv,'Estimated growth':total-inv,'Projected value':total}; }
+    case 'loan-against-property': { const loan=Math.max(v.property,0)*Math.max(v.ltv,0)/100,n=Math.max(1,Math.round(v.years*12)),r=Math.max(v.rate,0)/1200,emi=r===0?loan/n:loan*r*(1+r)**n/((1+r)**n-1),total=emi*n;return {'Indicative loan amount':loan,'Monthly EMI':emi,'Total interest':total-loan}; }
+    case 'home-loan-eligibility': { const c=Math.max(v.income,0)*Math.max(v.foir,0)/100-Math.max(v.existing,0),n=Math.max(1,Math.round(v.years*12)),r=Math.max(v.rate,0)/1200,l=c<=0?0:r===0?c*n:c*((1+r)**n-1)/(r*(1+r)**n);return {'Indicative EMI capacity':Math.max(c,0),'Indicative eligible loan':Math.max(l,0)}; }
+    case 'silver-jewelry': { const m=Math.max(v.rate,0)*Math.max(v.weight,0)*Math.max(v.purity,0)/100,mc=m*Math.max(v.making,0)/100,t=(m+mc)*Math.max(v.tax,0)/100;return {'Fine-silver value':m,'Making charge':mc,'Tax / GST':t,'Estimated jewellery price':m+mc+t}; }
+    case 'advanced-home-loan-eligibility': { const inc=Math.max(v.income,0)+Math.max(v.coIncome,0),c=Math.max(inc*Math.max(v.foir,0)/100-Math.max(v.existing,0),0),n=Math.max(1,Math.round(v.years*12)),r=Math.max(v.rate,0)/1200,l=r===0?c*n:c*((1+r)**n-1)/(r*(1+r)**n);return {'Combined monthly income':inc,'Indicative EMI capacity':c,'Indicative eligible loan':l}; }
+    case 'consumer-durable-loan': { const p=Math.max(v.price,0),d=Math.min(Math.max(v.down,0),p),P=p-d,n=Math.max(1,Math.round(v.years*12)),r=Math.max(v.rate,0)/1200,e=P===0?0:r===0?P/n:P*r*(1+r)**n/((1+r)**n-1),fee=P*Math.max(v.fee,0)/100,total=e*n;return {'Financed amount':P,'Monthly EMI':e,'Total interest':total-P,'Estimated all-in cost':total+d+fee}; }
+    case 'gold-jewelry': { const m=Math.max(v.rate,0)*Math.max(v.weight,0)*Math.max(v.purity,0)/100,w=m*Math.max(v.wastage,0)/100,mc=(m+w)*Math.max(v.making,0)/100,t=(m+w+mc)*Math.max(v.tax,0)/100;return {'Fine-gold value':m,'Wastage value':w,'Making charge':mc,'Tax / GST':t,'Estimated jewellery price':m+w+mc+t}; }
+    case 'loan-prepayment-vs-sip': { const P=Math.max(v.balance,0),x=Math.min(Math.max(v.prepay,0),P),n=Math.max(1,Math.round(v.years*12)),r=Math.max(v.rate,0)/1200,e=r===0?P/n:P*r*(1+r)**n/((1+r)**n-1),base=e*n-P,np=P-x,ne=r===0?np/n:np*r*(1+r)**n/((1+r)**n-1),saved=Math.max(base-(ne*n-np),0),ri=Math.max(v.investmentReturn,0)/1200,iv=ri===0?x:x*(1+ri)**n;return {'Estimated loan interest saved':saved,'Investment value of the same cash':iv,'Loan EMI after prepayment':ne,'Difference (investment value − interest saved)':iv-saved}; }
+    case 'ltv': { const p=Math.max(v.property,0),l=Math.max(v.loan,0);return {'LTV':p>0?l/p*100:0,'Equity / value not financed':Math.max(p-l,0),'Loan amount':l}; }
+    case 'stamp-duty': { const p=Math.max(v.value,0),st=p*Math.max(v.stamp,0)/100,re=p*Math.max(v.registration,0)/100;return {'Stamp duty':st,'Registration / transfer':re,'Estimated total charges':st+re}; }
+    case 'property-calculator': { const p=Math.max(v.price,0),d=Math.min(Math.max(v.down,0),p),P=p-d,n=Math.max(1,Math.round(v.years*12)),r=Math.max(v.rate,0)/1200,e=P===0?0:r===0?P/n:P*r*(1+r)**n/((1+r)**n-1),rep=e*n,st=p*Math.max(v.stamp,0)/100,re=p*Math.max(v.registration,0)/100,up=d+st+re+Math.max(v.other,0);return {'Loan amount':P,'Monthly EMI':e,'Cash needed upfront':up,'Total loan interest':rep-P,'Estimated total cash cost':up+rep}; }
+    case 'loan-interest': { const P=Math.max(v.principal,0),n=Math.max(1,Math.round(v.years*12)),r=Math.max(v.rate,0)/1200,e=P===0?0:r===0?P/n:P*r*(1+r)**n/((1+r)**n-1),total=e*n;return {'Monthly EMI':e,'Principal repaid':P,'Total interest':total-P,'Total repayment':total}; }
+
     default: throw new Error(`No independent reference for ${id}`);
   }
 }
@@ -103,7 +120,7 @@ function stressValues(calc) {
 }
 
 let failures=0;
-if(CALCULATORS.length!==20) { console.error(`FAIL: expected 20 calculators, found ${CALCULATORS.length}`); failures++; }
+if(CALCULATORS.length!==37) { console.error(`FAIL: expected 37 calculators, found ${CALCULATORS.length}`); failures++; }
 for(const id of expectedIds) if(!CALCULATORS.some(c=>c.id===id)) { console.error(`FAIL: missing calculator ${id}`); failures++; }
 
 for(const calc of CALCULATORS) {

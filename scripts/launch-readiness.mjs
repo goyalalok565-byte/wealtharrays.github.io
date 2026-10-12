@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
+const calculatorSlugs = new Set(['sip-calculator','compound-interest-calculator','mortgage-emi-calculator','roi-calculator','simple-interest-calculator','retirement-calculator','salary-to-hourly-calculator','profit-margin-calculator','fixed-deposit-calculator','recurring-deposit-calculator','lumpsum-calculator','cagr-calculator','car-loan-calculator','personal-loan-calculator','debt-payoff-calculator','inflation-calculator','net-worth-calculator','overtime-pay-calculator','freelance-rate-calculator','income-tax-planner','home-loan-emi-calculator','currency-converter','flat-cost-calculator','loan-emi-calculator','capital-gain-calculator','lumpsum-sip-calculator','loan-against-property-calculator','home-loan-eligibility-calculator','silver-jewelry-calculator','advanced-home-loan-eligibility-calculator','consumer-durable-loan-calculator','gold-jewelry-calculator','loan-prepayment-vs-sip-calculator','loan-to-value-ltv-calculator','stamp-duty-calculator','property-calculator','loan-interest-calculator']);
 const errors = [];
 const warnings = [];
 const htmlFiles = [];
@@ -130,10 +131,10 @@ for (const requiredFile of ['about.html', 'contact.html', 'privacy.html', 'terms
 const calculatorUrls = sitemapLocs.filter(url => {
   try {
     const pathname = new URL(url).pathname;
-    return /^\/[a-z0-9-]+-calculator\/$/i.test(pathname);
+    return calculatorSlugs.has(pathname.replace(/^\//,'').replace(/\/$/,''));
   } catch { return false; }
 });
-if (calculatorUrls.length !== 20) errors.push(`Expected 20 calculator pages in sitemap, found ${calculatorUrls.length}`);
+if (calculatorUrls.length !== 37) errors.push(`Expected 37 calculator pages in sitemap, found ${calculatorUrls.length}`);
 for (const url of calculatorUrls) {
   const file = repositoryFileForUrl(url);
   if (!file) continue;
