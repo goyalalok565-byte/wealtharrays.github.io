@@ -20,7 +20,7 @@ const cases = [
 ];
 try {
   for (const item of cases) {
-    await page.goto(`${baseUrl.replace(/\/$/,'')}/${item.slug}.html`, {waitUntil:'domcontentloaded'});
+    await page.goto(`${baseUrl.replace(/\/$/,'')}/${item.slug}/`, {waitUntil:'domcontentloaded'});
     const button = page.locator('#calc-widget-embed');
     await button.waitFor({state:'visible',timeout:8000});
     await button.click();
