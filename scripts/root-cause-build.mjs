@@ -6,8 +6,8 @@ const root=process.cwd();
 const stamp=new Date().toISOString().replace(/\D/g,'').slice(0,14);
 const siteSources=['wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js','homepage-search.js','calculator-search.js'];
 const calcSources=['widget.js','widget-bootstrap.js',...siteSources,'calculator-safety.js','calculator-page-init.js','calculator-enhancements.js','pdf-export-fix.js'];
-const calculatorPages=['sip-calculator/index.html','compound-interest-calculator/index.html','mortgage-emi-calculator/index.html','roi-calculator/index.html','simple-interest-calculator/index.html','retirement-calculator/index.html','salary-to-hourly-calculator/index.html','profit-margin-calculator/index.html','fixed-deposit-calculator/index.html','recurring-deposit-calculator/index.html','lumpsum-calculator/index.html','cagr-calculator/index.html','car-loan-calculator/index.html','personal-loan-calculator/index.html','debt-payoff-calculator/index.html','inflation-calculator/index.html','net-worth-calculator/index.html','overtime-pay-calculator/index.html','freelance-rate-calculator/index.html','income-tax-scenario-calculator/index.html'];
-const slugs=calculatorPages.map(x=>x.replace(/\/index\.html$/,'').replace(/\.html$/,''));
+let calculatorPages=[];
+let slugs=[];
 const required=[...new Set([...siteSources,...calcSources,'calculators.js'])];
 for(const f of required)if(!fs.existsSync(path.join(root,f)))throw new Error(`Missing runtime source: ${f}`);
 function bundle(sources,label){const parts=sources.map(file=>{const body=fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n').trimEnd();const hash=crypto.createHash('sha256').update(body).digest('hex').slice(0,12);return `/* ===== WA CANONICAL MODULE | ${label} | ${file} | sha256:${hash} ===== */\n${body}\n`;});return `/* Wealth Arrays canonical ${label} runtime. Generated ${stamp}. */\n(function(){const k='__WA_CANONICAL_${label.toUpperCase()}_RUNTIME__';if(window[k])return;window[k]=true;})();\n${parts.join('\n')}`;}
@@ -21,9 +21,11 @@ if(start<0||end<0)throw new Error('CALCULATORS definition list not found');
 const body=source.slice(start+'const CALCULATORS = ['.length,end);
 const objects=[];let depth=0,begin=-1,string=null,escaped=false;
 for(let i=0;i<body.length;i++){const c=body[i];if(string){if(escaped)escaped=false;else if(c==='\\')escaped=true;else if(c===string)string=null;continue}if(c==='"'||c==="'"||c==='`'){string=c;continue}if(c==='{'){if(depth===0)begin=i;depth++;continue}if(c==='}'){depth--;if(depth===0&&begin>=0){objects.push(body.slice(begin,i+1).trim());begin=-1}}}
-if(objects.length!==20)throw new Error(`Expected 20 calculator definitions, found ${objects.length}`);
+if(objects.length<1)throw new Error('No calculator definitions found');
 const definitions=objects.map(obj=>({obj,id:obj.match(/\bid:\s*["']([^"']+)["']/)?.[1],slug:obj.match(/\bslug:\s*["']([^"']+)["']/)?.[1]}));
-if(definitions.some(x=>!x.id))throw new Error('Calculator definition has no id');
+if(definitions.some(x=>!x.id||!x.slug))throw new Error('Calculator definition is missing id or slug');
+calculatorPages=definitions.map(x=>`${x.slug}/index.html`);
+slugs=definitions.map(x=>x.slug);
 const bySlug=new Map(definitions.filter(x=>x.slug).map(x=>[x.slug,x.id]));
 const byId=new Map(definitions.map(x=>[x.id,x.id]));
 const pageAliases=new Map([['income-tax-scenario-calculator','income-tax-planner']]);
