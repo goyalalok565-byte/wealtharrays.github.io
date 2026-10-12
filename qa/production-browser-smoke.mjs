@@ -51,10 +51,10 @@ try {
   const retiredLinks = await page.locator('a[href*="step-up-sip"],a[href*="emergency-fund"],a[href*="real-return"]').count();
   if (retiredLinks) throw new Error('Homepage still exposes a retired calculator link');
 
-  await assertCalculator('sip-calculator.html', 'SIP calculator');
-  await assertCalculator('mortgage-emi-calculator.html', 'Mortgage / EMI calculator');
-  await assertCalculator('retirement-calculator.html', 'Freedom Milestone calculator');
-  await assertCalculator('debt-payoff-calculator.html', 'Debt payoff calculator');
+  await assertCalculator('sip-calculator/', 'SIP calculator');
+  await assertCalculator('mortgage-emi-calculator/', 'Mortgage / EMI calculator');
+  await assertCalculator('retirement-calculator/', 'Freedom Milestone calculator');
+  await assertCalculator('debt-payoff-calculator/', 'Debt payoff calculator');
 
   if (failedResponses.length) throw new Error(`Failed network responses: ${failedResponses.join(' | ')}`);
   if (errors.length) throw new Error(`Browser errors: ${errors.join(' | ')}`);
