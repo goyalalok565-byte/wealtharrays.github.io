@@ -90,7 +90,11 @@ for (const x of ['/v1/calculate','/v1/models','model_version','inputs','assumpti
 for (const p of ['ARCHITECTURE.md','methodology.html','editorial-policy.html','about.html']) must(p);
 if (!/author|Alok Goyal/i.test(must('about.html'))) fail('Phase 11: authorship contract missing');
 const seo=must('sitemap.xml');
-for (const p of ['/scenario-lab','/goal-planner','/financial-workspace']) if (!seo.includes('https://wealtharrays.com'+p)) fail('Phase 12: sitemap missing '+p);
+for (const p of ['/scenario-lab','/goal-planner','/financial-workspace']) {
+  if (seo.includes('<loc>https://wealtharrays.com'+p+'</loc>') || seo.includes('<loc>https://wealtharrays.com'+p+'/'+'</loc>')) fail('Phase 12: noindex utility leaked into sitemap '+p);
+  const page=must(p.slice(1)+'.html');
+  if (!/<meta\s+name=["']robots["']\s+content=["']noindex,follow["']/i.test(page)) fail('Phase 12: utility page must remain noindex '+p);
+}
 
 const a11y=must('qa/accessibility-static-audit.mjs');
 if (!/alt|button|label/i.test(a11y)) fail('Phase 13: accessibility gate too weak');
