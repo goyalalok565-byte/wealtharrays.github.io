@@ -11,9 +11,9 @@ const PUBLIC_ROOT_EXTS = new Set([
 const PUBLIC_ROOT_EXACT = new Set([
   '_headers','_redirects','ads.txt','robots.txt','sitemap.xml','sw.js','manifest.webmanifest'
 ]);
-const PUBLIC_DIRS = new Set(['articles','research']);
+const PUBLIC_DIRS = new Set(['articles','research','calculator-definitions']);
 const EXCLUDE_DIRS = new Set([
-  '.git','.github','node_modules','qa','scripts','calculator-definitions',
+  '.git','.github','node_modules','qa','scripts',
   'country-modules','api','p','privacy','reports','dist'
 ]);
 const EXCLUDE_ROOT = new Set([
@@ -93,7 +93,7 @@ function auditTree(dir, rel='') {
 }
 auditTree(out);
 const forbiddenHits = forbidden.filter(p =>
-  /^(qa|scripts|calculator-definitions|country-modules|api|p|privacy|reports)(\/|$)/.test(p) ||
+  /^(qa|scripts|country-modules|api|p|privacy|reports)(\/|$)/.test(p) ||
   /\.(md)$/i.test(p) ||
   p === 'content-sources.json' ||
   p.startsWith('.github/')
@@ -104,4 +104,17 @@ if (forbiddenHits.length) {
 for (const required of ['index.html','robots.txt','sitemap.xml','ads.txt','_headers','_redirects','sw.js','manifest.webmanifest','widget.html','widget.js','widget-bootstrap.js','wa-calculator-runtime.js']) {
   if (!fs.existsSync(path.join(out, required))) throw new Error('Missing required public output: ' + required);
 }
+const definitionsSrc = path.join(root, 'calculator-definitions');
+const definitionsOut = path.join(out, 'calculator-definitions');
+if (!fs.existsSync(definitionsSrc) || !fs.existsSync(definitionsOut)) {
+  throw new Error('Missing calculator-definitions directory in source or dist/.');
+}
+const definitionFiles = fs.readdirSync(definitionsSrc).filter(name => name.endsWith('.js'));
+for (const name of definitionFiles) {
+  if (!fs.existsSync(path.join(definitionsOut, name))) {
+    throw new Error('Missing calculator definition in dist/: calculator-definitions/' + name);
+  }
+}
+if (!definitionFiles.length) throw new Error('No calculator definition JavaScript files found.');
 console.log('Cloudflare public build PASS:', forbidden.length, 'public files emitted to dist/.');
+console.log('Calculator definitions PASS:', definitionFiles.length, 'definition scripts copied to dist/.');
