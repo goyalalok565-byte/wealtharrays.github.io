@@ -20,6 +20,23 @@
 /p/privacy-policy.html /privacy 301
 /p/terms.html /terms 301
 
+# Clean canonical aliases for legacy root-level HTML pages
+/about.html /about 301
+/contact.html /contact 301
+/faq.html /faq 301
+/methodology.html /methodology 301
+/terms.html /terms 301
+/editorial-policy.html /editorial-policy 301
+/advertising-policy.html /advertising-policy 301
+/tools.html /tools 301
+/research.html /research 301
+/category-investment.html /category-investment 301
+/category-loan.html /category-loan 301
+/category-banking.html /category-banking 301
+/category-retirement.html /category-retirement 301
+/category-salary.html /category-salary 301
+/category-business.html /category-business 301
+
 # Calculator .html -> clean slash routes
 /sip-calculator.html /sip-calculator/ 301
 /compound-interest-calculator.html /compound-interest-calculator/ 301
