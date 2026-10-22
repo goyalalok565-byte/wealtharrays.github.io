@@ -10,7 +10,7 @@ const calculators = context.__WA_TEST_CALCULATORS__;
 
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
 assert(Array.isArray(calculators), 'CALCULATORS must be an array');
-assert(calculators.length === 46, `Expected 46 calculators, found ${calculators.length}`);
+assert(calculators.length === 47, `Expected 47 calculators, found ${calculators.length}`);
 const actualSlugs = calculators.map(c => c.slug);
 assert(actualSlugs.every(Boolean), 'Every calculator must have a slug');
 assert(new Set(actualSlugs).size === actualSlugs.length, 'Calculator slugs must be unique');
@@ -28,7 +28,7 @@ assert(!widgetSource.includes('value="${esc(f.default)}"'), 'Calculator numeric 
 assert(widgetSource.includes('<option value="" selected disabled>Choose'), 'Calculator select inputs must start with a blank prompt');
 assert(widgetSource.includes('autocomplete="off" required'), 'Calculator inputs must be required and avoid stale browser autofill');
 assert(widgetSource.includes('if(inputsComplete())recompute()'), 'Calculator should auto-update once all fields are complete');
-assert(!/<input[^>]+id="wa-emi-(?:principal|rate|years)"[^>]+value=/i.test(homepage), 'Homepage quick EMI inputs must start blank');
+assert(!/<input[^>]+id="wa-emi-(?:principal|rate|years)"[^>]+\bvalue=/i.test(homepage), 'Homepage quick EMI inputs must start blank');
 assert(homepage.includes('id="wa-emi-output" for="wa-emi-principal wa-emi-rate wa-emi-years">Enter values</output>'), 'Homepage quick EMI result should have a blank initial state');
 assert(homeScript.includes("if(!String(principal.value).trim()||!String(rate.value).trim()||!String(years.value).trim())"), 'Homepage quick EMI must not show errors before the user enters values');
 assert(buildScript.includes("styles.css?v='+stamp"), 'Build must cache-bust the global stylesheet URL');
@@ -78,4 +78,4 @@ for (const calc of calculators) {
 
 assert(!toolsPage.includes('/income-tax-scenario-calculator/'), 'Tools library still points to legacy income-tax route');
 assert(!searchSource.includes('/income-tax-scenario-calculator/'), 'Search catalog still points to legacy income-tax route');
-console.log('Calculator regression PASS — 46/46 definitions, blank-input UX, responsive runtime hooks, field bounds, finite outputs, homepage/tools/search/llms/sitemap parity passed.');
+console.log('Calculator regression PASS — 47/47 definitions, blank-input UX, responsive runtime hooks, field bounds, finite outputs, homepage/tools/search/llms/sitemap parity passed.');
