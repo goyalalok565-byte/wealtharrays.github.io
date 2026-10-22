@@ -59,6 +59,16 @@
 - Property Calculator: https://wealtharrays.com/property-calculator/
 - Loan Interest Calculator: https://wealtharrays.com/loan-interest-calculator/
 
+- PPF Calculator: https://wealtharrays.com/ppf-calculator/
+- EPF Calculator: https://wealtharrays.com/epf-calculator/
+- GST Calculator: https://wealtharrays.com/gst-calculator/
+- Emergency Fund Calculator: https://wealtharrays.com/emergency-fund-calculator/
+- Credit Card Payoff Calculator: https://wealtharrays.com/credit-card-payoff-calculator/
+- Step-Up SIP Calculator: https://wealtharrays.com/step-up-sip-calculator/
+- SIP Goal Calculator: https://wealtharrays.com/sip-goal-calculator/
+- Gratuity Calculator: https://wealtharrays.com/gratuity-calculator/
+- HRA Exemption Calculator: https://wealtharrays.com/hra-exemption-calculator/
+
 ## Calculator collections
 
 - https://wealtharrays.com/category-investment
