@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
-const calculatorSlugs = new Set(['sip-calculator','compound-interest-calculator','mortgage-emi-calculator','roi-calculator','simple-interest-calculator','retirement-calculator','salary-to-hourly-calculator','profit-margin-calculator','fixed-deposit-calculator','recurring-deposit-calculator','lumpsum-calculator','cagr-calculator','car-loan-calculator','personal-loan-calculator','debt-payoff-calculator','inflation-calculator','net-worth-calculator','overtime-pay-calculator','freelance-rate-calculator','income-tax-planner','home-loan-emi-calculator','currency-converter','flat-cost-calculator','loan-emi-calculator','capital-gain-calculator','lumpsum-sip-calculator','loan-against-property-calculator','home-loan-eligibility-calculator','silver-jewelry-calculator','advanced-home-loan-eligibility-calculator','consumer-durable-loan-calculator','gold-jewelry-calculator','loan-prepayment-vs-sip-calculator','loan-to-value-ltv-calculator','stamp-duty-calculator','property-calculator','loan-interest-calculator']);
+const calculatorSlugs = new Set(['sip-calculator','compound-interest-calculator','mortgage-emi-calculator','roi-calculator','simple-interest-calculator','retirement-calculator','salary-to-hourly-calculator','profit-margin-calculator','fixed-deposit-calculator','recurring-deposit-calculator','lumpsum-calculator','cagr-calculator','car-loan-calculator','personal-loan-calculator','debt-payoff-calculator','inflation-calculator','net-worth-calculator','overtime-pay-calculator','freelance-rate-calculator','income-tax-planner','home-loan-emi-calculator','currency-converter','flat-cost-calculator','loan-emi-calculator','capital-gain-calculator','lumpsum-sip-calculator','loan-against-property-calculator','home-loan-eligibility-calculator','silver-jewelry-calculator','advanced-home-loan-eligibility-calculator','consumer-durable-loan-calculator','gold-jewelry-calculator','loan-prepayment-vs-sip-calculator','loan-to-value-ltv-calculator','stamp-duty-calculator','property-calculator','loan-interest-calculator','ppf-calculator','epf-calculator','gst-calculator','emergency-fund-calculator','credit-card-payoff-calculator','step-up-sip-calculator','sip-goal-calculator','gratuity-calculator','hra-exemption-calculator']);
 const errors = [];
 const warnings = [];
 const htmlFiles = [];
@@ -134,7 +134,7 @@ const calculatorUrls = sitemapLocs.filter(url => {
     return calculatorSlugs.has(pathname.replace(/^\//,'').replace(/\/$/,''));
   } catch { return false; }
 });
-if (calculatorUrls.length !== 37) errors.push(`Expected 37 calculator pages in sitemap, found ${calculatorUrls.length}`);
+if (calculatorUrls.length !== 46) errors.push(`Expected 46 calculator pages in sitemap, found ${calculatorUrls.length}`);
 for (const url of calculatorUrls) {
   const file = repositoryFileForUrl(url);
   if (!file) continue;

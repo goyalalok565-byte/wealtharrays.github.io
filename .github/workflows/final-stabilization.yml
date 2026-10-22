@@ -28,6 +28,8 @@ jobs:
         run: find . -maxdepth 2 -type f -name '*.js' -print0 | xargs -0 -n1 node --check
       - name: Calculator regression before build
         run: node qa/calculator-regression.mjs
+      - name: Generate new calculator routes
+        run: node scripts/generate-calculator-pages.mjs
       - name: Build canonical runtime, split definitions and sitemap
         run: node scripts/root-cause-build.mjs
       - name: Run Phase 4 premium normalization
