@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "build:dist": "node scripts/generate-research-datasets.mjs && node scripts/root-cause-build.mjs && node scripts/phase4-premium-build.mjs && node scripts/fix-route-alias-links.mjs && node scripts/normalize-nested-links.mjs && node scripts/fix-accessible-names.mjs && node scripts/repair-site-integrity.mjs && node scripts/build-dist.mjs && SITE_ROOT=dist node scripts/site-integrity.mjs",
+    "build:dist": "node scripts/generate-research-datasets.mjs && node scripts/generate-calculator-pages.mjs && node scripts/root-cause-build.mjs && node scripts/phase4-premium-build.mjs && node scripts/fix-route-alias-links.mjs && node scripts/normalize-nested-links.mjs && node scripts/fix-accessible-names.mjs && node scripts/repair-site-integrity.mjs && node scripts/build-dist.mjs && SITE_ROOT=dist node scripts/site-integrity.mjs",
     "qa:dist": "SITE_ROOT=dist node scripts/site-integrity.mjs",
     "build": "npm run build:dist",
     "research:generate": "node scripts/generate-research-datasets.mjs",
