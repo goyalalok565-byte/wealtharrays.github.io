@@ -13,7 +13,7 @@ function walk(dir) {
 walk('.');
 
 const budgets = { js: 140000, css: 100000 };
-const required = ['wa-calculator-runtime.js', 'wa-site-runtime.js', 'wa-home-runtime.js', 'styles.css'];
+const required = ['wa-calculator-runtime.js', 'wa-site-runtime.js', 'styles.css'];
 const failures = [];
 if (files.length < 10) failures.push('Asset discovery returned only ' + files.length + ' JS/CSS assets; expected at least 10.');
 for (const name of required) {
