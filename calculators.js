@@ -421,6 +421,315 @@ const CALCULATORS = [
   {id:"stamp-duty",slug:"stamp-duty-calculator",title:"Stamp Duty Calculator",category:"loan",short:"Estimate stamp duty and registration costs on a property purchase.",desc:"Apply your local stamp-duty and registration assumptions to an entered property value.",article:{formula:"Stamp duty = property value × stamp-duty rate; registration = property value × registration rate.",exampleInputs:{},faqs:[{q:"Are stamp-duty rates universal?",a:"No. Verify the current official rate for your location and transaction."},{q:"Is registration always a percentage?",a:"Not everywhere; some jurisdictions use slabs or fixed charges."},{q:"Does this include brokerage?",a:"No. Add brokerage, legal and inspection costs separately."}]},fields:[{id:"value",label:"Property value",type:"number",default:6000000,min:0,max:1000000000000,step:1},{id:"stamp",label:"Stamp duty rate",type:"number",default:5,min:0,max:100,step:0.1},{id:"registration",label:"Registration rate",type:"number",default:1,min:0,max:100,step:0.1}],compute(v){const p=Math.max(v.value,0),stamp=p*Math.max(v.stamp,0)/100,reg=p*Math.max(v.registration,0)/100;return[{label:'Stamp duty',value:stamp,format:'currency'},{label:'Registration / transfer',value:reg,format:'currency'},{label:'Estimated total charges',value:stamp+reg,format:'currency',emphasis:'negative'}];}},
   {id:"property-calculator",slug:"property-calculator",title:"Property Calculator",category:"loan",short:"Estimate upfront cash, EMI and total home-buying cost.",desc:"Combine price, down payment, loan rate, term and transaction costs to understand the full cost of a property purchase.",article:{formula:"Upfront cash = down payment + stamp duty + registration + other upfront costs.",exampleInputs:{},faqs:[{q:"Why is EMI not the full cost?",a:"A purchase also needs a down payment, transaction charges and potentially maintenance, insurance and taxes."},{q:"Does this include appreciation?",a:"No. Property appreciation is uncertain."},{q:"Can I compare renting with this?",a:"Yes, but a fair comparison also needs rent growth, investment returns, maintenance, taxes and opportunity cost."}]},fields:[{id:"price",label:"Property price",type:"number",default:6000000,min:0,max:1000000000000,step:1},{id:"down",label:"Down payment",type:"number",default:1200000,min:0,max:1000000000000,step:1},{id:"stamp",label:"Stamp duty",type:"number",default:5,min:0,max:100,step:0.1},{id:"registration",label:"Registration",type:"number",default:1,min:0,max:100,step:0.1},{id:"rate",label:"Loan interest rate",type:"number",default:8.5,min:0,max:100,step:0.1},{id:"years",label:"Loan term",type:"number",default:20,min:1,max:100,step:0.1},{id:"other",label:"Other upfront costs",type:"number",default:100000,min:0,max:1000000000000,step:1}],compute(v){const price=Math.max(v.price,0),down=Math.min(Math.max(v.down,0),price),P=price-down,n=Math.max(1,Math.round(v.years*12)),r=Math.max(v.rate,0)/1200,emi=P===0?0:r===0?P/n:P*r*(1+r)**n/((1+r)**n-1),repay=emi*n,stamp=price*Math.max(v.stamp,0)/100,reg=price*Math.max(v.registration,0)/100,upfront=down+stamp+reg+Math.max(v.other,0);return[{label:'Loan amount',value:P,format:'currency'},{label:'Monthly EMI',value:emi,format:'currency',emphasis:'neutral'},{label:'Cash needed upfront',value:upfront,format:'currency'},{label:'Total loan interest',value:repay-P,format:'currency',emphasis:'negative'},{label:'Estimated total cash cost',value:upfront+repay,format:'currency'}];}},
   {id:"loan-interest",slug:"loan-interest-calculator",title:"Loan Interest Calculator",category:"loan",short:"Calculate interest and total repayment on an amortizing loan.",desc:"See how much of a standard fixed-rate loan's total repayment is interest rather than principal.",article:{formula:"Total interest = scheduled repayments − original principal.",exampleInputs:{},faqs:[{q:"Why can total interest be so high?",a:"Long terms create many interest-bearing months, especially at higher rates."},{q:"Does this match every lender?",a:"It assumes standard monthly amortization with a constant rate."},{q:"How can I reduce interest?",a:"A lower rate, shorter term or extra principal payments can reduce it, subject to lender rules."}]},fields:[{id:"principal",label:"Loan principal",type:"number",default:1000000,min:0,max:1000000000000,step:1},{id:"rate",label:"Annual interest rate",type:"number",default:10,min:0,max:100,step:0.1},{id:"years",label:"Loan term",type:"number",default:10,min:1,max:100,step:0.1}],compute(v){const P=Math.max(v.principal,0),n=Math.max(1,Math.round(v.years*12)),r=Math.max(v.rate,0)/1200,emi=P===0?0:r===0?P/n:P*r*(1+r)**n/((1+r)**n-1),total=emi*n;return[{label:'Monthly EMI',value:emi,format:'currency'},{label:'Principal repaid',value:P,format:'currency'},{label:'Total interest',value:total-P,format:'currency',emphasis:'negative'},{label:'Total repayment',value:total,format:'currency',emphasis:'neutral'}];}}
+  ,
+  {
+    id: "ppf-growth",
+    slug: "ppf-calculator",
+    title: "PPF Calculator",
+    category: "banking",
+    short: "Estimate Public Provident Fund growth from annual contributions.",
+    desc: "Project a PPF balance from an annual contribution, an assumed interest rate and a chosen period.",
+    article: {
+      formula: "This estimate adds the annual contribution at the start of each year and then applies the assumed annual rate: balance = (previous balance + annual contribution) × (1 + rate). Actual PPF rules, contribution limits and notified rates can change.",
+      exampleInputs: { yearlyContribution: 150000, rate: 7.1, years: 15, initialBalance: 0 },
+      faqs: [
+        { q: "Is the interest rate guaranteed for the full period?", a: "No. PPF rates are notified periodically and can change. Treat the rate entered here as an assumption and check current official rules." },
+        { q: "Does this calculate tax benefits?", a: "No. This tool estimates account growth only; it does not determine eligibility for deductions or tax treatment." }
+      ]
+    },
+    fields: [
+      { id: "yearlyContribution", label: "Annual contribution", type: "number", default: 150000, min: 0, max: 100000000, step: 1000 },
+      { id: "rate", label: "Assumed annual interest rate", type: "number", default: 7.1, min: 0, max: 30, step: 0.05, suffix: "%" },
+      { id: "years", label: "Investment period", type: "number", default: 15, min: 1, max: 50, step: 1, suffix: "yrs" },
+      { id: "initialBalance", label: "Existing balance", type: "number", default: 0, min: 0, max: 1000000000, step: 1000 }
+    ],
+    compute(v) {
+      let balance = v.initialBalance, contributed = v.initialBalance;
+      for (let year = 0; year < v.years; year++) {
+        balance = (balance + v.yearlyContribution) * (1 + v.rate / 100);
+        contributed += v.yearlyContribution;
+      }
+      return [
+        { label: "Projected balance", value: balance, format: "currency", emphasis: "positive" },
+        { label: "Total contributions incl. opening balance", value: contributed, format: "currency" },
+        { label: "Estimated growth", value: balance - contributed, format: "currency", emphasis: "neutral" }
+      ];
+    }
+  },
+  {
+    id: "epf-growth",
+    slug: "epf-calculator",
+    title: "EPF Calculator",
+    category: "retirement",
+    short: "Project EPF savings from monthly contributions and salary growth.",
+    desc: "Estimate a future EPF balance using salary, contribution percentages, an assumed interest rate and years remaining.",
+    article: {
+      formula: "Each month, this estimate adds the employee contribution plus the employer EPF contribution you enter, then applies the monthly equivalent of the assumed annual rate. Basic pay is increased once per year by the assumed salary growth rate. Employer EPS allocation, statutory ceilings, withdrawals and tax rules are not modelled.",
+      exampleInputs: { monthlyBasic: 30000, employeePct: 12, employerPct: 3.67, salaryGrowth: 5, rate: 8.25, years: 25 },
+      faqs: [
+        { q: "Is this an official EPF statement?", a: "No. It is a projection based on the rates and contributions you enter, not a statement from EPFO." },
+        { q: "Does it model EPS and contribution ceilings?", a: "No. Enter only the employer contribution you expect to reach EPF. EPS allocation, wage ceilings, withdrawals and tax treatment need separate checking." }
+      ]
+    },
+    fields: [
+      { id: "monthlyBasic", label: "Monthly basic pay", type: "number", default: 30000, min: 0, max: 10000000, step: 500 },
+      { id: "employeePct", label: "Employee contribution", type: "number", default: 12, min: 0, max: 100, step: 0.1, suffix: "%" },
+      { id: "employerPct", label: "Employer EPF contribution", type: "number", default: 3.67, min: 0, max: 100, step: 0.1, suffix: "%" },
+      { id: "salaryGrowth", label: "Annual basic-pay growth", type: "number", default: 5, min: 0, max: 50, step: 0.5, suffix: "%" },
+      { id: "rate", label: "Assumed annual EPF interest", type: "number", default: 8.25, min: 0, max: 30, step: 0.05, suffix: "%" },
+      { id: "years", label: "Years until withdrawal", type: "number", default: 25, min: 1, max: 45, step: 1, suffix: "yrs" }
+    ],
+    compute(v) {
+      let balance = 0, contributed = 0, salary = v.monthlyBasic;
+      const monthlyRate = v.rate / 1200;
+      for (let month = 1; month <= v.years * 12; month++) {
+        if (month > 1 && (month - 1) % 12 === 0) salary *= 1 + v.salaryGrowth / 100;
+        const contribution = salary * (v.employeePct + v.employerPct) / 100;
+        contributed += contribution;
+        balance = (balance + contribution) * (1 + monthlyRate);
+      }
+      return [
+        { label: "Projected EPF balance", value: balance, format: "currency", emphasis: "positive" },
+        { label: "Total contributions", value: contributed, format: "currency" },
+        { label: "Estimated interest", value: balance - contributed, format: "currency", emphasis: "neutral" }
+      ];
+    }
+  },
+  {
+    id: "gst",
+    slug: "gst-calculator",
+    title: "GST Calculator",
+    category: "business",
+    short: "Calculate GST and the invoice total from a pre-tax amount.",
+    desc: "Add a GST rate to a taxable amount to estimate the tax component and total invoice value.",
+    article: {
+      formula: "GST amount = taxable amount × GST rate ÷ 100. Total invoice value = taxable amount + GST amount. This calculator adds tax to a pre-tax amount; it does not extract GST from a tax-inclusive price or decide which rate legally applies.",
+      exampleInputs: { amount: 100000, rate: 18 },
+      faqs: [
+        { q: "Which GST rate should I use?", a: "Enter the rate that applies to your specific goods or services. Rates and classifications depend on the transaction and current rules." },
+        { q: "Does this split CGST and SGST?", a: "No. It calculates the combined GST amount. Whether CGST/SGST or IGST applies depends on the transaction." }
+      ]
+    },
+    fields: [
+      { id: "amount", label: "Taxable amount (before GST)", type: "number", default: 100000, min: 0, max: 100000000000, step: 100 },
+      { id: "rate", label: "GST rate", type: "number", default: 18, min: 0, max: 100, step: 0.1, suffix: "%" }
+    ],
+    compute(v) {
+      const tax = v.amount * v.rate / 100;
+      return [
+        { label: "GST amount", value: tax, format: "currency", emphasis: "neutral" },
+        { label: "Total including GST", value: v.amount + tax, format: "currency", emphasis: "positive" },
+        { label: "Pre-tax amount", value: v.amount, format: "currency" }
+      ];
+    }
+  },
+  {
+    id: "emergency-fund",
+    slug: "emergency-fund-calculator",
+    title: "Emergency Fund Calculator",
+    category: "retirement",
+    short: "Set an emergency savings target based on monthly expenses.",
+    desc: "Estimate a cash reserve target, your current shortfall and how long it may take to reach the goal.",
+    article: {
+      formula: "Target emergency fund = essential monthly expenses × target months. Savings gap = max(0, target fund − current savings). Estimated months to goal = savings gap ÷ monthly contribution, assuming the contribution remains constant and no money is withdrawn.",
+      exampleInputs: { expenses: 40000, targetMonths: 6, currentSavings: 100000, monthlySaving: 10000 },
+      faqs: [
+        { q: "How many months of expenses should I save?", a: "The right buffer depends on income stability, dependants, insurance, debt and likely unexpected costs. Six months is a common planning starting point, not a universal rule." },
+        { q: "Does the estimate include interest or inflation?", a: "No. It assumes a fixed monthly savings contribution and does not add interest, taxes or changes in expenses." }
+      ]
+    },
+    fields: [
+      { id: "expenses", label: "Essential monthly expenses", type: "number", default: 40000, min: 0, max: 100000000, step: 500 },
+      { id: "targetMonths", label: "Months of expenses to cover", type: "number", default: 6, min: 1, max: 36, step: 1, suffix: "months" },
+      { id: "currentSavings", label: "Existing emergency savings", type: "number", default: 100000, min: 0, max: 1000000000, step: 1000 },
+      { id: "monthlySaving", label: "Monthly amount you can add", type: "number", default: 10000, min: 0, max: 100000000, step: 500 }
+    ],
+    compute(v) {
+      const target = v.expenses * v.targetMonths;
+      const gap = Math.max(0, target - v.currentSavings);
+      const months = gap === 0 ? 0 : v.monthlySaving > 0 ? Math.ceil(gap / v.monthlySaving) : 0;
+      return [
+        { label: "Emergency fund target", value: target, format: "currency", emphasis: "neutral" },
+        { label: "Additional savings needed", value: gap, format: "currency", emphasis: gap > 0 ? "negative" : "positive" },
+        { label: "Months to target (0 = already funded or no monthly saving)", value: months, format: "number" }
+      ];
+    }
+  },
+  {
+    id: "credit-card-payoff",
+    slug: "credit-card-payoff-calculator",
+    title: "Credit Card Payoff Calculator",
+    category: "loan",
+    short: "Estimate payoff time and interest for a fixed monthly payment.",
+    desc: "Model how a credit-card balance changes when you pay a fixed amount each month at an assumed APR.",
+    article: {
+      formula: "Each month, interest is added using the monthly rate (APR ÷ 12), then the fixed payment is deducted. The estimate excludes fees, new purchases, changing APRs and minimum-payment rules. If the payment does not exceed the first month's interest, the balance will not decline.",
+      exampleInputs: { balance: 80000, apr: 36, payment: 8000 },
+      faqs: [
+        { q: "Why can a card balance take so long to clear?", a: "Interest is charged on the outstanding balance. If your payment is only slightly above the interest charged, little money reduces the principal." },
+        { q: "Does this include new spending or card fees?", a: "No. Stop adding new purchases for this estimate to be meaningful; fees, rate changes and issuer rules can alter the actual payoff schedule." }
+      ]
+    },
+    fields: [
+      { id: "balance", label: "Current card balance", type: "number", default: 80000, min: 0, max: 1000000000, step: 500 },
+      { id: "apr", label: "Annual percentage rate (APR)", type: "number", default: 36, min: 0, max: 300, step: 0.1, suffix: "%" },
+      { id: "payment", label: "Fixed monthly payment", type: "number", default: 8000, min: 0, max: 100000000, step: 100 }
+    ],
+    compute(v) {
+      let balance = v.balance, interestPaid = 0, totalPaid = 0, months = 0;
+      const monthlyRate = v.apr / 1200;
+      if (v.payment <= balance * monthlyRate && balance > 0) {
+        return [
+          { label: "Months to clear (0 = payment too low)", value: 0, format: "number" },
+          { label: "Monthly interest at current balance", value: balance * monthlyRate, format: "currency", emphasis: "negative" },
+          { label: "Payment needed to start reducing balance", value: balance * monthlyRate + 1, format: "currency", emphasis: "neutral" }
+        ];
+      }
+      while (balance > 0.005 && months < 1200) {
+        const interest = balance * monthlyRate;
+        interestPaid += interest;
+        const paid = Math.min(balance + interest, v.payment);
+        totalPaid += paid;
+        balance = Math.max(0, balance + interest - paid);
+        months++;
+      }
+      return [
+        { label: "Months to pay off", value: months, format: "number" },
+        { label: "Total interest paid", value: interestPaid, format: "currency", emphasis: "negative" },
+        { label: "Total payments", value: totalPaid, format: "currency" }
+      ];
+    }
+  },
+  {
+    id: "step-up-sip",
+    slug: "step-up-sip-calculator",
+    title: "Step-Up SIP Calculator",
+    category: "investment",
+    short: "Project monthly investments that rise each year.",
+    desc: "Estimate how an annual increase in monthly SIP contributions may change the projected corpus.",
+    article: {
+      formula: "The monthly contribution increases by the step-up percentage at the start of each investment year. Each contribution is added at the start of a month and the balance grows at the monthly equivalent of the assumed annual return. Actual investment returns vary and are not guaranteed.",
+      exampleInputs: { monthly: 5000, stepUp: 10, rate: 12, years: 15 },
+      faqs: [
+        { q: "What is a step-up SIP?", a: "It is a recurring investment plan where the monthly contribution increases periodically, often once a year, as income or savings capacity grows." },
+        { q: "Are the projected returns guaranteed?", a: "No. The return rate is an assumption. Market-linked investments can lose value and actual returns vary over time." }
+      ]
+    },
+    fields: [
+      { id: "monthly", label: "Starting monthly investment", type: "number", default: 5000, min: 0, max: 100000000, step: 100 },
+      { id: "stepUp", label: "Annual SIP increase", type: "number", default: 10, min: 0, max: 100, step: 0.5, suffix: "%" },
+      { id: "rate", label: "Assumed annual return", type: "number", default: 12, min: 0, max: 100, step: 0.1, suffix: "%" },
+      { id: "years", label: "Investment period", type: "number", default: 15, min: 1, max: 60, step: 1, suffix: "yrs" }
+    ],
+    compute(v) {
+      let balance = 0, invested = 0;
+      const monthlyRate = v.rate / 1200;
+      for (let year = 0; year < v.years; year++) {
+        const contribution = v.monthly * Math.pow(1 + v.stepUp / 100, year);
+        for (let month = 0; month < 12; month++) {
+          balance = (balance + contribution) * (1 + monthlyRate);
+          invested += contribution;
+        }
+      }
+      return [
+        { label: "Projected investment value", value: balance, format: "currency", emphasis: "positive" },
+        { label: "Total contributions", value: invested, format: "currency" },
+        { label: "Estimated growth", value: balance - invested, format: "currency", emphasis: "neutral" }
+      ];
+    }
+  },
+  {
+    id: "sip-goal",
+    slug: "sip-goal-calculator",
+    title: "SIP Goal Calculator",
+    category: "investment",
+    short: "Estimate the monthly SIP needed to reach a target corpus.",
+    desc: "Work backward from a target amount, current savings, expected return and time horizon.",
+    article: {
+      formula: "First grow the current corpus at the assumed monthly rate. The remaining target is divided by the future-value factor for equal monthly contributions. This model assumes contributions at the start of each month and a constant return, which real investments will not deliver exactly.",
+      exampleInputs: { target: 5000000, current: 500000, rate: 10, years: 15 },
+      faqs: [
+        { q: "Does this guarantee I will reach the target?", a: "No. The required SIP is a mathematical estimate based on a constant assumed return. Actual returns vary and the target may not be reached." },
+        { q: "What if my current savings already grow beyond the target?", a: "The calculator returns zero as the required monthly SIP if the assumed growth of your current corpus already meets or exceeds the target." }
+      ]
+    },
+    fields: [
+      { id: "target", label: "Target corpus", type: "number", default: 5000000, min: 0, max: 100000000000, step: 10000 },
+      { id: "current", label: "Current investment corpus", type: "number", default: 500000, min: 0, max: 10000000000, step: 10000 },
+      { id: "rate", label: "Assumed annual return", type: "number", default: 10, min: 0, max: 100, step: 0.1, suffix: "%" },
+      { id: "years", label: "Time to goal", type: "number", default: 15, min: 1, max: 80, step: 1, suffix: "yrs" }
+    ],
+    compute(v) {
+      const n = v.years * 12, monthlyRate = v.rate / 1200;
+      const futureCurrent = v.current * Math.pow(1 + monthlyRate, n);
+      const gap = Math.max(0, v.target - futureCurrent);
+      const factor = monthlyRate === 0 ? n : ((Math.pow(1 + monthlyRate, n) - 1) / monthlyRate) * (1 + monthlyRate);
+      const required = gap === 0 ? 0 : factor > 0 ? gap / factor : 0;
+      return [
+        { label: "Required monthly SIP", value: required, format: "currency", emphasis: "positive" },
+        { label: "Future value of current corpus", value: futureCurrent, format: "currency" },
+        { label: "Target gap after current corpus growth", value: gap, format: "currency", emphasis: "neutral" }
+      ];
+    }
+  },
+  {
+    id: "gratuity",
+    slug: "gratuity-calculator",
+    title: "Gratuity Calculator",
+    category: "salary",
+    short: "Estimate gratuity using salary and completed service years.",
+    desc: "Estimate a gratuity amount using the common 15/26 salary formula, subject to eligibility and applicable rules.",
+    article: {
+      formula: "For an employee covered by the Payment of Gratuity Act, the common estimate is last-drawn monthly basic salary plus dearness allowance × 15 ÷ 26 × completed years of service. Eligibility and exceptions depend on the applicable law and employment circumstances.",
+      exampleInputs: { salary: 50000, years: 10 },
+      faqs: [
+        { q: "Is five years of service always required?", a: "Five years of continuous service is the general rule for many cases under the Act, but exceptions and legal interpretation can apply, including certain death or disablement cases." },
+        { q: "Does this include every component of salary?", a: "No. The common formula uses last-drawn basic salary plus dearness allowance, not necessarily total CTC or every allowance." }
+      ]
+    },
+    fields: [
+      { id: "salary", label: "Last-drawn monthly basic + DA", type: "number", default: 50000, min: 0, max: 100000000, step: 500 },
+      { id: "years", label: "Completed years of service", type: "number", default: 10, min: 0, max: 60, step: 1, suffix: "yrs" }
+    ],
+    compute(v) {
+      const eligible = v.years >= 5;
+      const gratuity = eligible ? v.salary * 15 / 26 * Math.floor(v.years) : 0;
+      return [
+        { label: "Estimated gratuity (0 if threshold not met)", value: gratuity, format: "currency", emphasis: "positive" },
+        { label: "General 5-year threshold met (1 = yes)", value: eligible ? 1 : 0, format: "number" }
+      ];
+    }
+  },
+  {
+    id: "hra-exemption",
+    slug: "hra-exemption-calculator",
+    title: "HRA Exemption Calculator",
+    category: "salary",
+    short: "Estimate HRA exemption from salary, rent and city percentage.",
+    desc: "Estimate the HRA exemption under the common salary-based method using editable salary, rent and city assumptions.",
+    article: {
+      formula: "The estimated exemption is the lowest of actual HRA received, rent paid minus 10% of basic salary plus DA, and the basic salary plus DA multiplied by the city percentage you enter (commonly 50% for specified metro cities and 40% elsewhere). Negative values are treated as zero. Tax rules and eligibility can vary.",
+      exampleInputs: { basicDA: 50000, hra: 20000, rent: 25000, cityPct: 50 },
+      faqs: [
+        { q: "Which city percentage should I enter?", a: "The common calculation uses 50% for specified metro cities and 40% for other locations. Check the current tax rules for your circumstances." },
+        { q: "Does this decide my final tax liability?", a: "No. It estimates one HRA exemption component and does not calculate your complete tax liability or confirm eligibility for a tax regime." }
+      ]
+    },
+    fields: [
+      { id: "basicDA", label: "Monthly basic salary + DA", type: "number", default: 50000, min: 0, max: 100000000, step: 500 },
+      { id: "hra", label: "Monthly HRA received", type: "number", default: 20000, min: 0, max: 100000000, step: 500 },
+      { id: "rent", label: "Monthly rent paid", type: "number", default: 25000, min: 0, max: 100000000, step: 500 },
+      { id: "cityPct", label: "City percentage (50 or 40)", type: "number", default: 50, min: 0, max: 100, step: 10, suffix: "%" }
+    ],
+    compute(v) {
+      const exemption = Math.max(0, Math.min(v.hra, v.rent - 0.1 * v.basicDA, v.basicDA * v.cityPct / 100));
+      return [
+        { label: "Estimated HRA exemption per month", value: exemption, format: "currency", emphasis: "positive" },
+        { label: "Estimated taxable HRA per month", value: Math.max(0, v.hra - exemption), format: "currency", emphasis: "neutral" },
+        { label: "Annual estimated exemption", value: exemption * 12, format: "currency" }
+      ];
+    }
+  }
 ];
 
 const CURRENCIES = [
