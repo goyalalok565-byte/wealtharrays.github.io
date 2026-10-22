@@ -17,6 +17,26 @@ jobs:
       - name: Checkout exact commit
         uses: actions/checkout@v4
 
+      - name: Wait for canonical build artifacts on main
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 30); do
+            git fetch origin main
+            if git cat-file -e FETCH_HEAD:wa-home-runtime.js 2>/dev/null &&
+               git show FETCH_HEAD:index.html | grep -q '/wa-home-runtime.js?v=' &&
+               git show FETCH_HEAD:tools.html | grep -q '/wa-site-runtime.js?v=' &&
+               git show FETCH_HEAD:sip-calculator/index.html | grep -q '/wa-calculator-runtime.js?v='; then
+              git checkout --detach FETCH_HEAD
+              echo "Checked out canonical build commit $(git rev-parse --short HEAD)."
+              exit 0
+            fi
+            echo "Waiting for the canonical build bot to commit generated runtime artifacts... attempt $i/30"
+            sleep 10
+          done
+          echo "Canonical runtime artifacts did not appear on main within five minutes."
+          exit 1
+
       - name: Install Playwright
         run: |
           npm install --no-save playwright@1.55.0
@@ -41,8 +61,29 @@ jobs:
       - name: Run visual and calculator smoke against exact checkout
         run: node qa/production-browser-smoke.mjs
 
-      - name: Wait for Pages CDN propagation
-        run: sleep 180
+      - name: Wait for exact production runtime versions
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected_home="$(grep -oE '/wa-home-runtime\\.js\\?v=[^"]+' index.html | head -n1)"
+          expected_site="$(grep -oE '/wa-site-runtime\\.js\\?v=[^"]+' tools.html | head -n1)"
+          expected_calc="$(grep -oE '/wa-calculator-runtime\\.js\\?v=[^"]+' sip-calculator/index.html | head -n1)"
+          test -n "$expected_home" || { echo "Could not extract expected home runtime URL"; exit 1; }
+          test -n "$expected_site" || { echo "Could not extract expected site runtime URL"; exit 1; }
+          test -n "$expected_calc" || { echo "Could not extract expected calculator runtime URL"; exit 1; }
+          for i in $(seq 1 60); do
+            home="$(curl -fsSL https://wealtharrays.com/index.html 2>/dev/null || true)"
+            tools="$(curl -fsSL https://wealtharrays.com/tools/ 2>/dev/null || true)"
+            calc="$(curl -fsSL https://wealtharrays.com/sip-calculator/ 2>/dev/null || true)"
+            if grep -Fq "$expected_home" <<<"$home" && grep -Fq "$expected_site" <<<"$tools" && grep -Fq "$expected_calc" <<<"$calc"; then
+              echo "Production is serving the current home, site and calculator runtime versions."
+              exit 0
+            fi
+            echo "Waiting for exact production runtime versions... attempt $i/60"
+            sleep 10
+          done
+          echo "Production did not expose the current runtime versions within ten minutes."
+          exit 1
 
       - name: Verify production embed browser smoke
         env:
