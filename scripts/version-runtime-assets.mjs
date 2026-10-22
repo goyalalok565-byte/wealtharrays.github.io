@@ -14,6 +14,7 @@ walk(root);
 let changed=0;
 for(const full of htmlFiles){let html=fs.readFileSync(full,'utf8');const before=html;
   html=html.replace(/\/wa-site-runtime\.js\?v=[^"']+/g,`/wa-site-runtime.js?v=${siteVersion}`);
+  html=html.replace(/\/wa-home-runtime\.js\?v=[^"']+/g,`/wa-home-runtime.js?v=${homeVersion}`);
   html=html.replace(/\/wa-calculator-runtime\.js\?v=[^"']+/g,`/wa-calculator-runtime.js?v=${calculatorVersion}`);
   if(html!==before){fs.writeFileSync(full,html,'utf8');changed++;}
 }
