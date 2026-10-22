@@ -43,7 +43,7 @@ try {
   await input.fill('tax');
   await results.first().waitFor({ state: 'visible', timeout: 5000 });
   const taxHref = await results.first().getAttribute('href');
-  if (new URL(taxHref, page.url()).pathname !== '/income-tax-scenario-calculator/') throw new Error(`Unexpected tax result href: ${taxHref}`);
+  if (new URL(taxHref, page.url()).pathname !== '/income-tax-planner/') throw new Error(`Unexpected tax result href: ${taxHref}`);
 
   const browserErrors = await page.evaluate(() => window.__WA_BROWSER_ERRORS__ || []);
   if (browserErrors.length) throw new Error(`Browser page errors:\n${browserErrors.join('\n---\n')}\nPlaywright: ${errors.join(' | ')}`);
