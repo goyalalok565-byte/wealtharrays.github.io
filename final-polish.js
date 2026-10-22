@@ -19,6 +19,7 @@ function reframeTaxScenario(){
  const title=document.querySelector('.calc-title');if(title)title.textContent='Income Tax Scenario Calculator';document.title='Income Tax Scenario Calculator — Free Planning Tool | Wealth Arrays';const desc=document.querySelector('.calc-desc');if(desc)desc.textContent='Explore tax scenarios using a user-entered effective tax-rate assumption. This is not jurisdiction-specific tax software.';document.querySelectorAll('script[type="application/ld+json"]').forEach(s=>{try{s.textContent=s.textContent.replaceAll('Income Tax Planner','Income Tax Scenario Calculator')}catch(e){}});document.querySelectorAll('a,b,h2,h3,small,p').forEach(el=>{if(el.children.length===0&&/Income Tax Planner/i.test(el.textContent||''))el.textContent=(el.textContent||'').replace(/Income Tax Planner/gi,'Income Tax Scenario Calculator')});
 }
 function mobileSearchFallback(){
+ if(window.__WA_HOMEPAGE_SEARCH_LOADED__)return;
  const input=document.getElementById('tool-search'),box=document.getElementById('tool-search-results');
  if(!input||!box||window.__WA_MOBILE_SEARCH_FALLBACK__)return;
  window.__WA_MOBILE_SEARCH_FALLBACK__=true;
@@ -39,6 +40,7 @@ function mobileSearchFallback(){
  input.addEventListener('click',render,true); input.addEventListener('keydown',e=>{if(e.key==='Escape'){box.hidden=true;box.style.display='none';input.blur()}},true);
 }
 function moveHomepageSearchUp(){
+ if(window.__WA_HOMEPAGE_SEARCH_LOADED__)return;
  if(window.innerWidth>760)return;
  const input=document.getElementById('tool-search');
  const shell=input?.closest('.tool-search-shell,.search-bar');
@@ -48,6 +50,7 @@ function moveHomepageSearchUp(){
  shell.style.order='-1';shell.style.marginTop='0';shell.style.marginBottom='26px';shell.style.maxWidth='620px';shell.style.width='100%';
 }
 function mobileSearchLayerFix(){
+ if(window.__WA_HOMEPAGE_SEARCH_LOADED__)return;
  const input=document.getElementById('tool-search'),box=document.getElementById('tool-search-results');
  if(!input||!box||window.innerWidth>680)return;
  const place=()=>{if(box.hidden||box.style.display==='none')return;const r=input.getBoundingClientRect();box.style.position='fixed';box.style.left=Math.max(8,r.left)+'px';box.style.top=Math.min(window.innerHeight-120,r.bottom+8)+'px';box.style.width=Math.min(r.width,window.innerWidth-16)+'px';box.style.right='auto';box.style.zIndex='2147483647';box.style.maxHeight=Math.max(120,window.innerHeight-(r.bottom+20))+'px';};
