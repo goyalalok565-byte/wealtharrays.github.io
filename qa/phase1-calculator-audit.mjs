@@ -7,7 +7,8 @@ const REVIEW_DATE = '2026-09-15';
 const expectedIds = [
   'sip','compound-interest','mortgage','roi','simple-interest','freedom-milestone','salary-hourly','profit-margin',
   'fixed-deposit','recurring-deposit','lumpsum','cagr','car-loan','personal-loan','debt-payoff','inflation','net-worth',
-  'overtime','freelance-rate','income-tax-planner','home-loan-emi','currency-converter','flat-cost','loan-emi','capital-gain','lumpsum-sip','loan-against-property','home-loan-eligibility','silver-jewelry','advanced-home-loan-eligibility','consumer-durable-loan','gold-jewelry','loan-prepayment-vs-sip','ltv','stamp-duty','property-calculator','loan-interest'
+  'overtime','freelance-rate','income-tax-planner','home-loan-emi','currency-converter','flat-cost','loan-emi','capital-gain','lumpsum-sip','loan-against-property','home-loan-eligibility','silver-jewelry','advanced-home-loan-eligibility','consumer-durable-loan','gold-jewelry','loan-prepayment-vs-sip','ltv','stamp-duty','property-calculator','loan-interest',
+  'ppf-growth','epf-growth','gst','emergency-fund','credit-card-payoff','step-up-sip','sip-goal','gratuity','hra-exemption'
 ];
 
 function approx(a,b,tol=Math.max(EPS,Math.abs(b)*1e-9)) {
@@ -80,6 +81,16 @@ function reference(id,v) {
     case 'property-calculator': { const p=Math.max(v.price,0),d=Math.min(Math.max(v.down,0),p),P=p-d,n=Math.max(1,Math.round(v.years*12)),r=Math.max(v.rate,0)/1200,e=P===0?0:r===0?P/n:P*r*(1+r)**n/((1+r)**n-1),rep=e*n,st=p*Math.max(v.stamp,0)/100,re=p*Math.max(v.registration,0)/100,up=d+st+re+Math.max(v.other,0);return {'Loan amount':P,'Monthly EMI':e,'Cash needed upfront':up,'Total loan interest':rep-P,'Estimated total cash cost':up+rep}; }
     case 'loan-interest': { const P=Math.max(v.principal,0),n=Math.max(1,Math.round(v.years*12)),r=Math.max(v.rate,0)/1200,e=P===0?0:r===0?P/n:P*r*(1+r)**n/((1+r)**n-1),total=e*n;return {'Monthly EMI':e,'Principal repaid':P,'Total interest':total-P,'Total repayment':total}; }
 
+
+    case 'ppf-growth': { let balance=v.initialBalance, contributed=v.initialBalance; for(let y=0;y<v.years;y++){balance=(balance+v.yearlyContribution)*(1+v.rate/100);contributed+=v.yearlyContribution;} return {'Projected balance':balance,'Total contributions incl. opening balance':contributed,'Estimated growth':balance-contributed}; }
+    case 'epf-growth': { let balance=0,contributed=0,salary=v.monthlyBasic; const mr=v.rate/1200; for(let m=1;m<=v.years*12;m++){if(m>1&&(m-1)%12===0)salary*=1+v.salaryGrowth/100;const c=salary*(v.employeePct+v.employerPct)/100;contributed+=c;balance=(balance+c)*(1+mr);} return {'Projected EPF balance':balance,'Total contributions':contributed,'Estimated interest':balance-contributed}; }
+    case 'gst': { const tax=v.amount*v.rate/100; return {'GST amount':tax,'Total including GST':v.amount+tax,'Pre-tax amount':v.amount}; }
+    case 'emergency-fund': { const target=v.expenses*v.targetMonths,gap=Math.max(0,target-v.currentSavings),months=gap===0?0:v.monthlySaving>0?Math.ceil(gap/v.monthlySaving):0; return {'Emergency fund target':target,'Additional savings needed':gap,'Months to target (0 = already funded or no monthly saving)':months}; }
+    case 'credit-card-payoff': { let balance=v.balance,interestPaid=0,totalPaid=0,months=0;const mr=v.apr/1200;if(v.payment<=balance*mr&&balance>0)return {'Months to clear (0 = payment too low)':0,'Monthly interest at current balance':balance*mr,'Payment needed to start reducing balance':balance*mr+1};while(balance>0.005&&months<1200){const interest=balance*mr;interestPaid+=interest;const paid=Math.min(balance+interest,v.payment);totalPaid+=paid;balance=Math.max(0,balance+interest-paid);months++;}return {'Months to pay off':months,'Total interest paid':interestPaid,'Total payments':totalPaid}; }
+    case 'step-up-sip': { let balance=0,invested=0;const mr=v.rate/1200;for(let y=0;y<v.years;y++){const c=v.monthly*Math.pow(1+v.stepUp/100,y);for(let m=0;m<12;m++){balance=(balance+c)*(1+mr);invested+=c;}}return {'Projected investment value':balance,'Total contributions':invested,'Estimated growth':balance-invested}; }
+    case 'sip-goal': { const n=v.years*12,mr=v.rate/1200,futureCurrent=v.current*Math.pow(1+mr,n),gap=Math.max(0,v.target-futureCurrent),factor=mr===0?n:((Math.pow(1+mr,n)-1)/mr)*(1+mr),required=gap===0?0:factor>0?gap/factor:0;return {'Required monthly SIP':required,'Future value of current corpus':futureCurrent,'Target gap after current corpus growth':gap}; }
+    case 'gratuity': { const eligible=v.years>=5,amount=eligible?v.salary*15/26*Math.floor(v.years):0;return {'Estimated gratuity (0 if threshold not met)':amount,'General 5-year threshold met (1 = yes)':eligible?1:0}; }
+    case 'hra-exemption': { const exemption=Math.max(0,Math.min(v.hra,v.rent-0.1*v.basicDA,v.basicDA*v.cityPct/100));return {'Estimated HRA exemption per month':exemption,'Estimated taxable HRA per month':Math.max(0,v.hra-exemption),'Annual estimated exemption':exemption*12}; }
     default: throw new Error(`No independent reference for ${id}`);
   }
 }
@@ -120,7 +131,7 @@ function stressValues(calc) {
 }
 
 let failures=0;
-if(CALCULATORS.length!==37) { console.error(`FAIL: expected 37 calculators, found ${CALCULATORS.length}`); failures++; }
+if(CALCULATORS.length!==46) { console.error(`FAIL: expected 46 calculators, found ${CALCULATORS.length}`); failures++; }
 for(const id of expectedIds) if(!CALCULATORS.some(c=>c.id===id)) { console.error(`FAIL: missing calculator ${id}`); failures++; }
 
 for(const calc of CALCULATORS) {
