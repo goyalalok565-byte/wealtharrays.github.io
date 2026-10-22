@@ -19,7 +19,7 @@
 - https://wealtharrays.com/disclaimer — Financial, tax and legal disclaimer
 - https://wealtharrays.com/advertising-policy — Advertising and editorial independence
 
-## All 46 calculators
+## All 47 calculators
 
 - SIP Calculator: https://wealtharrays.com/sip-calculator/
 - Compound Interest: https://wealtharrays.com/compound-interest-calculator/
@@ -68,6 +68,7 @@
 - SIP Goal Calculator: https://wealtharrays.com/sip-goal-calculator/
 - Gratuity Calculator: https://wealtharrays.com/gratuity-calculator/
 - HRA Exemption Calculator: https://wealtharrays.com/hra-exemption-calculator/
+- NPS Calculator: https://wealtharrays.com/nps-calculator/
 
 ## Calculator collections
 
