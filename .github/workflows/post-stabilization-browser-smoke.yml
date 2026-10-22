@@ -46,9 +46,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          expected_home="$(grep -oE '/wa-home-runtime\\.js\\?v=[^"]+' index.html | head -n1)"
-          expected_site="$(grep -oE '/wa-site-runtime\\.js\\?v=[^"]+' tools.html | head -n1)"
-          expected_calc="$(grep -oE '/wa-calculator-runtime\\.js\\?v=[^"]+' sip-calculator/index.html | head -n1)"
+          expected_home="$(grep -oE '/wa-home-runtime\.js\?v=[^"]+' index.html | head -n1)"
+          expected_site="$(grep -oE '/wa-site-runtime\.js\?v=[^"]+' tools.html | head -n1)"
+          expected_calc="$(grep -oE '/wa-calculator-runtime\.js\?v=[^"]+' sip-calculator/index.html | head -n1)"
           test -n "$expected_home" || { echo "Could not extract expected home runtime URL from index.html"; exit 1; }
           test -n "$expected_site" || { echo "Could not extract expected site runtime URL from tools.html"; exit 1; }
           test -n "$expected_calc" || { echo "Could not extract expected calculator runtime URL from sip-calculator/index.html"; exit 1; }
