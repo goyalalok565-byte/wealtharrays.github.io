@@ -48,13 +48,23 @@ try {
   const bodyDisplay = await page.locator('body').evaluate(el => getComputedStyle(el).display);
   if (bodyDisplay === 'inline') throw new Error('Homepage body is rendering with inline/default styling; CSS may be missing');
   if ((await page.locator('h1').count()) !== 1) throw new Error('Homepage must have exactly one H1');
-  const retiredLinks = await page.locator('a[href*="step-up-sip"],a[href*="emergency-fund"],a[href*="real-return"]').count();
-  if (retiredLinks) throw new Error('Homepage still exposes a retired calculator link');
+  const retiredLinks = await page.locator('a[href*="real-return"]').count();
+  if (retiredLinks) throw new Error('Homepage still exposes a retired real-return calculator link');
 
   await assertCalculator('sip-calculator/', 'SIP calculator');
   await assertCalculator('mortgage-emi-calculator/', 'Mortgage / EMI calculator');
   await assertCalculator('retirement-calculator/', 'Freedom Milestone calculator');
   await assertCalculator('debt-payoff-calculator/', 'Debt payoff calculator');
+  await assertCalculator('ppf-calculator/', 'PPF calculator');
+  await assertCalculator('epf-calculator/', 'EPF calculator');
+  await assertCalculator('gst-calculator/', 'GST calculator');
+  await assertCalculator('emergency-fund-calculator/', 'Emergency fund calculator');
+  await assertCalculator('credit-card-payoff-calculator/', 'Credit card payoff calculator');
+  await assertCalculator('step-up-sip-calculator/', 'Step-up SIP calculator');
+  await assertCalculator('sip-goal-calculator/', 'SIP goal calculator');
+  await assertCalculator('gratuity-calculator/', 'Gratuity calculator');
+  await assertCalculator('hra-exemption-calculator/', 'HRA exemption calculator');
+
   await assertCalculator('cagr-calculator/', 'CAGR calculator');
   for (const [field, expected] of [['start','100000'],['end','161051'],['years','5']]) {
     const actual = await page.locator(`#calc-widget input[data-field="${field}"]`).inputValue();
