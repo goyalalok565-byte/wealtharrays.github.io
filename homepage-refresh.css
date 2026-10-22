@@ -110,3 +110,18 @@ html.wa-home-ready #wa-home-tool-grid:not(.is-expanded) .home-tool-card:nth-chil
 /* Reserve the mobile hero search position before JavaScript initializes to prevent CLS. */
 .ledger-hero .tool-search-shell{position:relative;z-index:30;overflow:visible}
 @media(max-width:760px){.ledger-hero .tool-search-shell{order:-1;width:100%;max-width:620px;margin:0 0 24px}}
+
+
+/* Quick EMI: cleaner touch-first inputs and honest empty state */
+.wa-emi-widget{border:1px solid var(--line);border-radius:22px;background:var(--surface);padding:clamp(16px,2.5vw,24px);box-shadow:0 16px 42px rgba(16,24,40,.07)}
+.wa-emi-fields{gap:13px}
+.wa-emi-fields label{display:block;font-size:12px;font-weight:800;line-height:1.45;color:var(--text)}
+.wa-emi-fields input{display:block;box-sizing:border-box;width:100%;min-height:52px;margin-top:7px;padding:13px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--text);font:inherit;font-size:16px;box-shadow:inset 0 1px 1px rgba(16,24,40,.025);transition:border-color .15s,box-shadow .15s}
+.wa-emi-fields input::placeholder{color:var(--muted);opacity:.85;font-weight:500}
+.wa-emi-fields input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 14%,transparent)}
+.wa-emi-result{border-radius:17px;padding:18px;background:var(--surface2)}
+.wa-emi-result output{display:block;margin:7px 0 15px;font-size:clamp(24px,3vw,34px);line-height:1.1;font-weight:900;letter-spacing:-.04em;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.wa-emi-result-meta{gap:12px}
+.wa-emi-result-meta span{font-size:12px;color:var(--muted)}
+.wa-emi-result-meta strong{display:block;margin-top:5px;font-size:14px;color:var(--text);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+@media(max-width:700px){.wa-quick-emi{gap:18px!important}.wa-emi-widget{border-radius:19px;padding:15px}.wa-emi-fields{grid-template-columns:minmax(0,1fr)!important;gap:12px}.wa-emi-fields input{min-height:54px}.wa-emi-result{padding:15px}.wa-emi-result-meta{grid-template-columns:1fr 1fr;gap:10px}}
