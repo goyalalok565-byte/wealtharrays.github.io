@@ -4,14 +4,17 @@ import crypto from 'node:crypto';
 
 const root=process.cwd();
 const stamp=new Date().toISOString().replace(/\D/g,'').slice(0,14);
-const siteSources=['wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js','homepage-search.js','calculator-search.js'];
+const siteSources=['wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js','calculator-search.js'];
+const homeSources=['final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js'];
 const calcSources=['widget.js','widget-bootstrap.js',...siteSources,'calculator-safety.js','calculator-page-init.js','calculator-enhancements.js','pdf-export-fix.js'];
 let calculatorPages=[];
 let slugs=[];
 const required=[...new Set([...siteSources,...calcSources,'calculators.js'])];
 for(const f of required)if(!fs.existsSync(path.join(root,f)))throw new Error(`Missing runtime source: ${f}`);
+if(!fs.existsSync(path.join(root,'homepage-search.js')))throw new Error('Missing homepage-specific search source: homepage-search.js');
 function bundle(sources,label){const parts=sources.map(file=>{const body=fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n').trimEnd();const hash=crypto.createHash('sha256').update(body).digest('hex').slice(0,12);return `/* ===== WA CANONICAL MODULE | ${label} | ${file} | sha256:${hash} ===== */\n${body}\n`;});return `/* Wealth Arrays canonical ${label} runtime. Generated ${stamp}. */\n(function(){const k='__WA_CANONICAL_${label.toUpperCase()}_RUNTIME__';if(window[k])return;window[k]=true;})();\n${parts.join('\n')}`;}
 fs.writeFileSync(path.join(root,'wa-site-runtime.js'),bundle(siteSources,'site'),'utf8');
+fs.writeFileSync(path.join(root,'wa-home-runtime.js'),bundle(homeSources,'home'),'utf8');
 fs.writeFileSync(path.join(root,'wa-calculator-runtime.js'),bundle(calcSources,'calculator'),'utf8');
 
 const source=fs.readFileSync(path.join(root,'calculators.js'),'utf8');
@@ -33,7 +36,7 @@ const defDir=path.join(root,'calculator-definitions');fs.mkdirSync(defDir,{recur
 for(const {obj,id} of definitions)fs.writeFileSync(path.join(defDir,`${id}.js`),`/* Generated from calculators.js — do not edit directly. */\nwindow.CALCULATORS=window.CALCULATORS||[];window.CALCULATORS.push(${obj});\n`,'utf8');
 
 const allHtml=[];function walk(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){const f=path.join(dir,e.name);if(e.isDirectory()){if(!['.git','node_modules'].includes(e.name))walk(f);}else if(e.name.endsWith('.html'))allHtml.push(f);}}walk(root);
-const managed=new Set([...required,'wa-site-runtime.js','wa-calculator-runtime.js','financial-engine.js','decision-adapters.js','scenario-lab.js','goal-planner.js','financial-workspace.js','report-engine.js','formula-registry.js','i18n.js','accessibility.js','analytics.js','visualization.js']);
+const managed=new Set([...required,'wa-site-runtime.js','wa-home-runtime.js','wa-calculator-runtime.js','financial-engine.js','decision-adapters.js','scenario-lab.js','goal-planner.js','financial-workspace.js','report-engine.js','formula-registry.js','i18n.js','accessibility.js','analytics.js','visualization.js']);
 const isScenarioLabPage=(rel)=>rel==='scenario-lab.html';
 const isGoalPlannerPage=(rel)=>rel==='goal-planner.html';
 const isWorkspacePage=(rel)=>rel==='financial-workspace.html';
@@ -75,7 +78,7 @@ for(const full of allHtml){
     const base=path.basename(src.split('?',1)[0]);
     const keep=managed.has(base)||(isWidget&&['calculators.js','widget.js','widget-bootstrap.js','wa-calculator-runtime.js'].includes(base))||(isScenarioLab&&['financial-engine.js','decision-adapters.js','scenario-lab.js'].includes(base))||(isGoalPlanner&&['financial-engine.js','decision-adapters.js','goal-planner.js'].includes(base))||(isWorkspacePageCurrent&&['financial-engine.js','report-engine.js','financial-workspace.js'].includes(base));
     return keep?'':tag;
-  });html=html.replace(/\s*<!-- WA-(?:SITE|CANONICAL)-RUNTIME:[^>]+-->\s*/g,'\n');
+  });html=html.replace(/\s*<!-- WA-(?:SITE|HOME|CANONICAL)-RUNTIME:[^>]+-->\s*/g,'\n');
 html=html.replace(/(<link\s+[^>]*rel=["'](?:preload|stylesheet)["'][^>]*href=["'])\/?styles\.css(["'][^>]*>)/gi,'$1/styles.css$2');html=html.replace(/(<link\s+[^>]*href=["'])styles\.css(["'][^>]*rel=["'](?:preload|stylesheet)["'][^>]*>)/gi,'$1/styles.css$2');if(!html.includes('href="/styles.css"')&&!html.includes("href='/styles.css'"))html=html.replace('</head>','<link rel="stylesheet" href="/styles.css"></head>');
 html=html.replace(/\s*<link\s+[^>]*rel=["'](?:icon|shortcut icon|apple-touch-icon)["'][^>]*>/gi,'');
 html=html.replace('</head>','<link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="48x48" href="/icon-192.png"><link rel="apple-touch-icon" sizes="180x180" href="/icon-512.png"></head>');
@@ -86,8 +89,13 @@ else{
     html=html.replace('</body>',`<script src="/calculators.js?v=${stamp}"></script></body>`);
     html=html.replace(/(<body[^>]*>)/i,'$1\n<!-- WA-WIDGET-RUNTIME:v4 -->');
   }else{
-    if(!html.includes('wa-site-runtime.js'))html=html.replace('</body>',`<script src="/wa-site-runtime.js?v=${stamp}" defer></script></body>`);
-    html=html.replace(/(<body[^>]*>)/i,'$1\n<!-- WA-SITE-RUNTIME:v3 -->');
+    if(relPath==='index.html'){
+      if(!html.includes('wa-home-runtime.js'))html=html.replace('</body>',`<script src="/wa-home-runtime.js?v=${stamp}" defer></script></body>`);
+      html=html.replace(/(<body[^>]*>)/i,'$1\n<!-- WA-HOME-RUNTIME:v1 -->');
+    }else{
+      if(!html.includes('wa-site-runtime.js'))html=html.replace('</body>',`<script src="/wa-site-runtime.js?v=${stamp}" defer></script></body>`);
+      html=html.replace(/(<body[^>]*>)/i,'$1\n<!-- WA-SITE-RUNTIME:v3 -->');
+    }
   }
 }
 if(isScenarioLab){html=html.replace(/\s*<script\s+src=["']\/financial-engine\.js[^>]*><\/script>/gi,'').replace(/\s*<script\s+src=["']\/scenario-lab\.js[^>]*><\/script>/gi,'');html=html.replace('</body>','<script src="/financial-engine.js"></script><script src="/decision-adapters.js"></script><script src="/scenario-lab.js"></script></body>');}

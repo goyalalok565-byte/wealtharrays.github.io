@@ -41,6 +41,7 @@ jobs:
       - name: Minify canonical bundles and CSS
         run: |
           npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output wa-site-runtime.js -- wa-site-runtime.js
+          npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output wa-home-runtime.js -- wa-home-runtime.js
           npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output wa-calculator-runtime.js -- wa-calculator-runtime.js
           for file in styles.css phase3-seo.css phase4-premium.css cls-fixes.css; do
             npx --yes clean-css-cli@5 -O2 -o "${file}.min" "$file"

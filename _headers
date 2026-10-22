@@ -31,6 +31,9 @@
 /wa-site-runtime.js
   Cache-Control: public, max-age=0, must-revalidate
 
+/wa-home-runtime.js
+  Cache-Control: public, max-age=0, must-revalidate
+
 /wa-calculator-runtime.js
   Cache-Control: public, max-age=0, must-revalidate
 
