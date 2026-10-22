@@ -8,7 +8,7 @@ const expectedIds = [
   'sip','compound-interest','mortgage','roi','simple-interest','freedom-milestone','salary-hourly','profit-margin',
   'fixed-deposit','recurring-deposit','lumpsum','cagr','car-loan','personal-loan','debt-payoff','inflation','net-worth',
   'overtime','freelance-rate','income-tax-planner','home-loan-emi','currency-converter','flat-cost','loan-emi','capital-gain','lumpsum-sip','loan-against-property','home-loan-eligibility','silver-jewelry','advanced-home-loan-eligibility','consumer-durable-loan','gold-jewelry','loan-prepayment-vs-sip','ltv','stamp-duty','property-calculator','loan-interest',
-  'ppf-growth','epf-growth','gst','emergency-fund','credit-card-payoff','step-up-sip','sip-goal','gratuity','hra-exemption'
+  'ppf-growth','epf-growth','gst','emergency-fund','credit-card-payoff','step-up-sip','sip-goal','gratuity','hra-exemption','nps'
 ];
 
 function approx(a,b,tol=Math.max(EPS,Math.abs(b)*1e-9)) {
@@ -63,6 +63,7 @@ function reference(id,v) {
     case 'net-worth': { const assets=Math.max(v.cash,0)+Math.max(v.investments,0)+Math.max(v.property,0),debt=Math.max(v.debt,0);return {'Total assets':assets,'Total liabilities':debt,'Net worth':assets-debt}; }
     case 'overtime': { const hourly=Math.max(v.hourly,0),regular=Math.max(v.regular,0),ot=Math.max(v.overtime,0),mult=Math.max(v.multiplier,1),reg=hourly*regular,over=hourly*ot*mult;return {'Regular pay':reg,'Overtime pay':over,'Total gross pay':reg+over}; }
     case 'freelance-rate': { const hours=Math.max(v.hours,0),weeks=Math.max(v.weeks,0),income=Math.max(v.income,0),expenses=Math.max(v.expenses,0),billable=hours*weeks,needed=income+expenses;return {'Annual amount to cover':needed,'Billable hours / year':billable,'Target hourly rate':billable?needed/billable:0}; }
+    case 'nps': { const monthly=Math.max(v.monthly,0),months=Math.round(Math.max(v.years,0)*12),r=Math.max(v.rate,0)/1200,invested=monthly*months,corpus=r===0?invested:monthly*((Math.pow(1+r,months)-1)/r),share=Math.min(100,Math.max(0,v.annuityShare))/100,annuity=corpus*share,rate=Math.max(0,v.annuityRate)/100;return {'Total contributions':invested,'Estimated investment growth':corpus-invested,'Estimated retirement corpus':corpus,'Illustrative lump-sum allocation':corpus-annuity,'Illustrative annuity allocation':annuity,'Illustrative monthly annuity income before tax':annuity*rate/12}; }
     case 'income-tax-planner': { const income=Math.max(v.income,0),ded=Math.min(Math.max(v.deductions,0),income),taxable=income-ded,tax=taxable*Math.max(v.rate,0)/100;return {'Estimated taxable income':taxable,'Estimated tax':tax,'Effective tax on gross income':income?tax/income*100:0,'Estimated after-tax income':income-tax}; }    case 'home-loan-emi': { const P=Math.max(v.principal,0),n=Math.max(1,Math.round(v.years*12)),r=Math.max(v.rate,0)/1200,emi=P===0?0:r===0?P/n:P*r*(1+r)**n/((1+r)**n-1),total=emi*n;return {'Monthly home-loan EMI':emi,'Total repayment':total,'Total interest':total-P}; }
     case 'currency-converter': { const a=Math.max(v.amount,0),r=Math.max(v.rate,0);return {[v.from+' amount']:a,['Converted amount in '+v.to]:a*r}; }
     case 'flat-cost': { const p=Math.max(v.price,0),st=p*Math.max(v.stamp,0)/100,re=p*Math.max(v.registration,0)/100,f=Math.max(v.furnishing,0),o=Math.max(v.other,0);return {'Stamp duty':st,'Registration / transfer':re,'Other purchase costs':f+o,'Estimated all-in purchase cost':p+st+re+f+o}; }
@@ -131,7 +132,7 @@ function stressValues(calc) {
 }
 
 let failures=0;
-if(CALCULATORS.length!==46) { console.error(`FAIL: expected 46 calculators, found ${CALCULATORS.length}`); failures++; }
+if(CALCULATORS.length!==47) { console.error(`FAIL: expected 47 calculators, found ${CALCULATORS.length}`); failures++; }
 for(const id of expectedIds) if(!CALCULATORS.some(c=>c.id===id)) { console.error(`FAIL: missing calculator ${id}`); failures++; }
 
 for(const calc of CALCULATORS) {
