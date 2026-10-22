@@ -14,6 +14,7 @@ const read=f=>fs.readFileSync(path.join(root,f),'utf8');
 const walk=(dir, out=[])=>{for(const e of fs.readdirSync(dir,{withFileTypes:true})){if(e.name.startsWith('.')||e.name==='node_modules')continue;const full=path.join(dir,e.name);if(e.isDirectory())walk(full,out);else if(e.name.endsWith('.html'))out.push(full)}return out};
 const publicFiles=walk(root).filter(f=>{const r=path.relative(root,f).replaceAll(path.sep,'/');return !r.startsWith('p/')&&!r.startsWith('qa/')&&!r.startsWith('scripts/')&&!r.startsWith('tests/')});
 if(!fs.existsSync(path.join(root,'wa-site-runtime.js'))) failures.push('wa-site-runtime.js missing');
+if(!fs.existsSync(path.join(root,'wa-home-runtime.js'))) failures.push('wa-home-runtime.js missing');
 if(!fs.existsSync(path.join(root,'wa-calculator-runtime.js'))) failures.push('wa-calculator-runtime.js missing');
 if(!fs.existsSync(path.join(root,'phase4-premium.css'))) failures.push('phase4-premium.css missing');
 if(!fs.existsSync(path.join(root,'theme-init.js'))) failures.push('theme-init.js missing');
