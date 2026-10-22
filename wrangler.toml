@@ -1,6 +1,9 @@
 name = "wealtharrays-github-io"
 compatibility_date = "2026-10-12"
 
+[build]
+command = "npm run build"
+
 [assets]
 directory = "./dist"
 html_handling = "auto-trailing-slash"
