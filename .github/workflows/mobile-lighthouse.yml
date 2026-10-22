@@ -38,9 +38,9 @@ jobs:
           for i in $(seq 1 30); do
             git fetch origin main
             if git cat-file -e FETCH_HEAD:wa-home-runtime.js 2>/dev/null &&
-               git show FETCH_HEAD:index.html | grep -q '/wa-home-runtime.js?v=' &&
-               git show FETCH_HEAD:tools.html | grep -q '/wa-site-runtime.js?v=' &&
-               git show FETCH_HEAD:sip-calculator/index.html | grep -q '/wa-calculator-runtime.js?v='; then
+               git show FETCH_HEAD:index.html | grep -F '/wa-home-runtime.js?v=' >/dev/null &&
+               git show FETCH_HEAD:tools.html | grep -F '/wa-site-runtime.js?v=' >/dev/null &&
+               git show FETCH_HEAD:sip-calculator/index.html | grep -F '/wa-calculator-runtime.js?v=' >/dev/null; then
               if node <<'NODE'
           const {execFileSync}=require('child_process');
           const crypto=require('crypto');
