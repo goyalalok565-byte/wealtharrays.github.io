@@ -10,7 +10,7 @@ const calculators = context.__WA_TEST_CALCULATORS__;
 
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
 assert(Array.isArray(calculators), 'CALCULATORS must be an array');
-assert(calculators.length === 46, `Expected 46 calculators, found ${calculators.length}`);
+assert(calculators.length === 47, `Expected 47 calculators, found ${calculators.length}`);
 const actualSlugs = calculators.map(c => c.slug);
 assert(actualSlugs.every(Boolean), 'Every calculator must have a slug');
 assert(new Set(actualSlugs).size === actualSlugs.length, 'Calculator slugs must be unique');
@@ -66,4 +66,4 @@ for (const calc of calculators) {
 
 assert(!toolsPage.includes('/income-tax-scenario-calculator/'), 'Tools library still points to legacy income-tax route');
 assert(!searchSource.includes('/income-tax-scenario-calculator/'), 'Search catalog still points to legacy income-tax route');
-console.log('Calculator regression PASS — 46/46 definitions, field bounds, defaults, finite outputs, homepage/tools/search/llms/sitemap parity passed.');
+console.log('Calculator regression PASS — 47/47 definitions, field bounds, defaults, finite outputs, homepage/tools/search/llms/sitemap parity passed.');

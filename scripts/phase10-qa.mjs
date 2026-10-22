@@ -21,12 +21,13 @@ const cases = [
   ['overtime', { hourly: 20, regular: 40, overtime: 10, multiplier: 1.5 }, 'Total gross pay', 1100],
   ['freelance-rate', { income: 50000, expenses: 10000, hours: 20, weeks: 50 }, 'Target hourly rate', 60],
   ['income-tax-planner', { income: 100000, deductions: 20000, rate: 20 }, 'Estimated tax', 16000],
+  ['nps', { monthly: 5000, rate: 0, years: 1, annuityShare: 40, annuityRate: 6 }, 'Estimated retirement corpus', 60000],
 ];
 
 const byId = new Map(CALCULATORS.map(c => [c.id, c]));
 const failures = [];
 
-if (CALCULATORS.length !== 46) failures.push(`Expected 46 calculators, found ${CALCULATORS.length}`);
+if (CALCULATORS.length !== 47) failures.push(`Expected 47 calculators, found ${CALCULATORS.length}`);
 if (new Set(CALCULATORS.map(c => c.id)).size !== CALCULATORS.length) failures.push('Calculator IDs are not unique');
 
 for (const [id, values, label, expected] of cases) {
@@ -55,4 +56,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`Phase 10 QA PASS: ${cases.length}/20 deterministic calculator scenarios passed.`);
+console.log(`Phase 10 QA PASS: ${cases.length}/21 deterministic calculator scenarios passed.`);

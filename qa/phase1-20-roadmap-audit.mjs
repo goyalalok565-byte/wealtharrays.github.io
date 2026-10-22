@@ -12,9 +12,9 @@ const calculators = (() => {
   vm.runInContext(source+';globalThis.__WA_CALCS__=CALCULATORS;',ctx);
   return ctx.__WA_CALCS__;
 })();
-if (!Array.isArray(calculators) || calculators.length !== 46) fail('Calculator registry expected 46 calculators (20 legacy calculators plus 26 additions)');
+if (!Array.isArray(calculators) || calculators.length !== 47) fail('Calculator registry expected 47 calculators (20 legacy calculators plus 27 additions)');
 const legacyCalculators = calculators.slice(0, 20);
-if (legacyCalculators.length !== 20 || new Set(calculators.map(c => c.id)).size !== 46) fail('Calculator registry must retain the 20-calculator legacy baseline and 46 unique IDs');
+if (legacyCalculators.length !== 20 || new Set(calculators.map(c => c.id)).size !== 47) fail('Calculator registry must retain the 20-calculator legacy baseline and 47 unique IDs');
 
 const models = json('model-registry.json').models;
 const formulas = (() => {
