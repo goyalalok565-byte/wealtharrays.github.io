@@ -17,24 +17,37 @@ jobs:
       - name: Checkout exact commit
         uses: actions/checkout@v4
 
-      - name: Wait for canonical build artifacts on main
+      - name: Wait for current canonical build artifacts on main
         shell: bash
         run: |
           set -euo pipefail
           for i in $(seq 1 30); do
             git fetch origin main
             if git cat-file -e FETCH_HEAD:wa-home-runtime.js 2>/dev/null &&
-               git show FETCH_HEAD:index.html | grep -q '/wa-home-runtime.js?v=' &&
-               git show FETCH_HEAD:tools.html | grep -q '/wa-site-runtime.js?v=' &&
-               git show FETCH_HEAD:sip-calculator/index.html | grep -q '/wa-calculator-runtime.js?v='; then
-              git checkout --detach FETCH_HEAD
-              echo "Checked out canonical build commit $(git rev-parse --short HEAD)."
-              exit 0
+               git show FETCH_HEAD:index.html | grep -F '/wa-home-runtime.js?v=' >/dev/null &&
+               git show FETCH_HEAD:tools.html | grep -F '/wa-site-runtime.js?v=' >/dev/null &&
+               git show FETCH_HEAD:sip-calculator/index.html | grep -F '/wa-calculator-runtime.js?v=' >/dev/null; then
+              if node <<'NODE'
+          const {execFileSync}=require('child_process');
+          const crypto=require('crypto');
+          const show=(p)=>execFileSync('git',['show',`FETCH_HEAD:${p}`],{encoding:'utf8'});
+          const hash=(p)=>crypto.createHash('sha256').update(show(p).replace(/\r\n/g,'\n').trimEnd()).digest('hex').slice(0,12);
+          const checks=[['wa-home-runtime.js','home','final-polish.js'],['wa-site-runtime.js','site','wa-core.js'],['wa-calculator-runtime.js','calculator','calculator-page-init.js']];
+          for(const [bundlePath,label,sourcePath] of checks){
+            const marker=`WA CANONICAL MODULE | ${label} | ${sourcePath} | sha256:${hash(sourcePath)}`;
+            if(!show(bundlePath).includes(marker))process.exit(1);
+          }
+          NODE
+              then
+                git checkout --detach FETCH_HEAD
+                echo "Checked out current canonical build commit $(git rev-parse --short HEAD)."
+                exit 0
+              fi
             fi
-            echo "Waiting for the canonical build bot to commit generated runtime artifacts... attempt $i/30"
+            echo "Waiting for the canonical build bot to refresh runtime bundles from current sources... attempt $i/30"
             sleep 10
           done
-          echo "Canonical runtime artifacts did not appear on main within five minutes."
+          echo "Current source and canonical runtime bundle provenance did not match within five minutes."
           exit 1
 
       - name: Install Playwright
