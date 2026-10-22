@@ -33,6 +33,29 @@ jobs:
           node-version: 24
       - name: Install Lighthouse
         run: npm install --no-save lighthouse@13.0.1
+      - name: Wait for exact production runtime versions
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected_home="$(grep -oE '/wa-home-runtime\\.js\\?v=[^"]+' index.html | head -n1)"
+          expected_site="$(grep -oE '/wa-site-runtime\\.js\\?v=[^"]+' tools.html | head -n1)"
+          expected_calc="$(grep -oE '/wa-calculator-runtime\\.js\\?v=[^"]+' sip-calculator/index.html | head -n1)"
+          test -n "$expected_home" || { echo "Could not extract home runtime URL"; exit 1; }
+          test -n "$expected_site" || { echo "Could not extract site runtime URL"; exit 1; }
+          test -n "$expected_calc" || { echo "Could not extract calculator runtime URL"; exit 1; }
+          for i in $(seq 1 60); do
+            home="$(curl -fsSL https://wealtharrays.com/index.html 2>/dev/null || true)"
+            tools="$(curl -fsSL https://wealtharrays.com/tools/ 2>/dev/null || true)"
+            calc="$(curl -fsSL https://wealtharrays.com/sip-calculator/ 2>/dev/null || true)"
+            if grep -Fq "$expected_home" <<<"$home" && grep -Fq "$expected_site" <<<"$tools" && grep -Fq "$expected_calc" <<<"$calc"; then
+              echo "Current home, site and calculator runtime versions are live."
+              exit 0
+            fi
+            echo "Waiting for exact production runtime versions... attempt $i/60"
+            sleep 10
+          done
+          echo "Production did not expose the current runtime versions within the wait window."
+          exit 1
       - name: Run mobile Lighthouse
         run: |
           npx lighthouse https://wealtharrays.com/ \
@@ -67,7 +90,7 @@ jobs:
           name: wealtharrays-mobile-lighthouse
           path: /tmp/lighthouse.json
           retention-days: 14
-      - name: Enforce 95+ category scores
+      - name: Enforce category thresholds
         run: |
           node - <<'NODE'
           const fs=require('fs');
