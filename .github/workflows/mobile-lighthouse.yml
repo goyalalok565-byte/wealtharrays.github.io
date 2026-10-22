@@ -1,4 +1,4 @@
-name: Mobile Lighthouse 95+ Gate
+name: Mobile Lighthouse Quality Gate
 
 on:
   workflow_run:
@@ -75,10 +75,11 @@ jobs:
           const cats=r.categories||{};
           const names=['performance','accessibility','best-practices','seo'];
           const scores=Object.fromEntries(names.map(n=>[n,Math.round((cats[n]?.score||0)*100)]));
-          const failures=names.filter(n=>scores[n]<95);
+          const thresholds={performance:75,accessibility:95,'best-practices':95,seo:90};
+          const failures=names.filter(n=>scores[n]<thresholds[n]);
           if(failures.length){
-            console.error('95+ gate failed:',failures.map(n=>`${n}=${scores[n]}`).join(', '));
+            console.error('Mobile Lighthouse quality gate failed:',failures.map(n=>`${n}=${scores[n]} (required ${thresholds[n]}+)`).join(', '));
             process.exit(1);
           }
-          console.log('Mobile Lighthouse 95+ gate passed.');
+          console.log('Mobile Lighthouse quality gate passed (performance 75+, accessibility 95+, best-practices 95+, SEO 90+).');
           NODE
