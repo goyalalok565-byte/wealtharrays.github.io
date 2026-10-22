@@ -4,8 +4,8 @@ import crypto from 'node:crypto';
 
 const root=process.cwd();
 const stamp=new Date().toISOString().replace(/\D/g,'').slice(0,14);
-const siteSources=['wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js','homepage-search.js','calculator-search.js'];
-const calcSources=['widget.js','widget-bootstrap.js',...siteSources,'calculator-safety.js','calculator-page-init.js','calculator-enhancements.js','pdf-export-fix.js'];
+const siteSources=['final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js'];
+const calcSources=['widget.js','widget-bootstrap.js','wa-core.js','site-runtime.js',...siteSources,'calculator-search.js','calculator-safety.js','calculator-page-init.js','calculator-enhancements.js','pdf-export-fix.js'];
 let calculatorPages=[];
 let slugs=[];
 const required=[...new Set([...siteSources,...calcSources,'calculators.js'])];
