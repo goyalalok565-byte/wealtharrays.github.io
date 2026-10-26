@@ -47,6 +47,9 @@ for(const file of htmlFiles){
   s=s.replace(/<script src="\/phase4-premium\.js[^>]*><\/script>/g,'');
   if(!s.includes('/phase4-premium.css')) s=s.replace('</head>',`${phase4Css}</head>`);
   if(!s.includes('name="referrer"')) s=s.replace('</head>',`<meta name="referrer" content="strict-origin-when-cross-origin"></head>`);
+  if(rel==='mortgage-emi-calculator/index.html'){
+    s=s.replace(/<meta\\s+name=["']robots["'][^>]*>/i,'<meta name="robots" content="index, follow">');
+  }
   // AdSense is intentionally excluded from 404.html and widget.html.
   // 404 is an error/low-value page; widget.html may be embedded on third-party domains.
   const noindex=/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(s);
