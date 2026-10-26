@@ -251,7 +251,7 @@ if(isArticle){
   }
   const adsExcluded=isWidget||relPath==='404.html'||relPath==='index.html'||isThinPage||/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html);
   if(adsExcluded)html=html.replace(/\s*<script[^>]+adsbygoogle\.js[^>]*><\/script>/gi,'').replace(/\s*<link[^>]+(?:pagead2\.googlesyndication\.com|googleads\.g\.doubleclick\.net)[^>]*>/gi,'').replace(/\s*<link[^>]+(?:pagead2\.googlesyndication\.com|googleads\.g\.doubleclick\.net)[^>]*>/gi,'');
-  if(relPath==='mortgage-emi-calculator/index.html' && !adsExcluded && !html.includes('ca-pub-6507600103785450')) html=html.replace('</head>','<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6507600103785450" crossorigin="anonymous"></script></head>');if(!html.includes('/cls-fixes.css'))html=html.replace('</head>','<link rel="stylesheet" href="/cls-fixes.css?v=20260917" media="all"></head>');
+  if(relPath==='mortgage-emi-calculator/index.html' && !html.includes('ca-pub-6507600103785450')) html=html.replace('</head>','<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6507600103785450" crossorigin="anonymous"></script></head>');if(!html.includes('/cls-fixes.css'))html=html.replace('</head>','<link rel="stylesheet" href="/cls-fixes.css?v=20260917" media="all"></head>');
   if(isWidget){
     html=html.replace(/\s*<script[^>]+(?:wa-site-runtime|wa-calculator-runtime|calculators\.js|widget\.js|financial-engine|report-engine|financial-workspace)[^>]*><\/script>/gi,'');
     html=html.replace(/\s*<!-- WA-(?:SITE|CANONICAL|WIDGET)-RUNTIME:[^>]+-->/g,'');
