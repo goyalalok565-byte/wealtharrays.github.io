@@ -247,7 +247,7 @@ if(isArticle){
       .replace(/<div\b[^>]*class=["'][^"']*(?:ad-slot|ad-container|advertisement)[^"']*["'][^>]*>[\s\S]*?<\/div>/gi,'');
   }
   if(relPath==='mortgage-emi-calculator/index.html'){
-    html=html.replace(/<meta\\s+name=["']robots["'][^>]*>/i,'<meta name="robots" content="index, follow">');
+    html=html.replace(/<meta\s+name=["']robots["'][^>]*>/i,'<meta name="robots" content="index, follow">');
   }
   const adsExcluded=isWidget||relPath==='404.html'||relPath==='index.html'||isThinPage||/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html);
   if(adsExcluded)html=html.replace(/\s*<script[^>]+adsbygoogle\.js[^>]*><\/script>/gi,'').replace(/\s*<link[^>]+(?:pagead2\.googlesyndication\.com|googleads\.g\.doubleclick\.net)[^>]*>/gi,'').replace(/\s*<link[^>]+(?:pagead2\.googlesyndication\.com|googleads\.g\.doubleclick\.net)[^>]*>/gi,'');if(!html.includes('/cls-fixes.css'))html=html.replace('</head>','<link rel="stylesheet" href="/cls-fixes.css?v=20260917" media="all"></head>');
