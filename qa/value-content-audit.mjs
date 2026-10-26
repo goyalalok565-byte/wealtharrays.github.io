@@ -20,7 +20,7 @@ for(const slug of calculators){
   const canonical=(html.match(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i)||[])[1]||'';
   const checks=[
     ['650+ educational words',words>=650],
-    ['worked example with computed result',(()=>{const match=article.match(/<section class=["']worked-example["'][^>]*>([\\s\\S]*?)<\\/section>/i);if(!match||!/<h2[^>]*>Worked example/i.test(match[0]))return false;const text=match[1].replace(/<[^>]+>/g,' ').replace(/&[^;]+;/g,' ');return /\\d/.test(text)&&/(?:result|output|total|amount|balance|interest|EMI|GST|corpus|CAGR|net worth|payoff|projected|estimate|gives|produces|shows|equals|about|approximately|value|tax)/i.test(text);})()],
+    ['worked example with computed result',(()=>{const match=article.match(/<section class=["']worked-example["'][^>]*>([\s\S]*?)<\/section>/i);if(!match||!/<h2[^>]*>Worked example/i.test(match[0]))return false;const text=match[1].replace(/<[^>]+>/g,' ').replace(/&[^;]+;/g,' ');return /\d/.test(text)&&/(?:result|output|total|amount|balance|interest|EMI|GST|corpus|CAGR|net worth|payoff|projected|estimate|gives|produces|shows|equals|about|approximately|value|tax)/i.test(text);})()],
     ['FAQ section with answers',/frequently asked questions/i.test(article)&&((article.match(/class=["']faq-item["']/gi)||[]).length>=2)],
     ['calculator-specific value guide',/WA-CALCULATOR-VALUE-GUIDE/i.test(html)],
     ['two or more calculator-specific guidance sections',(article.match(/calculator-specific-guidance/g)||[]).length>=2],
