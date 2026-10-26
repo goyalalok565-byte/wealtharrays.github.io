@@ -37,7 +37,8 @@ for(const [file,result] of Object.entries(examples)){
  let h=fs.readFileSync(p,'utf8');
  const block='<p class="worked-example-result"><strong>Worked result:</strong> '+result+'</p>';
  if(/<h2[^>]*>\s*Example inputs\s*<\/h2>/i.test(h)) h=h.replace(/(<h2[^>]*>\s*Example inputs\s*<\/h2>)/i,'$1'+block);
- else if(/<section[^>]*class=["'][^"']*calculator-specific-guidance[^"']*["'][^>]*>/i.test(h)) h=h.replace(/(<section[^>]*class=["'][^"']*calculator-specific-guidance[^"']*["'][^>]*>)/i,'$1'+block);\n else h=h.replace('</main>',block+'</main>');
+ else if(/<section[^>]*class=["'][^"']*calculator-specific-guidance[^"']*["'][^>]*>/i.test(h)) h=h.replace(/(<section[^>]*class=["'][^"']*calculator-specific-guidance[^"']*["'][^>]*>)/i,'$1'+block);
+ else h=h.replace('</main>',block+'</main>');
  fs.writeFileSync(p,h); changed++;
 }
 for(const file of ['loan-interest-calculator/index.html','loan-emi-calculator/index.html']){
