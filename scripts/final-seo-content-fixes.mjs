@@ -51,4 +51,11 @@ for(const file of ['loan-interest-calculator/index.html','loan-emi-calculator/in
  h=h.replace(/<script\b[^>]*src=["'][^"']*(?:adsbygoogle|pagead2\.googlesyndication|adsense)[^"']*["'][^>]*>\s*<\/script>/gi,'').replace(/<ins\b[^>]*class=["'][^"']*adsbygoogle[^"']*["'][\s\S]*?<\/ins>/gi,'');
  fs.writeFileSync(p,h); changed++;
 }
+const primaryPath=path.join(root,'mortgage-emi-calculator/index.html');
+if(fs.existsSync(primaryPath)){
+ let primary=fs.readFileSync(primaryPath,'utf8');
+ const publisher='<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6507600103785450" crossorigin="anonymous"></script>';
+ if(!primary.includes('ca-pub-6507600103785450')) primary=primary.replace('</head>',publisher+'</head>');
+ fs.writeFileSync(primaryPath,primary);
+}
 console.log('Final SEO/content fixes applied to '+changed+' HTML files.');
