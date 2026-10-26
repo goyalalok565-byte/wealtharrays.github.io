@@ -4,7 +4,7 @@ import crypto from 'node:crypto';
 
 const root=process.cwd();
 const hash=file=>crypto.createHash('sha256').update(fs.readFileSync(path.join(root,file))).digest('hex').slice(0,12);
-const RUNTIME_CACHE_EPOCH='20261022-5';
+const RUNTIME_CACHE_EPOCH='20261026-currency-top25-rank1';
 const siteVersion=`${hash('wa-site-runtime.js')}-${RUNTIME_CACHE_EPOCH}`;
 const homeVersion=`${hash('wa-home-runtime.js')}-${RUNTIME_CACHE_EPOCH}`;
 const calculatorVersion=`${hash('wa-calculator-runtime.js')}-${RUNTIME_CACHE_EPOCH}`;
