@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import vm from 'node:vm';
 
 const root=process.cwd();
 const stamp=new Date().toISOString().replace(/\D/g,'').slice(0,14);
@@ -18,6 +19,8 @@ fs.writeFileSync(path.join(root,'wa-home-runtime.js'),bundle(homeSources,'home')
 fs.writeFileSync(path.join(root,'wa-calculator-runtime.js'),bundle(calcSources,'calculator'),'utf8');
 
 const source=fs.readFileSync(path.join(root,'calculators.js'),'utf8');
+const calculatorContext={console};vm.createContext(calculatorContext);vm.runInContext(source+'\n;globalThis.__WA_CALCULATORS__=CALCULATORS;',calculatorContext,{filename:'calculators.js'});
+const calculatorRuntimeDefinitions=calculatorContext.__WA_CALCULATORS__;
 const start=source.indexOf('const CALCULATORS = [');
 const end=source.indexOf('\n];',start);
 if(start<0||end<0)throw new Error('CALCULATORS definition list not found');
@@ -111,7 +114,20 @@ if(isCalc){
     if(html.includes('WA-CALCULATOR-VALUE-GUIDE')) html=html.replace(/<!-- WA-CALCULATOR-VALUE-GUIDE -->\s*<section class="calculator-value-guide"[\s\S]*?<\/section>/i,block);
     else html=html.replace(/<\/article>/i,block+'</article>');
     const extraSections=(Array.isArray(value.sections)?value.sections:[]).map(section=>'<section class="calculator-specific-guidance"><h2>'+escText(section.heading)+'</h2><p>'+escText(section.body)+'</p></section>').join('');
-    const worked=value.worked?'<section class="worked-example" aria-labelledby="worked-example-title"><h2 id="worked-example-title">Worked example with Indian rupees</h2><p>'+escText(value.worked)+'</p></section>':'';
+    const guideCalcId=html.match(/data-wa-calculator="([^"]+)"/i)?.[1];
+    const guideCalc=calculatorRuntimeDefinitions.find(c=>c.id===guideCalcId);
+    let workedText=value.worked||'';
+    if(!workedText&&guideCalc?.article?.exampleInputs&&typeof guideCalc.compute==='function'){
+      const sample=guideCalc.article.exampleInputs;
+      const inputLabels=guideCalc.fields.filter(field=>Object.prototype.hasOwnProperty.call(sample,field.id)).map(field=>field.label+': '+String(sample[field.id]));
+      try{
+        const rows=guideCalc.compute(sample)||[];
+        const numberFmt=new Intl.NumberFormat('en-IN',{maximumFractionDigits:2});
+        const outputLabels=rows.slice(0,3).map(row=>row.label+': '+(row.format==='currency'?'₹':'')+numberFmt.format(row.value)+(row.format==='percent'?'%':row.format==='years'?' years':''));
+        workedText='Example inputs — '+inputLabels.join('; ')+'. Using the calculator formula, the illustrative outputs are '+outputLabels.join('; ')+'. These results follow the stated assumptions and are not a guarantee of a real-world outcome.';
+      }catch(error){workedText='Example inputs — '+inputLabels.join('; ')+'. Enter these values to reproduce a worked scenario, then change one input at a time to see how the result responds.';}
+    }
+    const worked=workedText?'<section class="worked-example" aria-labelledby="worked-example-title"><h2 id="worked-example-title">Worked example with Indian rupees</h2><p>'+escText(workedText)+'</p></section>':'';
     const articleLink=value.article?'<p class="related-reading">Related reading: <a href="'+escText(value.article)+'">Read the related Wealth Arrays guide</a> for additional context.</p>':'';
     const extras=extraSections+worked+articleLink;
     html=html.replace(/<!-- WA-CALCULATOR-EXTRA-GUIDANCE -->[\s\S]*?<!-- \/WA-CALCULATOR-EXTRA-GUIDANCE -->/i,'');
