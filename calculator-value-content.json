@@ -220,7 +220,7 @@
   "lumpsum-sip-calculator": {
     "heading": "Compare a one-time investment with monthly contributions",
     "body": "A lump-sum-versus-SIP comparison shows how contribution timing changes the projected value under a chosen return assumption. A lump sum is invested at the start, while an SIP spreads contributions across months; money invested earlier has more time to compound, but the result depends on the market path and cash-flow assumptions. A constant assumed return is a mathematical scenario, not a forecast of market performance or a recommendation about which method is right for you.",
-    "worked": "For a ₹1,20,000 budget and a hypothetical 10% annual return over one year, a lump sum has the full amount invested throughout the year. A monthly plan investing ₹10,000 at the beginning of each month has less money invested during the early months, so under a smooth positive-return assumption its projected end value will generally be lower. In a falling or volatile market, the realised comparison can be different. Compare equal total contributions and the same date range.",
+    "worked": "With a ₹1,20,000 budget and a hypothetical 10% annual return over one year, a lump sum grows to about ₹1,32,000 before fees and taxes. Investing the same total as ₹10,000 at the end of each month produces about ₹1,25,656 under a 10% nominal annual rate compounded monthly. The comparison assumes smooth returns and end-of-month SIP payments; actual market returns vary, and different contribution timing changes the result.",
     "sections": [
       {
         "heading": "Make the comparison fair",
@@ -388,7 +388,7 @@
   "loan-prepayment-vs-sip-calculator": {
     "heading": "Compare loan prepayment with investing extra cash",
     "body": "This comparison weighs a relatively certain reduction in future loan interest against an uncertain investment outcome. Prepayment can reduce principal and interest according to the lender's amortisation and prepayment rules. An SIP projection depends on an assumed return and market risk. The two outcomes are not directly equivalent unless taxes, fees, timing, liquidity and risk are considered consistently. Use the tool to test scenarios, not to promise that investing will outperform debt repayment.",
-    "worked": "Suppose you have ₹1,00,000 available and a loan costing 9% a year. Applying the amount to principal may reduce future interest, depending on the lender's rules and whether the EMI or tenure is adjusted. Investing the same ₹1,00,000 at an assumed 10% may show a higher projected value, but that return is not guaranteed and taxes/fees can lower it. Compare a range of investment returns, including a weak outcome, and verify any prepayment charge.",
+    "worked": "Suppose you have ₹1,00,000 available and a loan charging 9% a year. Applying that amount to principal reduces the first year's interest by roughly ₹9,000 if the full amount would otherwise remain outstanding for that year; the exact schedule saving depends on payment dates and the lender's recalculation. Investing the same amount at an assumed 10% would model to ₹1,10,000 after one year before fees and taxes, but that return is not guaranteed. Compare downside scenarios and preserve an emergency reserve.",
     "sections": [
       {
         "heading": "What the loan side represents",
@@ -509,7 +509,7 @@
   "ppf-calculator": {
     "heading": "PPF projection: contribution timing and notified rates",
     "body": "A Public Provident Fund estimate projects the balance from contributions and an assumed interest rate. The actual scheme has government-notified rates, eligibility conditions, contribution limits, account rules and withdrawal restrictions. Rates can change during the investment horizon, so a constant-rate projection is a scenario rather than a forecast. The timing of deposits can matter under the scheme's interest calculation conventions; check current official rules before relying on an exact maturity amount.",
-    "worked": "For a simplified illustration, contributing ₹1,00,000 at the beginning of each year for 15 years at a constant assumed 7.1% gives a projected balance that is higher than the ₹15,00,000 contributed because the earlier contributions compound for longer. The actual PPF interest rate is notified periodically and the precise calculation follows scheme rules, so use the calculator's output as a model and verify current rates and deposit timing with official guidance.",
+    "worked": "For a simplified illustration, depositing ₹1,00,000 at the beginning of each year for 15 years at a constant assumed 7.1% annual rate gives an approximate projected balance of ₹27.12 lakh, against ₹15 lakh in total contributions. This is a mathematical scenario, not an official PPF maturity quote: notified rates can change and scheme interest rules and deposit timing affect the actual amount. Verify current official rates and account rules before relying on a maturity estimate.",
     "sections": [
       {
         "heading": "Separate contribution from growth",
@@ -589,7 +589,7 @@
   "step-up-sip-calculator": {
     "heading": "Step-up SIP: model contributions that rise annually",
     "body": "A step-up SIP projection increases the monthly contribution by a chosen percentage at a regular interval, often once a year. This can model a plan to raise investments as income grows, but the result depends on the step-up percentage, investment horizon and assumed return. The return is not guaranteed and the calculation convention for when contributions are added affects the exact total. Compare projected value with total contributions to see how much comes from saving more versus assumed growth.",
-    "worked": "Starting with ₹5,000 per month, a 10% annual step-up and a 12% assumed annual return over 15 years creates a contribution schedule that rises each year. The first year contributes ₹60,000; the second year's monthly contribution becomes ₹5,500. The final corpus depends on the calculator's monthly compounding convention, so use its displayed value rather than treating a rounded external estimate as exact. Also compare a flat ₹5,000 SIP to isolate the effect of stepping up.",
+    "worked": "Starting with ₹5,000 per month, increasing the monthly contribution by 10% after each year, and assuming a 12% nominal annual return compounded monthly for 15 years, monthly end-of-period contributions total about ₹19.06 lakh and the modelled future value is approximately ₹42.99 lakh. This estimate depends on the contribution timing and smooth-return assumption; it is not a market forecast. Compare it with a flat ₹5,000 monthly SIP to isolate the effect of increasing contributions.",
     "sections": [
       {
         "heading": "Choose a step-up you can sustain",
@@ -605,7 +605,7 @@
   "sip-goal-calculator": {
     "heading": "Calculate a monthly SIP for a target corpus",
     "body": "A goal-based SIP calculator works backward from a target amount, current investments, time horizon and assumed return to estimate the monthly contribution needed. The output is sensitive to the target date and return assumption. If current savings are already projected to meet the target under the chosen assumption, the required SIP may be zero; that does not guarantee the goal will be reached in real markets. Consider inflation if the target is a future expense.",
-    "worked": "For a target of ₹50,00,000 in 15 years with ₹5,00,000 already invested and a hypothetical 10% annual return, the calculator estimates the recurring contribution needed to bridge the future-value gap. The exact monthly amount depends on whether contributions are assumed at the beginning or end of each month. Run 7%, 10% and 12% scenarios and compare the required SIP with a realistic household budget.",
+    "worked": "For a target of ₹50,00,000 in 15 years, with ₹5,00,000 already invested and a hypothetical 10% nominal annual return compounded monthly, the existing investment grows to about ₹22.27 lakh in the model. The additional monthly end-of-month SIP needed is approximately ₹6,691 to bridge the remaining target under these assumptions. Run lower-return scenarios such as 7% and include inflation if the target represents a future expense; the projection is not guaranteed.",
     "sections": [
       {
         "heading": "Set the target in future rupees",
@@ -653,7 +653,7 @@
   "nps-calculator": {
     "heading": "NPS corpus and annuity are separate estimates",
     "body": "An NPS projection estimates how regular contributions could grow under an assumed return and retirement horizon. If the calculator also models an annuity allocation, it separates the amount allocated to an annuity from the remaining corpus. The return assumption is not guaranteed, and the annuity income estimate is not a quote from an insurer. Current exit, withdrawal, annuity and tax rules can change and are not fully determined by a simple projection.",
-    "worked": "At ₹5,000 per month for 25 years and a hypothetical 9% annual return, total contributions would be ₹15,00,000 before considering any changes. Compounding can make the projected corpus larger, but the exact figure depends on contribution timing and monthly-rate convention. If 40% of the projected corpus is allocated to an annuity and an illustrative annuity rate of 6% is used, the model's income estimate remains hypothetical. Verify current PFRDA rules and insurer quotes.",
+    "worked": "At ₹5,000 per month for 25 years and a hypothetical 9% nominal annual return compounded monthly, total contributions are ₹15 lakh and the modelled corpus is about ₹56.06 lakh before fees and taxes. If 40% of that illustrative corpus were allocated to an annuity, the allocated amount would be about ₹22.42 lakh; at a hypothetical 6% annual annuity rate, the simple monthly income estimate is roughly ₹11,211 before tax and product-specific terms. These are scenarios, not a guarantee or insurer quote.",
     "sections": [
       {
         "heading": "Corpus is not the same as spendable income",
