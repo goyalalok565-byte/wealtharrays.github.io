@@ -117,7 +117,8 @@
         "body": "For each lender, record the sanctioned principal, rate type, reset frequency, tenure, EMI, total repayment, processing fee and prepayment conditions in one table. Ask whether the lender's quoted rate is linked to a benchmark and what spread applies. Confirm whether the first instalment date or any pre-EMI interest changes the cash flow. If you are comparing a longer and shorter tenure, calculate the difference in total interest and consider whether you can make voluntary prepayments without penalty. Recheck the estimate if the final loan amount changes after the property valuation or down-payment adjustment."
       }
     ],
-    "article": "/articles/how-to-compare-loan-offers-beyond-emi"
+    "article": "/articles/how-to-compare-loan-offers-beyond-emi",
+    "description": "Estimate home-loan EMI and total interest from principal, annual rate and repayment tenure, with an illustrative monthly payment."
   },
   "currency-converter": {
     "heading": "Currency conversion with a rate you can verify",
@@ -189,7 +190,8 @@
         "body": "Ask the lender to show the opening balance, interest charged, principal repaid and closing balance for several early instalments. This makes it easier to confirm that the calculator's reducing-balance assumptions match the actual contract. Check whether interest starts on disbursement or another date and whether partial disbursement creates pre-EMI interest. If a loan is secured against a purchase, make sure financed fees are reflected in the principal used for the estimate. When comparing offers, use the same principal and tenure and read the Key Facts Statement or equivalent disclosure to understand the total amount payable and charges."
       }
     ],
-    "article": "/articles/loan-emi-guide"
+    "article": "/articles/loan-emi-guide",
+    "description": "Calculate EMI for personal, education or consumer loans and compare total repayment using a reducing-balance formula."
   },
   "capital-gain-calculator": {
     "heading": "Capital gains: distinguish sale proceeds, cost and tax",
@@ -501,7 +503,8 @@
         "body": "If you plan to make extra repayments, ask whether the lender applies them immediately to principal and whether the monthly EMI or remaining term changes. Some products have minimum prepayment amounts, notice requirements or charges. For a floating-rate loan, the interest total can move when the benchmark changes; the current schedule is not a promise of future interest. Compare the contract's total amount payable with the calculator and include fees separately. If the lender uses a flat-rate method, do not compare its nominal percentage directly with a reducing-balance rate without converting the effective cost. These checks help prevent a seemingly low rate from hiding a more expensive loan."
       }
     ],
-    "article": "/articles/loan-emi-guide"
+    "article": "/articles/loan-emi-guide",
+    "description": "Estimate loan interest on a reducing balance, understand flat versus reducing rates, and compare interest with total repayment."
   },
   "ppf-calculator": {
     "heading": "PPF projection: contribution timing and notified rates",
