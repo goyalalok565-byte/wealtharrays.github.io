@@ -152,7 +152,8 @@ if(isCalc){
   const titleMatch=calcDefinition?.obj.match(/\btitle:\s*["']([^"']+)["']/);
   const descMatch=calcDefinition?.obj.match(/\bdesc:\s*["']([^"']+)["']/);
   const seoTitle=(titleMatch?.[1]||'Financial Calculator')+' | Wealth Arrays';
-  const seoDescription=(descMatch?.[1]||'Use this free financial calculator to estimate results from your inputs and review the assumptions.').replace(/\s+/g,' ').trim().slice(0,158);
+  const rawSeoDescription=(descMatch?.[1]||'Use this free financial calculator to estimate results from your inputs and review the assumptions.').replace(/\s+/g,' ').trim();
+  const seoDescription=(rawSeoDescription.length<70?(value?.body||rawSeoDescription):rawSeoDescription).replace(/\s+/g,' ').trim().slice(0,158);
   html=html.replace(/<title[^>]*>[\s\S]*?<\/title>/i,'<title>'+seoTitle.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</title>');
   if(/<meta[^>]+name=["']description["']/i.test(html))html=html.replace(/<meta([^>]+name=["']description["'][^>]+content=["'])[^"']*(["'][^>]*>)/i,'<meta$1'+seoDescription.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'$2');
   else html=html.replace('</head>','<meta name="description" content="'+seoDescription.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'"></head>');
