@@ -94,5 +94,437 @@
     "heading": "Use a concrete tax-planning scenario",
     "body": "For example, suppose annual gross income is ₹12,00,000, estimated deductions are ₹1,50,000, and the assumed effective tax rate is 15%. This simplified model applies the rate to ₹10,50,000 of modeled taxable income. It is useful for comparing assumptions, but actual tax can differ because real tax systems may use slabs, credits, exemptions and jurisdiction-specific rules.",
     "worked": "With ₹12,00,000 of gross income, ₹1,50,000 of modeled deductions and a 15% assumed effective rate, the calculator estimates ₹10,50,000 of taxable income, ₹1,57,500 of tax and ₹10,42,500 after tax. Change one input at a time to see which assumption drives the result."
+  },
+  "home-loan-emi-calculator": {
+    "heading": "Home loan EMI: payment, interest and affordability",
+    "body": "A home-loan EMI is the fixed monthly instalment used to repay principal and interest on a loan at a stated rate and term. The estimate is useful before comparing offers because it separates the monthly commitment from the total amount repaid. It does not include stamp duty, registration, maintenance, property tax, insurance, processing fees or rate-reset effects unless those are separately entered. A lender may calculate eligibility from income, existing obligations, credit history, property valuation and its own policy; an EMI result alone does not establish approval.",
+    "worked": "For a ₹40,00,000 loan at 8.5% a year over 20 years, the standard monthly reducing-balance formula gives an EMI of about ₹34,700. Total payments over 240 months are roughly ₹83.3 lakh, so interest is about ₹43.3 lakh before fees. Treat this as an illustration: the exact result depends on rate, payment timing and rounding. Compare it with 7.5% and 9.5%, and test a shorter term to see the trade-off between monthly affordability and lifetime interest.",
+    "sections": [
+      {
+        "heading": "What changes a home-loan EMI?",
+        "body": "Principal, interest rate and tenure are the main drivers. Increasing the loan amount increases the payment proportionally; a higher rate raises both the EMI and total interest. Extending tenure usually reduces the monthly EMI but keeps the balance outstanding for longer. For floating-rate loans, an unchanged EMI may not be guaranteed: a lender can change the instalment, remaining term or both after a rate reset. Keep the assumptions aligned with the sanction letter when comparing offers."
+      },
+      {
+        "heading": "Budget beyond the instalment",
+        "body": "A responsible housing budget includes the down payment and transaction costs as well as recurring ownership costs. Keep a cash buffer after paying the down payment, and stress-test the budget against higher rates, repairs and income disruption. Compare APR or total borrowing cost, processing charges, prepayment terms and rate-reset rules—not only the advertised EMI. If the home is jointly financed, model who pays which share and whether the household can still cover essential expenses if one income temporarily stops."
+      }
+    ],
+    "article": "/articles/how-to-compare-loan-offers-beyond-emi"
+  },
+  "currency-converter": {
+    "heading": "Currency conversion with a rate you can verify",
+    "body": "This converter uses the exchange rate you enter; it does not fetch live foreign-exchange quotes. That makes it suitable for checking arithmetic, comparing a quoted rate or estimating a budget when you already have a rate from a bank, card network or reputable market source. The result may differ from the amount ultimately received because providers can add a spread, transfer fee, cash-handling charge or card foreign-transaction fee. Always note the rate source and the time it was quoted.",
+    "worked": "If you convert ₹10,000 at an illustrative rate of ₹83.00 per US dollar, the arithmetic result is about US$120.48 before fees (₹10,000 ÷ 83). If a provider offers ₹81.50 per dollar instead, the same amount buys about US$122.70 only if the direction and quoted rate convention are interpreted correctly—so check whether the quote is INR per USD or USD per INR. Use the actual provider quote and calculate fees separately.",
+    "sections": [
+      {
+        "heading": "Check the direction and units",
+        "body": "A quote such as 83 INR per USD means one US dollar costs ₹83. To convert rupees to dollars, divide the rupee amount by 83; to convert dollars to rupees, multiply dollars by 83. A quote expressed in the inverse direction must be inverted before use. Never compare two quotes until both use the same base and quote currency and refer to the same transaction direction."
+      },
+      {
+        "heading": "Why your final amount may differ",
+        "body": "Retail conversion rates are not identical to mid-market reference rates. Banks, exchange counters, remittance services and card issuers may use different spreads and fee schedules. For travel, compare the final amount after fees; for international transfers, include intermediary and recipient-bank charges where relevant. This tool is a calculator, not a live quote service, and should not be presented as guaranteeing the rate available at checkout."
+      }
+    ],
+    "article": "/articles/how-to-use-financial-calculators"
+  },
+  "flat-cost-calculator": {
+    "heading": "Estimate the full cost of buying a flat",
+    "body": "A flat purchase budget is broader than the advertised base price. Depending on the transaction, the buyer may need to budget for parking, floor-rise or amenity charges, GST where applicable, stamp duty, registration, legal checks, brokerage, interiors and moving costs. Which charges apply depends on location, property status, agreement terms and current law. Use the calculator as a planning checklist, then verify every line item with the builder, seller, registrar and a qualified adviser before signing.",
+    "worked": "For an illustrative flat price of ₹75,00,000, suppose additional costs total 8% of the base price. Those additions would be ₹6,00,000, making the estimated acquisition budget ₹81,00,000 before any items not included in that 8% assumption. The percentage is only a scenario, not a standard rate. Enter actual quoted charges individually wherever possible, then add a contingency for repairs, furnishing or delayed possession expenses.",
+    "sections": [
+      {
+        "heading": "Separate one-time and ongoing costs",
+        "body": "One-time acquisition costs can include stamp duty, registration, brokerage, legal review and fit-out. Ongoing costs can include maintenance, property tax, insurance, utilities and loan interest. Keeping these categories separate avoids underestimating the cash required at possession and the monthly cost of ownership. If you are comparing two properties, apply the same cost categories to both so that a lower base price does not hide higher additional charges."
+      },
+      {
+        "heading": "Verify local charges before committing",
+        "body": "Stamp duty and registration rates vary by state and can depend on ownership type, transaction value and concessions. GST treatment can differ for under-construction and completed properties under applicable rules. Do not apply a generic percentage as a legal conclusion. Ask for a written cost sheet, confirm whether each charge is included in the agreement value and check official state guidance for duties and registration."
+      }
+    ],
+    "article": "/articles/how-to-build-a-realistic-monthly-budget"
+  },
+  "loan-emi-calculator": {
+    "heading": "General loan EMI: compare instalment and total borrowing cost",
+    "body": "A standard EMI estimate assumes a fixed annual rate, regular monthly payments and a reducing principal balance. It can be used for many amortising loans, but it is not a substitute for a lender's repayment schedule. Flat-rate loans, balloon payments, introductory rates, fees financed into the principal and changing interest rates can produce different cash flows. Enter the amount actually borrowed, not automatically the sticker price of the purchase.",
+    "worked": "For a ₹5,00,000 loan at an illustrative 12% annual rate for 5 years, the reducing-balance EMI is approximately ₹11,122 per month. Across 60 payments, total repayment is about ₹6.67 lakh and modeled interest is around ₹1.67 lakh before fees. Compare the lender's APR and amortisation schedule against this estimate. A processing fee or compulsory add-on may increase the effective borrowing cost even if the stated interest rate matches.",
+    "sections": [
+      {
+        "heading": "EMI formula and assumptions",
+        "body": "For principal P, monthly rate r and n monthly instalments, EMI = P × r × (1+r)^n ÷ ((1+r)^n − 1). The monthly rate is commonly the annual nominal rate divided by 12; the exact convention should match the lender's disclosure. At a zero rate, the payment reduces to principal divided by the number of instalments. The formula assumes regular payments and does not automatically include fees, insurance, late charges or rate changes."
+      },
+      {
+        "heading": "Compare offers on a like-for-like basis",
+        "body": "Use the same loan amount, term and repayment frequency for each offer. Compare total repayment, fees, prepayment conditions and whether the quoted rate is fixed or floating. A lower EMI can simply reflect a longer term and may cost more in total interest. If the payment is close to your monthly budget limit, test a higher rate and a temporary income reduction before taking the loan."
+      }
+    ],
+    "article": "/articles/loan-emi-guide"
+  },
+  "capital-gain-calculator": {
+    "heading": "Capital gains: distinguish sale proceeds, cost and tax",
+    "body": "A capital-gain estimate starts with sale consideration and the relevant cost basis, then adjusts for eligible expenses or reliefs only where the applicable rules allow them. The resulting gain is not automatically the taxable amount or final tax payable. Holding period, asset class, acquisition date, residency, exemptions, indexation rules and the tax year can materially change treatment. This calculator is an arithmetic aid; it does not determine the correct legal classification or apply every current tax provision.",
+    "worked": "If an asset is sold for ₹6,50,000 and its eligible cost basis is ₹4,00,000, the simple difference is ₹2,50,000 before eligible transaction costs, exemptions or other adjustments. Do not multiply that amount by a guessed tax rate without first identifying the asset, acquisition and sale dates, applicable law and any reliefs. Keep purchase records, sale statements and fee evidence so the calculation can be reconciled with tax reporting.",
+    "sections": [
+      {
+        "heading": "Gain is not the same as tax liability",
+        "body": "A positive gain is only one step in a tax calculation. Some assets have special holding-period rules or tax rates; some transactions may qualify for exemptions or require adjustments. Loss set-off and reporting requirements can also matter. Use the result as a preliminary reconciliation, then check the official Income Tax Department guidance for the relevant financial year or consult a qualified tax professional for a filing decision."
+      },
+      {
+        "heading": "Keep records that support the cost basis",
+        "body": "Useful records may include contract notes, purchase invoices, broker statements, transfer fees and evidence of improvement costs where relevant. Avoid double-counting costs or including an expense that the applicable rules do not permit. If the asset was acquired through inheritance, gifting, corporate action or multiple purchases, the cost basis may require additional analysis. A single input cannot resolve those legal details."
+      }
+    ],
+    "article": "/articles/how-to-read-an-investment-return-number"
+  },
+  "lumpsum-sip-calculator": {
+    "heading": "Compare a one-time investment with monthly contributions",
+    "body": "A lump-sum-versus-SIP comparison shows how contribution timing changes the projected value under a chosen return assumption. A lump sum is invested at the start, while an SIP spreads contributions across months; money invested earlier has more time to compound, but the result depends on the market path and cash-flow assumptions. A constant assumed return is a mathematical scenario, not a forecast of market performance or a recommendation about which method is right for you.",
+    "worked": "For a ₹1,20,000 budget and a hypothetical 10% annual return over one year, a lump sum has the full amount invested throughout the year. A monthly plan investing ₹10,000 at the beginning of each month has less money invested during the early months, so under a smooth positive-return assumption its projected end value will generally be lower. In a falling or volatile market, the realised comparison can be different. Compare equal total contributions and the same date range.",
+    "sections": [
+      {
+        "heading": "Make the comparison fair",
+        "body": "Keep total planned contributions, end date and return convention consistent. Check whether the SIP is treated as beginning-of-month or end-of-month and whether the lump sum is invested immediately. Fees, taxes, missed contributions and the actual sequence of returns can change the result. If you already have the cash available, liquidity needs and risk tolerance matter alongside the modelled value."
+      },
+      {
+        "heading": "Use scenarios rather than predictions",
+        "body": "Run low, base and high return assumptions, and include a flat or negative period if the investment is market-linked. The model cannot tell you what the market will do next month. For an actual investment decision, consider diversification, emergency savings, time horizon and product costs, and avoid treating a higher assumed return as evidence that one strategy is inherently superior."
+      }
+    ],
+    "article": "/articles/how-to-compare-sip-scenarios-properly"
+  },
+  "loan-against-property-calculator": {
+    "heading": "Loan against property: collateral does not remove repayment risk",
+    "body": "A loan against property is secured by an asset, but the approved amount and terms depend on the lender's valuation, loan-to-value policy, income assessment, existing liabilities and property documents. This calculator can estimate repayment from the amount, rate and tenure you enter; it cannot predict sanction, valuation or legal eligibility. Default can put the pledged property at risk, so compare the repayment with household cash flow before borrowing.",
+    "worked": "If a lender were to approve ₹20,00,000 at an illustrative 11% annual rate for 10 years, the standard reducing-balance EMI would be about ₹27,550 per month. That estimate excludes processing charges, valuation and legal fees, insurance and other contract terms. The approved amount may be lower than expected if the lender's eligible property value or LTV cap is lower. Obtain a written offer and repayment schedule before relying on the number.",
+    "sections": [
+      {
+        "heading": "What affects the eligible amount?",
+        "body": "Lenders may consider property type, marketable value, ownership and title checks, location, existing encumbrances, borrower income and credit history. A percentage of property value is not a guarantee of approval. Co-owners may need to participate in the transaction, and restrictions can apply to certain properties or uses of funds. Confirm all requirements with the lender and legal adviser."
+      },
+      {
+        "heading": "Assess repayment risk separately",
+        "body": "The property is collateral, not a substitute for stable repayment capacity. Stress-test the instalment at a higher rate or lower income, and keep emergency funds separate from the loan proceeds. Compare the effective annual cost, prepayment rules, default charges and disbursement conditions. Avoid borrowing the maximum available amount if it leaves too little room for essential spending or unexpected costs."
+      }
+    ],
+    "article": "/articles/how-to-compare-loan-offers-beyond-emi"
+  },
+  "home-loan-eligibility-calculator": {
+    "heading": "Home-loan eligibility is an estimate, not a sanction",
+    "body": "Eligibility models usually estimate a possible loan amount from income, existing EMIs, a repayment term and an assumed interest rate. Lenders also assess credit history, employment, age, dependants, property value, documentation and their internal underwriting rules. The calculator's result is therefore a planning range, not a promise that a bank will approve that amount. Use take-home income and realistic recurring obligations rather than gross salary alone.",
+    "worked": "Suppose a household takes home ₹1,20,000 per month and already pays ₹20,000 in EMIs. If a planning rule limits total monthly debt payments to 40% of take-home income, the illustrative total EMI ceiling is ₹48,000 and the remaining room is ₹28,000. This is only an affordability assumption; actual lender ratios vary. A lender may offer less after reviewing credit, expenses and the property.",
+    "sections": [
+      {
+        "heading": "Understand the debt-to-income assumption",
+        "body": "A higher permitted EMI ratio can produce a larger estimated loan, but it can also leave less money for food, school fees, medical costs, maintenance and savings. Test a more conservative ratio and include any credit-card, vehicle or personal-loan payments. If income varies, use a sustainable lower-month estimate instead of a best month."
+      },
+      {
+        "heading": "What to prepare before applying",
+        "body": "Review credit reports, salary slips or business income records, bank statements, existing loan schedules and property documents. Ask lenders how they treat bonuses, variable pay, co-applicant income, age at maturity and floating rates. Compare total interest and all charges in addition to the maximum eligible principal."
+      }
+    ],
+    "article": "/articles/how-to-compare-loan-offers-beyond-emi"
+  },
+  "silver-jewelry-calculator": {
+    "heading": "Silver jewellery cost: metal value is only one component",
+    "body": "A silver-jewellery estimate can combine net silver weight, the assumed silver price per gram, purity, making charges and applicable taxes. The result depends on the unit and purity basis used in the price quote. A retail bill may include design or labour charges that are not recovered on resale. Confirm whether the jeweller's quoted rate is per gram of pure silver or for a particular purity and whether the displayed price already includes tax.",
+    "worked": "For illustration, 30 grams of jewellery at a quoted ₹90 per gram has a base metal-value estimate of ₹2,700 before making charges and taxes. If the item is not 100% pure or the quoted rate uses a different purity basis, the simple multiplication can misstate the metal component. Add the jeweller's written making-charge calculation and current tax amount to estimate the invoice total.",
+    "sections": [
+      {
+        "heading": "Check purity, net weight and units",
+        "body": "Confirm whether the weight includes stones, enamel, thread or other non-silver components. Hallmarking and purity declarations can help identify the metal standard, but the rate applied to the bill still needs to be understood. Keep the price unit consistent—grams, kilograms, or another unit—and convert before multiplying. Do not compare two shops using gross weight if one excludes non-metal parts and the other does not."
+      },
+      {
+        "heading": "Purchase price and resale value differ",
+        "body": "Retail making charges, taxes and design premiums may not be recovered when selling or exchanging jewellery. Buy-back deductions, testing and purity checks may also affect proceeds. This calculator estimates a scenario from inputs; it does not verify the live market price, authenticity, hallmark or a jeweller's buy-back policy. Ask for a detailed invoice before purchase."
+      }
+    ],
+    "article": "/articles/how-to-use-financial-calculators"
+  },
+  "advanced-home-loan-eligibility-calculator": {
+    "heading": "Advanced home-loan affordability: test multiple constraints",
+    "body": "A more detailed eligibility estimate can help compare the impact of income, existing obligations, interest rate and tenure. It still cannot reproduce every lender's underwriting model. Banks may apply different income multipliers, EMI-to-income limits, credit requirements, property valuation rules and age-at-maturity limits. Treat the output as a scenario for budgeting rather than an approval decision, and do not use a maximum estimate as a target to borrow.",
+    "worked": "For an illustrative monthly take-home income of ₹1,50,000, existing EMIs of ₹25,000 and a planning ceiling of 40% of income, the total EMI budget is ₹60,000 and the room for a new home loan is ₹35,000. A lender may use a different ratio or exclude some income, so this is not an eligibility guarantee. Run the same inputs at a higher interest rate and shorter remaining working period.",
+    "sections": [
+      {
+        "heading": "Use conservative household inputs",
+        "body": "Include all existing monthly debt payments and use income that is dependable after deductions. If you receive bonuses, commissions or self-employment income, test a lower average rather than relying on the strongest month. Account for dependants, insurance, school fees and likely maintenance expenses even if the formula does not include them. The aim is sustainable affordability, not the largest possible principal."
+      },
+      {
+        "heading": "Compare this estimate with lender criteria",
+        "body": "Ask lenders how they calculate eligible income, obligations, co-applicant contributions, credit score, property valuation and loan maturity age. Check processing charges, rate-reset rules, insurance conditions and prepayment terms. If the detailed and basic eligibility tools produce different outputs, compare the assumptions field by field instead of assuming the larger figure is more accurate."
+      }
+    ],
+    "article": "/articles/how-to-compare-loan-offers-beyond-emi"
+  },
+  "consumer-durable-loan-calculator": {
+    "heading": "Consumer-durable financing: compare the full purchase cost",
+    "body": "Consumer-durable loans and point-of-sale instalment plans can make a purchase feel affordable by showing a monthly payment. The actual cost may also include processing fees, interest, taxes on fees, bundled insurance, lost cash discounts or penalties. Some offers are advertised as no-cost EMI while the discount structure or fees still affects the effective price. Use the calculator with the financed amount and rate disclosed in the agreement, not only the retail price.",
+    "worked": "For a financed purchase of ₹60,000 over 12 months at an illustrative 15% annual reducing-balance rate, the EMI is about ₹5,417 and total payments are roughly ₹65,000 before fees. Compare that with paying cash and any cash discount, and include processing charges. If the offer says no-cost EMI, ask for the invoice price, discount, fees and repayment schedule in writing before comparing.",
+    "sections": [
+      {
+        "heading": "Read the offer beyond the EMI banner",
+        "body": "Check whether the lender finances the full price or only part of it, whether a down payment is required and whether the rate is flat or reducing balance. Confirm late-payment charges, foreclosure rules and whether missing a payment affects your credit record. A small monthly instalment can conceal a high effective annual cost if the term is long or fees are financed."
+      },
+      {
+        "heading": "Borrow for a planned purchase",
+        "body": "Compare the financed total with the cash price and avoid taking instalments that interfere with rent, food, utilities or emergency savings. For small purchases, fees can form a meaningful share of the loan. If a promotion's details are unclear, request the Key Facts Statement or equivalent disclosure and verify the total amount payable before accepting."
+      }
+    ],
+    "article": "/articles/how-to-compare-loan-offers-beyond-emi"
+  },
+  "gold-jewelry-calculator": {
+    "heading": "Gold jewellery price: purity and making charges matter",
+    "body": "A gold-jewellery estimate combines the gold rate, net metal weight, purity and retail charges. The quoted rate may refer to 24-karat gold while jewellery is commonly sold at a lower purity such as 22K or 18K. Making charges, wastage policies, stones and applicable GST can materially affect the bill. Confirm the rate basis and the exact net gold weight before comparing a displayed estimate with a jeweller's invoice.",
+    "worked": "For illustration, 10 grams of 22K gold valued from a 24K reference price of ₹7,000 per gram has a simple purity-adjusted metal value of ₹7,000 × 10 × 22/24 = about ₹64,167 before making charges and taxes. The reference price is illustrative, not live. If the seller already quotes a 22K rate, do not apply the purity adjustment a second time.",
+    "sections": [
+      {
+        "heading": "Avoid double-counting purity",
+        "body": "First identify whether the entered price is for 24K, 22K or another purity. If the quote already reflects the jewellery purity, multiplying by the purity fraction again will understate the metal value. Use net gold weight rather than gross weight when stones or other materials are present. Ask for hallmark details and an itemised invoice."
+      },
+      {
+        "heading": "Making charges and resale deductions",
+        "body": "Making charges may be calculated per gram or as a percentage, and policies vary by retailer. Stones and design charges may not be recovered at resale, and buy-back deductions can differ from the purchase invoice. The calculator does not verify live rates, purity or authenticity. Check the current rate and jeweller's written terms on the day of purchase."
+      }
+    ],
+    "article": "/articles/how-to-use-financial-calculators"
+  },
+  "loan-prepayment-vs-sip-calculator": {
+    "heading": "Compare loan prepayment with investing extra cash",
+    "body": "This comparison weighs a relatively certain reduction in future loan interest against an uncertain investment outcome. Prepayment can reduce principal and interest according to the lender's amortisation and prepayment rules. An SIP projection depends on an assumed return and market risk. The two outcomes are not directly equivalent unless taxes, fees, timing, liquidity and risk are considered consistently. Use the tool to test scenarios, not to promise that investing will outperform debt repayment.",
+    "worked": "Suppose you have ₹1,00,000 available and a loan costing 9% a year. Applying the amount to principal may reduce future interest, depending on the lender's rules and whether the EMI or tenure is adjusted. Investing the same ₹1,00,000 at an assumed 10% may show a higher projected value, but that return is not guaranteed and taxes/fees can lower it. Compare a range of investment returns, including a weak outcome, and verify any prepayment charge.",
+    "sections": [
+      {
+        "heading": "What the loan side represents",
+        "body": "The interest saved from prepayment depends on outstanding principal, remaining tenure, interest-rate resets and the lender's allocation of extra payments. Confirm whether prepayment reduces EMI, shortens tenure or can be directed by you. Keep an emergency reserve before using all available cash to reduce a loan, because money paid into the loan may not be easy to access again."
+      },
+      {
+        "heading": "What the investment side leaves uncertain",
+        "body": "A projected SIP or investment return is an assumption rather than a contractual rate. Market returns can be negative over shorter periods and taxes, expense ratios and transaction costs affect net outcomes. Compare after-tax values over the same horizon and include risk tolerance and liquidity needs. A lower expected return may still be acceptable if flexibility is important; a higher projected return is not a guarantee."
+      }
+    ],
+    "article": "/articles/how-to-compare-sip-scenarios-properly"
+  },
+  "loan-to-value-ltv-calculator": {
+    "heading": "Loan-to-value ratio: understand the collateral share",
+    "body": "Loan-to-value (LTV) compares the loan amount with the value accepted by the lender for the property or asset. It is usually expressed as a percentage: loan amount ÷ eligible asset value × 100. A higher LTV means the borrower finances a larger share of the value and may have less equity. LTV is only one part of underwriting; lenders also assess income, credit, title, property type and applicable regulatory or product limits.",
+    "worked": "If the requested loan is ₹40,00,000 and the lender accepts the property value as ₹50,00,000, LTV is 80% (₹40 lakh ÷ ₹50 lakh × 100). If the lender's valuation is ₹45,00,000 instead, the same loan would imply an LTV of about 88.9%. That difference may affect the amount a lender is willing to approve, but the applicable cap depends on the product and current rules.",
+    "sections": [
+      {
+        "heading": "Use the lender's eligible valuation",
+        "body": "The purchase price and the lender's accepted valuation may not be identical. Some fees, land components or property types may be treated differently under a product's rules. If you use an inflated or outdated market estimate, the resulting LTV may be misleading. Confirm the valuation method and whether the calculation includes only the loan principal or other financed charges."
+      },
+      {
+        "heading": "LTV is not the same as affordability",
+        "body": "A low LTV does not prove that the monthly instalment is affordable, and a high LTV does not by itself establish rejection. Consider down payment, EMI, existing debt, income stability and transaction costs together. Check current lender terms and any applicable regulatory ceilings rather than treating a generic percentage as universal."
+      }
+    ],
+    "article": "/articles/how-to-compare-loan-offers-beyond-emi"
+  },
+  "stamp-duty-calculator": {
+    "heading": "Stamp duty and registration: verify state-specific rules",
+    "body": "Stamp duty and registration charges are transaction costs associated with property documents, but the rate and calculation base vary by jurisdiction and transaction. Some locations may have different rates or concessions based on buyer category, property type or ownership. A calculator can multiply a chosen rate by a chosen value; it cannot decide which legal rate applies to your agreement or whether a concession is available. Confirm current rules with the relevant state registration department.",
+    "worked": "If a property agreement value is ₹80,00,000 and an illustrative duty rate is 6%, the simple estimate is ₹4,80,000 before registration fees or other charges. This is arithmetic only; 6% is not a universal rate. The legal calculation base may be agreement value, guideline/circle value or whichever rule applies under local law. Verify the rate and base before budgeting the final payment.",
+    "sections": [
+      {
+        "heading": "Confirm both rate and valuation base",
+        "body": "The rate is only half the calculation. The authority may compare the agreement value with a government-notified guideline or circle rate and apply the relevant base. Registration fees may be charged separately and can have minimums, caps or different rules. Ask the registrar or a qualified conveyancing professional which rule applies to the exact property and transaction date."
+      },
+      {
+        "heading": "Keep transaction costs separate",
+        "body": "Budget for stamp duty, registration, legal review, brokerage and other documented charges as separate line items. Do not assume that a builder's cost sheet includes every government fee or that a concession applies automatically. Save the official fee calculation and receipt with the property records. This tool is not a legal filing or an official fee quote."
+      }
+    ],
+    "article": "/articles/how-to-build-a-realistic-monthly-budget"
+  },
+  "property-calculator": {
+    "heading": "Property purchase planning: compare price with ownership cost",
+    "body": "A property decision includes more than the quoted purchase price. Financing, transaction taxes, maintenance, repairs, insurance, vacancy risk for rentals and eventual sale costs can change the economics. The right inputs depend on whether you are buying to live in the property, renting it out or comparing it with renting. Use this calculator as a scenario framework and keep one-time acquisition costs separate from recurring ownership expenses.",
+    "worked": "Suppose a property costs ₹60,00,000 and one-time costs add an illustrative 7% (₹4,20,000). The acquisition cash requirement is then ₹64,20,000 before interiors, financing fees or repairs. If you borrow part of the amount, add total loan interest and ongoing maintenance to the ownership scenario. The 7% is an assumption, not a standard charge; replace it with written local quotes.",
+    "sections": [
+      {
+        "heading": "Compare like with like",
+        "body": "For two properties, use the same holding period and include comparable costs: stamp duty, registration, repairs, annual maintenance, property tax, insurance and likely selling expenses. If you are evaluating rental income, use realistic occupancy, maintenance and tax assumptions rather than gross rent alone. Property appreciation is uncertain and should be stress-tested instead of treated as guaranteed."
+      },
+      {
+        "heading": "Separate personal value from investment return",
+        "body": "A home can provide stability and utility that a simple investment return does not capture. A rental property also concentrates money in one asset and may be difficult to sell quickly. Compare the cash required, monthly affordability, liquidity and downside scenarios. Confirm legal title, approvals, encumbrances and the exact cost sheet before committing."
+      }
+    ],
+    "article": "/articles/how-to-build-a-realistic-monthly-budget"
+  },
+  "loan-interest-calculator": {
+    "heading": "Loan interest: distinguish interest cost from total repayment",
+    "body": "Loan interest depends on the outstanding balance, rate convention, payment timing and how the lender applies each payment. A reducing-balance loan charges interest on the amount still owed, so early payments typically contain a larger interest share. A flat-rate quote can look smaller but may produce a higher effective cost. This calculator provides an estimate from the inputs shown; compare the result with the lender's amortisation schedule and fee disclosure.",
+    "worked": "For a simple interest-only illustration, ₹5,00,000 at 10% for one year produces ₹50,000 of interest if the principal remains outstanding for the full year. A reducing-balance EMI loan will usually have a different interest total because the principal falls with each payment. Do not use a simple-interest multiplication as the total cost of an amortising loan unless the contract actually uses that method.",
+    "sections": [
+      {
+        "heading": "Reducing balance versus flat rate",
+        "body": "With a reducing-balance method, interest is calculated on the remaining principal each period. With a flat-rate quote, interest may be calculated on the original principal even while instalments repay it. The same headline percentage can therefore describe different costs. Ask the lender for APR/effective rate, total amount payable and a payment schedule before comparing products."
+      },
+      {
+        "heading": "What may sit outside the interest result",
+        "body": "Processing fees, documentation charges, compulsory insurance, late fees and prepayment penalties may not be included in an interest-only estimate. For floating-rate loans, future rates may change the interest path. Keep principal, interest and fees as separate lines in your comparison so that the total borrowing cost is visible."
+      }
+    ],
+    "article": "/articles/loan-emi-guide"
+  },
+  "ppf-calculator": {
+    "heading": "PPF projection: contribution timing and notified rates",
+    "body": "A Public Provident Fund estimate projects the balance from contributions and an assumed interest rate. The actual scheme has government-notified rates, eligibility conditions, contribution limits, account rules and withdrawal restrictions. Rates can change during the investment horizon, so a constant-rate projection is a scenario rather than a forecast. The timing of deposits can matter under the scheme's interest calculation conventions; check current official rules before relying on an exact maturity amount.",
+    "worked": "For a simplified illustration, contributing ₹1,00,000 at the beginning of each year for 15 years at a constant assumed 7.1% gives a projected balance that is higher than the ₹15,00,000 contributed because the earlier contributions compound for longer. The actual PPF interest rate is notified periodically and the precise calculation follows scheme rules, so use the calculator's output as a model and verify current rates and deposit timing with official guidance.",
+    "sections": [
+      {
+        "heading": "Separate contribution from growth",
+        "body": "Compare the projected balance with total contributions to understand how much comes from deposits and how much from the assumed interest. Run a lower-rate scenario to see the impact of future rate changes. A higher projection does not establish tax eligibility, account compliance or the amount that can be withdrawn at a particular date."
+      },
+      {
+        "heading": "Verify scheme-specific details",
+        "body": "PPF has specific rules for contribution limits, account tenure, extension, loans and withdrawals. This calculator does not verify whether each deposit is permitted or determine tax treatment for your circumstances. Refer to the current National Savings Institute or India Post/official government scheme guidance before making a deposit or withdrawal decision."
+      }
+    ],
+    "article": "/articles/compound-interest-guide"
+  },
+  "epf-calculator": {
+    "heading": "EPF projection: employee and employer contributions",
+    "body": "An Employees' Provident Fund projection depends on basic pay, contribution percentages, salary growth, interest assumptions and years remaining. Employer contributions are not necessarily credited entirely to EPF: part may be allocated to EPS subject to applicable rules and wage ceilings. This model uses the employer EPF percentage you enter and does not reproduce every EPFO rule, withdrawal, transfer or tax situation. Compare its estimate with your payslip and EPFO passbook.",
+    "worked": "With monthly basic pay of ₹30,000, a 12% employee share is ₹3,600 per month. If the entered employer EPF share is 3.67%, that adds ₹1,101 per month to the modelled EPF contribution, or ₹4,701 combined before interest. The employer's actual allocation can differ because EPS and statutory rules apply. Over a long horizon, salary increases and the credited rate can materially change the projected balance.",
+    "sections": [
+      {
+        "heading": "Employee share and employer share are different",
+        "body": "The employee contribution is commonly calculated as a percentage of eligible wages. The employer's total statutory contribution can be split between EPF and EPS, and the applicable wage ceiling or employee category may affect the calculation. Enter only the employer share intended for EPF if the model asks for that field; do not treat the full employer contribution as EPF automatically."
+      },
+      {
+        "heading": "Use the projection as a reconciliation check",
+        "body": "Compare the inputs with monthly payslips and the EPFO passbook, and check whether contribution wages, salary growth and credited interest match your employment terms. Withdrawals, transfers, service breaks, tax treatment and changes in rules are not automatically modelled. For an official balance or claim decision, rely on EPFO records and current official guidance."
+      }
+    ],
+    "article": "/articles/how-to-stress-test-a-retirement-goal"
+  },
+  "gst-calculator": {
+    "heading": "GST arithmetic: exclusive price versus inclusive price",
+    "body": "GST calculations depend on whether the entered price is before tax or already includes tax. For a pre-tax amount, GST = taxable value × rate ÷ 100 and invoice total = taxable value + GST. For a tax-inclusive total, the tax component is total × rate ÷ (100 + rate), and the taxable value is total ÷ (1 + rate/100). This calculator adds GST to a pre-tax amount; it does not extract tax from an inclusive total or decide the legally applicable rate.",
+    "worked": "For a pre-tax taxable value of ₹1,00,000 at an illustrative 18% rate, GST is ₹18,000 and the invoice total is ₹1,18,000. If ₹1,18,000 is already GST-inclusive at 18%, the tax component is ₹18,000 and the pre-tax value is ₹1,00,000. Those results are equivalent only because the example uses a matching rate and amount. Actual rates and classifications must be verified for the goods or services.",
+    "sections": [
+      {
+        "heading": "Inclusive and exclusive prices are not interchangeable",
+        "body": "Adding 18% to ₹1,00,000 gives ₹1,18,000. It is incorrect to take 18% of ₹1,18,000 to recover the tax already included; use the inclusive-price fraction instead. Invoice systems may separately show taxable value, CGST/SGST or IGST depending on the transaction. This calculator returns the combined tax amount and does not determine place-of-supply treatment or invoice compliance."
+      },
+      {
+        "heading": "Verify the classification and current rules",
+        "body": "GST rates depend on the classification of goods or services and applicable notifications. Whether CGST plus SGST or IGST applies depends on the transaction and place of supply. Inputting a rate does not mean that rate is legally correct. Verify the current GST portal guidance or consult a tax professional for invoice, registration and filing questions."
+      }
+    ],
+    "article": "/articles/how-to-use-financial-calculators"
+  },
+  "emergency-fund-calculator": {
+    "heading": "Emergency fund: choose a target that matches your risks",
+    "body": "An emergency fund is a liquid reserve for essential costs during income disruption or unexpected expenses. A common starting point is several months of essential spending, but the appropriate target depends on job stability, dependants, insurance, health costs, debt and how quickly another income source could be found. This estimate uses the monthly expenses and target months you enter; it does not predict future emergencies or add interest unless the tool explicitly models it.",
+    "worked": "If essential expenses are ₹40,000 per month and the target is six months, the target reserve is ₹2,40,000. With ₹1,00,000 already saved, the gap is ₹1,40,000. Saving ₹10,000 per month would close that gap in 14 months if contributions remain steady and no withdrawals occur. If your income is variable or dependants rely on you, compare a nine- or twelve-month target as well.",
+    "sections": [
+      {
+        "heading": "Count essential spending, not every expense",
+        "body": "Start with housing, utilities, food, transport, insurance, minimum debt payments and other unavoidable obligations. Separate discretionary purchases that could be paused during a disruption. Use a realistic monthly average and include irregular but predictable annual bills by dividing them into monthly equivalents. The target should be accessible quickly without depending on selling volatile investments at a loss."
+      },
+      {
+        "heading": "Balance the target with other priorities",
+        "body": "An emergency reserve can reduce the need to borrow when income stops, but building it may take time. Automate a sustainable monthly amount and review the target after a job change, new dependant, relocation or major debt change. Do not assume the estimated months to goal will remain accurate if expenses, income or withdrawals change."
+      }
+    ],
+    "article": "/articles/how-to-build-an-emergency-fund"
+  },
+  "credit-card-payoff-calculator": {
+    "heading": "Credit-card payoff: payment must exceed monthly interest",
+    "body": "A credit-card payoff estimate applies the assumed APR to the outstanding balance and subtracts a fixed monthly payment. It is especially important to check whether the payment exceeds the interest charged; otherwise the balance may not decline. Real card accounts can include new purchases, fees, changing APRs, minimum-payment rules and payment allocation across different balance types, which this simplified model does not include.",
+    "worked": "For an ₹80,000 balance at a 36% APR, the simple monthly-rate approximation is 3%, or about ₹2,400 interest in the first month before any payment. A fixed ₹8,000 payment would initially leave roughly ₹74,400 after that month's interest and payment, assuming no new charges or fees. Later interest falls as the balance falls. Confirm the issuer's calculation method and stop adding purchases for the estimate to be useful.",
+    "sections": [
+      {
+        "heading": "Why minimum payments can prolong debt",
+        "body": "When the payment is only a little larger than interest and fees, a small portion reduces principal. The remaining balance then continues to accrue interest. Compare a larger fixed payment and see how much time and interest may be saved. Avoid interpreting the output as an exact payoff date if the issuer changes rates or applies different minimum-payment and allocation rules."
+      },
+      {
+        "heading": "A practical payoff plan",
+        "body": "List balances, APRs, fees and due dates for every card. Keep required minimums current to avoid penalties, then direct extra payments according to a clear strategy while preserving essential cash reserves. Check the statement for promotional rates and expiry dates. If payments are unaffordable, contact the issuer or a qualified debt counsellor before missed payments compound the problem."
+      }
+    ],
+    "article": "/articles/how-to-use-a-debt-payoff-calculator"
+  },
+  "step-up-sip-calculator": {
+    "heading": "Step-up SIP: model contributions that rise annually",
+    "body": "A step-up SIP projection increases the monthly contribution by a chosen percentage at a regular interval, often once a year. This can model a plan to raise investments as income grows, but the result depends on the step-up percentage, investment horizon and assumed return. The return is not guaranteed and the calculation convention for when contributions are added affects the exact total. Compare projected value with total contributions to see how much comes from saving more versus assumed growth.",
+    "worked": "Starting with ₹5,000 per month, a 10% annual step-up and a 12% assumed annual return over 15 years creates a contribution schedule that rises each year. The first year contributes ₹60,000; the second year's monthly contribution becomes ₹5,500. The final corpus depends on the calculator's monthly compounding convention, so use its displayed value rather than treating a rounded external estimate as exact. Also compare a flat ₹5,000 SIP to isolate the effect of stepping up.",
+    "sections": [
+      {
+        "heading": "Choose a step-up you can sustain",
+        "body": "A high annual increase may produce an attractive projection but can become unrealistic if income does not rise as expected. Model a smaller step-up or pause scenario and keep emergency savings and debt payments in view. Review the plan when your salary, household costs or goals change rather than automatically committing to an unsustainable contribution increase."
+      },
+      {
+        "heading": "Understand the return assumption",
+        "body": "The calculator uses a constant assumed return for mathematical projection. Real market returns vary, may be negative in some periods and do not arrive in a smooth monthly sequence. Run several rates, include a weak-return case and account for product costs and taxes separately. Do not use the highest scenario as a promise of reaching a goal."
+      }
+    ],
+    "article": "/articles/step-up-sip-calculator-guide"
+  },
+  "sip-goal-calculator": {
+    "heading": "Calculate a monthly SIP for a target corpus",
+    "body": "A goal-based SIP calculator works backward from a target amount, current investments, time horizon and assumed return to estimate the monthly contribution needed. The output is sensitive to the target date and return assumption. If current savings are already projected to meet the target under the chosen assumption, the required SIP may be zero; that does not guarantee the goal will be reached in real markets. Consider inflation if the target is a future expense.",
+    "worked": "For a target of ₹50,00,000 in 15 years with ₹5,00,000 already invested and a hypothetical 10% annual return, the calculator estimates the recurring contribution needed to bridge the future-value gap. The exact monthly amount depends on whether contributions are assumed at the beginning or end of each month. Run 7%, 10% and 12% scenarios and compare the required SIP with a realistic household budget.",
+    "sections": [
+      {
+        "heading": "Set the target in future rupees",
+        "body": "A target for education, a home deposit or retirement may cost more in the future because prices rise. If you enter today's cost as the target without adjusting for inflation, the required SIP can be understated. Estimate the future expense first, then calculate the contribution. Separate a firm deadline from a flexible goal because a shorter horizon generally requires larger contributions."
+      },
+      {
+        "heading": "Review the plan over time",
+        "body": "Investment values and household savings capacity change. Revisit the target, current corpus and remaining time periodically; do not keep using the original time horizon after a missed contribution or market decline. A required SIP is a scenario estimate, not personalised investment advice or a guarantee. Choose a contribution that leaves room for essential spending and emergency reserves."
+      }
+    ],
+    "article": "/articles/how-to-compare-sip-scenarios-properly"
+  },
+  "gratuity-calculator": {
+    "heading": "Gratuity estimate: salary basis and service eligibility",
+    "body": "A gratuity estimate commonly uses the last-drawn basic salary plus dearness allowance, completed years of service and the applicable formula. Under the common formula for covered employees, the amount is salary × 15 ÷ 26 × eligible years. Eligibility, rounding of service, statutory caps and exceptions depend on the law and employment circumstances. This calculator provides a planning estimate and does not determine whether a specific employee is legally entitled to a payment.",
+    "worked": "With last-drawn monthly basic plus DA of ₹50,000 and 10 completed years, the common formula gives ₹50,000 × 15 ÷ 26 × 10 = about ₹2,88,461.54 before considering any applicable statutory ceiling or special circumstances. The estimate uses the salary definition entered, not total CTC or every allowance. Verify the applicable Act, service record and employer calculation before relying on a final settlement figure.",
+    "sections": [
+      {
+        "heading": "Use the correct salary figure",
+        "body": "The common statutory formula does not automatically use total cost to company or every salary component. Confirm which components qualify as wages for the relevant employment and legal context. Use completed service years as required by the applicable rules and do not assume that rounding conventions are identical for every case."
+      },
+      {
+        "heading": "Check eligibility and applicable limits",
+        "body": "Five years of continuous service is a general rule in many covered cases, but legal exceptions can apply, including certain death or disablement situations. Statutory ceilings and amendments may affect the payable amount. This calculator cannot verify service records or current legal interpretation. Consult official labour guidance or a qualified professional for a disputed or high-value claim."
+      }
+    ],
+    "article": "/articles/how-to-use-financial-calculators"
+  },
+  "hra-exemption-calculator": {
+    "heading": "HRA exemption: apply the lowest-of-three method carefully",
+    "body": "The common HRA exemption calculation compares actual HRA received, rent paid minus 10% of eligible salary, and a salary-based percentage that depends on the applicable city category. The lowest eligible amount is used, subject to the tax rules and conditions for the relevant year and regime. This tool estimates one component; it does not calculate the full income-tax liability, validate rent receipts or determine final eligibility for a tax regime.",
+    "worked": "For an illustration, assume monthly basic salary plus DA of ₹50,000, HRA received of ₹20,000, rent paid of ₹25,000 and a 50% city percentage. The three amounts are ₹20,000, ₹20,000 (rent minus 10% of salary), and ₹25,000. The estimated monthly exemption is the lowest: ₹20,000. If rent were ₹18,000, the rent-based limit would be ₹13,000 and would reduce the estimate. Verify the correct salary and city inputs.",
+    "sections": [
+      {
+        "heading": "Rent, salary and city percentage",
+        "body": "The salary base and rent amount must match the applicable tax rules and period. The commonly used 50% percentage applies to specified metro cities; 40% is commonly used elsewhere, but verify the relevant law and tax year. Do not enter annual rent alongside monthly salary or mix gross rent with the amount actually paid for the period."
+      },
+      {
+        "heading": "Keep evidence and check the tax regime",
+        "body": "Rent receipts, payment records, landlord details and any required declarations may be relevant to an employer or tax filing. Eligibility for HRA treatment depends on the applicable regime and current rules; the calculator does not review documents or determine the complete tax outcome. Confirm current Income Tax Department guidance or consult a tax professional before filing."
+      }
+    ],
+    "article": "/articles/how-to-use-financial-calculators"
+  },
+  "nps-calculator": {
+    "heading": "NPS corpus and annuity are separate estimates",
+    "body": "An NPS projection estimates how regular contributions could grow under an assumed return and retirement horizon. If the calculator also models an annuity allocation, it separates the amount allocated to an annuity from the remaining corpus. The return assumption is not guaranteed, and the annuity income estimate is not a quote from an insurer. Current exit, withdrawal, annuity and tax rules can change and are not fully determined by a simple projection.",
+    "worked": "At ₹5,000 per month for 25 years and a hypothetical 9% annual return, total contributions would be ₹15,00,000 before considering any changes. Compounding can make the projected corpus larger, but the exact figure depends on contribution timing and monthly-rate convention. If 40% of the projected corpus is allocated to an annuity and an illustrative annuity rate of 6% is used, the model's income estimate remains hypothetical. Verify current PFRDA rules and insurer quotes.",
+    "sections": [
+      {
+        "heading": "Corpus is not the same as spendable income",
+        "body": "The accumulated balance and the amount available as a lump sum may be subject to scheme exit rules and conditions. An annuity converts an allocated amount into a pension-like payment under the selected product terms; payout options, spouse benefits, insurer pricing and tax treatment affect the result. Do not interpret an assumed annuity rate as a guaranteed market quote."
+      },
+      {
+        "heading": "Check official NPS rules before acting",
+        "body": "Eligibility, withdrawal conditions, annuity allocation and tax treatment can depend on subscriber type, exit reason and current regulations. This calculator does not decide legal eligibility or process a withdrawal. Confirm the current rules with PFRDA and the official NPS service provider, and compare actual annuity illustrations before making a retirement decision."
+      }
+    ],
+    "article": "/articles/how-to-stress-test-a-retirement-goal"
   }
 }
