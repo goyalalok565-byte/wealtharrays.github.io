@@ -2,7 +2,7 @@
 (function(){'use strict';
 /* Search fallback is shared by the home/tool hubs; the canonical bundle already owns theme/currency state. */
 if(window.__WEALTH_ARRAYS_FINAL_POLISH_LOADED__)return; window.__WEALTH_ARRAYS_FINAL_POLISH_LOADED__=true;
-const CURRENCY_SYMBOLS={USD:'$',EUR:'€',JPY:'¥',GBP:'£',AUD:'A$',CAD:'C$',CHF:'CHF',CNY:'CN¥',HKD:'HK$',NZD:'NZ$',SEK:'kr',KRW:'₩',SGD:'S$',NOK:'kr',MXN:'MX$',INR:'₹',ZAR:'R',BRL:'R$',AED:'د.إ',SAR:'﷼',TRY:'₺',PLN:'zł',THB:'฿',IDR:'Rp',MYR:'RM',PHP:'₱',DKK:'kr',ILS:'₪',CZK:'Kč',HUF:'Ft'};
+const CURRENCY_SYMBOLS={"USD":"$","EUR":"€","GBP":"£","INR":"₹","JPY":"¥","CNY":"CN¥","CAD":"C$","AUD":"A$","CHF":"CHF","SGD":"S$","HKD":"HK$","KRW":"₩","AED":"د.إ","SAR":"﷼","NZD":"NZ$","MXN":"MX$","BRL":"R$","ZAR":"R","TRY":"₺","THB":"฿","MYR":"RM","IDR":"Rp","PHP":"₱","PLN":"zł","SEK":"kr"};
 function tidy(){
  document.querySelectorAll('#language-select').forEach(s=>{if(!s.options.length||!s.value)s.remove()});
  const footers=[...document.querySelectorAll('footer')];if(footers.length>1)footers.slice(1).forEach(f=>f.remove());
