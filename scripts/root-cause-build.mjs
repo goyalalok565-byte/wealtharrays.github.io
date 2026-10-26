@@ -113,9 +113,15 @@ if(isCalc){
     const block='<!-- WA-CALCULATOR-VALUE-GUIDE --><section class="calculator-value-guide" aria-labelledby="calculator-value-guide-title"><h2 id="calculator-value-guide-title">'+escText(value.heading)+'</h2><p>'+escText(value.body)+'</p></section>';
     if(html.includes('WA-CALCULATOR-VALUE-GUIDE')) html=html.replace(/<!-- WA-CALCULATOR-VALUE-GUIDE -->\s*<section class="calculator-value-guide"[\s\S]*?<\/section>/i,block);
     else html=html.replace(/<\/article>/i,block+'</article>');
-    const extraSections=(Array.isArray(value.sections)?value.sections:[]).map(section=>'<section class="calculator-specific-guidance"><h2>'+escText(section.heading)+'</h2><p>'+escText(section.body)+'</p></section>').join('');
     const guideCalcId=html.match(/data-wa-calculator="([^"]+)"/i)?.[1];
     const guideCalc=calculatorRuntimeDefinitions.find(c=>c.id===guideCalcId);
+    const sampleInputs=guideCalc?.article?.exampleInputs||{};
+    const sampleInputText=guideCalc?.fields?.filter(field=>Object.prototype.hasOwnProperty.call(sampleInputs,field.id)).map(field=>field.label+': '+String(sampleInputs[field.id])).join('; ')||'the example inputs shown in the calculator definition';
+    const derivedSections=Array.isArray(value.sections)&&value.sections.length?value.sections:[
+      {heading:'Formula and assumptions for this calculator',body:guideCalc?.article?.formula||value.body},
+      {heading:'How to validate your inputs',body:'Use the published example inputs as a baseline: '+sampleInputText+'. Confirm the unit, period and eligibility conditions for each input against your own documents or the relevant provider. Change one assumption at a time and compare the output with an independent statement, invoice or schedule before making a material decision.'}
+    ];
+    const extraSections=derivedSections.map(section=>'<section class="calculator-specific-guidance"><h2>'+escText(section.heading)+'</h2><p>'+escText(section.body)+'</p></section>').join('');
     let workedText=value.worked||'';
     if(!workedText&&guideCalc?.article?.exampleInputs&&typeof guideCalc.compute==='function'){
       const sample=guideCalc.article.exampleInputs;
@@ -128,7 +134,9 @@ if(isCalc){
       }catch(error){workedText='Example inputs — '+inputLabels.join('; ')+'. Enter these values to reproduce a worked scenario, then change one input at a time to see how the result responds.';}
     }
     const worked=workedText?'<section class="worked-example" aria-labelledby="worked-example-title"><h2 id="worked-example-title">Worked example with Indian rupees</h2><p>'+escText(workedText)+'</p></section>':'';
-    const articleLink=value.article?'<p class="related-reading">Related reading: <a href="'+escText(value.article)+'">Read the related Wealth Arrays guide</a> for additional context.</p>':'';
+    const relatedArticleMap={investment:['/articles/how-to-compare-sip-scenarios-properly','Compare investment scenarios'],loan:['/articles/how-to-compare-loan-offers-beyond-emi','Compare loan offers beyond EMI'],banking:['/articles/compound-interest-guide','Understand compounding'],retirement:['/articles/how-to-stress-test-a-retirement-goal','Stress-test a retirement goal'],salary:['/articles/how-to-use-a-salary-to-hourly-calculator','Understand pay calculations'],business:['/articles/how-to-use-financial-calculators','How to use financial calculators']};
+    const relatedArticle=value.article?[value.article,'Read the related Wealth Arrays guide']:(relatedArticleMap[guideCalc?.category]||relatedArticleMap.business);
+    const articleLink='<p class="related-reading">Related reading: <a href="'+escText(relatedArticle[0])+'">'+escText(relatedArticle[1])+'</a> for additional context.</p>';
     const extras=extraSections+worked+articleLink;
     html=html.replace(/<!-- WA-CALCULATOR-EXTRA-GUIDANCE -->[\s\S]*?<!-- \/WA-CALCULATOR-EXTRA-GUIDANCE -->/i,'');
     if(extras)html=html.replace(/<\/article>/i,'<!-- WA-CALCULATOR-EXTRA-GUIDANCE -->'+extras+'<!-- /WA-CALCULATOR-EXTRA-GUIDANCE --></article>');
