@@ -34,7 +34,7 @@ for(const [file,desc] of Object.entries(descriptions)){
 }
 for(const [file,result] of Object.entries(examples)){
  const p=path.join(root,file); if(!fs.existsSync(p)) continue;
- let h=fs.readFileSync(p,'utf8'); if(h.includes('class="worked-example-result"')) continue;
+ let h=fs.readFileSync(p,'utf8');
  const block='<p class="worked-example-result"><strong>Worked result:</strong> '+result+'</p>';
  if(/<h2[^>]*>\s*Example inputs\s*<\/h2>/i.test(h)) h=h.replace(/(<h2[^>]*>\s*Example inputs\s*<\/h2>)/i,'$1'+block);
  else h=h.replace(/(<section[^>]*class=["'][^"']*calculator-specific-guidance[^"']*["'][^>]*>)/i,'$1'+block);
