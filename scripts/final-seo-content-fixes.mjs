@@ -36,7 +36,8 @@ for(const [file,result] of Object.entries(examples)){
  const p=path.join(root,file); if(!fs.existsSync(p)) continue;
  let h=fs.readFileSync(p,'utf8');
  const block='<p class="worked-example-result"><strong>Worked result:</strong> '+result+'</p>';
- if(/<h2[^>]*>\s*Example inputs\s*<\/h2>/i.test(h)) h=h.replace(/(<h2[^>]*>\s*Example inputs\s*<\/h2>)/i,'$1'+block);
+ if(/<section[^>]*class=["']worked-example["'][^>]*>[\s\S]*?<\/section>/i.test(h)) h=h.replace(/(<section[^>]*class=["']worked-example["'][^>]*>[\s\S]*?)(<\/section>)/i,'$1'+block+'$2');
+ else if(/<h2[^>]*>\s*Example inputs\s*<\/h2>/i.test(h)) h=h.replace(/(<h2[^>]*>\s*Example inputs\s*<\/h2>)/i,'$1'+block);
  else if(/<section[^>]*class=["'][^"']*calculator-specific-guidance[^"']*["'][^>]*>/i.test(h)) h=h.replace(/(<section[^>]*class=["'][^"']*calculator-specific-guidance[^"']*["'][^>]*>)/i,'$1'+block);
  else if(h.includes('</article>')) h=h.replace('</article>',block+'</article>'); else h=h.replace('</main>',block+'</main>');
  fs.writeFileSync(p,h); changed++;
