@@ -150,11 +150,6 @@ if(isCalc){
   }
   if(value && Array.isArray(value.sections) && value.sections.length){
     html=html.replace(/<h2>How to use the result responsibly<\/h2>\s*<p>Do not treat one output as a prediction\.[\s\S]*?<\/p>/i,'');
-    html=html.replace(/<h2>Limitations and methodology<\/h2>\s*<p>Wealth Arrays performs deterministic browser-side calculations\.[\s\S]*?<\/p>/i,'');
-    html=html.replace(/<h2>Read the result in context<\/h2>\s*<p>The output is the mathematical result of the assumptions entered[\s\S]*?<\/p>/i,'');
-    html=html.replace(/<h2>Compare more than one scenario<\/h2>\s*<p>Run a baseline estimate first\.[\s\S]*?<\/p>/i,'');
-    html=html.replace(/<h2>What this estimate does not include<\/h2>\s*<p>This calculator does not automatically know current product terms[\s\S]*?<\/p>/i,'');
-    html=html.replace(/<h2>Important assumptions and limitations<\/h2>\s*<p>This tool models the formula and assumptions described above\.[\s\S]*?<\/p>/i,'');
   }
 }
 if(isWidget){
