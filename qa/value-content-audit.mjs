@@ -30,7 +30,7 @@ for(const slug of calculators){
     ['valid JSON-LD',true],
     ['title 70 characters or less',title.length>0&&title.length<=70],
     ['description 70–170 characters',description.length>=70&&description.length<=170],
-    ['canonical URL',canonical===`https://wealtharrays.com/${slug}/`],
+    ['canonical URL',canonical===`https://wealtharrays.com/${({'loan-emi-calculator':'mortgage-emi-calculator','loan-interest-calculator':'mortgage-emi-calculator'}[slug]||slug)}/`],
     ['no generic annual-rate filler',!article.includes('If a field represents an annual rate')],
     ['no generic prediction filler',!article.includes('Do not treat one output as a prediction')]
   ];

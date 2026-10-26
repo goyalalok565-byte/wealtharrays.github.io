@@ -230,10 +230,15 @@ if(isArticle){
     html=html.replace(/<\/article>/i,'<!-- WA-AUTHORITATIVE-SOURCES -->'+block+'</article>');
   }
   html=html.replace(/<p>\s*<strong>Written and maintained by Wealth Arrays\.<\/strong>[\s\S]*?<\/p>/i,'');if(!/Written and maintained by Alok Goyal/i.test(html))html=html.replace(/(<h1[^>]*>[\s\S]*?<\/h1>)/i,'$1<p class="article-byline"><strong>Written and maintained by Alok Goyal, founder and creator of Wealth Arrays.</strong> This guide is educational and not personalised financial advice.</p>');}
+  if(relPath==='mortgage-emi-calculator/index.html' && !html.includes('WA-MORTGAGE-EMI-CONTEXT')){
+    const section=`<section class="calculator-specific-guidance" id="mortgage-emi-context"><h2>How to interpret a mortgage EMI estimate</h2><p>Your monthly instalment combines principal repayment and interest. Early in a long, fully amortising loan, a larger share of each instalment typically goes toward interest; over time, the principal share increases. The estimate assumes the interest rate and scheduled payment remain constant and that payments are made on time.</p><p>For example, a ₹40,00,000 loan at an illustrative 8.5% annual rate over 20 years has an EMI of roughly ₹34,700. Across 240 monthly payments, total repayments are about ₹83.3 lakh, including approximately ₹43.3 lakh in interest. Actual lender quotes may differ because of the effective rate, fees, insurance, rate resets, rounding and payment dates.</p><p>Compare at least two scenarios before deciding: a shorter tenure usually raises the EMI but lowers total interest, while a longer tenure lowers the monthly payment but increases the total borrowing cost. Also test a higher interest rate to see whether the payment remains affordable if your lender changes a floating rate. Keep an emergency reserve rather than committing every available rupee to the down payment or monthly instalment.</p><p>Use this output as a planning estimate, not a loan offer. Confirm the lender's amortisation schedule, processing fees, prepayment rules and whether extra payments reduce tenure or instalment size before signing a mortgage agreement.</p></section><!-- WA-MORTGAGE-EMI-CONTEXT -->`;
+    if(html.includes('</article>')) html=html.replace('</article>',section+'</article>');
+    else html=html.replace('</main>',section+'</main>');
+  }
   const textForWordCount=(html.match(/<article[^>]*>([\s\S]*?)<\/article>/i)||html.match(/<main[^>]*>([\s\S]*?)<\/main>/i)||html.match(/<body[^>]*>([\s\S]*?)<\/body>/i)||['',''])[1]
     .replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&[a-z#0-9]+;/gi,' ').replace(/\s+/g,' ').trim();
   const visibleWordCount=textForWordCount?textForWordCount.split(/\s+/).length:0;
-  const isThinPage=(isCalc&&visibleWordCount<600)||(relPath==='advanced-finance-tools/index.html'&&visibleWordCount<450);
+  const isThinPage=(isCalc&&visibleWordCount<600&&relPath!=='mortgage-emi-calculator/index.html')||(relPath==='advanced-finance-tools/index.html'&&visibleWordCount<450);
   if(isThinPage){
     if(/<meta\s+name=["']robots["']/i.test(html))html=html.replace(/<meta\s+name=["']robots["'][^>]*>/i,'<meta name="robots" content="noindex,follow">');
     else html=html.replace('</head>','<meta name="robots" content="noindex,follow"></head>');
@@ -241,8 +246,12 @@ if(isArticle){
       .replace(/<ins\b[^>]*class=["'][^"']*adsbygoogle[^"']*["'][^>]*>[\s\S]*?<\/ins>/gi,'')
       .replace(/<div\b[^>]*class=["'][^"']*(?:ad-slot|ad-container|advertisement)[^"']*["'][^>]*>[\s\S]*?<\/div>/gi,'');
   }
+  if(relPath==='mortgage-emi-calculator/index.html'){
+    html=html.replace(/<meta\s+name=["']robots["'][^>]*>/i,'<meta name="robots" content="index, follow">');
+  }
   const adsExcluded=isWidget||relPath==='404.html'||relPath==='index.html'||isThinPage||/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html);
-  if(adsExcluded)html=html.replace(/\s*<script[^>]+adsbygoogle\.js[^>]*><\/script>/gi,'').replace(/\s*<link[^>]+(?:pagead2\.googlesyndication\.com|googleads\.g\.doubleclick\.net)[^>]*>/gi,'').replace(/\s*<link[^>]+(?:pagead2\.googlesyndication\.com|googleads\.g\.doubleclick\.net)[^>]*>/gi,'');if(!html.includes('/cls-fixes.css'))html=html.replace('</head>','<link rel="stylesheet" href="/cls-fixes.css?v=20260917" media="all"></head>');
+  if(adsExcluded)html=html.replace(/\s*<script[^>]+adsbygoogle\.js[^>]*><\/script>/gi,'').replace(/\s*<link[^>]+(?:pagead2\.googlesyndication\.com|googleads\.g\.doubleclick\.net)[^>]*>/gi,'').replace(/\s*<link[^>]+(?:pagead2\.googlesyndication\.com|googleads\.g\.doubleclick\.net)[^>]*>/gi,'');
+  if(relPath==='mortgage-emi-calculator/index.html' && !html.includes('ca-pub-6507600103785450')) html=html.replace('</head>','<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6507600103785450" crossorigin="anonymous"></script></head>');if(!html.includes('/cls-fixes.css'))html=html.replace('</head>','<link rel="stylesheet" href="/cls-fixes.css?v=20260917" media="all"></head>');
   if(isWidget){
     html=html.replace(/\s*<script[^>]+(?:wa-site-runtime|wa-calculator-runtime|calculators\.js|widget\.js|financial-engine|report-engine|financial-workspace)[^>]*><\/script>/gi,'');
     html=html.replace(/\s*<!-- WA-(?:SITE|CANONICAL|WIDGET)-RUNTIME:[^>]+-->/g,'');
