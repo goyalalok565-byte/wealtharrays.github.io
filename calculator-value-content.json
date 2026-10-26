@@ -107,6 +107,10 @@
       {
         "heading": "Budget beyond the instalment",
         "body": "A responsible housing budget includes the down payment and transaction costs as well as recurring ownership costs. Keep a cash buffer after paying the down payment, and stress-test the budget against higher rates, repairs and income disruption. Compare APR or total borrowing cost, processing charges, prepayment terms and rate-reset rules—not only the advertised EMI. If the home is jointly financed, model who pays which share and whether the household can still cover essential expenses if one income temporarily stops."
+      },
+      {
+        "heading": "A pre-purchase affordability checklist",
+        "body": "Before applying, list the down payment, stamp duty, registration, moving and furnishing costs separately from the loan principal. Keep an emergency reserve after the purchase rather than using every available rupee at closing. Ask the lender whether the rate is fixed, floating or fixed only for an initial period, and how rate changes affect the EMI or tenure. Confirm whether insurance is optional or compulsory and whether processing charges are paid upfront or financed. For a joint application, test the household budget on one income as well as both incomes. The calculator estimates repayment under entered assumptions; it does not validate title, valuation, approval or the affordability of the whole purchase."
       }
     ],
     "article": "/articles/how-to-compare-loan-offers-beyond-emi"
@@ -123,6 +127,10 @@
       {
         "heading": "Why your final amount may differ",
         "body": "Retail conversion rates are not identical to mid-market reference rates. Banks, exchange counters, remittance services and card issuers may use different spreads and fee schedules. For travel, compare the final amount after fees; for international transfers, include intermediary and recipient-bank charges where relevant. This tool is a calculator, not a live quote service, and should not be presented as guaranteeing the rate available at checkout."
+      },
+      {
+        "heading": "A practical way to compare provider quotes",
+        "body": "When comparing two exchange providers, record the amount you send, the exchange rate, every fee, the amount the recipient receives and the timestamp of the quote. Compare the final delivered amount rather than the headline rate alone. For card purchases, the network rate, issuer markup and transaction fee can differ from a cash exchange quote. For remittances, intermediary banks or recipient charges may reduce the final amount. Keep the quote direction consistent: INR per USD and USD per INR are reciprocals, not interchangeable values. If a provider updates its rate before settlement, recalculate with the final quoted rate. This page performs arithmetic only and does not fetch or guarantee current market rates."
       }
     ],
     "article": "/articles/how-to-use-financial-calculators"
@@ -139,6 +147,10 @@
       {
         "heading": "Verify local charges before committing",
         "body": "Stamp duty and registration rates vary by state and can depend on ownership type, transaction value and concessions. GST treatment can differ for under-construction and completed properties under applicable rules. Do not apply a generic percentage as a legal conclusion. Ask for a written cost sheet, confirm whether each charge is included in the agreement value and check official state guidance for duties and registration."
+      },
+      {
+        "heading": "A document checklist for the final cost sheet",
+        "body": "Request a written cost sheet that separates agreement value, taxes, stamp duty, registration, parking, maintenance deposits, utility connection charges and any builder or society fees. Ask which amounts are refundable and which are payable before possession. For under-construction property, verify the applicable GST treatment rather than assuming the same rule applies to a completed resale property. Check whether the quoted carpet area, built-up area and agreement value use consistent definitions. If a home loan is involved, add lender processing, valuation and legal charges outside the builder's price. Save invoices and receipts for each payment. This calculator is most reliable when estimates are replaced with documented charges for the exact property and location."
       }
     ],
     "article": "/articles/how-to-build-a-realistic-monthly-budget"
@@ -155,6 +167,10 @@
       {
         "heading": "Compare offers on a like-for-like basis",
         "body": "Use the same loan amount, term and repayment frequency for each offer. Compare total repayment, fees, prepayment conditions and whether the quoted rate is fixed or floating. A lower EMI can simply reflect a longer term and may cost more in total interest. If the payment is close to your monthly budget limit, test a higher rate and a temporary income reduction before taking the loan."
+      },
+      {
+        "heading": "How to read the amortisation trade-off",
+        "body": "At the start of a reducing-balance loan, interest is calculated on a relatively large outstanding principal. As scheduled payments reduce that balance, the interest component generally falls and more of each instalment goes toward principal. Extending the term can lower the monthly instalment while increasing the number of months on which interest is charged. Extra payments may shorten the term or reduce future instalments depending on lender policy. Ask for a repayment schedule and compare the total amount payable, not just the first EMI. If the rate can reset, run a higher-rate scenario. The estimate excludes contract-specific charges unless you include them in the amount borrowed or model them separately."
       }
     ],
     "article": "/articles/loan-emi-guide"
@@ -171,6 +187,10 @@
       {
         "heading": "Keep records that support the cost basis",
         "body": "Useful records may include contract notes, purchase invoices, broker statements, transfer fees and evidence of improvement costs where relevant. Avoid double-counting costs or including an expense that the applicable rules do not permit. If the asset was acquired through inheritance, gifting, corporate action or multiple purchases, the cost basis may require additional analysis. A single input cannot resolve those legal details."
+      },
+      {
+        "heading": "Evidence to gather before using a tax estimate",
+        "body": "Collect the acquisition date, sale date, purchase consideration, sale proceeds and documented transaction expenses before calculating a gain. For securities, broker contract notes and statements may help reconcile purchase lots and sale proceeds. For property, purchase and sale deeds plus eligible improvement and transfer-cost records may be relevant. Inherited or gifted assets can require tracing the previous owner's cost and acquisition date under applicable law. Do not assume that a simple difference between sale price and purchase price equals taxable capital gain. Tax rules can vary by asset, holding period and financial year, and exemptions may have conditions. Use this estimate as a preliminary working figure and verify the current tax treatment with official guidance or a qualified tax professional."
       }
     ],
     "article": "/articles/how-to-read-an-investment-return-number"
@@ -187,6 +207,10 @@
       {
         "heading": "Use scenarios rather than predictions",
         "body": "Run low, base and high return assumptions, and include a flat or negative period if the investment is market-linked. The model cannot tell you what the market will do next month. For an actual investment decision, consider diversification, emergency savings, time horizon and product costs, and avoid treating a higher assumed return as evidence that one strategy is inherently superior."
+      },
+      {
+        "heading": "Timing, risk and liquidity are part of the comparison",
+        "body": "The arithmetic comparison cannot determine the best entry strategy without knowing the investor's circumstances. A lump sum puts the full amount at market risk immediately, while periodic contributions spread the entry dates. That can change both risk exposure and the realised return, but it does not guarantee that an SIP will outperform or reduce losses in every market. Compare the same total amount and end date, and ensure the assumed return convention is applied consistently. Include product costs, tax, emergency savings and the possibility of needing the money before the target date. For a market-linked investment, run weak, flat and strong return scenarios and treat each as a hypothetical path rather than a prediction."
       }
     ],
     "article": "/articles/how-to-compare-sip-scenarios-properly"
@@ -203,6 +227,10 @@
       {
         "heading": "Assess repayment risk separately",
         "body": "The property is collateral, not a substitute for stable repayment capacity. Stress-test the instalment at a higher rate or lower income, and keep emergency funds separate from the loan proceeds. Compare the effective annual cost, prepayment rules, default charges and disbursement conditions. Avoid borrowing the maximum available amount if it leaves too little room for essential spending or unexpected costs."
+      },
+      {
+        "heading": "Questions to ask before pledging property",
+        "body": "Ask the lender for the effective annual borrowing cost, processing and legal fees, valuation method, repayment schedule, prepayment terms and consequences of missed payments. Confirm who must sign if the property has co-owners and whether the title documents meet the lender's requirements. Understand whether the funds can be used for your intended purpose and whether disbursement is staged or conditional. Do not assume that the market value you expect is the value the lender will accept. A secured loan can have a lower rate than some unsecured credit, but the collateral increases the consequences of default. Keep the repayment affordable under a higher-rate or lower-income scenario and seek independent legal review where needed."
       }
     ],
     "article": "/articles/how-to-compare-loan-offers-beyond-emi"
@@ -219,6 +247,10 @@
       {
         "heading": "What to prepare before applying",
         "body": "Review credit reports, salary slips or business income records, bank statements, existing loan schedules and property documents. Ask lenders how they treat bonuses, variable pay, co-applicant income, age at maturity and floating rates. Compare total interest and all charges in addition to the maximum eligible principal."
+      },
+      {
+        "heading": "Why a lender may approve less than the estimate",
+        "body": "A lender's assessment can differ because it may discount variable income, include existing credit obligations, apply an age-at-maturity limit or use a lower property valuation. Credit history, employment stability, documentation, dependants and the property itself can affect underwriting. Some lenders assess gross income while others apply deductions or internal obligations ratios; these policies are not universal. Before applying, reconcile salary slips or business income records with bank statements, list every EMI and review your credit report for errors. Ask for the lender's eligibility assumptions in writing. Use the calculator to understand a possible range, then plan a purchase around a conservative EMI that leaves room for essential spending and savings."
       }
     ],
     "article": "/articles/how-to-compare-loan-offers-beyond-emi"
@@ -235,6 +267,10 @@
       {
         "heading": "Purchase price and resale value differ",
         "body": "Retail making charges, taxes and design premiums may not be recovered when selling or exchanging jewellery. Buy-back deductions, testing and purity checks may also affect proceeds. This calculator estimates a scenario from inputs; it does not verify the live market price, authenticity, hallmark or a jeweller's buy-back policy. Ask for a detailed invoice before purchase."
+      },
+      {
+        "heading": "Use an itemised invoice to validate the estimate",
+        "body": "Ask the seller to show the net silver weight, declared purity, rate per gram, making charge, tax and any stone or accessory charge separately. Confirm whether the quoted metal rate already reflects the item's purity; applying a purity adjustment twice will understate the value. If a piece contains stones or other materials, the gross scale weight may not equal the silver weight used for pricing. Compare quotes only when both sellers use the same purity basis and include the same charge categories. Retail making charges may not be recovered on resale, so purchase cost and resale value should be considered separately. This tool cannot authenticate silver or verify a live market quote."
       }
     ],
     "article": "/articles/how-to-use-financial-calculators"
@@ -251,6 +287,10 @@
       {
         "heading": "Compare this estimate with lender criteria",
         "body": "Ask lenders how they calculate eligible income, obligations, co-applicant contributions, credit score, property valuation and loan maturity age. Check processing charges, rate-reset rules, insurance conditions and prepayment terms. If the detailed and basic eligibility tools produce different outputs, compare the assumptions field by field instead of assuming the larger figure is more accurate."
+      },
+      {
+        "heading": "Stress-test the result against household changes",
+        "body": "Run a conservative case with a higher rate, lower dependable income and all existing monthly obligations included. Consider future costs such as childcare, education, medical expenses, maintenance and retirement contributions that may not be part of a simple eligibility formula. If a co-applicant contributes income, test whether the payment remains manageable if that income is temporarily unavailable. Check the loan's expected end date against the borrower's age and retirement plans. Ask lenders how they treat bonuses, self-employment income, co-borrowers and property valuation. The most useful outcome is a sustainable payment range, not the maximum number a formula can produce. Final eligibility remains subject to the lender's underwriting and current terms."
       }
     ],
     "article": "/articles/how-to-compare-loan-offers-beyond-emi"
@@ -267,6 +307,10 @@
       {
         "heading": "Borrow for a planned purchase",
         "body": "Compare the financed total with the cash price and avoid taking instalments that interfere with rent, food, utilities or emergency savings. For small purchases, fees can form a meaningful share of the loan. If a promotion's details are unclear, request the Key Facts Statement or equivalent disclosure and verify the total amount payable before accepting."
+      },
+      {
+        "heading": "Compare financing with the true cash price",
+        "body": "Before accepting a point-of-sale loan, ask for the cash price, financed amount, down payment, total instalments, processing fee, taxes on fees and any compulsory add-on. A promotion described as no-cost EMI may include a reduced cash discount or a fee that changes the effective cost. Check whether the quoted interest is flat or reducing balance and whether early closure is allowed without penalty. Confirm the payment dates and consequences of missed instalments, including possible credit-reporting effects. Compare the total amount payable with the amount you would pay in cash. If the instalment reduces money available for rent, utilities or emergency savings, reconsider the purchase or choose a lower-cost option."
       }
     ],
     "article": "/articles/how-to-compare-loan-offers-beyond-emi"
@@ -283,6 +327,10 @@
       {
         "heading": "Making charges and resale deductions",
         "body": "Making charges may be calculated per gram or as a percentage, and policies vary by retailer. Stones and design charges may not be recovered at resale, and buy-back deductions can differ from the purchase invoice. The calculator does not verify live rates, purity or authenticity. Check the current rate and jeweller's written terms on the day of purchase."
+      },
+      {
+        "heading": "Validate the rate, purity and making-charge basis",
+        "body": "Ask whether the displayed gold price is a 24K reference rate or a rate already adjusted for 22K, 18K or another purity. Confirm the net gold weight separately from stones, beads or other materials. Making charges may be calculated per gram or as a percentage, and a quoted wastage amount should be itemised rather than assumed. Check hallmark and purity information and request a detailed invoice showing metal value, labour, tax and other fees. A retail purchase price is not the same as a buy-back value: design charges and taxes may not be recovered on resale. The calculator does not verify authenticity or live rates, so use the jeweller's current written quote for the final comparison."
       }
     ],
     "article": "/articles/how-to-use-financial-calculators"
@@ -299,6 +347,10 @@
       {
         "heading": "What the investment side leaves uncertain",
         "body": "A projected SIP or investment return is an assumption rather than a contractual rate. Market returns can be negative over shorter periods and taxes, expense ratios and transaction costs affect net outcomes. Compare after-tax values over the same horizon and include risk tolerance and liquidity needs. A lower expected return may still be acceptable if flexibility is important; a higher projected return is not a guarantee."
+      },
+      {
+        "heading": "Compare net outcomes and preserve liquidity",
+        "body": "A fair comparison uses the same starting cash amount, time horizon and tax basis for both choices. On the loan side, confirm the outstanding principal, remaining tenure, prepayment fees and whether the lender reduces EMI or term after an extra payment. On the investment side, use net-of-cost return assumptions and include a weak or negative scenario. Interest avoided through prepayment may be more predictable than market returns, but prepayment reduces liquid cash and can be hard to reverse. Keep an emergency fund and account for any tax effects before deciding. The higher projected number should not automatically win if it requires taking risk you cannot afford or leaves too little accessible savings."
       }
     ],
     "article": "/articles/how-to-compare-sip-scenarios-properly"
@@ -315,6 +367,10 @@
       {
         "heading": "LTV is not the same as affordability",
         "body": "A low LTV does not prove that the monthly instalment is affordable, and a high LTV does not by itself establish rejection. Consider down payment, EMI, existing debt, income stability and transaction costs together. Check current lender terms and any applicable regulatory ceilings rather than treating a generic percentage as universal."
+      },
+      {
+        "heading": "LTV should be read alongside cash contribution",
+        "body": "LTV helps show how much of the eligible asset value is financed by the loan, but it does not measure whether the monthly repayment fits the borrower's budget. The cash contribution may need to cover the difference between the lender's accepted valuation and the loan, plus stamp duty, registration and other costs that are not financed. If the valuation is lower than the purchase price, the required down payment can rise. Check whether fees are included in the loan amount for the calculation and use the lender's accepted valuation rather than a listing price. Compare LTV with EMI affordability, income stability and existing debt before making a purchase commitment."
       }
     ],
     "article": "/articles/how-to-compare-loan-offers-beyond-emi"
@@ -331,6 +387,10 @@
       {
         "heading": "Keep transaction costs separate",
         "body": "Budget for stamp duty, registration, legal review, brokerage and other documented charges as separate line items. Do not assume that a builder's cost sheet includes every government fee or that a concession applies automatically. Save the official fee calculation and receipt with the property records. This tool is not a legal filing or an official fee quote."
+      },
+      {
+        "heading": "Confirm the rule for the exact transaction date",
+        "body": "Property duty can depend on the state or territory, document type, agreement value, government guideline value, ownership structure and any applicable concession. Rates can change through notifications, and the registration fee may be calculated separately with a cap or minimum. Do not assume a rate seen in another city or on an older website applies to your transaction. Before paying, check the relevant registration department's current calculator or schedule and retain the challan and receipt. Ask a conveyancing professional to review the agreement value and classification if the transaction is unusual. This tool multiplies the value and rate you enter; it does not provide a legal determination or official payment demand."
       }
     ],
     "article": "/articles/how-to-build-a-realistic-monthly-budget"
@@ -347,6 +407,10 @@
       {
         "heading": "Separate personal value from investment return",
         "body": "A home can provide stability and utility that a simple investment return does not capture. A rental property also concentrates money in one asset and may be difficult to sell quickly. Compare the cash required, monthly affordability, liquidity and downside scenarios. Confirm legal title, approvals, encumbrances and the exact cost sheet before committing."
+      },
+      {
+        "heading": "Separate rental yield, ownership costs and appreciation",
+        "body": "For an investment property, distinguish gross rental yield from net cash flow after maintenance, vacancy, repairs, insurance, property tax, management costs and financing. For an owner-occupied home, the benefit includes housing utility but should still be compared with ongoing costs and alternative uses of the deposit. Property appreciation is uncertain and a sale can involve brokerage, legal fees and taxes. Use the same holding period when comparing properties and include realistic assumptions for downtime and repairs. Before buying, verify title, approvals, encumbrances, possession terms and the full cost sheet. A calculator can organise scenarios, but it cannot inspect the property, validate legal documents or guarantee resale value."
       }
     ],
     "article": "/articles/how-to-build-a-realistic-monthly-budget"
@@ -363,6 +427,10 @@
       {
         "heading": "What may sit outside the interest result",
         "body": "Processing fees, documentation charges, compulsory insurance, late fees and prepayment penalties may not be included in an interest-only estimate. For floating-rate loans, future rates may change the interest path. Keep principal, interest and fees as separate lines in your comparison so that the total borrowing cost is visible."
+      },
+      {
+        "heading": "Check the lender's method and all-in cost",
+        "body": "Request the lender's amortisation schedule so you can see how principal and interest change over time. Confirm whether the advertised rate is flat, reducing-balance, fixed or floating, and whether it is nominal or an effective annual rate. Add processing fees, documentation costs, compulsory insurance and prepayment penalties to the comparison where relevant. For a floating-rate loan, the future interest total can change when the rate resets; a fixed-rate example should not be treated as a forecast for that product. Keep interest cost separate from principal repayment and other fees. The calculator is an estimate based on the inputs provided, so use the contract and payment schedule to confirm the final borrowing cost."
       }
     ],
     "article": "/articles/loan-emi-guide"
