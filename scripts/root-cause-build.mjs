@@ -106,12 +106,16 @@ if(isCalc){
   const calculatorValueContent=JSON.parse(fs.readFileSync(path.join(root,'calculator-value-content.json'),'utf8'));
   const value=m && calculatorValueContent[m[1]];
   if(value){
-    const block='<!-- WA-CALCULATOR-VALUE-GUIDE --> <section class="calculator-value-guide" aria-labelledby="calculator-value-guide-title"><h2 id="calculator-value-guide-title">'+value.heading+'</h2><p>'+value.body+'</p></section>';
+    const escText=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const block='<!-- WA-CALCULATOR-VALUE-GUIDE --><section class="calculator-value-guide" aria-labelledby="calculator-value-guide-title"><h2 id="calculator-value-guide-title">'+escText(value.heading)+'</h2><p>'+escText(value.body)+'</p></section>';
     if(html.includes('WA-CALCULATOR-VALUE-GUIDE')) html=html.replace(/<!-- WA-CALCULATOR-VALUE-GUIDE -->\s*<section class="calculator-value-guide"[\s\S]*?<\/section>/i,block);
     else html=html.replace(/<\/article>/i,block+'</article>');
-    if(value.worked){
-      html=html.replace(/<h2>Worked scenario<\/h2>\s*<p>Use the calculator above to build a baseline from your own numbers\. Then open comparison mode and create a second scenario with a different rate, time period or amount\. The difference between the two outputs is often more useful than either output alone because it shows how sensitive the decision is to your assumptions\.<\/p>/i,'<h2>Worked scenario</h2><p>'+value.worked+'</p>');
-    }
+    const extraSections=(Array.isArray(value.sections)?value.sections:[]).map(section=>'<section class="calculator-specific-guidance"><h2>'+escText(section.heading)+'</h2><p>'+escText(section.body)+'</p></section>').join('');
+    const worked=value.worked?'<section class="worked-example" aria-labelledby="worked-example-title"><h2 id="worked-example-title">Worked example with Indian rupees</h2><p>'+escText(value.worked)+'</p></section>':'';
+    const articleLink=value.article?'<p class="related-reading">Related reading: <a href="'+escText(value.article)+'">Read the related Wealth Arrays guide</a> for additional context.</p>':'';
+    const extras=extraSections+worked+articleLink;
+    html=html.replace(/<!-- WA-CALCULATOR-EXTRA-GUIDANCE -->[\s\S]*?<!-- \/WA-CALCULATOR-EXTRA-GUIDANCE -->/i,'');
+    if(extras)html=html.replace(/<\/article>/i,'<!-- WA-CALCULATOR-EXTRA-GUIDANCE -->'+extras+'<!-- /WA-CALCULATOR-EXTRA-GUIDANCE --></article>');
   }
   const pageCalcId=html.match(/data-wa-calculator="([^"]+)"/i)?.[1];
   const calcDefinition=definitions.find(x=>x.id===pageCalcId);
@@ -120,6 +124,37 @@ if(isCalc){
     const escapeFaqHtml=value=>value.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     const faqItems=[...faqMatch[1].matchAll(/\{\s*q:\s*("(?:\\.|[^"\\])*")\s*,\s*a:\s*("(?:\\.|[^"\\])*")\s*\}/g)].map(m=>'<div class="faq-item"><h3>'+escapeFaqHtml(JSON.parse(m[1]))+'</h3><p>'+escapeFaqHtml(JSON.parse(m[2]))+'</p></div>').join('');
     if(faqItems) html=html.replace(/<h2>Frequently asked questions<\/h2>[\s\S]*?(?=<h2>Related calculators<\/h2>)/i,'<h2>Frequently asked questions</h2>'+faqItems);
+  }
+  const titleMatch=calcDefinition?.obj.match(/\btitle:\s*["']([^"']+)["']/);
+  const descMatch=calcDefinition?.obj.match(/\bdesc:\s*["']([^"']+)["']/);
+  const seoTitle=(titleMatch?.[1]||'Financial Calculator')+' | Wealth Arrays';
+  const seoDescription=(descMatch?.[1]||'Use this free financial calculator to estimate results from your inputs and review the assumptions.').replace(/\s+/g,' ').trim().slice(0,158);
+  html=html.replace(/<title[^>]*>[\s\S]*?<\/title>/i,'<title>'+seoTitle.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</title>');
+  if(/<meta[^>]+name=["']description["']/i.test(html))html=html.replace(/<meta([^>]+name=["']description["'][^>]+content=["'])[^"']*(["'][^>]*>)/i,'<meta$1'+seoDescription.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'$2');
+  else html=html.replace('</head>','<meta name="description" content="'+seoDescription.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'"></head>');
+  if(/<meta[^>]+property=["']og:title["']/i.test(html))html=html.replace(/<meta[^>]+property=["']og:title["'][^>]*>/i,'<meta property="og:title" content="'+seoTitle.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'">');
+  if(/<meta[^>]+property=["']og:description["']/i.test(html))html=html.replace(/<meta[^>]+property=["']og:description["'][^>]*>/i,'<meta property="og:description" content="'+seoDescription.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'">');
+  const schemaUrl='https://wealtharrays.com/'+relPath.replace(/\/index\.html$/,'').replace(/\.html$/,'').replace(/\/$/,'')+'/';
+  const schema={"@context":"https://schema.org","@graph":[
+    {"@type":"SoftwareApplication","name":titleMatch?.[1]||"Financial Calculator","applicationCategory":"FinanceApplication","operatingSystem":"Any","isAccessibleForFree":true,"description":seoDescription,"url":schemaUrl,"offers":{"@type":"Offer","price":"0","priceCurrency":"INR"}},
+    {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://wealtharrays.com/"},{"@type":"ListItem","position":2,"name":"Calculators","item":"https://wealtharrays.com/tools"},{"@type":"ListItem","position":3,"name":titleMatch?.[1]||"Financial Calculator","item":schemaUrl}]}
+  ]};
+  const schemaTag='<!-- WA-CALCULATOR-SCHEMA --><script type="application/ld+json">'+JSON.stringify(schema)+'</script>';
+  html=html.replace(/<!-- WA-CALCULATOR-SCHEMA -->\s*<script type="application\/ld\+json">[\s\S]*?<\/script>/i,'');
+  html=html.replace('</head>',schemaTag+'</head>');
+  const fieldLabels=[...((calcDefinition?.obj||'').matchAll(/\blabel:\s*["']([^"']+)["']/g))].map(m=>m[1]);
+  if(fieldLabels.length){
+    const fieldsSentence='For this calculator, check these inputs and units: '+fieldLabels.join('; ')+'. Keep monthly and annual figures separate, and change one input at a time when comparing scenarios.';
+    html=html.replace(/<p>Start by entering values that match your situation and check the unit shown beside each input\.[\s\S]*?<\/p>/i,'<p>'+fieldsSentence+'</p>');
+    html=html.replace(/<p>If a field represents an annual rate, keep it annual unless the label explicitly says monthly\.[\s\S]*?<\/p>/i,'');
+  }
+  if(value && Array.isArray(value.sections) && value.sections.length){
+    html=html.replace(/<h2>How to use the result responsibly<\/h2>\s*<p>Do not treat one output as a prediction\.[\s\S]*?<\/p>/i,'');
+    html=html.replace(/<h2>Limitations and methodology<\/h2>\s*<p>Wealth Arrays performs deterministic browser-side calculations\.[\s\S]*?<\/p>/i,'');
+    html=html.replace(/<h2>Read the result in context<\/h2>\s*<p>The output is the mathematical result of the assumptions entered[\s\S]*?<\/p>/i,'');
+    html=html.replace(/<h2>Compare more than one scenario<\/h2>\s*<p>Run a baseline estimate first\.[\s\S]*?<\/p>/i,'');
+    html=html.replace(/<h2>What this estimate does not include<\/h2>\s*<p>This calculator does not automatically know current product terms[\s\S]*?<\/p>/i,'');
+    html=html.replace(/<h2>Important assumptions and limitations<\/h2>\s*<p>This tool models the formula and assumptions described above\.[\s\S]*?<\/p>/i,'');
   }
 }
 if(isWidget){
@@ -174,7 +209,20 @@ if(isArticle){
     const block='<section class="article-sources" id="sources" aria-labelledby="article-sources-title"><h2 id="article-sources-title">Authoritative sources and further reading</h2><p>These official sources provide background or current rules relevant to this guide. Wealth Arrays does not treat them as investment recommendations.</p><ul>'+sources+'</ul></section>';
     html=html.replace(/<\/article>/i,'<!-- WA-AUTHORITATIVE-SOURCES -->'+block+'</article>');
   }
-  html=html.replace(/<p>\s*<strong>Written and maintained by Wealth Arrays\.<\/strong>[\s\S]*?<\/p>/i,'');if(!/Written and maintained by Alok Goyal/i.test(html))html=html.replace(/(<h1[^>]*>[\s\S]*?<\/h1>)/i,'$1<p class="article-byline"><strong>Written and maintained by Alok Goyal, founder and creator of Wealth Arrays.</strong> This guide is educational and not personalised financial advice.</p>');}const adsExcluded=isWidget||relPath==='404.html'||relPath==='index.html';if(adsExcluded)html=html.replace(/\s*<script[^>]+adsbygoogle\.js[^>]*><\/script>/gi,'').replace(/\s*<link[^>]+(?:pagead2\.googlesyndication\.com|googleads\.g\.doubleclick\.net)[^>]*>/gi,'').replace(/\s*<link[^>]+(?:pagead2\.googlesyndication\.com|googleads\.g\.doubleclick\.net)[^>]*>/gi,'');if(!html.includes('/cls-fixes.css'))html=html.replace('</head>','<link rel="stylesheet" href="/cls-fixes.css?v=20260917" media="all"></head>');
+  html=html.replace(/<p>\s*<strong>Written and maintained by Wealth Arrays\.<\/strong>[\s\S]*?<\/p>/i,'');if(!/Written and maintained by Alok Goyal/i.test(html))html=html.replace(/(<h1[^>]*>[\s\S]*?<\/h1>)/i,'$1<p class="article-byline"><strong>Written and maintained by Alok Goyal, founder and creator of Wealth Arrays.</strong> This guide is educational and not personalised financial advice.</p>');}
+  const textForWordCount=(html.match(/<article[^>]*>([\s\S]*?)<\/article>/i)||html.match(/<main[^>]*>([\s\S]*?)<\/main>/i)||html.match(/<body[^>]*>([\s\S]*?)<\/body>/i)||['',''])[1]
+    .replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&[a-z#0-9]+;/gi,' ').replace(/\s+/g,' ').trim();
+  const visibleWordCount=textForWordCount?textForWordCount.split(/\s+/).length:0;
+  const isThinPage=(isCalc&&visibleWordCount<600)||(relPath==='advanced-finance-tools/index.html'&&visibleWordCount<450);
+  if(isThinPage){
+    if(/<meta\s+name=["']robots["']/i.test(html))html=html.replace(/<meta\s+name=["']robots["'][^>]*>/i,'<meta name="robots" content="noindex,follow">');
+    else html=html.replace('</head>','<meta name="robots" content="noindex,follow"></head>');
+    html=html.replace(/\s*<script[^>]+(?:adsbygoogle\.js|pagead2\.googlesyndication\.com)[^>]*><\/script>/gi,'')
+      .replace(/<ins\b[^>]*class=["'][^"']*adsbygoogle[^"']*["'][^>]*>[\s\S]*?<\/ins>/gi,'')
+      .replace(/<div\b[^>]*class=["'][^"']*(?:ad-slot|ad-container|advertisement)[^"']*["'][^>]*>[\s\S]*?<\/div>/gi,'');
+  }
+  const adsExcluded=isWidget||relPath==='404.html'||relPath==='index.html'||isThinPage||/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html);
+  if(adsExcluded)html=html.replace(/\s*<script[^>]+adsbygoogle\.js[^>]*><\/script>/gi,'').replace(/\s*<link[^>]+(?:pagead2\.googlesyndication\.com|googleads\.g\.doubleclick\.net)[^>]*>/gi,'').replace(/\s*<link[^>]+(?:pagead2\.googlesyndication\.com|googleads\.g\.doubleclick\.net)[^>]*>/gi,'');if(!html.includes('/cls-fixes.css'))html=html.replace('</head>','<link rel="stylesheet" href="/cls-fixes.css?v=20260917" media="all"></head>');
   if(isWidget){
     html=html.replace(/\s*<script[^>]+(?:wa-site-runtime|wa-calculator-runtime|calculators\.js|widget\.js|financial-engine|report-engine|financial-workspace)[^>]*><\/script>/gi,'');
     html=html.replace(/\s*<!-- WA-(?:SITE|CANONICAL|WIDGET)-RUNTIME:[^>]+-->/g,'');
@@ -187,4 +235,4 @@ if(isArticle){
   fs.writeFileSync(full,html,'utf8');}
 
 const routes=['/','/tools','/articles','/research','/faq','/about','/contact','/privacy','/terms','/disclaimer','/methodology','/editorial-policy','/advertising-policy','/category-investment','/category-loan','/category-banking','/category-retirement','/category-salary','/category-business',...slugs.map(s=>`/${s}/`)];for(const full of allHtml){const rel=path.relative(root,full).replaceAll(path.sep,'/');if(/^articles\/[^/]+\.html$/.test(rel))routes.push('/'+rel.replace(/\.html$/,''));}
-const unique=[...new Set(routes)];const today=new Date().toISOString().slice(0,10);const sitemap=['<?xml version="1.0" encoding="UTF-8"?>','<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',...unique.map(u=>`  <url><loc>https://wealtharrays.com${u}</loc><lastmod>${today}</lastmod></url>`),'</urlset>',''].join('\n');fs.writeFileSync(path.join(root,'sitemap.xml'),sitemap,'utf8');console.log(`Root-cause build complete: canonical site search, calculator search, current favicon, 20 split definitions, normalized calculator IDs, legacy route aliases, nested route support, absolute styles, CLS reservation, deterministic sitemap, ${allHtml.length} HTML files normalized.`);
+const unique=[...new Set(routes)].filter(u=>{let rel;if(u==='/')rel='index.html';else if(u==='/tools')rel='tools.html';else if(u.startsWith('/articles/'))rel='articles/'+u.slice('/articles/'.length)+'.html';else rel=u.replace(/^\//,'').replace(/\/$/,'')+'/index.html';const file=path.join(root,rel);if(!fs.existsSync(file))return true;const page=fs.readFileSync(file,'utf8');return !/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(page);});const today=new Date().toISOString().slice(0,10);const sitemap=['<?xml version="1.0" encoding="UTF-8"?>','<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',...unique.map(u=>`  <url><loc>https://wealtharrays.com${u}</loc><lastmod>${today}</lastmod></url>`),'</urlset>',''].join('\n');fs.writeFileSync(path.join(root,'sitemap.xml'),sitemap,'utf8');console.log(`Root-cause build complete: canonical site search, calculator search, current favicon, ${definitions.length} split definitions, normalized calculator IDs, legacy route aliases, nested route support, absolute styles, CLS reservation, page-specific guides, metadata and schema, thin-page noindex/ad guard, indexable-only sitemap, ${allHtml.length} HTML files normalized.`);
