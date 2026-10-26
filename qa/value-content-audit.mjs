@@ -20,7 +20,7 @@ for(const slug of calculators){
   const canonical=(html.match(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i)||[])[1]||'';
   const checks=[
     ['650+ educational words',words>=650],
-    ['worked example',/<h2[^>]*>Worked example/i.test(article)&&/example inputs|for illustration|suppose|if you/i.test(article)],
+    ['worked example',/<h2[^>]*>Worked example/i.test(article)&&/<section class=["']worked-example["']/i.test(article)],
     ['FAQ section with answers',/frequently asked questions/i.test(article)&&((article.match(/class=["']faq-item["']/gi)||[]).length>=2)],
     ['calculator-specific value guide',/WA-CALCULATOR-VALUE-GUIDE/i.test(html)],
     ['two or more calculator-specific guidance sections',(article.match(/calculator-specific-guidance/g)||[]).length>=2],
