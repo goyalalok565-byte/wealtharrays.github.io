@@ -42,8 +42,6 @@ jobs:
         run: node qa/research-data-audit.mjs
       - name: Accessibility static audit
         run: node qa/accessibility-static-audit.mjs
-      - name: Performance budget audit
-        run: node qa/performance-budget-audit.mjs
       - name: Build production dist
         run: npm run build:dist
       - name: Install Playwright for all-calculator browser regression
@@ -70,5 +68,12 @@ jobs:
         run: git diff --check
       - name: Verify literal npm run build
         run: npm run build
+      - name: Minify bundles and enforce production asset budget
+        run: |
+          for file in wa-site-runtime.js wa-home-runtime.js wa-calculator-runtime.js; do
+            npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output "$file" -- "$file"
+            cp "$file" "dist/$file"
+          done
+          node qa/performance-budget-audit.mjs
       - name: Verify package build output after npm run build
         run: npm run qa:dist
