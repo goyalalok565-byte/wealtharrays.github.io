@@ -73,7 +73,7 @@ const taxAt12L = await taxModule.onRequestPost({ request: new Request('https://e
 const tax12L = await taxAt12L.json();
 assert.equal(taxAt12L.status, 200);
 assert.equal(tax12L.results.find(x=>x.label==='Estimated total tax').value, 0, 'Section 87A rebate should reduce normal tax to zero at ₹12 lakh taxable income');
-const taxAt125L = await taxModule.onRequestPost({ request: new Request('https://example.test/v1/india-tax', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tax_year:'2026-27',regime:'new',taxable_income:1250000}) }) });
+const taxAt125L = await taxModule.onRequestPost({ request: new Request('https://example.test/v1/india-tax', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tax_year:'2026-27',regime:'new',taxable_income:1250000,rebate_eligible:true}) }) });
 const tax125L = await taxAt125L.json();
 assert.equal(tax125L.results.find(x=>x.label==='Estimated total tax').value, 52000, 'Marginal relief and cess should be applied at ₹12.5 lakh taxable income');
 console.log('SaaS readiness foundation audit, calculation vectors and tax vectors passed.');
