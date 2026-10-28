@@ -37,5 +37,18 @@ assert.equal(gstInclusive.results[0].value, 100000, 'GST inclusive taxable base 
 const zeroInterest = sharedModule.calculate('loan-emi', { principal: 120000, annualRate: 0, months: 12 });
 assert.equal(zeroInterest.results[0].value, 10000, 'Zero-rate loan EMI must avoid divide-by-zero');
 assert.throws(() => sharedModule.calculate('cagr', { startValue: 100, endValue: 110, years: 0 }), /years must be greater than zero/);
-console.log('SaaS readiness foundation audit and API golden vectors passed.');
+
+const taxHarness = tax
+  .replace(/^import \{ CORS_HEADERS, error, json \} from "\.\/\_shared\.js";\n/, 'const CORS_HEADERS = {}; const error = (code, message, status = 400, details) => new Response(JSON.stringify({error:{code,message,...(details?{details}:{})}}), {status, headers:{"Content-Type":"application/json"}}); const json = (data, status = 200) => new Response(JSON.stringify(data), {status, headers:{"Content-Type":"application/json"}});\\n')
+  .replaceAll('export async function onRequestOptions', 'async function onRequestOptions')
+  .replaceAll('export async function onRequestPost', 'async function onRequestPost') + '\\nexport { onRequestPost };';
+const taxModule = await import('data:text/javascript;base64,' + Buffer.from(taxHarness).toString('base64'));
+const taxAt12L = await taxModule.onRequestPost({ request: new Request('https://example.test/v1/india-tax', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tax_year:'2026-27',regime:'new',taxable_income:1200000}) }) });
+const tax12L = await taxAt12L.json();
+assert.equal(taxAt12L.status, 200);
+assert.equal(tax12L.results.find(x=>x.label==='Estimated total tax').value, 0, 'Section 87A rebate should reduce normal tax to zero at ₹12 lakh taxable income');
+const taxAt125L = await taxModule.onRequestPost({ request: new Request('https://example.test/v1/india-tax', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tax_year:'2026-27',regime:'new',taxable_income:1250000}) }) });
+const tax125L = await taxAt125L.json();
+assert.equal(tax125L.results.find(x=>x.label==='Estimated total tax').value, 52000, 'Marginal relief and cess should be applied at ₹12.5 lakh taxable income');
+console.log('SaaS readiness foundation audit, calculation vectors and tax vectors passed.');
 
