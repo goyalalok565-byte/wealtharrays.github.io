@@ -59,6 +59,16 @@ paths:
       responses:
         '200': {description: Webhook accepted}
         '401': {description: Invalid signature}
+  /v1/billing/cancel:
+    post:
+      summary: Schedule cancellation of the authenticated user's Razorpay subscription
+      operationId: cancelSubscription
+      security: [{bearerAuth: []}]
+      responses:
+        '200': {description: Cancellation scheduled at the current period end}
+        '404': {description: No cancellable subscription found}
+        '409': {description: Subscription is not cancellable in its current state}
+        '503': {description: Billing is not configured}
   /v1/billing/status:
     get:
       summary: Read the authenticated user's latest subscription status
