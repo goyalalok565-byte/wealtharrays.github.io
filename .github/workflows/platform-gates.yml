@@ -28,6 +28,8 @@ jobs:
         run: find . -maxdepth 2 -type f -name '*.js' -print0 | xargs -0 -n1 node --check
       - name: Validate Pages Functions JavaScript
         run: find functions -type f -name '*.js' -print0 | xargs -0 -n1 sh -c 'node --input-type=module --check < "$0"'
+      - name: Validate Cloudflare Worker router
+        run: node --check worker.mjs
       - name: Calculator regression and catalogue parity
         run: node qa/calculator-regression.mjs
       - name: Generate research datasets
