@@ -30,6 +30,10 @@ jobs:
         run: find functions -type f -name '*.js' -print0 | xargs -0 -n1 sh -c 'node --input-type=module --check < "$0"'
       - name: Validate Cloudflare Worker router
         run: node --check worker.mjs
+      - name: Service worker privacy and auth CSP regression
+        run: node qa/service-worker-privacy-audit.mjs
+      - name: Privacy policy consistency audit
+        run: node qa/privacy-policy-audit.mjs
       - name: Calculator regression and catalogue parity
         run: node qa/calculator-regression.mjs
       - name: Generate research datasets
@@ -42,10 +46,10 @@ jobs:
         run: node qa/research-data-audit.mjs
       - name: Accessibility static audit
         run: node qa/accessibility-static-audit.mjs
-      - name: Performance budget audit
-        run: node qa/performance-budget-audit.mjs
       - name: Build production dist
         run: npm run build:dist
+      - name: Canonical embed source regression
+        run: node qa/embed-regression.mjs
       - name: Install Playwright for all-calculator browser regression
         run: |
           npm install --no-save playwright@1.55.0
@@ -70,5 +74,12 @@ jobs:
         run: git diff --check
       - name: Verify literal npm run build
         run: npm run build
+      - name: Minify bundles and enforce production asset budget
+        run: |
+          for file in wa-site-runtime.js wa-home-runtime.js wa-calculator-runtime.js; do
+            npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output "$file" -- "$file"
+            cp "$file" "dist/$file"
+          done
+          node qa/performance-budget-audit.mjs
       - name: Verify package build output after npm run build
         run: npm run qa:dist

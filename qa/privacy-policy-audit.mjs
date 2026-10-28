@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const html = fs.readFileSync('privacy.html', 'utf8');
+assert.match(html, /<h2>Overview<\/h2>/, 'Privacy policy must have an overview');
+assert.match(html, /authentication provider/, 'Privacy policy must describe account authentication');
+assert.match(html, /cloud scenario sync/, 'Privacy policy must describe optional cloud scenario storage');
+assert.match(html, /Razorpay/, 'Privacy policy must describe subscription/payment processing');
+assert.match(html, /Service providers, retention and security/, 'Privacy policy must describe service providers and retention');
+assert.match(html, /access, correct or delete/, 'Privacy policy must describe data request options');
+assert.doesNotMatch(html, /<h2>What we don't collect<\/h2>|<h2>Changes to this policy<h2>/, 'Remove contradictory legacy claims and malformed duplicate headings');
+assert.equal((html.match(/<h2>Changes to this policy<\/h2>/g) || []).length, 1, 'Policy changes heading should appear exactly once');
+console.log('Privacy policy audit PASS — account/cloud/billing disclosures, retention, user requests and heading structure are consistent.');

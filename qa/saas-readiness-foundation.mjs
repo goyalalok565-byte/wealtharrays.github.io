@@ -37,6 +37,8 @@ for (const [name, source] of [['widget.js', widget], ['wa-calculator-runtime.js'
 }
 for (const model of ['sip','loan-emi','home-loan-emi','compound-interest','fixed-deposit','lumpsum','gst','cagr','inflation','simple-interest','currency-converter']) assert.ok(shared.includes('id: "'+model+'"'), 'API registry missing '+model);
 assert.match(calculate, /export async function onRequestPost/);
+assert.match(calculate, /jurisdictional_rules_applied: false/);
+assert.match(calculate, /Country is metadata only/);
 assert.match(worker, /ROUTES = new Map/);
 assert.match(worker, /billing/);
 assert.match(wrangler, /main/);
@@ -50,9 +52,16 @@ assert.match(auth, /auth\/v1\/user/);
 assert.match(authConfig, /SUPABASE_ANON_KEY/);
 assert.match(scenarios, /DELETE FROM saved_scenarios WHERE id = \? AND user_id = \?/);
 assert.match(checkout, /RAZORPAY_PLAN_MONTHLY/);
+assert.match(checkout, /SUBSCRIPTION_ALREADY_ACTIVE/);
+assert.match(checkout, /CHECKOUT_ALREADY_PENDING/);
+assert.ok(checkout.includes("https://api.razorpay.com/v1/subscriptions/"), "Existing checkout must be reused instead of creating a duplicate.");
 assert.match(webhook, /crypto\.subtle\.sign/);
+assert.match(webhook, /const safePayload = JSON\.stringify/);
+assert.doesNotMatch(webhook, /event\.event, raw/, 'Raw billing webhook bodies must not be persisted');
 assert.match(premiumBuild, /wa-ad-loader\.js/);
-assert.match(adLoader, /waSubscriptionCache/);
+assert.ok(adLoader.includes('/v1/billing/status'), 'Ad-free status must be checked against the server');
+assert.ok(adLoader.includes('Authorization'), 'Subscription status request must be authenticated');
+assert.ok(!adLoader.includes('getItem("waSubscriptionCache")'), 'Client-controlled subscription cache must not grant ad-free status');
 assert.match(adLoader, /adsbygoogle\.js/);
 assert.doesNotMatch(premiumBuild.match(/const adsenseJs=.*;/)?.[0] || '', /localStorage/);
 assert.match(cancel, /cancel_at_cycle_end/);
@@ -83,5 +92,8 @@ assert.equal(tax12L.results.find(x=>x.label==='Estimated total tax').value, 0, '
 const taxAt125L = await taxModule.onRequestPost({ request: new Request('https://example.test/v1/india-tax', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tax_year:'2026-27',regime:'new',taxable_income:1250000,rebate_eligible:true}) }) });
 const tax125L = await taxAt125L.json();
 assert.equal(tax125L.results.find(x=>x.label==='Estimated total tax').value, 52000, 'Marginal relief and cess should be applied at ₹12.5 lakh taxable income');
+const invalidRebate = await taxModule.onRequestPost({ request: new Request('https://example.test/v1/india-tax', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tax_year:'2026-27',regime:'new',taxable_income:1200000,rebate_eligible:'false'}) }) });
+assert.equal(invalidRebate.status, 400, 'String values must not be accepted as rebate eligibility booleans');
+assert.equal((await invalidRebate.json()).error.code, 'INVALID_REBATE_ELIGIBILITY');
 console.log('SaaS readiness foundation audit, calculation vectors and tax vectors passed.');
 
