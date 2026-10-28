@@ -38,7 +38,7 @@ assert.match(authConfig, /SUPABASE_ANON_KEY/);
 assert.match(scenarios, /DELETE FROM saved_scenarios WHERE id = \? AND user_id = \?/);
 assert.match(checkout, /RAZORPAY_PLAN_MONTHLY/);
 assert.match(webhook, /crypto\.subtle\.sign/);
-assert.match(account, /Create account/);
+assert.match(account, /auth\\/v1\\/signup/);
 assert.match(migration, /CREATE TABLE IF NOT EXISTS saved_scenarios/);
 assert.match(migration, /CREATE TABLE IF NOT EXISTS subscriptions/);
 
