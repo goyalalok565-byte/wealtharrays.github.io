@@ -34,7 +34,7 @@ Configure the Razorpay webhook URL as `https://wealtharrays.com/v1/billing/webho
 
 - `POST /v1/calculate` supports the model IDs returned by `GET /v1/models`. Model version `1.0.0` is explicit; unsupported IDs and versions return errors.
 - `GET /v1/fx?base=INR&symbols=USD,EUR` returns indicative rates from open.er-api.com with a 15-minute cache. These are not executable bank/trading quotes and the provider has no SLA guaranteed by this site.
-- `POST /v1/india-tax` currently supports only the Indian new tax regime for tax year 2026-27 and accepts **taxable income**, not gross salary. It does not automatically apply standard deduction and excludes special-rate income and several individual-specific details. It is an estimate, not tax filing software. Verify rates and individual eligibility against current official guidance: https://www.incometaxindia.gov.in/w/tax-rates-and-computation
+- `POST /v1/india-tax` currently supports only the Indian new tax regime for tax year 2026-27 and accepts **taxable income**, not gross salary. The caller must explicitly confirm Section 87A rebate eligibility. It does not automatically apply standard deduction and excludes special-rate income and several individual-specific details. It is an estimate, not tax filing software. Verify rates and individual eligibility against current official guidance: https://www.incometaxindia.gov.in/w/tax-rates-and-computation
 
 ## 5. Privacy and security
 
