@@ -9,9 +9,9 @@ for(const id of ids) if(!defs.includes(`id:"${id}"`)) throw new Error(`Missing c
 if(!widgetSource.includes('async function waCopyEmbed(calc)')) throw new Error('widget.js missing Copy Embed implementation');
 if(!widgetSource.includes('/widget.html?calc=${encodeURIComponent(calc.id)}')) throw new Error('widget.js must use canonical /widget.html embed route');
 if(!widgetSource.includes("document.execCommand('copy')")) throw new Error('Copy Embed must have synchronous clipboard fallback');
-if(!runtime.includes('/widget.html?calc=${encodeURIComponent(e.id)}')) throw new Error('Generated calculator runtime has stale direct widget route');
-if(!runtime.includes('class="tool-action" id="${t}-embed"')) throw new Error('Calculator mount must render Copy embed action');
-if(!widgetHtml.includes('/calculators.js') || !widgetHtml.includes('/widget.js')) throw new Error('Widget must load calculator definitions and canonical runtime');
+if(!runtime.includes('/widget.html?calc=${encodeURIComponent(calc.id)}')) throw new Error('Generated calculator runtime has stale direct widget route');
+if(!runtime.includes('class="tool-action" id="${id}-embed"')) throw new Error('Calculator mount must render Copy embed action');
+if(!widgetHtml.includes('/calculators.js') || !widgetHtml.includes('/wa-calculator-runtime.js') || !widgetHtml.includes('/widget-bootstrap.js')) throw new Error('Widget must load calculator definitions, canonical runtime, and bootstrap');
 if(/document\.addEventListener\("DOMContentLoaded", \(\) =>/.test(widgetHtml)) throw new Error('Widget must not use the pre-runtime racing bootstrap');
-if(!pageInit.includes('new URLSearchParams(location.search).get("calc")')) throw new Error('Calculator bootstrap must resolve widget calc query parameter');
+if(!pageInit.includes("new URLSearchParams(location.search).get('calc')")) throw new Error('Calculator bootstrap must resolve widget calc query parameter');
 console.log(`Embed regression PASS — all ${ids.length} calculators share the canonical Copy Embed path, widget bootstrap, and clipboard fallback.`);
