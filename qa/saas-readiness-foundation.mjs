@@ -16,6 +16,7 @@ const webhook = fs.readFileSync('functions/v1/billing/webhook.js', 'utf8');
 const cancel = fs.readFileSync('functions/v1/billing/cancel.js', 'utf8');
 const account = fs.readFileSync('account.js', 'utf8');
 const premiumBuild = fs.readFileSync('scripts/phase4-premium-build.mjs', 'utf8');
+const adLoader = fs.readFileSync('wa-ad-loader.js', 'utf8');
 const migration = fs.readFileSync('migrations/0001_saas.sql', 'utf8');
 for (const [name, source] of [['widget.js', widget], ['wa-calculator-runtime.js', runtime]]) {
   assert.match(source, /toLocaleString\(['"]en-IN['"]/ , name + ' must format numbers using Indian grouping');
