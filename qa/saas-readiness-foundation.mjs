@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 const widget = fs.readFileSync('widget.js', 'utf8');
 const runtime = fs.readFileSync('wa-calculator-runtime.js', 'utf8');
 const shared = fs.readFileSync('functions/v1/_shared.js', 'utf8');
+const worker = fs.readFileSync('worker.mjs', 'utf8');
+const wrangler = fs.readFileSync('wrangler.toml', 'utf8');
 const calculatorDefinitions = fs.readFileSync('calculators.js', 'utf8');
 const calculate = fs.readFileSync('functions/v1/calculate.js', 'utf8');
 const models = fs.readFileSync('functions/v1/models.js', 'utf8');
@@ -35,6 +37,11 @@ for (const [name, source] of [['widget.js', widget], ['wa-calculator-runtime.js'
 }
 for (const model of ['sip','loan-emi','home-loan-emi','compound-interest','fixed-deposit','lumpsum','gst','cagr','inflation','simple-interest','currency-converter']) assert.ok(shared.includes('id: "'+model+'"'), 'API registry missing '+model);
 assert.match(calculate, /export async function onRequestPost/);
+assert.match(worker, /ROUTES = new Map/);
+assert.match(worker, /billing/);
+assert.match(wrangler, /main/);
+assert.match(wrangler, /ASSETS/);
+assert.match(wrangler, /run_worker_first/);
 assert.match(models, /export async function onRequestGet/);
 assert.match(fx, /open\.er-api\.com/);
 assert.match(tax, /2026-27-new-regime-v1/);
