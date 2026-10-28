@@ -1,6 +1,7 @@
 name = "wealtharrays-github-io"
 main = "./worker.mjs"
 compatibility_date = "2026-10-12"
+routes = [{ pattern = "wealtharrays.com/v1/*", zone_name = "wealtharrays.com" }]
 
 [assets]
 directory = "./dist"
