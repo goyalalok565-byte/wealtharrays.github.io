@@ -99,7 +99,7 @@ try {
 
   await assertCalculator('sip-calculator/', 'SIP calculator scenario tools');
   // Calculator pages intentionally start with blank inputs; fill a known scenario explicitly.
-  for (const [field, expected] of [['monthly','200'],['rate','10'],['years','15']]) {
+  for (const [field, expected] of [['monthly','200'],['rate','10'],['years','15'],['inflation','6']]) {
     await page.locator('#calc-widget input[data-field="' + field + '"]').fill(expected);
   }
   if (await page.locator('#calc-widget .calc-result-row').count()) throw new Error('SIP must not calculate automatically while filling a scenario');
@@ -109,9 +109,9 @@ try {
   const sharePayload = await page.evaluate(() => window.__waSharePayload || null);
   if (!sharePayload?.url) throw new Error('Share scenario did not produce a share URL');
   const shareUrl = new URL(sharePayload.url);
-  if (shareUrl.searchParams.get('wa_scenario') !== '1' || shareUrl.searchParams.get('wa_monthly') !== '200' || shareUrl.searchParams.get('wa_rate') !== '10' || shareUrl.searchParams.get('wa_years') !== '15') throw new Error('Share scenario URL did not preserve all SIP inputs');
+  if (shareUrl.searchParams.get('wa_scenario') !== '1' || shareUrl.searchParams.get('wa_monthly') !== '200' || shareUrl.searchParams.get('wa_rate') !== '10' || shareUrl.searchParams.get('wa_years') !== '15' || shareUrl.searchParams.get('wa_inflation') !== '6') throw new Error('Share scenario URL did not preserve all SIP inputs');
   await page.goto(sharePayload.url, { waitUntil: 'networkidle' });
-  for (const [field, expected] of [['monthly','200'],['rate','10'],['years','15']]) {
+  for (const [field, expected] of [['monthly','200'],['rate','10'],['years','15'],['inflation','6']]) {
     const actual = await page.locator('#calc-widget input[data-field="' + field + '"]').inputValue();
     if (actual !== expected) throw new Error('Shared scenario did not restore ' + field + ': ' + actual);
   }
