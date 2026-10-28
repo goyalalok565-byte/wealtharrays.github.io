@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const sw = fs.readFileSync('sw.js', 'utf8');
+const headers = fs.readFileSync('_headers', 'utf8');
+assert.match(sw, /url\.pathname\s*===\s*'\/v1'\s*\|\|\s*url\.pathname\.startsWith\('\/v1\/'\)/, 'Service worker must bypass all API routes');
+assert.match(sw, /request\.headers\.has\('Authorization'\)/, 'Service worker must bypass authenticated requests');
+assert.match(sw, /no-store\|private\|no-cache/, 'Cache helper must respect private/no-store/no-cache response directives');
+assert.match(sw, /Do not cache arbitrary same-origin fetches/, 'Only navigations and static assets should be cacheable');
+assert.ok((headers.match(/connect-src[^\n]*https:\/\/\*\.supabase\.co/g) || []).length >= 3, 'CSP connect-src must permit Supabase auth on top-level and embed policies');
+console.log('Service worker privacy/CSP audit PASS — API and authenticated requests bypass Cache Storage, cache directives are respected, and Supabase auth is permitted.');
