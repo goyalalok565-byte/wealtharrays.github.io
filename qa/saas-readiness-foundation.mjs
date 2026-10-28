@@ -69,7 +69,7 @@ const taxHarness = tax
   .replaceAll('export async function onRequestOptions', 'async function onRequestOptions')
   .replaceAll('export async function onRequestPost', 'async function onRequestPost') + '\nexport { onRequestPost };';
 const taxModule = await import('data:text/javascript;base64,' + Buffer.from(taxHarness).toString('base64'));
-const taxAt12L = await taxModule.onRequestPost({ request: new Request('https://example.test/v1/india-tax', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tax_year:'2026-27',regime:'new',taxable_income:1200000}) }) });
+const taxAt12L = await taxModule.onRequestPost({ request: new Request('https://example.test/v1/india-tax', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tax_year:'2026-27',regime:'new',taxable_income:1200000,rebate_eligible:true}) }) });
 const tax12L = await taxAt12L.json();
 assert.equal(taxAt12L.status, 200);
 assert.equal(tax12L.results.find(x=>x.label==='Estimated total tax').value, 0, 'Section 87A rebate should reduce normal tax to zero at ₹12 lakh taxable income');
