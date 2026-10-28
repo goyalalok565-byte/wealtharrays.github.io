@@ -83,5 +83,8 @@ assert.equal(tax12L.results.find(x=>x.label==='Estimated total tax').value, 0, '
 const taxAt125L = await taxModule.onRequestPost({ request: new Request('https://example.test/v1/india-tax', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tax_year:'2026-27',regime:'new',taxable_income:1250000,rebate_eligible:true}) }) });
 const tax125L = await taxAt125L.json();
 assert.equal(tax125L.results.find(x=>x.label==='Estimated total tax').value, 52000, 'Marginal relief and cess should be applied at ₹12.5 lakh taxable income');
+const invalidRebate = await taxModule.onRequestPost({ request: new Request('https://example.test/v1/india-tax', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tax_year:'2026-27',regime:'new',taxable_income:1200000,rebate_eligible:'false'}) }) });
+assert.equal(invalidRebate.status, 400, 'String values must not be accepted as rebate eligibility booleans');
+assert.equal((await invalidRebate.json()).error.code, 'INVALID_REBATE_ELIGIBILITY');
 console.log('SaaS readiness foundation audit, calculation vectors and tax vectors passed.');
 
