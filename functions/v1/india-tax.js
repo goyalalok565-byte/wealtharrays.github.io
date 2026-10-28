@@ -63,7 +63,8 @@ export async function onRequestPost({ request }) {
       slabs: SLABS.map(s => ({ upper_limit: Number.isFinite(s.limit) ? s.limit : null, rate: s.rate })),
       standard_deduction: "Not applied automatically. If applicable, subtract the eligible amount before submitting taxable_income.",
       excludes: ["special-rate income such as certain capital gains or winnings", "tax credits other than the implemented Section 87A rebate", "individual-specific deductions and exemptions", "advance tax, TDS and interest"],
-      source: "Income Tax Department, tax rates and computation, current rules for tax year 2026-27; confirm with current official guidance before filing."
+      source: "Income Tax Department, tax rates and computation, current rules for tax year 2026-27; confirm with current official guidance before filing.",
+      source_url: "https://www.incometaxindia.gov.in/w/tax-rates-and-computation"
     },
     metadata: { calculated_at: new Date().toISOString(), deterministic: true, not_for_filing: true }
   }, 200, { "Cache-Control": "no-store" });
