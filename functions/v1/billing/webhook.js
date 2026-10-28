@@ -13,9 +13,10 @@ export async function onRequestPost({ request, env }) {
   let event; try { event = JSON.parse(raw); } catch { return error("INVALID_JSON", "Webhook body must be valid JSON.", 400); }
   if (!event.id || !event.event) return error("INVALID_EVENT", "Webhook event id and type are required.", 400);
   const entity = event.payload?.subscription?.entity || event.payload?.subscription?.subscription || null;
+  const safePayload = JSON.stringify({ subscription_id: entity?.id || null, status: entity?.status || null, current_end: entity?.current_end || null });
   try {
     await env.DB.prepare("INSERT OR IGNORE INTO billing_events (id, provider, provider_event_id, event_type, payload_json, processed_at) VALUES (?, 'razorpay', ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now'))")
-      .bind(crypto.randomUUID(), event.id, event.event, raw).run();
+      .bind(crypto.randomUUID(), event.id, event.event, safePayload).run();
     if (entity?.id) {
       const map = { "subscription.activated": "active", "subscription.charged": "active", "subscription.pending": "pending", "subscription.halted": "halted", "subscription.cancelled": "cancelled", "subscription.completed": "completed" };
       const status = map[event.event];
