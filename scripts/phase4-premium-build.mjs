@@ -56,10 +56,19 @@ for(const file of htmlFiles){
     s=s.replace(/<script[^>]+src=["']\/consent-loader\.js[^>]*><\/script>/gi,'');
   }else if(!s.includes('/consent-loader.js')) s=s.replace('</head>',consentJs+'</head>');
 
+  const staticAdScript=/<script\\b[^>]*src=["']https:\\/\\/pagead\\.googlesyndication\\.com\\/pagead\\/js\\/adsbygoogle\\.js[^"']*["'][^>]*>\\s*<\\/script>/gi;
   if(adsenseExcluded){
+    const escaped=adsenseJs.replace(/[.*+?^\\${}()|[\\]\\\\]/g,'\\\\  if(adsenseExcluded){
     const escaped=adsenseJs.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
     s=s.replace(new RegExp('\\s*'+escaped),'');
   } else if(!s.includes('ca-pub-6507600103785450')) {
+    s=s.replace('</head>',`${adsenseJs}</head>`);
+  }');
+    s=s.replace(new RegExp('\\\\s*'+escaped),'');
+    s=s.replace(staticAdScript,'');
+  } else if(staticAdScript.test(s)) {
+    s=s.replace(staticAdScript,adsenseJs);
+  } else if(!s.includes('waSubscriptionCache')) {
     s=s.replace('</head>',`${adsenseJs}</head>`);
   }
   if(id && s.includes('id="calc-widget"') && base!=='widget.html'){
