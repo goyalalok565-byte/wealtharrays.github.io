@@ -49,9 +49,11 @@ export async function onRequestPost({ request }) {
   if (year !== "2026-27" || regime !== "new") return error("UNSUPPORTED_TAX_RULE", "Only the reviewed Indian new-regime model for tax year 2026-27 is currently supported.", 422, { supported_tax_year: "2026-27", supported_regime: "new", model_version: VERSION });
   const income = body.taxable_income;
   if (typeof income !== "number" || !Number.isFinite(income) || income < 0 || income > 1e9) return error("INVALID_TAXABLE_INCOME", "taxable_income must be a finite number between ₹0 and ₹100 crore.", 400, { field: "taxable_income" });
-  const output = compute(income, body.rebate_eligible);
+  if (body.rebate_eligible !== undefined && typeof body.rebate_eligible !== "boolean") return error("INVALID_REBATE_ELIGIBILITY", "rebate_eligible must be a boolean when provided.", 400, { field: "rebate_eligible" });
+  const rebateEligible = body.rebate_eligible ?? false;
+  const output = compute(income, rebateEligible);
   return json({
-    tax_year: year, regime, model_version: VERSION, taxable_income: income, rebate_eligible: body.rebate_eligible,
+    tax_year: year, regime, model_version: VERSION, taxable_income: income, rebate_eligible: rebateEligible,
     results: [
       { label: "Tax before rebate", value: output.grossTax, format: "currency" },
       { label: "Section 87A rebate / marginal relief", value: output.rebate, format: "currency" },
