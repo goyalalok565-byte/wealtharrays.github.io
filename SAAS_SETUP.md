@@ -6,7 +6,7 @@ The repository now contains the application code for browser-first scenarios, an
 
 1. Create a Cloudflare D1 database for Wealth Arrays.
 2. In the Cloudflare Pages project settings, add a D1 database binding named **DB** pointing at that database.
-3. Apply `migrations/0001_saas.sql` to the database, for example with Wrangler's remote D1 execute command.
+3. Apply all SQL migrations in `migrations/` to the database in order, for example with Wrangler's remote D1 migration command.
 4. Confirm the Functions directory at the repository root is deployed with the Pages project. Routes implemented here include `/v1/calculate`, `/v1/models`, `/v1/fx`, `/v1/india-tax`, `/v1/scenarios`, and `/v1/billing/*`.
 
 ## 2. Supabase authentication
