@@ -57,12 +57,13 @@ for(const file of htmlFiles){
   }else if(!s.includes('/consent-loader.js')) s=s.replace('</head>',consentJs+'</head>');
 
   const staticAdScript=/<script\b[^>]*src=["']https:\/\/pagead\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js[^"']*["'][^>]*>\s*<\/script>/gi;
+  s=s.replace(/<script>[^]*?waSubscriptionCache[^]*?<\/script>/gi,'');
   if(adsenseExcluded){
     s=s.replace(staticAdScript,'');
-    s=s.replace(/<script>[^]*?waSubscriptionCache[^]*?<\/script>/gi,'');
+    s=s.replace(/<script\b[^>]*src=["']\/wa-ad-loader\.js[^"']*["'][^>]*>\s*<\/script>/gi,'');
   } else if(staticAdScript.test(s)) {
     s=s.replace(staticAdScript,adsenseJs);
-  } else if(!s.includes('waSubscriptionCache')) {
+  } else if(!s.includes('/wa-ad-loader.js')) {
     s=s.replace('</head>',adsenseJs+'</head>');
   }
   if(id && s.includes('id="calc-widget"') && base!=='widget.html'){
