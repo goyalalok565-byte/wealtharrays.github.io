@@ -25,7 +25,7 @@ function compute(taxableIncome) {
   const grossTax = slabTax(taxableIncome);
   let rebate = 0;
   if (taxableIncome <= 1200000) rebate = Math.min(grossTax, 60000);
-  else if (taxableIncome <= 1270000) rebate = Math.min(grossTax, Math.max(0, grossTax - (taxableIncome - 1200000)));
+  else if (grossTax > taxableIncome - 1200000) rebate = grossTax - (taxableIncome - 1200000);
   const afterRebate = Math.max(0, grossTax - rebate);
   let surcharge = afterRebate * surchargeRate(taxableIncome);
   const threshold = surchargeThreshold(taxableIncome);
