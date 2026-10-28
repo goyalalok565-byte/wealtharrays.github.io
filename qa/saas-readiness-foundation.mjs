@@ -21,8 +21,7 @@ for (const [name, source] of [['widget.js', widget], ['wa-calculator-runtime.js'
   assert.match(source, /waGetSavedScenarios/, name + ' must persist scenarios locally');
   assert.match(source, /waSyncSavedScenarios/, name + ' must support opt-in account sync');
   assert.match(source, /Download PDF/, name + ' must expose a direct PDF download action');
-  assert.match(source, /compare-panel\\[hidden\\].*display:none!important/, name + ' must honor hidden state for compare and saved panels');
-  assert.match(source, /waDownloadPdfReport/, name + ' must download a PDF report');
+  assert.match(source, /compare-panel\[hidden\].*display:none!important/, name + ' must honor hidden state for compare and saved panels');
   assert.match(source, /waDownloadPdfReport/, name + ' must download a PDF report');
   assert.match(source, /aria-invalid/, name + ' must expose field validation to assistive technology');
   assert.match(source, /Get live exchange rate/, name + ' must expose live FX retrieval');
