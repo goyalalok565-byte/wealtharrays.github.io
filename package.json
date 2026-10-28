@@ -7,6 +7,6 @@
     "qa:dist": "SITE_ROOT=dist node scripts/site-integrity.mjs && node qa/value-content-audit.mjs",
     "build": "npm run build:dist",
     "research:generate": "node scripts/generate-research-datasets.mjs",
-    "qa:platform": "node qa/platform-phase1-20-audit.mjs && node qa/phase1-20-roadmap-audit.mjs && node qa/research-data-audit.mjs && node qa/accessibility-static-audit.mjs && node qa/performance-budget-audit.mjs && node qa/saas-readiness-foundation.mjs"
+    "qa:platform": "node qa/platform-phase1-20-audit.mjs && node qa/phase1-20-roadmap-audit.mjs && node qa/research-data-audit.mjs && node qa/accessibility-static-audit.mjs && npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output wa-calculator-runtime.js -- wa-calculator-runtime.js && node qa/performance-budget-audit.mjs && node qa/saas-readiness-foundation.mjs"
   }
 }
