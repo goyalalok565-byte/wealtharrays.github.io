@@ -5,7 +5,7 @@ window.CALCULATORS=window.CALCULATORS||[];window.CALCULATORS.push({
     title: "Mortgage / Loan EMI",
     category: "loan",
     short: "Work out fixed monthly payments on any loan.",
-    desc: "Calculate the equal monthly instalment for a mortgage, car loan, or personal loan, and the total interest paid over its term.",
+    desc: "Calculate monthly mortgage payments, total interest and total repayment for a home purchase using loan amount, rate and term.",
     article: {
       formula: "EMI = [P × r × (1+r)^n] / [(1+r)^n − 1], where P is the loan amount, r is the monthly interest rate (annual rate ÷ 12), and n is the number of monthly payments.",
       exampleInputs: { principal: 250000, rate: 6.5, years: 25 },
