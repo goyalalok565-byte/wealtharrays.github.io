@@ -7,7 +7,7 @@ export async function onRequestGet({ request, env }) {
   try {
     await ensureProfile(env, auth.user);
     const rows = await env.DB.prepare("SELECT id, calculator_id, name, model_version, inputs_json, results_json, created_at, updated_at FROM saved_scenarios WHERE user_id = ? ORDER BY updated_at DESC LIMIT 100").bind(auth.user.id).all();
-    const subscription = await env.DB.prepare("SELECT plan_id, status, current_period_end FROM subscriptions WHERE user_id = ? ORDER BY updated_at DESC LIMIT 1").bind(auth.user.id).first();
+    const subscription = await env.DB.prepare("SELECT plan_id, status, current_period_end, cancel_at_period_end FROM subscriptions WHERE user_id = ? ORDER BY updated_at DESC LIMIT 1").bind(auth.user.id).first();
     return json({ scenarios: (rows.results || []).map(row => ({ ...row, inputs: parseJson(row.inputs_json), results: parseJson(row.results_json) })), subscription: subscription || null }, 200, { "Cache-Control": "no-store" });
   } catch { return error("DATABASE_ERROR", "Could not load your saved scenarios.", 500); }
 }
