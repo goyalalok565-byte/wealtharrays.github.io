@@ -143,7 +143,7 @@ try {
     const apiCalc = await apiCalcResponse.json();
     const apiFuture = apiCalc.results?.find(result => result.label === 'Estimated future value')?.value;
     if (!Number.isFinite(apiFuture) || Math.abs(apiFuture - 83584.85) > 0.02) throw new Error('Production SIP API golden vector mismatch: ' + apiFuture);
-    const taxResponse = await fetch(baseUrl + '/v1/india-tax', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tax_year: '2026-27', regime: 'new', taxable_income: 1200000 }) });
+    const taxResponse = await fetch(baseUrl + '/v1/india-tax', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tax_year: '2026-27', regime: 'new', taxable_income: 1200000, rebate_eligible: true }) });
     if (!taxResponse.ok) throw new Error('Production /v1/india-tax returned ' + taxResponse.status);
     const taxData = await taxResponse.json();
     if (taxData.results?.find(result => result.label === 'Estimated total tax')?.value !== 0) throw new Error('Production India tax rebate vector mismatch at ₹12 lakh');
