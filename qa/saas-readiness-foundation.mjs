@@ -37,6 +37,8 @@ for (const [name, source] of [['widget.js', widget], ['wa-calculator-runtime.js'
 }
 for (const model of ['sip','loan-emi','home-loan-emi','compound-interest','fixed-deposit','lumpsum','gst','cagr','inflation','simple-interest','currency-converter']) assert.ok(shared.includes('id: "'+model+'"'), 'API registry missing '+model);
 assert.match(calculate, /export async function onRequestPost/);
+assert.match(calculate, /jurisdictional_rules_applied: false/);
+assert.match(calculate, /Country is metadata only/);
 assert.match(worker, /ROUTES = new Map/);
 assert.match(worker, /billing/);
 assert.match(wrangler, /main/);
