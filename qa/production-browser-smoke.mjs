@@ -133,6 +133,35 @@ try {
   const pdfDownload = await downloadPromise;
   if (!pdfDownload.suggestedFilename().endsWith('.pdf')) throw new Error('Export action did not download a PDF file');
   await page.locator('#calc-widget .wa-saved-item button[data-wa-delete]').first().click();
+  if (new URL(baseUrl).hostname === 'wealtharrays.com') {
+    const modelsResponse = await fetch(baseUrl + '/v1/models');
+    if (!modelsResponse.ok) throw new Error('Production /v1/models endpoint returned ' + modelsResponse.status);
+    const modelData = await modelsResponse.json();
+    if (!modelData.models?.some(model => model.id === 'sip' && model.version === '1.0.0')) throw new Error('Production model registry is missing the versioned SIP model');
+    const apiCalcResponse = await fetch(baseUrl + '/v1/calculate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'sip', model_version: '1.0.0', inputs: { monthly: 200, annualRate: 10, years: 15 } }) });
+    if (!apiCalcResponse.ok) throw new Error('Production /v1/calculate returned ' + apiCalcResponse.status);
+    const apiCalc = await apiCalcResponse.json();
+    const apiFuture = apiCalc.results?.find(result => result.label === 'Estimated future value')?.value;
+    if (!Number.isFinite(apiFuture) || Math.abs(apiFuture - 83584.85) > 0.02) throw new Error('Production SIP API golden vector mismatch: ' + apiFuture);
+    const taxResponse = await fetch(baseUrl + '/v1/india-tax', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tax_year: '2026-27', regime: 'new', taxable_income: 1200000 }) });
+    if (!taxResponse.ok) throw new Error('Production /v1/india-tax returned ' + taxResponse.status);
+    const taxData = await taxResponse.json();
+    if (taxData.results?.find(result => result.label === 'Estimated total tax')?.value !== 0) throw new Error('Production India tax rebate vector mismatch at ₹12 lakh');
+    const fxResponse = await fetch(baseUrl + '/v1/fx?base=USD&symbols=INR');
+    if (!fxResponse.ok) throw new Error('Production /v1/fx returned ' + fxResponse.status);
+    const fxData = await fxResponse.json();
+    if (!(Number(fxData.rates?.INR) > 0)) throw new Error('Production FX endpoint returned no USD/INR rate');
+    await assertCalculator('currency-converter/', 'Currency converter live-rate flow');
+    await page.locator('#calc-widget select[data-field="from"]').selectOption('USD');
+    await page.locator('#calc-widget select[data-field="to"]').selectOption('INR');
+    await page.locator('#calc-widget button[id$="-get-live-rate"]').click();
+    await page.waitForFunction(() => document.querySelector('#calc-widget [id$="-fx-status"]')?.textContent.includes('Indicative rate'), { timeout: 15000 });
+    if (await page.locator('#calc-widget .calc-result-row').count()) throw new Error('Fetching an FX rate must not auto-calculate the conversion');
+    if (!(Number(await page.locator('#calc-widget input[data-field="rate"]').inputValue()) > 0)) throw new Error('Live FX button did not populate the exchange-rate field');
+    await page.locator('#calc-widget button[id$="-calculate"]').click();
+    await page.locator('#calc-widget .calc-result-row').first().waitFor({ state: 'visible', timeout: 5000 });
+  }
+
   await assertCalculator('cagr-calculator/', 'CAGR worked example');
   for (const [field, expected] of [['start','100000'],['end','161051'],['years','5']]) {
     const actual = await page.locator('#calc-widget input[data-field="' + field + '"]').inputValue();
