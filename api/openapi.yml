@@ -2,8 +2,121 @@ openapi: 3.0.3
 info:
   title: Wealth Arrays Financial Engine API
   version: 1.0.0
-  description: Deterministic financial calculations with reproducible inputs, assumptions, model versions and provenance. This is an integration contract; hosting, authentication and rate limiting are external infrastructure concerns.
+  description: Versioned financial calculations, indicative FX rates, a limited Indian tax estimate, authenticated scenario storage and subscription endpoints. Cloudflare bindings, Supabase authentication and Razorpay plans require deployment configuration.
 paths:
+  /v1/auth-config:
+    get:
+      summary: Return public authentication configuration
+      operationId: getAuthConfig
+      responses:
+        '200': {description: Public Supabase URL and anon key}
+        '503': {description: Authentication not configured}
+  /v1/scenarios:
+    get:
+      summary: List the authenticated user's cloud scenarios
+      operationId: listSavedScenarios
+      security: [{bearerAuth: []}]
+      responses:
+        '200': {description: User-owned saved scenarios}
+        '401': {description: Authentication required}
+    post:
+      summary: Save a scenario to the authenticated user's account
+      operationId: saveScenario
+      security: [{bearerAuth: []}]
+      responses:
+        '201': {description: Scenario saved}
+        '400': {description: Invalid scenario}
+        '401': {description: Authentication required}
+    delete:
+      summary: Delete a user-owned saved scenario
+      operationId: deleteScenario
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema: {type: string}
+      security: [{bearerAuth: []}]
+      responses:
+        '200': {description: Scenario deleted}
+        '404': {description: Scenario not found}
+  /v1/billing/checkout:
+    post:
+      summary: Create a Razorpay subscription checkout
+      operationId: createBillingCheckout
+      security: [{bearerAuth: []}]
+      responses:
+        '201': {description: Razorpay checkout URL}
+        '503': {description: Billing or database is not configured}
+  /v1/billing/webhook:
+    post:
+      summary: Verify and process Razorpay subscription webhook events
+      operationId: processRazorpayWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, additionalProperties: true}
+      responses:
+        '200': {description: Webhook accepted}
+        '401': {description: Invalid signature}
+  /v1/billing/cancel:
+    post:
+      summary: Schedule cancellation of the authenticated user's Razorpay subscription
+      operationId: cancelSubscription
+      security: [{bearerAuth: []}]
+      responses:
+        '200': {description: Cancellation scheduled at the current period end}
+        '404': {description: No cancellable subscription found}
+        '409': {description: Subscription is not cancellable in its current state}
+        '503': {description: Billing is not configured}
+  /v1/billing/status:
+    get:
+      summary: Read the authenticated user's latest subscription status
+      operationId: getBillingStatus
+      security: [{bearerAuth: []}]
+      responses:
+        '200': {description: Subscription status}
+  /v1/fx:
+    get:
+      summary: Retrieve indicative foreign-exchange rates
+      operationId: getLiveFxRates
+      parameters:
+        - in: query
+          name: base
+          schema: {type: string, minLength: 3, maxLength: 3, default: INR}
+        - in: query
+          name: symbols
+          schema: {type: string, description: Optional comma-separated currency codes}
+      responses:
+        '200':
+          description: Indicative rates and provider update timestamp
+        '400':
+          description: Unsupported currency code
+        '502':
+          description: Rate provider unavailable
+  /v1/india-tax:
+    post:
+      summary: Estimate Indian new-regime income tax for tax year 2026-27
+      operationId: calculateIndiaTax
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tax_year, regime, taxable_income, rebate_eligible]
+              properties:
+                tax_year: {type: string, enum: ["2026-27"]}
+                regime: {type: string, enum: [new]}
+                taxable_income: {type: number, minimum: 0, maximum: 1000000000}
+                rebate_eligible: {type: boolean, description: Whether Section 87A rebate eligibility has been confirmed for this taxpayer}
+      responses:
+        '200':
+          description: Tax estimate with model version and assumptions
+        '400':
+          description: Invalid taxable income or rebate eligibility
+        '422':
+          description: Unsupported tax year or regime
   /v1/calculate:
     post:
       summary: Calculate a registered financial model
@@ -49,6 +162,11 @@ paths:
                     items:
                       $ref: '#/components/schemas/ModelSummary'
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     CalculationRequest:
       type: object
@@ -62,43 +180,47 @@ components:
         currency: {type: string, description: ISO 4217 currency code}
     CalculationResponse:
       type: object
-      required: [model, model_version, inputs, assumptions, results, limitations]
+      required: [model, model_version, inputs, assumptions, results, metadata]
       properties:
         model: {type: string}
         model_version: {type: string}
         inputs: {type: object, additionalProperties: true}
         assumptions: {type: object, additionalProperties: true}
-        results: {type: object, additionalProperties: true}
-        limitations:
+        results:
           type: array
-          items: {type: string}
+          items:
+            type: object
+            required: [label, value, format]
+            properties:
+              label: {type: string}
+              value: {type: number}
+              format: {type: string}
+              emphasis: {type: string}
+        metadata: {type: object, additionalProperties: true}
         sources:
           type: array
           items:
             type: object
             additionalProperties: true
-        reproducibility:
-          type: object
-          additionalProperties: true
     ModelSummary:
       type: object
-      required: [id, version, family, timing, formula, inputs, limitations]
+      required: [id, version, title, inputs, assumptions]
       properties:
         id: {type: string}
         version: {type: string}
-        family: {type: string}
-        timing: {type: string}
-        formula: {type: string}
+        title: {type: string}
         inputs:
           type: array
           items: {type: string}
-        limitations:
-          type: array
-          items: {type: string}
+        assumptions: {type: string}
     ErrorResponse:
       type: object
-      required: [error, message]
+      required: [error]
       properties:
-        error: {type: string}
-        message: {type: string}
-        details: {type: object, additionalProperties: true}
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: {type: string}
+            message: {type: string}
+            details: {type: object, additionalProperties: true}

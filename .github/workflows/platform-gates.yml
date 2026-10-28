@@ -26,6 +26,8 @@ jobs:
           node-version: 24
       - name: Validate JavaScript
         run: find . -maxdepth 2 -type f -name '*.js' -print0 | xargs -0 -n1 node --check
+      - name: Validate Pages Functions JavaScript
+        run: find functions -type f -name '*.js' -print0 | xargs -0 -n1 sh -c 'node --input-type=module --check < "$0"'
       - name: Calculator regression and catalogue parity
         run: node qa/calculator-regression.mjs
       - name: Generate research datasets
@@ -42,6 +44,24 @@ jobs:
         run: node qa/performance-budget-audit.mjs
       - name: Build production dist
         run: npm run build:dist
+      - name: Install Playwright for all-calculator browser regression
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start built site for browser regression
+        run: |
+          python3 -m http.server 4173 --directory dist > /tmp/wealtharrays-dist-http.log 2>&1 &
+          echo $! > /tmp/wealtharrays-dist-http.pid
+          for i in $(seq 1 20); do
+            curl -fsS http://127.0.0.1:4173/index.html >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/wealtharrays-dist-http.log
+          exit 1
+      - name: Browser regression for all 47 calculators and scenario features
+        env:
+          BASE_URL: http://127.0.0.1:4173
+        run: node qa/production-browser-smoke.mjs
       - name: Dist integrity
         run: npm run qa:dist
       - name: Diff check

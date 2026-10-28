@@ -16,7 +16,7 @@ walk(root);
 const phase4Css='<link rel="stylesheet" href="/phase4-premium.css?v=20260915-1">';
 const themeJs='<script src="/theme-init.js?v=20260915-1"></script>';
 const redirectJs='<script src="/404-runtime.js?v=20260915-1" defer></script>';
-const adsenseJs='<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6507600103785450" crossorigin="anonymous"></script>';
+const adsenseJs='<script src="/wa-ad-loader.js" defer></script>';
 const consentJs='<script data-cfasync="false" src="/consent-loader.js" defer></script>';
 const calcIds={
  'sip-calculator/index.html':'sip', 'compound-interest-calculator/index.html':'compound-interest', 'mortgage-emi-calculator/index.html':'mortgage', 'roi-calculator/index.html':'roi', 'simple-interest-calculator/index.html':'simple-interest', 'retirement-calculator/index.html':'freedom-milestone', 'salary-to-hourly-calculator/index.html':'salary-hourly', 'profit-margin-calculator/index.html':'profit-margin', 'fixed-deposit-calculator/index.html':'fixed-deposit', 'recurring-deposit-calculator/index.html':'recurring-deposit', 'lumpsum-calculator/index.html':'lumpsum', 'cagr-calculator/index.html':'cagr', 'car-loan-calculator/index.html':'car-loan', 'personal-loan-calculator/index.html':'personal-loan', 'debt-payoff-calculator/index.html':'debt-payoff', 'inflation-calculator/index.html':'inflation', 'net-worth-calculator/index.html':'net-worth', 'overtime-pay-calculator/index.html':'overtime', 'freelance-rate-calculator/index.html':'freelance-rate', 'income-tax-scenario-calculator/index.html':'income-tax-planner'
@@ -56,11 +56,15 @@ for(const file of htmlFiles){
     s=s.replace(/<script[^>]+src=["']\/consent-loader\.js[^>]*><\/script>/gi,'');
   }else if(!s.includes('/consent-loader.js')) s=s.replace('</head>',consentJs+'</head>');
 
+  const staticAdScript=/<script\b[^>]*src=["']https:\/\/pagead\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js[^"']*["'][^>]*>\s*<\/script>/gi;
+  s=s.replace(/<script>[^]*?waSubscriptionCache[^]*?<\/script>/gi,'');
   if(adsenseExcluded){
-    const escaped=adsenseJs.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-    s=s.replace(new RegExp('\\s*'+escaped),'');
-  } else if(!s.includes('ca-pub-6507600103785450')) {
-    s=s.replace('</head>',`${adsenseJs}</head>`);
+    s=s.replace(staticAdScript,'');
+    s=s.replace(/<script\b[^>]*src=["']\/wa-ad-loader\.js[^"']*["'][^>]*>\s*<\/script>/gi,'');
+  } else if(staticAdScript.test(s)) {
+    s=s.replace(staticAdScript,adsenseJs);
+  } else if(!s.includes('/wa-ad-loader.js')) {
+    s=s.replace('</head>',adsenseJs+'</head>');
   }
   if(id && s.includes('id="calc-widget"') && base!=='widget.html'){
     if(!s.includes('/wa-calculator-runtime.js')) s=s.replace('</body>','<script src="/wa-calculator-runtime.js" defer></script></body>');
