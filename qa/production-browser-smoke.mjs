@@ -61,6 +61,8 @@ try {
     const label = calc.title + ' (' + calc.slug + ')';
     await assertCalculator(calc.slug + '/', label);
     const calculateButton = page.locator('#calc-widget button[id$="-calculate"]');
+    const firstInput = page.locator('#calc-widget input[data-field]').first();
+    await firstInput.fill('');
     await calculateButton.click();
     await page.locator('#calc-widget .wa-result-empty').waitFor({ state: 'visible', timeout: 3000 });
     if (!(await page.locator('#calc-widget input[aria-invalid="true"], #calc-widget select[aria-invalid="true"]').count())) throw new Error(label + ' must mark invalid fields when Calculate is clicked with empty inputs');
@@ -68,11 +70,13 @@ try {
       const control = page.locator('#calc-widget [data-field="' + field.id + '"]');
       if (field.type === 'select') {
         const options = field.options || [];
-        const candidate = field.default === undefined || field.default === null ? '' : String(field.default);
+        const currentValue = await control.inputValue();
+        const candidate = field.default === undefined || field.default === null ? currentValue : String(field.default);
         const value = options.some(option => String(option.value) === candidate) ? candidate : String(options[0]?.value ?? '');
         if (value) await control.selectOption(value);
       } else {
         let value = field.default;
+        if (value === undefined || value === null || value === '') value = await control.inputValue();
         if (value === undefined || value === null || value === '') value = field.min !== undefined && field.min > 0 ? field.min : 1;
         value = Number(value);
         if (field.min !== undefined && value < field.min) value = field.min;
