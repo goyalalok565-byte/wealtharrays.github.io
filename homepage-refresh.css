@@ -393,3 +393,6 @@ html.wa-home-ready #wa-home-tool-grid:not(.is-expanded) .home-tool-card:nth-chil
 @media(prefers-reduced-motion:reduce){
   #wa-home-tool-grid .home-tool-card{transition:none!important}
 }
+
+/* Keep the mobile hero's natural reading order: heading and intro before search. */
+@media(max-width:760px){.ledger-hero .tool-search-shell{order:0!important}}
