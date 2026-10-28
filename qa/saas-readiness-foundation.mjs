@@ -52,7 +52,7 @@ assert.match(scenarios, /DELETE FROM saved_scenarios WHERE id = \? AND user_id =
 assert.match(checkout, /RAZORPAY_PLAN_MONTHLY/);
 assert.match(checkout, /SUBSCRIPTION_ALREADY_ACTIVE/);
 assert.match(checkout, /CHECKOUT_ALREADY_PENDING/);
-assert.match(checkout, /api\\.razorpay\\.com\\/v1\\/subscriptions\\//);
+assert.ok(checkout.includes("https://api.razorpay.com/v1/subscriptions/"), "Existing checkout must be reused instead of creating a duplicate.");
 assert.match(webhook, /crypto\.subtle\.sign/);
 assert.match(webhook, /const safePayload = JSON\.stringify/);
 assert.doesNotMatch(webhook, /event\.event, raw/, 'Raw billing webhook bodies must not be persisted');
