@@ -141,6 +141,11 @@ paths:
                     items:
                       $ref: '#/components/schemas/ModelSummary'
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     CalculationRequest:
       type: object
@@ -154,43 +159,47 @@ components:
         currency: {type: string, description: ISO 4217 currency code}
     CalculationResponse:
       type: object
-      required: [model, model_version, inputs, assumptions, results, limitations]
+      required: [model, model_version, inputs, assumptions, results, metadata]
       properties:
         model: {type: string}
         model_version: {type: string}
         inputs: {type: object, additionalProperties: true}
         assumptions: {type: object, additionalProperties: true}
-        results: {type: object, additionalProperties: true}
-        limitations:
+        results:
           type: array
-          items: {type: string}
+          items:
+            type: object
+            required: [label, value, format]
+            properties:
+              label: {type: string}
+              value: {type: number}
+              format: {type: string}
+              emphasis: {type: string}
+        metadata: {type: object, additionalProperties: true}
         sources:
           type: array
           items:
             type: object
             additionalProperties: true
-        reproducibility:
-          type: object
-          additionalProperties: true
     ModelSummary:
       type: object
-      required: [id, version, family, timing, formula, inputs, limitations]
+      required: [id, version, title, inputs, assumptions]
       properties:
         id: {type: string}
         version: {type: string}
-        family: {type: string}
-        timing: {type: string}
-        formula: {type: string}
+        title: {type: string}
         inputs:
           type: array
           items: {type: string}
-        limitations:
-          type: array
-          items: {type: string}
+        assumptions: {type: string}
     ErrorResponse:
       type: object
-      required: [error, message]
+      required: [error]
       properties:
-        error: {type: string}
-        message: {type: string}
-        details: {type: object, additionalProperties: true}
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: {type: string}
+            message: {type: string}
+            details: {type: object, additionalProperties: true}
