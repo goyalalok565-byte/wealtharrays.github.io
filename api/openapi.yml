@@ -104,11 +104,12 @@ paths:
           application/json:
             schema:
               type: object
-              required: [taxable_income]
+              required: [taxable_income, rebate_eligible]
               properties:
                 tax_year: {type: string, enum: ["2026-27"]}
                 regime: {type: string, enum: [new]}
                 taxable_income: {type: number, minimum: 0, maximum: 1000000000}
+                rebate_eligible: {type: boolean, description: Whether Section 87A rebate eligibility has been confirmed for this taxpayer}
       responses:
         '200':
           description: Tax estimate with model version and assumptions
