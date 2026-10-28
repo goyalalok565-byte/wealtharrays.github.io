@@ -48,6 +48,8 @@ jobs:
         run: node qa/accessibility-static-audit.mjs
       - name: Build production dist
         run: npm run build:dist
+      - name: Canonical embed source regression
+        run: node qa/embed-regression.mjs
       - name: Install Playwright for all-calculator browser regression
         run: |
           npm install --no-save playwright@1.55.0
