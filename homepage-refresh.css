@@ -125,3 +125,55 @@ html.wa-home-ready #wa-home-tool-grid:not(.is-expanded) .home-tool-card:nth-chil
 .wa-emi-result-meta span{font-size:12px;color:var(--muted)}
 .wa-emi-result-meta strong{display:block;margin-top:5px;font-size:14px;color:var(--text);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 @media(max-width:700px){.wa-quick-emi{gap:18px!important}.wa-emi-widget{border-radius:19px;padding:15px}.wa-emi-fields{grid-template-columns:minmax(0,1fr)!important;gap:12px}.wa-emi-fields input{min-height:54px}.wa-emi-result{padding:15px}.wa-emi-result-meta{grid-template-columns:1fr 1fr;gap:10px}}
+
+
+/* Responsive calculator library: keep two useful cards per row on phones. */
+@media (max-width: 650px) {
+  .home-tool-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    align-items: stretch;
+  }
+  .home-tool-card {
+    grid-template-columns: 24px minmax(0, 1fr) 12px !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+    min-height: 168px !important;
+    padding: 13px 11px !important;
+    align-content: start;
+    overflow-wrap: anywhere;
+  }
+  .home-tool-card .home-tool-index {
+    width: 23px !important;
+    height: 23px !important;
+    font-size: 9px !important;
+  }
+  .home-tool-card > div {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .home-tool-card small {
+    font-size: 8px !important;
+    margin-bottom: 6px !important;
+  }
+  .home-tool-card b {
+    display: block;
+    font-size: 12px !important;
+    line-height: 1.35 !important;
+    overflow-wrap: anywhere;
+  }
+  .home-tool-card p {
+    font-size: 10.5px !important;
+    line-height: 1.45 !important;
+    overflow-wrap: anywhere;
+  }
+  .home-tool-card strong {
+    font-size: 15px !important;
+  }
+}
+@media (max-width: 360px) {
+  .home-tool-grid { gap: 8px !important; }
+  .home-tool-card { padding: 12px 9px !important; gap: 6px !important; min-height: 176px !important; }
+  .home-tool-card b { font-size: 11.5px !important; }
+  .home-tool-card p { font-size: 10px !important; }
+}
