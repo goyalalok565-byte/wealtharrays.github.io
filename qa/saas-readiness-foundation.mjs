@@ -27,6 +27,7 @@ for (const [name, source] of [['widget.js', widget], ['wa-calculator-runtime.js'
   assert.match(source, /Download PDF/, name + ' must expose a direct PDF download action');
   assert.match(source, /compare-panel\[hidden\].*display:none!important/, name + ' must honor hidden state for compare and saved panels');
   assert.match(source, /waDownloadPdfReport/, name + ' must download a PDF report');
+  assert.match(source, /waRunIndiaTax/, name + ' must expose the explicit Indian tax engine action');
   assert.match(source, /aria-invalid/, name + ' must expose field validation to assistive technology');
   assert.match(source, /Get live exchange rate/, name + ' must expose live FX retrieval');
   assert.match(source, /addEventListener\(['"]click['"],(?:function\(\)|recompute)/, name + ' must keep calculation behind the explicit button');
@@ -37,6 +38,7 @@ assert.match(calculate, /export async function onRequestPost/);
 assert.match(models, /export async function onRequestGet/);
 assert.match(fx, /open\.er-api\.com/);
 assert.match(tax, /2026-27-new-regime-v1/);
+assert.match(widget, /Estimate India new-regime tax/);
 assert.match(auth, /auth\/v1\/user/);
 assert.match(authConfig, /SUPABASE_ANON_KEY/);
 assert.match(scenarios, /DELETE FROM saved_scenarios WHERE id = \? AND user_id = \?/);
