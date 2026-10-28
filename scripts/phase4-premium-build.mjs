@@ -58,14 +58,8 @@ for(const file of htmlFiles){
 
   const staticAdScript=/<script\\b[^>]*src=["']https:\\/\\/pagead\\.googlesyndication\\.com\\/pagead\\/js\\/adsbygoogle\\.js[^"']*["'][^>]*>\\s*<\\/script>/gi;
   if(adsenseExcluded){
-    const escaped=adsenseJs.replace(/[.*+?^\\${}()|[\\]\\\\]/g,'\\\\  if(adsenseExcluded){
-    const escaped=adsenseJs.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-    s=s.replace(new RegExp('\\s*'+escaped),'');
-  } else if(!s.includes('ca-pub-6507600103785450')) {
-    s=s.replace('</head>',`${adsenseJs}</head>`);
-  }');
-    s=s.replace(new RegExp('\\\\s*'+escaped),'');
     s=s.replace(staticAdScript,'');
+    s=s.replace(/<script>[^]*?waSubscriptionCache[^]*?<\\/script>/gi,'');
   } else if(staticAdScript.test(s)) {
     s=s.replace(staticAdScript,adsenseJs);
   } else if(!s.includes('waSubscriptionCache')) {
