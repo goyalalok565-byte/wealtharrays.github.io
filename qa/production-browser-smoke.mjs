@@ -125,7 +125,7 @@ try {
   if (await page.locator('#calc-widget .calc-result-row').count()) throw new Error('Loading a saved scenario must require a new Calculate click');
   await page.locator('#calc-widget button[id$="-calculate"]').click();
   await page.locator('#calc-widget .calc-result-row').first().waitFor({ state: 'visible', timeout: 5000 });
-  const downloadPromise = page.waitForEvent('download');
+  const downloadPromise = page.waitForEvent('download', { timeout: 10000 });
   await page.locator('#calc-widget button[id$="-export"]').click();
   const pdfDownload = await downloadPromise;
   if (!pdfDownload.suggestedFilename().endsWith('.pdf')) throw new Error('Export action did not download a PDF file');
