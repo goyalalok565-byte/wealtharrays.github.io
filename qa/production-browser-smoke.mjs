@@ -163,6 +163,7 @@ try {
     await assertCalculator('income-tax-planner/', 'Income Tax Planner tax-engine flow');
     await page.locator('#calc-widget input[data-field="income"]').fill('1200000');
     await page.locator('#calc-widget input[data-field="deductions"]').fill('150000');
+    await page.locator('#calc-widget select[id$="-india-tax-rebate"]').selectOption('yes');
     await page.locator('#calc-widget button[id$="-india-tax"]').click();
     await page.locator('#calc-widget .wa-india-tax-results:not([hidden])').waitFor({ state: 'visible', timeout: 15000 });
     const taxEngineText = await page.locator('#calc-widget .wa-india-tax-results').innerText();
