@@ -155,7 +155,7 @@ try {
     await page.locator('#calc-widget select[data-field="from"]').selectOption('USD');
     await page.locator('#calc-widget select[data-field="to"]').selectOption('INR');
     await page.locator('#calc-widget button[id$="-get-live-rate"]').click();
-    await page.waitForFunction(() => document.querySelector('#calc-widget [id$="-fx-status"]')?.textContent.includes('Indicative rate'), { timeout: 15000 });
+    await page.waitForFunction(() => document.querySelector('#calc-widget [id$="-fx-status"]')?.textContent.includes('Indicative rate'), null, { timeout: 15000 });
     if (await page.locator('#calc-widget .calc-result-row').count()) throw new Error('Fetching an FX rate must not auto-calculate the conversion');
     if (!(Number(await page.locator('#calc-widget input[data-field="rate"]').inputValue()) > 0)) throw new Error('Live FX button did not populate the exchange-rate field');
     await page.locator('#calc-widget button[id$="-calculate"]').click();
