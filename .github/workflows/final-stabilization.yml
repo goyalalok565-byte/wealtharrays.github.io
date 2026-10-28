@@ -40,6 +40,8 @@ jobs:
         run: node scripts/generate-calculator-pages.mjs
       - name: Build canonical runtime, split definitions and sitemap
         run: node scripts/root-cause-build.mjs
+      - name: Canonical embed source regression
+        run: node qa/embed-regression.mjs
       - name: Run Phase 4 premium normalization
         run: node scripts/phase4-premium-build.mjs
       - name: Normalize route aliases and accessibility
