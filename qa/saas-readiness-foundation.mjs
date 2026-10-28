@@ -26,4 +26,16 @@ assert.match(fx, /open\.er-api\.com/);
 assert.match(tax, /2026-27-new-regime-v1/);
 assert.match(migration, /CREATE TABLE IF NOT EXISTS saved_scenarios/);
 assert.match(migration, /CREATE TABLE IF NOT EXISTS subscriptions/);
-console.log('SaaS readiness foundation audit passed.');
+
+const sharedModule = await import('data:text/javascript;base64,' + Buffer.from(shared).toString('base64'));
+const sip = sharedModule.calculate('sip', { monthly: 200, annualRate: 10, years: 15 });
+assert.ok(Math.abs(sip.results[2].value - 83584.85) < 0.02, 'SIP API golden vector must match the documented example');
+const gstExclusive = sharedModule.calculate('gst', { amount: 100000, rate: 18, mode: 'exclusive' });
+assert.equal(gstExclusive.results[1].value, 18000, 'GST exclusive tax amount must be correct');
+const gstInclusive = sharedModule.calculate('gst', { amount: 118000, rate: 18, mode: 'inclusive' });
+assert.equal(gstInclusive.results[0].value, 100000, 'GST inclusive taxable base must be correct');
+const zeroInterest = sharedModule.calculate('loan-emi', { principal: 120000, annualRate: 0, months: 12 });
+assert.equal(zeroInterest.results[0].value, 10000, 'Zero-rate loan EMI must avoid divide-by-zero');
+assert.throws(() => sharedModule.calculate('cagr', { startValue: 100, endValue: 110, years: 0 }), /years must be greater than zero/);
+console.log('SaaS readiness foundation audit and API golden vectors passed.');
+
