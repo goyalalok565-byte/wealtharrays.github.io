@@ -2,7 +2,7 @@
 
 The repository now contains the application code for browser-first scenarios, an optional account sync flow, versioned calculation endpoints, indicative FX rates, an Indian tax estimate endpoint, and Razorpay subscription checkout/webhook handlers. The account, cloud database and billing features remain intentionally fail-closed until the external services are configured.
 
-## 1. Cloudflare Pages Functions + D1
+## 1. Cloudflare Worker API + D1
 
 1. Create a Cloudflare D1 database for Wealth Arrays.
 2. In the Cloudflare Pages project settings, add a D1 database binding named **DB** pointing at that database.
@@ -11,7 +11,7 @@ The repository now contains the application code for browser-first scenarios, an
 
 ## 2. Supabase authentication
 
-Create a Supabase project, enable email/password authentication, and set the site's account URL as an allowed redirect URL. Add these Cloudflare Pages environment variables for both Preview and Production as appropriate:
+Create a Supabase project, enable email/password authentication, and set the site's account URL as an allowed redirect URL. Add these GitHub Actions repository secrets so the deploy workflow can configure the Worker:
 
 - `SUPABASE_URL`
 - `SUPABASE_ANON_KEY` (the public anon/publishable key only; never use a service-role key in the browser)
@@ -20,7 +20,7 @@ The browser account page uses Supabase Auth REST endpoints. Server-side scenario
 
 ## 3. Razorpay subscriptions
 
-Create the monthly and yearly subscription plans in the Razorpay dashboard and configure:
+Create the monthly and yearly subscription plans in the Razorpay dashboard and add the following GitHub Actions repository secrets:
 
 - `RAZORPAY_KEY_ID`
 - `RAZORPAY_KEY_SECRET`
