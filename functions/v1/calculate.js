@@ -17,7 +17,7 @@ export async function onRequestPost({ request }) {
       model, model_version: API_VERSION, inputs: body.inputs,
       assumptions: { description: output.assumptions, supplied: body.assumptions || {} },
       results: output.results,
-      metadata: { engine: "wealth-arrays-api", calculated_at: new Date().toISOString(), country: (body.country || "IN").toUpperCase(), deterministic: true }
+      metadata: { engine: "wealth-arrays-api", calculated_at: new Date().toISOString(), country: body.country ? body.country.toUpperCase() : null, jurisdictional_rules_applied: false, jurisdiction_notice: "Country is metadata only; this generic model does not apply country-specific tax or legal rules.", deterministic: true }
     }, 200, { "Cache-Control": "no-store" });
   } catch (e) {
     if (e.unsupported) return error("UNSUPPORTED_MODEL", e.message, 422);
