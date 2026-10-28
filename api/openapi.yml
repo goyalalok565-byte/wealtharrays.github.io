@@ -4,6 +4,46 @@ info:
   version: 1.0.0
   description: Deterministic financial calculations with reproducible inputs, assumptions, model versions and provenance. This is an integration contract; hosting, authentication and rate limiting are external infrastructure concerns.
 paths:
+  /v1/fx:
+    get:
+      summary: Retrieve indicative foreign-exchange rates
+      operationId: getLiveFxRates
+      parameters:
+        - in: query
+          name: base
+          schema: {type: string, minLength: 3, maxLength: 3, default: INR}
+        - in: query
+          name: symbols
+          schema: {type: string, description: Optional comma-separated currency codes}
+      responses:
+        '200':
+          description: Indicative rates and provider update timestamp
+        '400':
+          description: Unsupported currency code
+        '502':
+          description: Rate provider unavailable
+  /v1/india-tax:
+    post:
+      summary: Estimate Indian new-regime income tax for tax year 2026-27
+      operationId: calculateIndiaTax
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [taxable_income]
+              properties:
+                tax_year: {type: string, enum: ["2026-27"]}
+                regime: {type: string, enum: [new]}
+                taxable_income: {type: number, minimum: 0, maximum: 1000000000}
+      responses:
+        '200':
+          description: Tax estimate with model version and assumptions
+        '400':
+          description: Invalid taxable income
+        '422':
+          description: Unsupported tax year or regime
   /v1/calculate:
     post:
       summary: Calculate a registered financial model
