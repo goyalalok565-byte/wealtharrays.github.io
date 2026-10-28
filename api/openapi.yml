@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Wealth Arrays Financial Engine API
   version: 1.0.0
-  description: Deterministic financial calculations with reproducible inputs, assumptions, model versions and provenance. This is an integration contract; hosting, authentication and rate limiting are external infrastructure concerns.
+  description: Versioned financial calculations, indicative FX rates, a limited Indian tax estimate, authenticated scenario storage and subscription endpoints. Cloudflare bindings, Supabase authentication and Razorpay plans require deployment configuration.
 paths:
   /v1/auth-config:
     get:
@@ -30,6 +30,11 @@ paths:
     delete:
       summary: Delete a user-owned saved scenario
       operationId: deleteScenario
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema: {type: string}
       security: [{bearerAuth: []}]
       responses:
         '200': {description: Scenario deleted}
@@ -46,6 +51,11 @@ paths:
     post:
       summary: Verify and process Razorpay subscription webhook events
       operationId: processRazorpayWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, additionalProperties: true}
       responses:
         '200': {description: Webhook accepted}
         '401': {description: Invalid signature}
