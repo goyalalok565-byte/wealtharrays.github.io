@@ -98,14 +98,11 @@ try {
   }
 
   await assertCalculator('sip-calculator/', 'SIP calculator scenario tools');
+  // Calculator pages intentionally start with blank inputs; fill a known scenario explicitly.
   for (const [field, expected] of [['monthly','200'],['rate','10'],['years','15']]) {
-    const actual = await page.locator('#calc-widget input[data-field="' + field + '"]').inputValue();
-    if (actual !== expected) throw new Error('SIP default ' + field + ' expected ' + expected + ', received ' + actual);
+    await page.locator('#calc-widget input[data-field="' + field + '"]').fill(expected);
   }
-  for (const field of ['monthly','rate','years']) {
-    const control = page.locator('#calc-widget input[data-field="' + field + '"]');
-    if (!(await control.inputValue())) await control.fill(field === 'monthly' ? '200' : field === 'rate' ? '10' : '15');
-  }
+  if (await page.locator('#calc-widget .calc-result-row').count()) throw new Error('SIP must not calculate automatically while filling a scenario');
   await page.locator('#calc-widget button[id$="-calculate"]').click();
   await page.locator('#calc-widget .calc-result-row').first().waitFor({ state: 'visible', timeout: 5000 });
   await page.locator('#calc-widget button[id$="-share"]').click();
