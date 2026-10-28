@@ -56,14 +56,14 @@ for(const file of htmlFiles){
     s=s.replace(/<script[^>]+src=["']\/consent-loader\.js[^>]*><\/script>/gi,'');
   }else if(!s.includes('/consent-loader.js')) s=s.replace('</head>',consentJs+'</head>');
 
-  const staticAdScript=/<script\\b[^>]*src=["']https:\\/\\/pagead\\.googlesyndication\\.com\\/pagead\\/js\\/adsbygoogle\\.js[^"']*["'][^>]*>\\s*<\\/script>/gi;
+  const staticAdScript=/<script\b[^>]*src=["']https:\/\/pagead\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js[^"']*["'][^>]*>\s*<\/script>/gi;
   if(adsenseExcluded){
     s=s.replace(staticAdScript,'');
-    s=s.replace(/<script>[^]*?waSubscriptionCache[^]*?<\\/script>/gi,'');
+    s=s.replace(/<script>[^]*?waSubscriptionCache[^]*?<\/script>/gi,'');
   } else if(staticAdScript.test(s)) {
     s=s.replace(staticAdScript,adsenseJs);
   } else if(!s.includes('waSubscriptionCache')) {
-    s=s.replace('</head>',`${adsenseJs}</head>`);
+    s=s.replace('</head>',adsenseJs+'</head>');
   }
   if(id && s.includes('id="calc-widget"') && base!=='widget.html'){
     if(!s.includes('/wa-calculator-runtime.js')) s=s.replace('</body>','<script src="/wa-calculator-runtime.js" defer></script></body>');
