@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 const widget = fs.readFileSync('widget.js', 'utf8');
 const runtime = fs.readFileSync('wa-calculator-runtime.js', 'utf8');
 const shared = fs.readFileSync('functions/v1/_shared.js', 'utf8');
+const calculatorDefinitions = fs.readFileSync('calculators.js', 'utf8');
 const calculate = fs.readFileSync('functions/v1/calculate.js', 'utf8');
 const models = fs.readFileSync('functions/v1/models.js', 'utf8');
 const fx = fs.readFileSync('functions/v1/fx.js', 'utf8');
