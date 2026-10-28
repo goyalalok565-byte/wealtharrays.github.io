@@ -160,6 +160,13 @@ try {
     if (!(Number(await page.locator('#calc-widget input[data-field="rate"]').inputValue()) > 0)) throw new Error('Live FX button did not populate the exchange-rate field');
     await page.locator('#calc-widget button[id$="-calculate"]').click();
     await page.locator('#calc-widget .calc-result-row').first().waitFor({ state: 'visible', timeout: 5000 });
+    await assertCalculator('income-tax-planner/', 'Income Tax Planner tax-engine flow');
+    await page.locator('#calc-widget input[data-field="income"]').fill('1200000');
+    await page.locator('#calc-widget input[data-field="deductions"]').fill('150000');
+    await page.locator('#calc-widget button[id$="-india-tax"]').click();
+    await page.locator('#calc-widget .wa-india-tax-results:not([hidden])').waitFor({ state: 'visible', timeout: 15000 });
+    const taxEngineText = await page.locator('#calc-widget .wa-india-tax-results').innerText();
+    if (!taxEngineText.includes('Estimated total tax') || !taxEngineText.includes('Official tax guidance')) throw new Error('Income Tax Planner did not display the versioned tax engine result and source link');
   }
 
   await assertCalculator('cagr-calculator/', 'CAGR worked example');
