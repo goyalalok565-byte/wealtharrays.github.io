@@ -53,14 +53,7 @@ jobs:
           D1_DATABASE_ID: ${{ secrets.CLOUDFLARE_D1_DATABASE_ID }}
         run: |
           if [ -n "$D1_DATABASE_ID" ]; then
-            cat >> wrangler.toml <<EOF
-
-          [[d1_databases]]
-          binding = "DB"
-          database_name = "wealtharrays-saas"
-          database_id = "$D1_DATABASE_ID"
-          migrations_dir = "./migrations"
-          EOF
+            printf '\\n[[d1_databases]]\\nbinding = "DB"\\ndatabase_name = "wealtharrays-saas"\\ndatabase_id = "%s"\\nmigrations_dir = "./migrations"\\n' "$D1_DATABASE_ID" >> wrangler.toml
             echo "D1 binding configured for deployment."
           else
             echo "::warning::CLOUDFLARE_D1_DATABASE_ID is missing. Account scenario storage and billing will remain unavailable (fail closed)."
