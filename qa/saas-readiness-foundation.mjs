@@ -12,6 +12,7 @@ const authConfig = fs.readFileSync('functions/v1/auth-config.js', 'utf8');
 const scenarios = fs.readFileSync('functions/v1/scenarios.js', 'utf8');
 const checkout = fs.readFileSync('functions/v1/billing/checkout.js', 'utf8');
 const webhook = fs.readFileSync('functions/v1/billing/webhook.js', 'utf8');
+const cancel = fs.readFileSync('functions/v1/billing/cancel.js', 'utf8');
 const account = fs.readFileSync('account.js', 'utf8');
 const migration = fs.readFileSync('migrations/0001_saas.sql', 'utf8');
 for (const [name, source] of [['widget.js', widget], ['wa-calculator-runtime.js', runtime]]) {
@@ -38,6 +39,7 @@ assert.match(authConfig, /SUPABASE_ANON_KEY/);
 assert.match(scenarios, /DELETE FROM saved_scenarios WHERE id = \? AND user_id = \?/);
 assert.match(checkout, /RAZORPAY_PLAN_MONTHLY/);
 assert.match(webhook, /crypto\.subtle\.sign/);
+assert.match(cancel, /cancel_at_cycle_end/);
 assert.ok(account.includes('/auth/v1/signup'));
 assert.match(migration, /CREATE TABLE IF NOT EXISTS saved_scenarios/);
 assert.match(migration, /CREATE TABLE IF NOT EXISTS subscriptions/);
