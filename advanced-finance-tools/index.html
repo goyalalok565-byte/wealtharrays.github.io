@@ -26,7 +26,7 @@ function run(){
   out('goldo','Estimated gold value <b>'+M(gold)+'</b><br>Making charges <b>'+M(making)+'</b><br>Estimated GST (3%) <b>'+M(gst)+'</b><br><b>Estimated total '+M(gold+making+gst)+'</b>');
   const income=clamp(n('bi'),0,1e12),goalPct=clamp(n('bs',20),0,100),needs=income*.5,wants=income*.3,goals=income*goalPct/100;
   out('bo','Needs (50%) <b>'+M(needs)+'</b><br>Wants (30%) <b>'+M(wants)+'</b><br>Your savings goal ('+goalPct+'%) <b>'+M(goals)+'</b><br>Unallocated <b>'+M(income-needs-wants-goals)+'</b>');
-  const target=clamp(n('st'),0,1e12),current=clamp(n('sc'),0,1e12),gap=Math.max(0,target-current),saveRate=clamp(n('sr'),-99,100)/1200,saveMonths=clamp(Math.round(n('sy',10)*12),1,1200);
+  const target=clamp(n('st'),0,1e12),current=clamp(n('sc'),0,1e12),saveRate=clamp(n('sr'),-99,100)/1200,saveMonths=clamp(Math.round(n('sy',10)*12),1,1200),currentAtGoal=current*Math.pow(1+saveRate,saveMonths),gap=Math.max(0,target-currentAtGoal);
   const monthly=gap===0?0:saveRate===0?gap/saveMonths:gap*saveRate/(Math.pow(1+saveRate,saveMonths)-1);
   out('so','Amount still needed <b>'+M(gap)+'</b><br>Estimated monthly saving (no annual step-up) <b>'+M(monthly)+'</b>');
   const converted=n('fa')*n('fr');
