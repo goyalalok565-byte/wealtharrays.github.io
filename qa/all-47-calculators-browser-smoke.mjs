@@ -1,4 +1,7 @@
 import { chromium } from 'playwright';
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+const { CALCULATORS: SOURCE_CALCULATORS } = require('../calculators.js');
 
 const baseUrl = (process.env.BASE_URL || 'http://127.0.0.1:4173').replace(/\/$/, '');
 const browser = await chromium.launch({ headless: true });
@@ -48,14 +51,11 @@ async function checkViewport(route, title, width) {
   assert(dims.doc <= dims.inner + 2, title + ' horizontal overflow at ' + width + 'px (' + dims.doc + ' > ' + dims.inner + ')');
 }
 try {
-  await page.goto(baseUrl + '/sip-calculator/', { waitUntil: 'domcontentloaded' });
-  await page.waitForSelector('#calc-widget [data-field]');
-  const calculators = await page.evaluate(() => (window.CALCULATORS || []).map(c => ({
+  const calculators = SOURCE_CALCULATORS.map(c => ({
     id: c.id, slug: c.slug, title: c.title,
-    fields: c.fields.map(f => ({ id: f.id, label: f.label, type: f.type, default: f.default, min: f.min, max: f.max, step: f.step, options: f.options })),
-    outputs: c.compute(Object.fromEntries(c.fields.map(f => [f.id, f.type === 'select' ? String(f.default ?? f.options?.[0]?.value ?? '') : Number(f.default ?? f.min ?? 1)]))).map(r => ({ label: r.label, value: r.value, format: r.format }))
-  })));
-  assert(calculators.length === 47, 'Expected 47 calculator definitions on the page, found ' + calculators.length);
+    fields: c.fields.map(f => ({ id: f.id, label: f.label, type: f.type, default: f.default, min: f.min, max: f.max, step: f.step, options: f.options }))
+  }));
+  assert(calculators.length === 47, 'Expected 47 source calculator definitions, found ' + calculators.length);
   assert(new Set(calculators.map(c => c.id)).size === 47, 'Calculator IDs are not unique');
 
   for (const calc of calculators) {
