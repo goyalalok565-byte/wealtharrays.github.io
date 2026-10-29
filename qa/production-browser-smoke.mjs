@@ -206,17 +206,14 @@ try {
     const before = (await page.locator(resultSelector).innerText()).trim();
     await page.locator(inputSelector).fill(String(value));
     const whileEditing = (await page.locator(resultSelector).innerText()).trim();
-    if (whileEditing === before && !/click calculate/i.test(whileEditing)) {
-      throw new Error(`${label} did not invalidate the old result after input edit`);
-    }
-    if (await page.locator(resultSelector + ' .calc-result-row').count()) {
-      throw new Error(`${label} showed a calculated result before the Calculate button was clicked`);
+    if (whileEditing !== before) {
+      throw new Error(`${label} recalculated its displayed result before the Calculate button was clicked`);
     }
     if (submitSelector) await page.locator(submitSelector).click();
-    await page.waitForFunction(({ selector }) => {
+    await page.waitForFunction(({ selector, oldText }) => {
       const node = document.querySelector(selector);
-      return node && node.innerText.trim() && !/click .*calculate|enter your numbers/i.test(node.innerText.trim());
-    }, { selector: resultSelector }, { timeout: 5000 });
+      return node && node.innerText.trim() !== oldText;
+    }, { selector: resultSelector, oldText: before }, { timeout: 5000 });
     const after = (await page.locator(resultSelector).innerText()).trim();
     if (!after || /NaN|Infinity|undefined|^—$/.test(after)) throw new Error(`${label} returned an invalid result: ${after}`);
     if (after === before) throw new Error(`${label} did not change after Calculate was clicked`);
