@@ -80,4 +80,13 @@ for (const calc of calculators) {
 
 assert(!toolsPage.includes('/income-tax-scenario-calculator/'), 'Tools library still points to legacy income-tax route');
 assert(!searchSource.includes('/income-tax-scenario-calculator/'), 'Search catalog still points to legacy income-tax route');
+// Extreme payoff horizons must terminate quickly and must never claim a payoff when a balance remains.
+const debtPayoff = calculators.find(c => c.id === 'debt-payoff');
+const longDebt = debtPayoff.compute({ balance: 1e12, rate: 0, payment: 0.01 });
+assert(longDebt.some(r => /not reached within 1,200 months/i.test(r.label)), 'Debt payoff must disclose a balance that cannot be cleared within the simulation horizon');
+assert(longDebt.some(r => /remaining balance/i.test(r.label) && r.value > 0), 'Debt payoff must report the remaining balance after its simulation cap');
+const cardPayoff = calculators.find(c => c.id === 'credit-card-payoff');
+const longCard = cardPayoff.compute({ balance: 1e12, apr: 0, payment: 0.01 });
+assert(longCard.some(r => /not reached within 1,200 months/i.test(r.label)), 'Credit-card payoff must disclose a balance that cannot be cleared within the simulation horizon');
+assert(longCard.some(r => /remaining balance/i.test(r.label) && r.value > 0), 'Credit-card payoff must report the remaining balance after its simulation cap');
 console.log('Calculator regression PASS — 47/47 definitions, blank-input UX, responsive runtime hooks, field bounds, finite outputs, homepage/tools/search/llms/sitemap parity passed.');
