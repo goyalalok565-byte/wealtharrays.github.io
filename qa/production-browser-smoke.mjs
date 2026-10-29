@@ -218,7 +218,12 @@ try {
     } catch (error) {
       const afterText = await page.locator(resultSelector).innerText().catch(() => '<missing result>');
       const statusText = await page.locator('#fw-status, #sl-status, #gp-status, #ga-status').first().innerText().catch(() => '<missing status>');
-      throw new Error(`${label} result did not update after Calculate click; before="${before}", whileEditing="${whileEditing}", after="${afterText}", status="${statusText}"`);
+      const runtime = await page.evaluate(() => {
+        const form = document.querySelector('#fw-form');
+        const invalid = form ? [...form.querySelectorAll('input,select')].filter(el => !el.checkValidity()).map(el => ({ id: el.id, value: el.value, validity: { valueMissing: el.validity.valueMissing, rangeUnderflow: el.validity.rangeUnderflow, rangeOverflow: el.validity.rangeOverflow, stepMismatch: el.validity.stepMismatch, typeMismatch: el.validity.typeMismatch } })) : [];
+        return { formExists: !!form, formTag: form?.tagName || null, formValid: form?.checkValidity() ?? null, invalid, engineLoaded: !!window.WA_FINANCIAL_ENGINE, scriptResources: performance.getEntriesByType('resource').map(r => r.name).filter(name => /financial-workspace|financial-engine|wa-site-runtime/.test(name)) };
+      }).catch(error => ({ diagnosticError: error.message }));
+      throw new Error(`${label} result did not update after Calculate click; before="${before}", whileEditing="${whileEditing}", after="${afterText}", status="${statusText}", runtime=${JSON.stringify(runtime)}, failedResponses=${failedResponses.join(' | ')}, browserErrors=${errors.join(' | ')}`);
     }
     const after = (await page.locator(resultSelector).innerText()).trim();
     if (!after || /NaN|Infinity|undefined|^—$/.test(after)) throw new Error(`${label} returned an invalid result: ${after}`);
