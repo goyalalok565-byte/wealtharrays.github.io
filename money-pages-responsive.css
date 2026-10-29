@@ -1,0 +1,96 @@
+/* Responsive polish for the four everyday money pages */
+.money-page-polish{scroll-behavior:smooth}
+.masthead{z-index:50}
+.masthead-inner{width:min(1440px,100%);margin-inline:auto;padding:12px clamp(12px,2.5vw,32px);flex-wrap:wrap;row-gap:10px}
+.wordmark{flex:0 0 auto;font-weight:850;font-size:1.08rem}
+.site-nav{min-width:0;flex:1 1 420px;flex-wrap:wrap;align-items:center}
+.site-nav a{padding:9px 11px;border-radius:10px;font-size:13px;white-space:nowrap}
+.masthead-controls{flex:0 0 auto;margin-left:auto}
+.masthead-controls select,.theme-toggle{min-height:42px;padding:8px 10px}
+#main-content{min-width:0}
+.section-wrap,.sl,.gp,.tools-wrap{width:min(1240px,100%);margin-inline:auto;padding-left:clamp(14px,3vw,36px);padding-right:clamp(14px,3vw,36px)}
+.section-wrap{padding-top:clamp(24px,4vw,52px);padding-bottom:clamp(36px,5vw,72px)}
+.section-wrap>h1,.sl h1,.gp h1,.tools-head h1{font-size:clamp(2rem,4.3vw,3.8rem);line-height:1.06;letter-spacing:-.045em;text-wrap:balance}
+.tool-lede,.sl>p,.gp>p,.tools-head>p{max-width:76ch;font-size:clamp(.98rem,1.25vw,1.08rem);line-height:1.75}
+.beginner-guide{border-radius:20px;padding:clamp(16px,2.4vw,26px);box-shadow:var(--shadow);margin-block:20px 24px}
+.beginner-guide p:last-child,.beginner-guide ol:last-child{margin-bottom:0}
+.card,.sl-card,.gp-card,.advanced-card{min-width:0;border-radius:20px}
+#fw-form{grid-template-columns:repeat(2,minmax(0,1fr))!important;padding:clamp(14px,2.4vw,26px)!important;gap:16px!important}
+#fw-form>label{min-width:0;display:flex;flex-direction:column;gap:7px;font-weight:650;font-size:.92rem}
+#fw-form input,#fw-form select,.sl-field input,.sl-field select,.gp-field input,.gp-field select,.advanced-card input{width:100%;min-width:0;min-height:46px;padding:10px 12px;border-radius:12px}
+#fw-form button,.sl-btns button,.gp-btns button,.calc-result-btn{min-height:48px;border-radius:12px;padding:12px 16px;font-weight:750;transition:transform .15s ease,filter .15s ease}
+#fw-form button:hover,.sl-btns button:hover,.gp-btns button:hover,.calc-result-btn:hover{filter:brightness(1.05);transform:translateY(-1px)}
+#fw-form button[type=submit],.sl-btns .primary,.gp-btns .primary{background:linear-gradient(110deg,var(--accent),var(--accent2));border:0;color:#fff}
+#fw-results,.cat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+#fw-results .card{min-width:0;padding:clamp(14px,2vw,22px)!important}
+#fw-results h2,.sl-kpi b,.gp-kpi b{overflow-wrap:anywhere}
+#fw-results-title,#sl-results-title,#gp-results-title{scroll-margin-top:100px;font-size:clamp(1.35rem,2.2vw,1.9rem)}
+.sl-grid,.gp-grid{grid-template-columns:minmax(280px,.82fr) minmax(0,1.5fr);align-items:start;gap:clamp(14px,2vw,24px)}
+.sl-fields,.gp-fields{gap:14px}
+.sl-field label,.gp-field label{font-size:clamp(.78rem,1vw,.9rem);line-height:1.4}
+.sl-btns,.gp-btns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.sl-btns .primary,.gp-btns .primary{grid-column:1/-1}
+.sl-results,.gp-results{min-width:0;gap:14px}
+.sl-kpis,.gp-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.sl-kpi,.gp-kpi{min-width:0;padding:clamp(12px,1.5vw,18px);border-radius:16px}
+.sl-kpi small,.gp-kpi small{font-size:.72rem;line-height:1.45}
+.sl-kpi b,.gp-kpi b{font-size:clamp(1rem,1.8vw,1.4rem);line-height:1.35}
+.sl-table-wrap,.gp-table-wrap{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px}
+.sl-table,.gp-table{min-width:560px;font-size:.82rem}
+.sl-table th,.sl-table td,.gp-table th,.gp-table td{padding:12px 10px}
+.sl-sens{grid-template-columns:repeat(5,minmax(78px,1fr));gap:8px}
+.sl-sens div{min-width:0;padding:12px 8px}
+.advanced-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(14px,2vw,24px)}
+.advanced-card{padding:clamp(16px,2.3vw,28px);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.advanced-card:hover{transform:translateY(-2px);border-color:var(--accent)}
+.advanced-card h2{font-size:clamp(1.1rem,1.7vw,1.45rem);line-height:1.25;letter-spacing:-.025em}
+.advanced-card p{line-height:1.65}
+.advanced-card label{min-width:0;line-height:1.45}
+.advanced-card .mini{min-width:0;overflow-wrap:anywhere;border:1px solid var(--line)}
+.advanced-note{background:var(--surface);border-radius:18px}
+button,a,input,select{touch-action:manipulation}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+@media(max-width:1000px){
+ .masthead-inner{gap:10px}
+ .site-nav{order:3;flex:1 1 100%;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px;scrollbar-width:thin}
+ .site-nav a{flex:0 0 auto}
+ .masthead-controls{margin-left:auto}
+ .sl-grid,.gp-grid{grid-template-columns:minmax(0,1fr)}
+ .sl-results,.gp-results{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:700px){
+ .masthead-inner{padding:10px 12px;gap:8px}
+ .wordmark{font-size:1rem}
+ .masthead-controls{gap:5px}
+ .masthead-controls select,.theme-toggle{font-size:12px;min-height:40px;padding:7px 8px}
+ .site-nav{gap:4px}
+ .site-nav a{font-size:12px;padding:8px 10px}
+ .section-wrap,.sl,.gp,.tools-wrap{padding-left:14px;padding-right:14px}
+ .section-wrap{padding-top:26px}
+ .section-wrap>h1,.sl h1,.gp h1,.tools-head h1{font-size:clamp(2rem,9vw,3rem);line-height:1.08;letter-spacing:-.04em}
+ .beginner-guide{margin-block:16px;padding:16px;border-radius:16px}
+ #fw-form{grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
+ #fw-form button{width:100%;grid-column:1}
+ #fw-results,.cat-grid{grid-template-columns:minmax(0,1fr)}
+ .sl-grid,.gp-grid{grid-template-columns:minmax(0,1fr);gap:14px}
+ .sl-card,.gp-card,.advanced-card{padding:16px}
+ .sl-kpis,.gp-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .sl-btns,.gp-btns{grid-template-columns:minmax(0,1fr)}
+ .sl-btns .primary,.gp-btns .primary{grid-column:auto}
+ .sl-table,.gp-table{min-width:520px}
+ .sl-sens{grid-template-columns:repeat(5,88px);overflow-x:auto;padding-bottom:4px}
+ .two-col{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .advanced-grid{grid-template-columns:minmax(0,1fr)}
+ .advanced-card:hover{transform:none}
+ .calc-result-btn{width:100%}
+}
+@media(max-width:380px){
+ .masthead-controls select{max-width:82px}
+ .masthead-controls .theme-toggle{font-size:11px}
+ .two-col{grid-template-columns:minmax(0,1fr)}
+ .sl-kpis,.gp-kpis{grid-template-columns:minmax(0,1fr)}
+ .sl-table,.gp-table{min-width:490px}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+}
