@@ -26,11 +26,8 @@
         const safe=sanitize(calc,values||{});
         let results=[];
         try{results=original(safe)||[];}catch(_){return[];}
-        return results.map(result=>{
-          const n=Number(result.value);
-          if(!Number.isFinite(n))return {...result,value:0};
-          return {...result,value:round(n,precision(result.format))};
-        });
+        if(!Array.isArray(results)||!results.length||results.some(result=>!result||!Number.isFinite(Number(result.value))))return[];
+        return results.map(result=>({...result,value:round(Number(result.value),precision(result.format))}));
       };
       wrapped.__waSafe=true;
       calc.compute=wrapped;
