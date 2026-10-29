@@ -36,6 +36,8 @@ jobs:
         run: node qa/privacy-policy-audit.mjs
       - name: Calculator regression before build
         run: node qa/calculator-regression.mjs
+      - name: Independent 47-calculator formula audit
+        run: node qa/phase1-calculator-audit.mjs
       - name: Generate new calculator routes
         run: node scripts/generate-calculator-pages.mjs
       - name: Build canonical runtime, split definitions and sitemap
