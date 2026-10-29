@@ -111,6 +111,21 @@ try {
       assert(afterRows.length === before.length, calc.id + ': result rows disappeared after recalculation');
       assert(afterRows.some((row, i) => row !== before[i]), calc.id + ': output did not change after a meaningful input change');
 
+      if (calc.id === 'capital-gain') {
+        for (const [id, value] of [['purchase', 1000000], ['sale', 900000], ['buyCosts', 50000], ['sellCosts', 30000], ['taxRate', 10]]) {
+          await page.locator('#f-' + id).fill(String(value));
+        }
+        await page.locator('#calc-widget button[id$="-calculate"]').click();
+        const lossValues = await page.locator('#calc-widget .calc-result-value').allTextContents();
+        const expectedLoss = await page.evaluate(() => ({
+          loss: window.waFormatValue(-180000, 'currency'),
+          tax: window.waFormatValue(0, 'currency')
+        }));
+        assert(lossValues[0].trim() === expectedLoss.loss, 'capital-gain: a 180,000 net loss must display as a negative amount');
+        assert(lossValues[1].trim() === expectedLoss.tax, 'capital-gain: assumed tax on a net loss must be zero');
+        assert(lossValues[2].trim() === expectedLoss.loss, 'capital-gain: after-tax result must preserve the loss');
+      }
+
       // Check the minimum bound for each numeric field and every declared maximum, one field at a time.
       for (const boundField of calc.fields.filter(f => f.type !== 'select')) {
         const bounds = [];
