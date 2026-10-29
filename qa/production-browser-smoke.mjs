@@ -217,7 +217,7 @@ try {
   const moneyPaths = new URL(baseUrl).hostname === 'wealtharrays.com'
     ? { workspace: 'financial-workspace', scenario: 'scenario-lab', goal: 'goal-planner', advanced: 'advanced-finance-tools/' }
     : { workspace: 'financial-workspace.html', scenario: 'scenario-lab.html', goal: 'goal-planner.html', advanced: 'advanced-finance-tools/' };
-  for (const width of [375, 1280]) {
+  for (const width of [375, 768, 1280]) {
     await assertMoneyPageViewport(moneyPaths.workspace, 'My Money Plan', width);
     await assertMoneyResultChanges('My Money Plan', '#fw-start', '#fw-future', width < 600 ? 50000 : 75000, '#fw-form button[type="submit"]');
     await assertMoneyPageViewport(moneyPaths.scenario, 'Compare Options', width);
