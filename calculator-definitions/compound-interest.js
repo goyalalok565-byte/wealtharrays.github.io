@@ -17,8 +17,8 @@ window.CALCULATORS=window.CALCULATORS||[];window.CALCULATORS.push({
     },
     fields: [
       { id: "principal", label: "Initial amount", type: "number", default: 5000, min: 0, step: 100 },
-      { id: "rate", label: "Annual interest rate", type: "number", default: 6, min: 0, max: 1000, step: 0.1, suffix: "%" },
-      { id: "years", label: "Time period", type: "number", default: 10, min: 1, max: 200, step: 1, suffix: "yrs" },
+      { id: "rate", label: "Annual interest rate", type: "number", default: 6, min: 0, max: 100, step: 0.1, suffix: "%" },
+      { id: "years", label: "Time period", type: "number", default: 10, min: 1, max: 100, step: 1, suffix: "yrs" },
       { id: "inflation", label: "Expected annual inflation", type: "number", default: 6, min: 0, max: 30, step: 0.1, suffix: "%" },
       {
         id: "freq", label: "Compounding frequency", type: "select", default: "12",

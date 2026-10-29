@@ -17,8 +17,8 @@ window.CALCULATORS=window.CALCULATORS||[];window.CALCULATORS.push({
     },
     fields: [
       { id: "monthly", label: "Monthly investment", type: "number", default: 200, min: 0, step: 10 },
-      { id: "rate", label: "Expected annual return", type: "number", default: 10, min: 0, max: 1000, step: 0.1, suffix: "%" },
-      { id: "years", label: "Investment period", type: "number", default: 15, min: 1, max: 200, step: 1, suffix: "yrs" },
+      { id: "rate", label: "Expected annual return", type: "number", default: 10, min: 0, max: 100, step: 0.1, suffix: "%" },
+      { id: "years", label: "Investment period", type: "number", default: 15, min: 1, max: 100, step: 1, suffix: "yrs" },
       { id: "inflation", label: "Expected annual inflation", type: "number", default: 6, min: 0, max: 30, step: 0.1, suffix: "%" },
     ],
     compute(v) {

@@ -20,8 +20,8 @@ window.CALCULATORS=window.CALCULATORS||[];window.CALCULATORS.push({
       { id: "payment", label: "Fixed monthly payment", type: "number", default: 8000, min: 0, max: 100000000, step: 100 }
     ],
     compute(v) {
-      let balance = v.balance, interestPaid = 0, totalPaid = 0, months = 0;
-      const monthlyRate = v.apr / 1200;
+      let balance = Math.max(v.balance, 0), interestPaid = 0, totalPaid = 0, months = 0;
+      const monthlyRate = Math.max(v.apr, 0) / 1200, maxMonths = 1200;
       if (v.payment <= balance * monthlyRate && balance > 0) {
         return [
           { label: "Months to clear (0 = payment too low)", value: 0, format: "number" },
@@ -29,13 +29,20 @@ window.CALCULATORS=window.CALCULATORS||[];window.CALCULATORS.push({
           { label: "Payment needed to start reducing balance", value: balance * monthlyRate + 1, format: "currency", emphasis: "neutral" }
         ];
       }
-      while (balance > 0.005 && months < 1200) {
+      while (balance > 0.005 && months < maxMonths) {
         const interest = balance * monthlyRate;
         interestPaid += interest;
-        const paid = Math.min(balance + interest, v.payment);
+        const paid = Math.min(balance + interest, Math.max(v.payment, 0));
         totalPaid += paid;
         balance = Math.max(0, balance + interest - paid);
         months++;
+      }
+      if (balance > 0.005) {
+        return [
+          { label: "Payoff not reached within 1,200 months", value: maxMonths, format: "number", emphasis: "negative" },
+          { label: "Remaining balance after 1,200 months", value: balance, format: "currency", emphasis: "negative" },
+          { label: "Interest paid within 1,200 months", value: interestPaid, format: "currency", emphasis: "negative" }
+        ];
       }
       return [
         { label: "Months to pay off", value: months, format: "number" },
