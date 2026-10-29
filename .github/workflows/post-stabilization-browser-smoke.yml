@@ -75,6 +75,11 @@ jobs:
       - name: Visual and calculator browser smoke
         run: node qa/production-browser-smoke.mjs
 
+      - name: Production four money pages responsive and calculation smoke
+        env:
+          BASE_URL: https://wealtharrays.com
+        run: node qa/money-pages-browser-smoke.mjs
+
       - name: Wait for exact canonical runtime and widget route to reach production
         shell: bash
         run: |
