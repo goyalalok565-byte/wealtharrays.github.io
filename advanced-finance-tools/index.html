@@ -7,9 +7,10 @@ const $=id=>document.getElementById(id);
 const n=(id,fallback=0)=>{const el=$(id),v=el?Number(el.value):fallback;return Number.isFinite(v)?v:fallback;};
 const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
 const M=v=>{try{return new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(Number.isFinite(v)?v:0)}catch(e){return '₹'+Math.round(v||0).toLocaleString('en-IN')}};
-const out=(id,html)=>{const el=$(id);if(el)el.innerHTML=html;};
+let activeResult=null;const out=(id,html)=>{if(activeResult&&id!==activeResult)return;const el=$(id);if(el)el.innerHTML=html;};
 function emi(p,rate,years){p=Math.max(0,p);rate=clamp(rate,0,100);const months=clamp(Math.round(years*12),1,1200),r=rate/1200;return r===0?p/months:p*r*Math.pow(1+r,months)/(Math.pow(1+r,months)-1);}
-function run(){
+function run(target){
+ activeResult=target||null;
  try{
   const amount=clamp(n('ga'),0,1e12),tax=clamp(n('gr'),0,100);
   out('go','Tax added <b>'+M(amount*tax/100)+'</b><br>Final price <b>'+M(amount*(1+tax/100))+'</b>');
@@ -36,7 +37,7 @@ function run(){
 function refresh(){/* Results are updated only by the matching Calculate button. */}
 const limits={ga:[0,1e12],gr:[0,100],lp:[0,1e12],ly:[.25,100],la:[0,100],lb:[0,100],ae:[0,1e10],ar:[0,100],ay:[.25,100],rm:[0,1e9],hp:[0,1e12],ry:[1,100],rg:[-99,100],goldr:[0,1e12],goldw:[0,1e7],goldp:[0,100],goldm:[0,100],bi:[0,1e12],bs:[0,100],st:[0,1e12],sc:[0,1e12],sr:[-99,100],sy:[.25,100],fa:[-1e12,1e12],fr:[-1e6,1e6]};
 document.querySelectorAll('.advanced-card input').forEach(el=>{el.addEventListener('change',()=>{const range=limits[el.id];if(range&&el.value.trim()!==''){const value=Number(el.value);if(Number.isFinite(value))el.value=String(clamp(value,range[0],range[1]));}});});
-document.querySelectorAll('.calc-result-btn').forEach(btn=>btn.addEventListener('click',()=>{run();const result=$(btn.dataset.result);if(result){result.scrollIntoView({behavior:'smooth',block:'center'});result.setAttribute('tabindex','-1');result.focus({preventScroll:true});}}));
+document.querySelectorAll('.calc-result-btn').forEach(btn=>btn.addEventListener('click',()=>{run(btn.dataset.result);const result=$(btn.dataset.result);if(result){result.scrollIntoView({behavior:'smooth',block:'center'});result.setAttribute('tabindex','-1');result.focus({preventScroll:true});}}));
 document.querySelectorAll('.mini').forEach(el=>{el.textContent='Enter your numbers, then click Calculate my result to see the estimate.';});
 })();
 </script><script src="/wa-site-runtime.js?v=f1bb96b218ab-20261026-currency-top25-rank1" defer></script></body></html>
