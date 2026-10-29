@@ -205,14 +205,21 @@ try {
   async function assertMoneyResultChanges(label, inputSelector, resultSelector, value, submitSelector) {
     const before = (await page.locator(resultSelector).innerText()).trim();
     await page.locator(inputSelector).fill(String(value));
-    await page.waitForFunction(({ selector, oldText }) => {
-      const node = document.querySelector(selector);
-      return node && node.innerText.trim() !== oldText;
-    }, { selector: resultSelector, oldText: before }, { timeout: 5000 });
+    const whileEditing = (await page.locator(resultSelector).innerText()).trim();
+    if (whileEditing === before && !/click calculate/i.test(whileEditing)) {
+      throw new Error(`${label} did not invalidate the old result after input edit`);
+    }
+    if (await page.locator(resultSelector + ' .calc-result-row').count()) {
+      throw new Error(`${label} showed a calculated result before the Calculate button was clicked`);
+    }
     if (submitSelector) await page.locator(submitSelector).click();
+    await page.waitForFunction(({ selector }) => {
+      const node = document.querySelector(selector);
+      return node && node.innerText.trim() && !/click .*calculate|enter your numbers/i.test(node.innerText.trim());
+    }, { selector: resultSelector }, { timeout: 5000 });
     const after = (await page.locator(resultSelector).innerText()).trim();
     if (!after || /NaN|Infinity|undefined|^—$/.test(after)) throw new Error(`${label} returned an invalid result: ${after}`);
-    if (after === before) throw new Error(`${label} did not change after changing its input`);
+    if (after === before) throw new Error(`${label} did not change after Calculate was clicked`);
   }
   const moneyPaths = new URL(baseUrl).hostname === 'wealtharrays.com'
     ? { workspace: 'financial-workspace', scenario: 'scenario-lab', goal: 'goal-planner', advanced: 'advanced-finance-tools/' }
