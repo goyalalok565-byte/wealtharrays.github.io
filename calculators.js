@@ -367,7 +367,7 @@ const CALCULATORS = [
     short:"Estimate how long a fixed payment takes to clear debt.",desc:"Estimate debt payoff time and total interest from your balance, APR and monthly payment, and test how a larger payment changes the result.",
     article:{formula:"Debt payoff is modeled month by month from the current balance, annual interest rate and fixed monthly payment. The calculator estimates payoff time and interest and flags payments that do not cover monthly interest.",exampleInputs:{balance:100000,rate:18,payment:3000},faqs:[{q:"Why does the first payment include so much interest?",a:"Interest is calculated on the outstanding balance. With a high rate, a meaningful part of the first payment can go to interest before the rest reduces principal."},{q:"What if my payment is less than monthly interest?",a:"The balance may not fall and can grow under some debt terms. If payment does not cover required interest and charges, contact the creditor."},{q:"How much can a higher payment change payoff time?",a:"Even a moderate increase can reduce months and future interest because principal falls faster. Compare the current payment with a realistic higher payment."},{q:"Should I trust the payoff date?",a:"Use it as a planning estimate. Lender-specific fees, daily interest, payment timing and rate changes can alter the actual payoff."}]},
     fields:[{id:"balance",label:"Current balance",type:"number", default:100000,min:0,step:100},{id:"rate",label:"Annual interest rate",type:"number", default:18,min:0,max:100,step:.1,suffix:"%"},{id:"payment",label:"Monthly payment",type:"number", default:3000,min:.01,step:10}],
-    compute(v){const balance=Math.max(v.balance,0),payment=Math.max(v.payment,0),r=Math.max(v.rate,0)/1200;if(balance===0)return[{label:"Months to payoff",value:0,format:"number",emphasis:"positive"},{label:"Estimated years",value:0,format:"years"},{label:"Estimated interest",value:0,format:"currency",emphasis:"positive"}];if(payment<=balance*r)return[{label:"Monthly interest at current balance",value:balance*r,format:"currency",emphasis:"negative"},{label:"Current monthly payment",value:payment,format:"currency",emphasis:"negative"},{label:"Payment gap to stop negative amortization",value:Math.max(balance*r-payment,0),format:"currency",emphasis:"negative"}];const exactMonths=r===0?balance/payment:-Math.log(1-r*balance/payment)/Math.log(1+r);const months=Math.max(1,Math.ceil(exactMonths));let remaining=balance,total=0;for(let m=1;m<=months;m++){remaining*=1+r;const due=Math.min(payment,remaining);total+=due;remaining=Math.max(remaining-due,0);if(remaining<=1e-8)break}return[{label:"Months to payoff",value:months,format:"number",emphasis:"neutral"},{label:"Estimated years",value:months/12,format:"years"},{label:"Estimated interest",value:Math.max(total-balance,0),format:"currency",emphasis:"negative"}]}
+    compute(v){const balance=Math.max(v.balance,0),payment=Math.max(v.payment,0),r=Math.max(v.rate,0)/1200,maxMonths=1200;if(balance===0)return[{label:"Months to payoff",value:0,format:"number",emphasis:"positive"},{label:"Estimated years",value:0,format:"years"},{label:"Estimated interest",value:0,format:"currency",emphasis:"positive"}];if(payment<=balance*r)return[{label:"Monthly interest at current balance",value:balance*r,format:"currency",emphasis:"negative"},{label:"Current monthly payment",value:payment,format:"currency",emphasis:"negative"},{label:"Payment gap to stop negative amortization",value:Math.max(balance*r-payment,0),format:"currency",emphasis:"negative"}];const exactMonths=r===0?balance/payment:-Math.log(1-r*balance/payment)/Math.log(1+r),months=Math.max(1,Math.ceil(exactMonths)),simulationMonths=Math.min(months,maxMonths);let remaining=balance,total=0;for(let m=1;m<=simulationMonths;m++){remaining*=1+r;const due=Math.min(payment,remaining);total+=due;remaining=Math.max(remaining-due,0);if(remaining<=1e-8)break}if(remaining>1e-8||months>maxMonths){const interestPaid=Math.max(total-(balance-remaining),0);return[{label:"Payoff not reached within 1,200 months",value:maxMonths,format:"number",emphasis:"negative"},{label:"Remaining balance after 1,200 months",value:remaining,format:"currency",emphasis:"negative"},{label:"Interest paid within 1,200 months",value:interestPaid,format:"currency",emphasis:"negative"}]}return[{label:"Months to payoff",value:months,format:"number",emphasis:"neutral"},{label:"Estimated years",value:months/12,format:"years"},{label:"Estimated interest",value:Math.max(total-balance,0),format:"currency",emphasis:"negative"}]}
   },
   {
     id:"inflation",slug:"inflation-calculator",title:"Inflation Calculator",category:"retirement",
@@ -576,8 +576,8 @@ const CALCULATORS = [
       { id: "payment", label: "Fixed monthly payment", type: "number", default: 8000, min: 0, max: 100000000, step: 100 }
     ],
     compute(v) {
-      let balance = v.balance, interestPaid = 0, totalPaid = 0, months = 0;
-      const monthlyRate = v.apr / 1200;
+      let balance = Math.max(v.balance, 0), interestPaid = 0, totalPaid = 0, months = 0;
+      const monthlyRate = Math.max(v.apr, 0) / 1200, maxMonths = 1200;
       if (v.payment <= balance * monthlyRate && balance > 0) {
         return [
           { label: "Months to clear (0 = payment too low)", value: 0, format: "number" },
@@ -585,13 +585,20 @@ const CALCULATORS = [
           { label: "Payment needed to start reducing balance", value: balance * monthlyRate + 1, format: "currency", emphasis: "neutral" }
         ];
       }
-      while (balance > 0.005 && months < 1200) {
+      while (balance > 0.005 && months < maxMonths) {
         const interest = balance * monthlyRate;
         interestPaid += interest;
-        const paid = Math.min(balance + interest, v.payment);
+        const paid = Math.min(balance + interest, Math.max(v.payment, 0));
         totalPaid += paid;
         balance = Math.max(0, balance + interest - paid);
         months++;
+      }
+      if (balance > 0.005) {
+        return [
+          { label: "Payoff not reached within 1,200 months", value: maxMonths, format: "number", emphasis: "negative" },
+          { label: "Remaining balance after 1,200 months", value: balance, format: "currency", emphasis: "negative" },
+          { label: "Interest paid within 1,200 months", value: interestPaid, format: "currency", emphasis: "negative" }
+        ];
       }
       return [
         { label: "Months to pay off", value: months, format: "number" },
