@@ -34,7 +34,8 @@ function run(){
  }catch(err){console.error('Everyday Money Tools calculation error',err);}
 }
 function refresh(){run();}
-document.querySelectorAll('.advanced-card input').forEach(el=>{el.addEventListener('input',refresh);el.addEventListener('change',refresh);});
+const limits={ga:[0,1e12],gr:[0,100],lp:[0,1e12],ly:[.25,100],la:[0,100],lb:[0,100],ae:[0,1e10],ar:[0,100],ay:[.25,100],rm:[0,1e9],hp:[0,1e12],ry:[1,100],rg:[-99,100],goldr:[0,1e12],goldw:[0,1e7],goldp:[0,100],goldm:[0,100],bi:[0,1e12],bs:[0,100],st:[0,1e12],sc:[0,1e12],sr:[-99,100],sy:[.25,100],fa:[-1e12,1e12],fr:[-1e6,1e6]};
+document.querySelectorAll('.advanced-card input').forEach(el=>{el.addEventListener('input',refresh);el.addEventListener('change',()=>{const range=limits[el.id];if(range&&el.value.trim()!==''){const value=Number(el.value);if(Number.isFinite(value))el.value=String(clamp(value,range[0],range[1]));}refresh();});});
 document.querySelectorAll('.calc-result-btn').forEach(btn=>btn.addEventListener('click',()=>{run();const result=$(btn.dataset.result);if(result){result.scrollIntoView({behavior:'smooth',block:'center'});result.setAttribute('tabindex','-1');result.focus({preventScroll:true});}}));
 run();
 })();
