@@ -191,6 +191,58 @@ try {
     if (!taxExample.includes(value)) throw new Error('Income tax worked example is missing ' + value);
   }
 
+
+  // Custom decision tools: responsive layout plus live calculation regression at phone and desktop widths.
+  async function assertMoneyPageViewport(path, label, width) {
+    await page.setViewportSize({ width, height: width < 600 ? 844 : 900 });
+    errors.length = 0;
+    failedResponses.length = 0;
+    await page.goto(`${baseUrl}/${path}`, { waitUntil: 'networkidle' });
+    if ((await page.locator('h1').count()) !== 1) throw new Error(`${label} must have exactly one H1 at ${width}px`);
+    const size = await page.evaluate(() => ({ inner: window.innerWidth, doc: document.documentElement.scrollWidth }));
+    if (size.doc > size.inner + 2) throw new Error(`${label} has horizontal overflow at ${width}px: ${size.doc}px document vs ${size.inner}px viewport`);
+  }
+  async function assertMoneyResultChanges(label, inputSelector, resultSelector, value, submitSelector) {
+    const before = (await page.locator(resultSelector).innerText()).trim();
+    await page.locator(inputSelector).fill(String(value));
+    await page.waitForFunction(({ selector, oldText }) => {
+      const node = document.querySelector(selector);
+      return node && node.innerText.trim() !== oldText;
+    }, { selector: resultSelector, oldText: before }, { timeout: 5000 });
+    if (submitSelector) await page.locator(submitSelector).click();
+    const after = (await page.locator(resultSelector).innerText()).trim();
+    if (!after || /NaN|Infinity|undefined|^—$/.test(after)) throw new Error(`${label} returned an invalid result: ${after}`);
+    if (after === before) throw new Error(`${label} did not change after changing its input`);
+  }
+  const moneyPaths = new URL(baseUrl).hostname === 'wealtharrays.com'
+    ? { workspace: 'financial-workspace', scenario: 'scenario-lab', goal: 'goal-planner', advanced: 'advanced-finance-tools/' }
+    : { workspace: 'financial-workspace.html', scenario: 'scenario-lab.html', goal: 'goal-planner.html', advanced: 'advanced-finance-tools/' };
+  for (const width of [375, 1280]) {
+    await assertMoneyPageViewport(moneyPaths.workspace, 'My Money Plan', width);
+    await assertMoneyResultChanges('My Money Plan', '#fw-start', '#fw-future', width < 600 ? 50000 : 75000, '#fw-form button[type="submit"]');
+    await assertMoneyPageViewport(moneyPaths.scenario, 'Compare Options', width);
+    await assertMoneyResultChanges('Compare Options', '#sl-contribution', '#sl-base-today', width < 600 ? 1500 : 2200, '#scenario-form button[type="submit"]');
+    await assertMoneyPageViewport(moneyPaths.goal, 'Savings Goal Planner', width);
+    await assertMoneyResultChanges('Savings Goal Planner', '#gp-monthly', '#gp-result', width < 600 ? 2500 : 3500, '#goal-form button[type="submit"]');
+    await assertMoneyPageViewport(moneyPaths.advanced, 'Everyday Money Tools', width);
+    const advancedCases = [
+      ['GST calculator', '#ga', '#go', 250000, '[data-result="go"]'],
+      ['Loan comparison', '#lp', '#lo', 2000000, '[data-result="lo"]'],
+      ['Loan affordability', '#ae', '#ao', 25000, '[data-result="ao"]'],
+      ['Rent comparison', '#rm', '#ro', 25000, '[data-result="ro"]'],
+      ['Gold jewellery estimate', '#goldr', '#goldo', 12000, '[data-result="goldo"]'],
+      ['Monthly budget', '#bi', '#bo', 150000, '[data-result="bo"]'],
+      ['Savings contribution', '#st', '#so', 900000, '[data-result="so"]'],
+      ['Exchange-rate conversion', '#fa', '#fo', 200000, '[data-result="fo"]']
+    ];
+    for (const [label, input, result, value, button] of advancedCases) {
+      await assertMoneyResultChanges(label, input, result, value, button);
+    }
+    if (errors.length) throw new Error(`Custom money pages browser errors at ${width}px: ${errors.join(' | ')}`);
+    if (failedResponses.length) throw new Error(`Custom money pages failed requests at ${width}px: ${failedResponses.join(' | ')}`);
+  }
+  await page.setViewportSize({ width: 375, height: 844 });
+
   if (failedResponses.length) throw new Error(`Failed network responses: ${failedResponses.join(' | ')}`);
   if (errors.length) throw new Error(`Browser errors: ${errors.join(' | ')}`);
   console.log(`Production browser smoke passed at ${baseUrl}: homepage, all 47 calculators, explicit Calculate/Compare interactions, shareable inputs, local save/load, PDF download, and 375px mobile overflow checks are healthy.`);
