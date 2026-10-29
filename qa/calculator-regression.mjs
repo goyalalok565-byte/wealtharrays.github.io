@@ -73,6 +73,16 @@ for (const calc of calculators) {
     assert(typeof row.value === 'number' && Number.isFinite(row.value), `${calc.slug}: non-finite valid-input result for ${row.label}; inputs=${JSON.stringify(safeDefaults)}`);
   }
 
+  const maxStress = Object.fromEntries(calc.fields.map(f => [
+    f.id,
+    f.type === 'select'
+      ? String(f.default ?? f.options?.[0]?.value ?? '')
+      : (typeof f.max === 'number' ? f.max : (typeof f.default === 'number' ? f.default : (typeof f.min === 'number' ? f.min : 1)))
+  ]));
+  try { result = calc.compute(maxStress); } catch (error) { throw new Error(`${calc.slug}: maximum-boundary calculation threw: ${error.message}; inputs=${JSON.stringify(maxStress)}`); }
+  assert(Array.isArray(result) && result.length > 0, `${calc.slug}: no maximum-boundary result rows; inputs=${JSON.stringify(maxStress)}`);
+  for (const row of result) assert(row && Number.isFinite(Number(row.value)), `${calc.slug}: non-finite maximum-boundary result for ${row?.label}; inputs=${JSON.stringify(maxStress)}`);
+
   const zeroed = Object.fromEntries(calc.fields.map(f => [f.id, typeof f.default === 'number' ? 0 : (f.type === 'select' ? f.default ?? f.options?.[0]?.value ?? '' : 0)]));
   try { result = calc.compute(zeroed); } catch (error) { throw new Error(`${calc.slug}: zero-boundary calculation threw: ${error.message}; inputs=${JSON.stringify(zeroed)}`); }
   for (const row of result) assert(typeof row.value === 'number' && Number.isFinite(row.value), `${calc.slug}: zero-boundary non-finite result for ${row.label}; inputs=${JSON.stringify(zeroed)}`);
