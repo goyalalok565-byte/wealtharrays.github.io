@@ -68,7 +68,7 @@ function reference(id,v) {
     case 'currency-converter': { const a=Math.max(v.amount,0),r=Math.max(v.rate,0);return {[v.from+' amount']:a,['Converted amount in '+v.to]:a*r}; }
     case 'flat-cost': { const p=Math.max(v.price,0),st=p*Math.max(v.stamp,0)/100,re=p*Math.max(v.registration,0)/100,f=Math.max(v.furnishing,0),o=Math.max(v.other,0);return {'Stamp duty':st,'Registration / transfer':re,'Other purchase costs':f+o,'Estimated all-in purchase cost':p+st+re+f+o}; }
     case 'loan-emi': { const P=Math.max(v.principal,0),n=Math.max(1,Math.round(v.years*12)),r=Math.max(v.rate,0)/1200,emi=P===0?0:r===0?P/n:P*r*(1+r)**n/((1+r)**n-1),total=emi*n;return {'Monthly EMI':emi,'Total repayment':total,'Total interest':total-P}; }
-    case 'capital-gain': { const g=Math.max(v.sale-v.purchase-Math.max(v.buyCosts,0)-Math.max(v.sellCosts,0),0),t=g*Math.max(v.taxRate,0)/100;return {'Estimated capital gain':g,'Assumed tax':t,'Estimated gain after assumed tax':g-t}; }
+    case 'capital-gain': { const g=v.sale-v.purchase-Math.max(v.buyCosts,0)-Math.max(v.sellCosts,0),t=Math.max(g,0)*Math.max(v.taxRate,0)/100;return {'Estimated capital gain':g,'Assumed tax':t,'Estimated gain after assumed tax':g-t}; }
     case 'lumpsum-sip': { const P=Math.max(v.lumpsum,0),m=Math.max(v.monthly,0),i=Math.max(v.rate,0)/1200,n=Math.max(1,Math.round(v.years*12)),l=P*(1+i)**n,s=i===0?m*n:m*((1+i)**n-1)/i*(1+i),inv=P+m*n,total=l+s;return {'Total invested':inv,'Estimated growth':total-inv,'Projected value':total}; }
     case 'loan-against-property': { const loan=Math.max(v.property,0)*Math.max(v.ltv,0)/100,n=Math.max(1,Math.round(v.years*12)),r=Math.max(v.rate,0)/1200,emi=r===0?loan/n:loan*r*(1+r)**n/((1+r)**n-1),total=emi*n;return {'Indicative loan amount':loan,'Monthly EMI':emi,'Total interest':total-loan}; }
     case 'home-loan-eligibility': { const c=Math.max(v.income,0)*Math.max(v.foir,0)/100-Math.max(v.existing,0),n=Math.max(1,Math.round(v.years*12)),r=Math.max(v.rate,0)/1200,l=c<=0?0:r===0?c*n:c*((1+r)**n-1)/(r*(1+r)**n);return {'Indicative EMI capacity':Math.max(c,0),'Indicative eligible loan':Math.max(l,0)}; }
@@ -138,6 +138,7 @@ for(const id of expectedIds) if(!CALCULATORS.some(c=>c.id===id)) { console.error
 for(const calc of CALCULATORS) {
   try {
     const cases=[baseValues(calc),stressValues(calc)];
+    if(calc.id==='capital-gain') cases.push({...baseValues(calc),sale:900000});
     if(calc.id==='salary-hourly') cases.push({...baseValues(calc),direction:'toSalary'});
     if(calc.id==='roi') cases.push({...baseValues(calc),finalValue:0});
     if(calc.id==='mortgage'||calc.id==='car-loan'||calc.id==='personal-loan') cases.push({...baseValues(calc),rate:0});
