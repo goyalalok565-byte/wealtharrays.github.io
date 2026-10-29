@@ -72,6 +72,9 @@ jobs:
       - name: Embed browser smoke
         run: node qa/embed-browser-smoke.mjs
 
+      - name: Deep audit all 47 calculator pages in browser
+        run: node qa/all-47-calculators-browser-smoke.mjs
+
       - name: Visual and calculator browser smoke
         run: node qa/production-browser-smoke.mjs
 
