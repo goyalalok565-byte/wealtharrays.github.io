@@ -210,10 +210,16 @@ try {
       throw new Error(`${label} recalculated its displayed result before the Calculate button was clicked`);
     }
     if (submitSelector) await page.locator(submitSelector).click();
-    await page.waitForFunction(({ selector, oldText }) => {
-      const node = document.querySelector(selector);
-      return node && node.innerText.trim() !== oldText;
-    }, { selector: resultSelector, oldText: before }, { timeout: 5000 });
+    try {
+      await page.waitForFunction(({ selector, oldText }) => {
+        const node = document.querySelector(selector);
+        return node && node.innerText.trim() !== oldText;
+      }, { selector: resultSelector, oldText: before }, { timeout: 5000 });
+    } catch (error) {
+      const afterText = await page.locator(resultSelector).innerText().catch(() => '<missing result>');
+      const statusText = await page.locator('#fw-status, #sl-status, #gp-status, #ga-status').first().innerText().catch(() => '<missing status>');
+      throw new Error(`${label} result did not update after Calculate click; before="${before}", whileEditing="${whileEditing}", after="${afterText}", status="${statusText}"`);
+    }
     const after = (await page.locator(resultSelector).innerText()).trim();
     if (!after || /NaN|Infinity|undefined|^—$/.test(after)) throw new Error(`${label} returned an invalid result: ${after}`);
     if (after === before) throw new Error(`${label} did not change after Calculate was clicked`);
