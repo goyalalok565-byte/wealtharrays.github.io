@@ -30,16 +30,17 @@ async function openPage(path, label, width) {
   if (layout.document > layout.viewport + 2) throw new Error(label + ' overflows horizontally at ' + width + 'px (' + layout.document + 'px document)');
 }
 async function assertChanges(label, input, output, value, button) {
-  const before = (await page.locator(output).innerText()).trim();
+  const initial = (await page.locator(output).innerText()).trim();
+  if (initial && !/^—$/.test(initial) && !/click .*calculate|enter your numbers/i.test(initial)) {
+    throw new Error(label + ' showed a result before Calculate was clicked: ' + initial);
+  }
   await page.locator(input).fill(String(value));
-  await page.waitForFunction(({ selector, oldText }) => {
-    const node = document.querySelector(selector);
-    return node && node.innerText.trim() !== oldText;
-  }, { selector: output, oldText: before }, { timeout: 5000 });
+  const whileEditing = (await page.locator(output).innerText()).trim();
+  if (whileEditing !== initial) throw new Error(label + ' recalculated automatically while editing inputs');
   await page.locator(button).click();
   const after = (await page.locator(output).innerText()).trim();
-  if (!after || /NaN|Infinity|undefined|^—$/.test(after) || after === before) {
-    throw new Error(label + ' did not return a changed, finite result (before: ' + before + ', after: ' + after + ')');
+  if (!after || /NaN|Infinity|undefined|^—$/.test(after) || after === initial) {
+    throw new Error(label + ' did not return a finite result after Calculate (before: ' + initial + ', after: ' + after + ')');
   }
 }
 function assertClean(label, width) {
@@ -78,7 +79,7 @@ try {
     assertClean('Everyday Money Tools', width);
     console.log('Money pages passed at ' + width + 'px.');
   }
-  console.log('Production money-page browser smoke PASS: all four pages fit mobile, tablet and desktop widths; all 11 tested calculations updated after input changes.');
+  console.log('Production money-page browser smoke PASS: all four pages fit mobile, tablet and desktop widths; all 11 tested calculations stayed blank while editing and updated only after clicking Calculate.');
 } finally {
   await browser.close();
 }
