@@ -229,7 +229,7 @@ try {
       ['GST calculator', '#ga', '#go', 250000, '[data-result="go"]'],
       ['Loan comparison', '#lp', '#lo', 2000000, '[data-result="lo"]'],
       ['Loan affordability', '#ae', '#ao', 25000, '[data-result="ao"]'],
-      ['Rent comparison', '#rm', '#ro', 25000, '[data-result="ro"]'],
+      ['Rent comparison', '#rm', '#ro', 40000, '[data-result="ro"]'],
       ['Gold jewellery estimate', '#goldr', '#goldo', 12000, '[data-result="goldo"]'],
       ['Monthly budget', '#bi', '#bo', 150000, '[data-result="bo"]'],
       ['Savings contribution', '#st', '#so', 900000, '[data-result="so"]'],
