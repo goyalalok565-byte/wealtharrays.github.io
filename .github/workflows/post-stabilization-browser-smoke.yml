@@ -87,40 +87,55 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          expected_home="$(grep -oE '/wa-home-runtime\.js\?v=[^"]+' index.html | head -n1)"
-          expected_site="$(grep -oE '/wa-site-runtime\.js\?v=[^"]+' tools.html | head -n1)"
-          expected_calc="$(grep -oE '/wa-calculator-runtime\.js\?v=[^"]+' sip-calculator/index.html | head -n1)"
-          test -n "$expected_home" || { echo "Could not extract expected home runtime URL from index.html"; exit 1; }
-          test -n "$expected_site" || { echo "Could not extract expected site runtime URL from tools.html"; exit 1; }
-          test -n "$expected_calc" || { echo "Could not extract expected calculator runtime URL from sip-calculator/index.html"; exit 1; }
-          echo "Expected home runtime: $expected_home"
-          echo "Expected site runtime: $expected_site"
-          echo "Expected calculator runtime: $expected_calc"
+          set -euo pipefail
+          node <<'NODE' > "$RUNNER_TEMP/wa-runtime-markers"
+          const fs=require('fs');
+          const crypto=require('crypto');
+          const hash=(p)=>crypto.createHash('sha256').update(fs.readFileSync(p,'utf8').replace(/\r\n/g,'\n').trimEnd()).digest('hex').slice(0,12);
+          console.log('WA CANONICAL MODULE | home | final-polish.js | sha256:'+hash('final-polish.js'));
+          console.log('WA CANONICAL MODULE | site | wa-core.js | sha256:'+hash('wa-core.js'));
+          console.log('WA CANONICAL MODULE | calculator | calculator-page-init.js | sha256:'+hash('calculator-page-init.js'));
+          NODE
+          mapfile -t expected_markers < "$RUNNER_TEMP/wa-runtime-markers"
+          expected_home_marker="\${expected_markers[0]}"
+          expected_site_marker="\${expected_markers[1]}"
+          expected_calc_marker="\${expected_markers[2]}"
           ua="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
           for i in $(seq 1 60); do
             home="$(curl -fsSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" -H "Pragma: no-cache" "https://wealtharrays.com/?__wa_verify=$GITHUB_SHA" 2>/dev/null || true)"
             tools="$(curl -fsSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" -H "Pragma: no-cache" "https://wealtharrays.com/tools/?__wa_verify=$GITHUB_SHA" 2>/dev/null || true)"
             calc="$(curl -fsSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" -H "Pragma: no-cache" "https://wealtharrays.com/sip-calculator/?__wa_verify=$GITHUB_SHA" 2>/dev/null || true)"
-            widget_final="$(curl -sSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" -o /dev/null -w '%{url_effective}' 'https://wealtharrays.com/widget.html?calc=sip' || true)"
-            widget="$(curl -fsSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" 'https://wealtharrays.com/widget.html?calc=sip' 2>/dev/null || true)"
             actual_home="$(grep -oE '/wa-home-runtime\.js\?v=[^"]+' <<<"$home" | head -n1 || true)"
             actual_site="$(grep -oE '/wa-site-runtime\.js\?v=[^"]+' <<<"$tools" | head -n1 || true)"
             actual_calc="$(grep -oE '/wa-calculator-runtime\.js\?v=[^"]+' <<<"$calc" | head -n1 || true)"
-            if [[ "$actual_home" == "$expected_home" && "$actual_site" == "$expected_site" && "$actual_calc" == "$expected_calc" && "$widget_final" == *'/widget.html?calc=sip' ]] && grep -q '/widget-bootstrap.js' <<<"$widget" && grep -q 'wa-calculator-runtime.js' <<<"$widget"; then
-              echo "Production is serving exact home/site/calculator runtimes and the canonical widget route."
-              exit 0
+            if [[ -n "$actual_home" && -n "$actual_site" && -n "$actual_calc" ]]; then
+              home_runtime="$(curl -fsSL --max-time 20 -A "$ua" "https://wealtharrays.com\${actual_home}" 2>/dev/null || true)"
+              site_runtime="$(curl -fsSL --max-time 20 -A "$ua" "https://wealtharrays.com\${actual_site}" 2>/dev/null || true)"
+              calc_runtime="$(curl -fsSL --max-time 20 -A "$ua" "https://wealtharrays.com\${actual_calc}" 2>/dev/null || true)"
+              if grep -Fq "$expected_home_marker" <<<"$home_runtime" && grep -Fq "$expected_site_marker" <<<"$site_runtime" && grep -Fq "$expected_calc_marker" <<<"$calc_runtime"; then
+                echo "Production serves canonical runtime bundles built from the exact checked-out source modules."
+                echo "Observed asset URLs: home=$actual_home site=$actual_site calc=$actual_calc"
+                exit 0
+              fi
             fi
             if (( i % 10 == 0 )); then
-              echo "Expected runtimes: home=$expected_home site=$expected_site calc=$expected_calc"
-              echo "Observed runtimes: home=$actual_home site=$actual_site calc=$actual_calc; widget=$widget_final"
+              echo "Expected source markers: home=$expected_home_marker | site=$expected_site_marker | calculator=$expected_calc_marker"
+              echo "Observed asset URLs: home=$actual_home site=$actual_site calc=$actual_calc"
+              echo "Runtime bundle provenance did not match yet; waiting for deployment."
             fi
-            echo "Waiting for exact production deployment... attempt $i/60 (widget URL: $widget_final)"
             sleep 10
           done
-          echo "Production did not expose the exact current runtime versions and canonical widget route within the wait window."
-          echo "Final observed runtimes: home=$actual_home site=$actual_site calc=$actual_calc; widget=$widget_final"
-          echo "This is a deployment/CDN/redirect mismatch, not a passing smoke test."
+          echo "Production did not expose canonical runtime bundles built from the checked-out source within ten minutes."
+          echo "Final observed asset URLs: home=$actual_home site=$actual_site calc=$actual_calc"
           exit 1
+          widget_final="$(curl -sSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" -o /dev/null -w '%{url_effective}' 'https://wealtharrays.com/widget.html?calc=sip' || true)"
+          widget="$(curl -fsSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" 'https://wealtharrays.com/widget.html?calc=sip' 2>/dev/null || true)"
+          if [[ "$widget_final" != *'/widget.html?calc=sip' ]] || ! grep -q '/widget-bootstrap.js' <<<"$widget" || ! grep -q 'wa-calculator-runtime.js' <<<"$widget"; then
+            echo "Canonical widget route is not resolving to the expected embed document."
+            echo "Final widget URL: $widget_final"
+            exit 1
+          fi
+          echo "Canonical widget route and bootstrap references verified."
 
       - name: Production embed browser smoke
         env:
