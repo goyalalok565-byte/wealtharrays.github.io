@@ -44,7 +44,10 @@ for(const [name,target,label] of [['cagr/index.html','/cagr-calculator/','CAGR C
 let widget=read('widget.html');
 if(!/<meta\s+name=["']description["']/i.test(widget)) widget=widget.replace('<title>Wealth Arrays Calculator Widget</title>','<title>Wealth Arrays Calculator Widget</title><meta name="description" content="Embeddable Wealth Arrays calculator widget.">');
 if(!/<h1\b/i.test(widget)) widget=widget.replace('<main style="max-width:900px;margin:0 auto;padding:18px">','<main class="static-page" style="max-width:900px;margin:0 auto;padding:18px"><h1>Wealth Arrays Calculator Widget</h1><p class="calc-desc">Embeddable access to the Wealth Arrays calculator library.</p>');
+widget=widget.replace('href="https://wealtharrays.com/widget.html"','href="https://wealtharrays.com/widget/"');
 write('widget.html',widget);
+fs.mkdirSync(path.join(root,'widget'),{recursive:true});
+write('widget/index.html',widget);
 
 let offline=read('offline.html');
 if(!/<meta\s+name=["']description["']/i.test(offline)) offline=offline.replace('<title>','<meta name="description" content="Wealth Arrays offline fallback page."><title>');
