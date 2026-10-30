@@ -1,77 +1,52 @@
-# Wealth Arrays Calculator QA Matrix
+# Wealth Arrays QA and release matrix
 
-This repository-level QA matrix documents deterministic scenario tests for all 20 calculators and the current production runtime. The previously removed Smart Calculator Assistant is intentionally not part of the release contract.
+This document describes the current 47-calculator site and the QA gates wired into the repository. Older 20-calculator scenarios are historical and must not be treated as complete coverage of the current application.
 
-| Calculator | Scenario | Expected check |
-|---|---|---|
-| SIP | ₹/$1,000 monthly, 0%, 2 years | Total invested = 24,000 |
-| Compound Interest | 1,000 principal, 12%, monthly, 1 year | Final ≈ 1,126.825 |
-| Mortgage / EMI | 12,000 principal, 0%, 1 year | Payment = 1,000/month |
-| ROI | 1,000 → 1,210 over 2 years | ROI = 21%, annualized ≈ 10% |
-| Simple Interest | 1,000 at 10% for 2 years | Interest = 200 |
-| Freedom Milestone | 40,000 expenses, 4% withdrawal | Target = 1,000,000 |
-| Salary ↔ Hourly | 52,000 / (40 × 52) | Hourly = 25 |
-| Profit Margin | Revenue 1,000, COGS 400, expenses 100 | Net margin = 50% |
-| Fixed Deposit | 1,000 at 10% for 1 year | Maturity = 1,100 |
-| Recurring Deposit | 100/month, 0%, 1 year | Total = 1,200 |
-| Lumpsum | 1,000 at 10% for 2 years | Final = 1,210 |
-| CAGR | 1,000 → 1,210 over 2 years | CAGR ≈ 10% |
-| Car Loan | 12,000 price, 2,000 down, 0%, 1 year | Payment ≈ 833.33 |
-| Personal Loan | 12,000, 0%, 1 year | Payment = 1,000/month |
-| Debt Payoff | 1,200 balance, 0%, 100/month | 12 months |
-| Inflation | 1,000 at 10% for 2 years | Future equivalent = 1,210 |
-| Net Worth | Assets 8,000, debt 1,500 | Net worth = 6,500 |
-| Overtime Pay | 20/hour, 40 regular, 10 OT at 1.5× | Total = 1,100 |
-| Freelance Rate | 50,000 income + 10,000 costs / 1,000 hours | Rate = 60/hour |
-| Income Tax Scenario | 100,000 income, 20,000 deductions, 20% | Tax = 16,000 |
+## Current build and mandatory QA
 
-## Edge-case checks
+The production build performs these steps:
 
-- Empty required numeric inputs keep the calculator in a clear incomplete state instead of calculating from hidden defaults.
-- Zero-rate cases are explicitly handled where the underlying formula has a divide-by-zero branch.
-- Negative numeric values are constrained by field minimums or handled by calculator logic where appropriate.
-- Freedom Milestone protects against a zero withdrawal rate.
-- Debt Payoff identifies payments that do not exceed monthly interest rather than pretending the debt will be repaid.
-- Mortgage, ROI and CAGR protect against invalid divide-by-zero or invalid annualization cases.
-- Results that become non-finite are rejected by the UI rather than rendered as NaN/Infinity.
+1. Generate research datasets and any missing calculator route pages.
+2. Generate canonical runtime bundles, 47 split calculator definitions, page-specific guidance, metadata and the indexable-only sitemap.
+3. Apply premium layout and accessibility normalization, route alias/link repair and static integrity checks.
+4. Build the dist deployment output and verify required public assets and all 47 split calculator definition scripts.
+5. Run site integrity with SITE_ROOT=dist, value-content audit, SaaS readiness vectors, billing webhook audit, Worker syntax checks and Worker routing tests.
 
-## Phase 1 independent audit — 2026-09-15
+The current checks verify:
 
-`qa/phase1-calculator-audit.mjs` independently re-implements the expected mathematics for all 20 calculator IDs and compares the live `calculators.js` results against those references. CI runs the audit on every push to `main` and can also be run manually.
+- 47 calculator definitions and 47 generated definition scripts are included in the build output.
+- All 108 HTML pages pass site integrity; internal links, sitemap and robots references resolve.
+- Every calculator has domain-specific guidance, a worked example, FAQs, internal article links, metadata and valid software/breadcrumb schema.
+- API golden vectors cover the versioned server-side models, including SIP, EMI, GST, CAGR, compounding and zero-rate edge cases.
+- The Indian new-regime tax engine has explicit tax-year, rebate and marginal-relief vectors. It is an estimate, not filing software.
+- Worker route dispatch, static fallback, rate-limit enforcement and fail-closed behavior are tested.
+- Razorpay webhook tests cover HMAC validation, duplicate delivery, stale event ordering, retryable unlinked subscription events and payment failure/refund event recording.
 
-The audit covers:
+## Calculator math and release expectations
 
-- all 20 calculator definitions are present;
-- default/reference scenarios;
-- stress scenarios kept inside a finite numerical domain;
-- zero-rate branches for growth and loan calculators;
-- zero/negative-growth cases where the model permits them;
-- alternate salary conversion direction;
-- debt-payoff behavior when the payment is insufficient;
-- non-finite output rejection (`NaN`, `Infinity`, `-Infinity`);
-- exact label/result-pair matching against independent reference equations.
+The full browser-side calculator library contains 47 calculators. The API currently exposes a smaller, separately versioned set of deterministic models; API model coverage must not be reported as 47/47 until each calculator has a reviewed adapter and independent golden vectors.
 
-## Calculator review standard
+For each calculator, the release standard is:
 
-Each calculator page now exposes a Phase 1 review panel with a **Last reviewed** date, publisher identity, calculation basis, important assumptions and a review/source note. The review panel intentionally does not claim professional certification or regulated financial advice. Country-specific calculators must identify their jurisdiction and tax year; the current Income Tax Planner does not use tax tables and is explicitly jurisdiction-neutral.
+- Independent reference equations and at least one worked golden vector.
+- Zero-rate, empty, boundary, invalid and non-finite input handling where applicable.
+- Unit clarity for monthly versus annual values and nominal versus real amounts.
+- Result labels that distinguish contributed principal, growth, interest, tax and estimated totals.
+- No unverified live rate, tax, lender or government-rule assumptions presented as current facts.
 
-The review date is currently **2026-09-15**. A material formula, assumption or regulatory change should trigger a new review date and an updated QA scenario before release.
+## Tax rule maintenance
 
-## Current production QA
+The server-side India tax endpoint currently supports the new regime for Tax Year 2026-27 under the Income-tax Act, 2025. Keep the Tax Year label distinct from legacy Assessment Year terminology. Any rate, rebate, surcharge, cess or marginal-relief change must be checked against current CBDT/Income Tax Department material, versioned, and accompanied by boundary vectors before release.
 
-1. **Deterministic calculators:** identical inputs produce identical outputs; formulas are local and transparent.
-2. **Input integrity:** required fields remain incomplete until supplied; min/max constraints and validation prevent unsupported numeric states.
-3. **Plain-language results:** the interface explains the main result and its assumptions without presenting the output as financial advice.
-4. **Scenario guidance:** calculators that support projections expose comparison or sensitivity information where meaningful.
-5. **Cross-calculator navigation:** related-tool links connect investment, inflation, debt, retirement, income and business workflows.
-6. **Voice UX:** supported browsers can accept a spoken number for the selected input field and can read a resulting value aloud where the browser permits it. Microphone permission and browser support remain required.
-7. **Mobile UX:** calculator controls use large touch targets, responsive layouts and compact result/chart presentation on narrow screens.
-8. **Privacy:** calculator inputs are designed to remain browser-first; analytics is consent-aware and should not receive raw financial inputs.
-9. **PWA:** manifest, install prompt handling, service-worker registration and cache/version contracts are validated by GitHub Actions.
-10. **Page integrity:** indexable pages must have one footer, the expected OG image, and no duplicate managed runtime scripts. Intentional noindex redirect shells are excluded from the full page-shell contract.
-11. **SEO integrity:** robots points to the sitemap; sitemap contains canonical indexable URLs and excludes known redirect-only pages.
-12. **Tax positioning:** the Income Tax Scenario Calculator is explicitly a jurisdiction-neutral effective-rate model, not official tax filing software.
+## Production verification still required
 
-## Release note
+A successful local build does not prove the production deployment is correct. These checks need access to the corresponding live services or devices:
 
-The matrix documents deterministic expected outcomes and release criteria. It is not a substitute for physical-device testing. Before a public advertising launch, verify the 20 scenarios in the live build plus Chrome Android, Safari iPhone, and a current desktop browser, including microphone permission, dark/light mode, currency switching, charts, comparison, share/export, and analytics events.
+- Cloudflare Pages deployment commit, build log, output directory, custom-domain routing and cache behavior.
+- Cloudflare Worker deployment status, D1 migration state and secret/binding configuration.
+- Real browser checks for all 47 calculator widgets, PDF/export/copy/embed flows, keyboard and screen-reader behavior, mobile layouts and console/network errors.
+- Razorpay test-mode checkout, webhook delivery/retries, cancellation and refund reconciliation.
+- Search Console indexing, query/page performance and GA4 conversion data.
+- Core Web Vitals field data, backup/restore drills, monitoring/alerts and DPDP compliance review.
+
+Do not mark any of these production checks as passed without direct evidence from the relevant service or browser.
