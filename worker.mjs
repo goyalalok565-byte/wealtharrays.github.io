@@ -48,6 +48,25 @@ export default {
     const route = ROUTES.get(url.pathname.replace(/\/$/, ""));
     if (!route) return jsonError("NOT_FOUND", "No API endpoint matches this path.", 404);
     const handler = methodHandler(route, request.method.toUpperCase());
+    const rateLimitedPaths = new Set(["/v1/calculate", "/v1/india-tax", "/v1/fx"]);
+    if (handler && request.method !== "OPTIONS" && rateLimitedPaths.has(url.pathname.replace(/\/$/, ""))) {
+      const limiter = env.PUBLIC_API_LIMITER;
+      if (!limiter || typeof limiter.limit !== "function") {
+        return jsonError("RATE_LIMITER_NOT_CONFIGURED", "The public API rate limiter is not configured.", 503);
+      }
+      try {
+        const ip = request.headers.get("cf-connecting-ip") || "local";
+        const decision = await limiter.limit({ key: url.pathname.replace(/\/$/, "") + ":" + ip });
+        if (!decision?.success) {
+          return new Response(JSON.stringify({ error: { code: "RATE_LIMITED", message: "Too many requests. Please wait before trying again." } }), {
+            status: 429,
+            headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", "Retry-After": "60", ...CORS }
+          });
+        }
+      } catch {
+        return jsonError("RATE_LIMITER_UNAVAILABLE", "The public API is temporarily unavailable.", 503);
+      }
+    }
     if (!handler) {
       if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
       return new Response(JSON.stringify({ error: { code: "METHOD_NOT_ALLOWED", message: "This method is not supported for the requested endpoint." } }), {
