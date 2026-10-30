@@ -23,7 +23,7 @@ async function dismissPrivacyChoices() {
   // Keep the automated calculator test privacy-preserving: choose a reject/essential-only
   // option instead of accepting optional advertising or analytics storage.
   const safeChoice = dialog.getByRole('button', {
-    name: /reject all|reject optional|essential only|necessary only|use necessary|decline all|continue without accepting/i
+    name: /reject(?: all)?|reject optional|essential only|necessary only|use necessary|decline all|continue without accepting/i
   }).first();
   if (!(await safeChoice.count())) {
     const available = await dialog.locator('button').allTextContents();
