@@ -6,7 +6,6 @@
 
 - https://wealtharrays.com/ — Homepage and calculator discovery
 - https://wealtharrays.com/tools — Full calculator library
-- https://wealtharrays.com/advanced-finance-tools/ — Scenario and decision tools
 - https://wealtharrays.com/articles — Financial education guides
 - https://wealtharrays.com/research — Reproducible calculation studies
 - https://wealtharrays.com/methodology — Formulas, assumptions and limitations

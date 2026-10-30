@@ -17,6 +17,22 @@ page.on('pageerror', error => errors.push(`pageerror: ${error}`));
 page.on('console', message => { if (message.type() === 'error' && !expectedCspWarning(message.text()) && !/googlesyndication|doubleclick|fonts\\.(googleapis|gstatic)|fundingchoices|ERR_BLOCKED_BY_CLIENT/i.test(message.text())) errors.push(`console: ${message.text()}`); });
 page.on('response', response => { if (response.status() >= 400 && new URL(response.url()).origin === new URL(baseUrl).origin) failedResponses.push(`${response.status()} ${response.url()}`); });
 
+async function dismissPrivacyChoices() {
+  const dialog = page.locator('#wa-consent, [role="dialog"][aria-label*="Privacy" i]').first();
+  if (!(await dialog.count()) || !(await dialog.isVisible().catch(() => false))) return;
+  // Keep the automated calculator test privacy-preserving: choose a reject/essential-only
+  // option instead of accepting optional advertising or analytics storage.
+  const safeChoice = dialog.getByRole('button', {
+    name: /reject(?: all)?|reject optional|essential only|necessary only|use necessary|decline all|continue without accepting/i
+  }).first();
+  if (!(await safeChoice.count())) {
+    const available = await dialog.locator('button').allTextContents();
+    throw new Error('Privacy choices dialog blocks the browser test and exposes no recognizable reject/essential-only action. Available buttons: ' + available.join(' | '));
+  }
+  await safeChoice.click();
+  await dialog.waitFor({ state: 'hidden', timeout: 5000 });
+}
+
 async function diagnostics(label) {
   const data = await page.evaluate(() => {
     const widget = document.querySelector('#calc-widget');
@@ -35,6 +51,7 @@ async function assertCalculator(path, label, phase2 = false) {
   errors.length = 0;
   failedResponses.length = 0;
   await page.goto(`${baseUrl}/${path}`, { waitUntil: 'networkidle' });
+  await dismissPrivacyChoices();
   try { await page.locator('#calc-widget').waitFor({ state: 'visible', timeout: 10000 }); }
   catch (error) { await diagnostics(label); throw new Error(`${label} failed to render at ${page.url()}: ${error.message}`); }
   if ((await page.locator('h1').count()) !== 1) throw new Error(`${label} must have exactly one H1`);
@@ -49,6 +66,7 @@ async function assertCalculator(path, label, phase2 = false) {
 
 try {
   await page.goto(`${baseUrl}/index.html`, { waitUntil: 'networkidle' });
+  await dismissPrivacyChoices();
   const stylesheet = await page.locator('link[rel="stylesheet"][href*="styles.css"]').count();
   if (!stylesheet) throw new Error('Homepage stylesheet link is missing');
   const bodyDisplay = await page.locator('body').evaluate(el => getComputedStyle(el).display);
@@ -111,6 +129,7 @@ try {
   const shareUrl = new URL(sharePayload.url);
   if (shareUrl.searchParams.get('wa_scenario') !== '1' || shareUrl.searchParams.get('wa_monthly') !== '200' || shareUrl.searchParams.get('wa_rate') !== '10' || shareUrl.searchParams.get('wa_years') !== '15' || shareUrl.searchParams.get('wa_inflation') !== '6') throw new Error('Share scenario URL did not preserve all SIP inputs');
   await page.goto(sharePayload.url, { waitUntil: 'networkidle' });
+  await dismissPrivacyChoices();
   for (const [field, expected] of [['monthly','200'],['rate','10'],['years','15'],['inflation','6']]) {
     const actual = await page.locator('#calc-widget input[data-field="' + field + '"]').inputValue();
     if (actual !== expected) throw new Error('Shared scenario did not restore ' + field + ': ' + actual);
@@ -198,6 +217,7 @@ try {
     errors.length = 0;
     failedResponses.length = 0;
     await page.goto(`${baseUrl}/${path}`, { waitUntil: 'networkidle' });
+    await dismissPrivacyChoices();
     if ((await page.locator('h1').count()) !== 1) throw new Error(`${label} must have exactly one H1 at ${width}px`);
     const size = await page.evaluate(() => ({ inner: window.innerWidth, doc: document.documentElement.scrollWidth }));
     if (size.doc > size.inner + 2) throw new Error(`${label} has horizontal overflow at ${width}px: ${size.doc}px document vs ${size.inner}px viewport`);
