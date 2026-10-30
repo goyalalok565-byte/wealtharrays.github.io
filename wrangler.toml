@@ -13,7 +13,4 @@ not_found_handling = "404-page"
 [[ratelimits]]
 name = "PUBLIC_API_LIMITER"
 namespace_id = "2026103001"
-
-  [ratelimits.simple]
-  limit = 120
-  period = 60
+simple = { limit = 120, period = 60 }
