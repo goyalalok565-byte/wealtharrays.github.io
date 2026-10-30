@@ -52,11 +52,11 @@ const fundingHeaders=read('_headers');
 if(!fundingHeaders.includes('https://fundingchoicesmessages.google.com')) failures.push('_headers: Funding Choices CSP allowlist missing');
 if(!read('privacy.html').includes('Google Privacy &amp; Messaging')) failures.push('privacy.html: Funding Choices disclosure missing');
 
-for(const name of ['404.html','widget.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html']){
+for(const name of ['404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html']){
   const s=read(name);
   if(s.includes('adsbygoogle.js')||s.includes('ca-pub-6507600103785450')) failures.push(name+': AdSense must not be present');
   if(s.includes('pagead2.googlesyndication.com')||s.includes('googleads.g.doubleclick.net')) failures.push(name+': AdSense preconnect must not be present');
-  if(name==='widget.html'){
+  if(name==='widget.html'||name==='widget/index.html'){
     if(!s.includes('/calculators.js')) failures.push(name+': calculators.js bootstrap missing');
     if(!s.includes('/wa-calculator-runtime.js')) failures.push(name+': calculator runtime bootstrap missing');
     if(/<html\s+data-wa-calculator=/i.test(s)) failures.push(name+': widget must not be converted into calculator-page bootstrap mode');
@@ -68,9 +68,9 @@ for(const full of publicFiles){
   if(apple>1) failures.push(r+': duplicate apple-touch-icon tags ('+apple+')');
 }
 const widgetSource=fs.readFileSync('widget.js','utf8');
-if(!widgetSource.includes('new URL(`/widget.html?calc=${encodeURIComponent(calc.id)}`,location.origin).href')) failures.push('widget.js: embed URL must use canonical /widget.html route');
+if(!widgetSource.includes('new URL(`/widget/?calc=${encodeURIComponent(calc.id)}`,location.origin).href')) failures.push('widget.js: embed URL must use canonical /widget/ route');
 const headers=fs.existsSync('_headers')?fs.readFileSync('_headers','utf8'):'';
-for(const rule of ['/widget','/widget.html']){
+for(const rule of ['/widget','/widget/','/widget.html']){
   const marker=rule+'\n';
   const start=headers.lastIndexOf(marker);
   const next=start>=0?headers.indexOf('\n/',start+marker.length):-1;
