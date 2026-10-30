@@ -1,5 +1,6 @@
-# Embeddable calculator widget — one-way aliases to the canonical widget document.
-/widget /widget.html 301
+# Embeddable calculator widget — old aliases converge on the canonical directory route.
+/widget /widget/ 301
+/widget.html /widget/ 301
 
 # Canonical legacy URL redirects
 # Each public route has one canonical destination; calculator routes always end in /.
