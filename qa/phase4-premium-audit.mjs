@@ -68,6 +68,8 @@ for(const full of publicFiles){
   if(apple>1) failures.push(r+': duplicate apple-touch-icon tags ('+apple+')');
 }
 const widgetSource=fs.readFileSync('widget.js','utf8');
+const widgetRedirects=read('_redirects');
+if(!widgetRedirects.includes('/widget /widget/ 301')||!widgetRedirects.includes('/widget.html /widget/ 301')) failures.push('_redirects: widget aliases must converge on /widget/');
 if(!widgetSource.includes('new URL(`/widget/?calc=${encodeURIComponent(calc.id)}`,location.origin).href')) failures.push('widget.js: embed URL must use canonical /widget/ route');
 const headers=fs.existsSync('_headers')?fs.readFileSync('_headers','utf8'):'';
 for(const rule of ['/widget','/widget/','/widget.html']){
