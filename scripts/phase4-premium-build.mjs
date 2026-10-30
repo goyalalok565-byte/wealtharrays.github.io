@@ -5,7 +5,7 @@ const root = process.cwd();
 const htmlFiles = [];
 function walk(dir){
   for(const name of fs.readdirSync(dir)){
-    if(name.startsWith('.') || name === 'node_modules') continue;
+    if(name.startsWith('.') || name === 'node_modules' || name === 'dist') continue;
     const full=path.join(dir,name), st=fs.statSync(full);
     if(st.isDirectory()) walk(full);
     else if(name.endsWith('.html')) htmlFiles.push(full);
