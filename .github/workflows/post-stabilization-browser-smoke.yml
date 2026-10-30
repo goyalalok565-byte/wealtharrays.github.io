@@ -114,9 +114,9 @@ jobs:
               site_runtime="$(curl -fsSL --max-time 20 -A "$ua" "https://wealtharrays.com${actual_site}" 2>/dev/null || true)"
               calc_runtime="$(curl -fsSL --max-time 20 -A "$ua" "https://wealtharrays.com${actual_calc}" 2>/dev/null || true)"
               if grep -Fq "$expected_home_marker" <<<"$home_runtime" && grep -Fq "$expected_site_marker" <<<"$site_runtime" && grep -Fq "$expected_calc_marker" <<<"$calc_runtime"; then
-                widget_final="$(curl -sSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" -o /dev/null -w '%{url_effective}' 'https://wealtharrays.com/widget.html?calc=sip' || true)"
-                widget="$(curl -fsSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" 'https://wealtharrays.com/widget.html?calc=sip' 2>/dev/null || true)"
-                if [[ "$widget_final" != *'/widget.html?calc=sip' ]] || ! grep -q '/widget-bootstrap.js' <<<"$widget" || ! grep -q 'wa-calculator-runtime.js' <<<"$widget"; then
+                widget_final="$(curl -sSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" -o /dev/null -w '%{url_effective}' 'https://wealtharrays.com/widget/?calc=sip' || true)"
+                widget="$(curl -fsSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" 'https://wealtharrays.com/widget/?calc=sip' 2>/dev/null || true)"
+                if [[ "$widget_final" != *'/widget/?calc=sip' ]] || ! grep -q '/widget-bootstrap.js' <<<"$widget" || ! grep -q 'wa-calculator-runtime.js' <<<"$widget"; then
                   echo "Canonical widget route is not resolving to the expected embed document."
                   echo "Final widget URL: $widget_final"
                   exit 1
