@@ -64,6 +64,10 @@ jobs:
           done
           cat /tmp/wealtharrays-dist-http.log
           exit 1
+      - name: Browser regression for canonical calculator embed route
+        env:
+          BASE_URL: http://127.0.0.1:4173
+        run: node qa/embed-browser-smoke.mjs
       - name: Browser regression for all 47 calculators and scenario features
         env:
           BASE_URL: http://127.0.0.1:4173
