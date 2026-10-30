@@ -37,9 +37,9 @@ function walkCalculatorPages(dir){
 walkCalculatorPages(root);
 if(pages.length!==47) throw new Error(`Expected 47 active canonical calculator runtime pages, found ${pages.length}`);
 for(const page of pages){const id=fs.readFileSync(path.join(root,page),'utf8').match(/data-wa-calculator="([^"]+)"/i)?.[1];if(!id||!fs.existsSync(path.join(root,'calculator-definitions',`${id}.js`))) throw new Error(`${page}: missing split calculator definition for ${id||'unknown'}`);}
-const widget=fs.readFileSync('widget.html','utf8');
-if(!widget.includes('/calculators.js')||!widget.includes('/wa-calculator-runtime.js')) throw new Error('widget.html: calculator bootstrap scripts missing');
-if(widget.includes('adsbygoogle.js')||widget.includes('ca-pub-6507600103785450')) throw new Error('widget.html: AdSense must not be present');
+const widget=fs.readFileSync('widget/index.html','utf8');
+if(!widget.includes('/calculators.js')||!widget.includes('/wa-calculator-runtime.js')) throw new Error('widget/index.html: calculator bootstrap scripts missing');
+if(widget.includes('adsbygoogle.js')||widget.includes('ca-pub-6507600103785450')) throw new Error('widget/index.html: AdSense must not be present');
 for(const page of pages){const html=fs.readFileSync(path.join(root,page),'utf8');const srcs=[...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi)].map(m=>m[1]);const loadedBasenames=new Set(srcs.map(src=>src.split('?')[0].split('#')[0].split('/').pop()));for(const file of canonicalSources) if(loadedBasenames.has(file)) throw new Error(`${page}: direct calculator runtime dependency ${file}`);}
 
 if(fs.existsSync('calculator-runtime.js')) throw new Error('Retired calculator-runtime.js must not exist');
