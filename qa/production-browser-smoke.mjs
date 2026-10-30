@@ -168,6 +168,8 @@ try {
     const fxData = await fxResponse.json();
     if (!(Number(fxData.rates?.INR) > 0)) throw new Error('Production FX endpoint returned no USD/INR rate');
     await assertCalculator('currency-converter/', 'Currency converter live-rate flow');
+    // The calculator intentionally starts blank; provide an amount before fetching a rate.
+    await page.locator('#calc-widget input[data-field="amount"]').fill('100');
     await page.locator('#calc-widget select[data-field="from"]').selectOption('USD');
     await page.locator('#calc-widget select[data-field="to"]').selectOption('INR');
     await page.locator('#calc-widget button[id$="-get-live-rate"]').click();
