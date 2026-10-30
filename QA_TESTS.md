@@ -36,7 +36,7 @@ For each calculator, the release standard is:
 
 ## Tax rule maintenance
 
-The server-side India tax endpoint currently supports the new regime for Tax Year 2026-27 under the Income-tax Act, 2025. Keep the Tax Year label distinct from legacy Assessment Year terminology. Any rate, rebate, surcharge, cess or marginal-relief change must be checked against current CBDT/Income Tax Department material, versioned, and accompanied by boundary vectors before release.
+The server-side India tax endpoint currently supports the new regime for Tax Year 2026-27 under the Income-tax Act, 2025. This is not AY 2026-27: the old Act's AY 2026-27 applies to FY 2025-26, while Tax Year 2026-27 under the new Act applies to FY 2026-27. Keep these periods distinct in labels, examples and golden vectors. Any rate, rebate, surcharge, cess or marginal-relief change must be checked against current CBDT/Income Tax Department material, versioned, and accompanied by boundary vectors before release.
 
 ## Production verification still required
 
