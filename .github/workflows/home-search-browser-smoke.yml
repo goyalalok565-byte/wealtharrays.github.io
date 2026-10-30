@@ -84,18 +84,27 @@ jobs:
           test -n "$expected_home" || { echo "Could not extract expected home runtime URL"; exit 1; }
           test -n "$expected_site" || { echo "Could not extract expected site runtime URL"; exit 1; }
           test -n "$expected_calc" || { echo "Could not extract expected calculator runtime URL"; exit 1; }
+          ua="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
           for i in $(seq 1 60); do
-            home="$(curl -fsSL https://wealtharrays.com/index.html 2>/dev/null || true)"
-            tools="$(curl -fsSL https://wealtharrays.com/tools/ 2>/dev/null || true)"
-            calc="$(curl -fsSL https://wealtharrays.com/sip-calculator/ 2>/dev/null || true)"
-            if grep -Fq "$expected_home" <<<"$home" && grep -Fq "$expected_site" <<<"$tools" && grep -Fq "$expected_calc" <<<"$calc"; then
+            home="$(curl -fsSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" -H "Pragma: no-cache" "https://wealtharrays.com/?__wa_verify=$GITHUB_SHA" 2>/dev/null || true)"
+            tools="$(curl -fsSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" -H "Pragma: no-cache" "https://wealtharrays.com/tools/?__wa_verify=$GITHUB_SHA" 2>/dev/null || true)"
+            calc="$(curl -fsSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" -H "Pragma: no-cache" "https://wealtharrays.com/sip-calculator/?__wa_verify=$GITHUB_SHA" 2>/dev/null || true)"
+            actual_home="$(grep -oE '/wa-home-runtime\.js\?v=[^"]+' <<<"$home" | head -n1 || true)"
+            actual_site="$(grep -oE '/wa-site-runtime\.js\?v=[^"]+' <<<"$tools" | head -n1 || true)"
+            actual_calc="$(grep -oE '/wa-calculator-runtime\.js\?v=[^"]+' <<<"$calc" | head -n1 || true)"
+            if [[ "$actual_home" == "$expected_home" && "$actual_site" == "$expected_site" && "$actual_calc" == "$expected_calc" ]]; then
               echo "Production is serving the current home, site and calculator runtime versions."
               exit 0
+            fi
+            if (( i % 10 == 0 )); then
+              echo "Runtime mismatch: expected home=$expected_home site=$expected_site calc=$expected_calc"
+              echo "Runtime observed: home=$actual_home site=$actual_site calc=$actual_calc"
             fi
             echo "Waiting for exact production runtime versions... attempt $i/60"
             sleep 10
           done
           echo "Production did not expose the current runtime versions within ten minutes."
+          echo "Final observed: home=$actual_home site=$actual_site calc=$actual_calc"
           exit 1
 
       - name: Verify production embed browser smoke
