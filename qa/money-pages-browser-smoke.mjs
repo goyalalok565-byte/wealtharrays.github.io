@@ -15,11 +15,28 @@ page.on('response', response => {
   if (response.status() >= 400 && new URL(response.url()).origin === new URL(baseUrl).origin) failedResponses.push(response.status() + ' ' + response.url());
 });
 
+async function dismissPrivacyChoices() {
+  const dialog = page.locator('#wa-consent, [role="dialog"][aria-label*="Privacy" i]').first();
+  if (!(await dialog.count()) || !(await dialog.isVisible().catch(() => false))) return;
+  // Keep the automated calculator test privacy-preserving: choose a reject/essential-only
+  // option instead of accepting optional advertising or analytics storage.
+  const safeChoice = dialog.getByRole('button', {
+    name: /reject(?: all)?|reject optional|essential only|necessary only|use necessary|decline all|continue without accepting/i
+  }).first();
+  if (!(await safeChoice.count())) {
+    const available = await dialog.locator('button').allTextContents();
+    throw new Error('Privacy choices dialog blocks the browser test and exposes no recognizable reject/essential-only action. Available buttons: ' + available.join(' | '));
+  }
+  await safeChoice.click();
+  await dialog.waitFor({ state: 'hidden', timeout: 5000 });
+}
+
 async function openPage(path, label, width) {
   errors.length = 0;
   failedResponses.length = 0;
   await page.setViewportSize({ width, height: width < 600 ? 844 : 900 });
   await page.goto(baseUrl + '/' + path, { waitUntil: 'networkidle' });
+  await dismissPrivacyChoices();
   if ((await page.locator('h1').count()) !== 1) throw new Error(label + ' must have exactly one H1 at ' + width + 'px');
   const layout = await page.evaluate(() => ({
     viewport: window.innerWidth,
