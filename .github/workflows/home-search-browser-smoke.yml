@@ -88,9 +88,9 @@ jobs:
           console.log('WA CANONICAL MODULE | calculator | calculator-page-init.js | sha256:'+hash('calculator-page-init.js'));
           NODE
           mapfile -t expected_markers < "$RUNNER_TEMP/wa-runtime-markers"
-          expected_home_marker="\${expected_markers[0]}"
-          expected_site_marker="\${expected_markers[1]}"
-          expected_calc_marker="\${expected_markers[2]}"
+          expected_home_marker="${expected_markers[0]}"
+          expected_site_marker="${expected_markers[1]}"
+          expected_calc_marker="${expected_markers[2]}"
           ua="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
           for i in $(seq 1 60); do
             home="$(curl -fsSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" -H "Pragma: no-cache" "https://wealtharrays.com/?__wa_verify=$GITHUB_SHA" 2>/dev/null || true)"
@@ -100,9 +100,9 @@ jobs:
             actual_site="$(grep -oE '/wa-site-runtime\.js\?v=[^"]+' <<<"$tools" | head -n1 || true)"
             actual_calc="$(grep -oE '/wa-calculator-runtime\.js\?v=[^"]+' <<<"$calc" | head -n1 || true)"
             if [[ -n "$actual_home" && -n "$actual_site" && -n "$actual_calc" ]]; then
-              home_runtime="$(curl -fsSL --max-time 20 -A "$ua" "https://wealtharrays.com\${actual_home}" 2>/dev/null || true)"
-              site_runtime="$(curl -fsSL --max-time 20 -A "$ua" "https://wealtharrays.com\${actual_site}" 2>/dev/null || true)"
-              calc_runtime="$(curl -fsSL --max-time 20 -A "$ua" "https://wealtharrays.com\${actual_calc}" 2>/dev/null || true)"
+              home_runtime="$(curl -fsSL --max-time 20 -A "$ua" "https://wealtharrays.com${actual_home}" 2>/dev/null || true)"
+              site_runtime="$(curl -fsSL --max-time 20 -A "$ua" "https://wealtharrays.com${actual_site}" 2>/dev/null || true)"
+              calc_runtime="$(curl -fsSL --max-time 20 -A "$ua" "https://wealtharrays.com${actual_calc}" 2>/dev/null || true)"
               if grep -Fq "$expected_home_marker" <<<"$home_runtime" && grep -Fq "$expected_site_marker" <<<"$site_runtime" && grep -Fq "$expected_calc_marker" <<<"$calc_runtime"; then
                 echo "Production serves canonical runtime bundles built from the exact checked-out source modules."
                 echo "Observed asset URLs: home=$actual_home site=$actual_site calc=$actual_calc"
