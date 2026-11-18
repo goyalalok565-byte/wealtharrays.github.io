@@ -146,6 +146,22 @@ for (const file of htmlFiles) {
   }
 }
 
+const articleSourceRequirements = [
+  ['articles/how-to-use-a-salary-to-hourly-calculator.html', 'labour.gov.in'],
+  ['articles/how-to-build-an-emergency-fund.html', 'I%20Can%20Do_RBI.pdf'],
+  ['articles/how-to-build-a-realistic-monthly-budget.html', 'FinancialEducation/fame.aspx'],
+  ['articles/sip-calculator-with-inflation-and-tax.html', 'incometax.gov.in'],
+  ['articles/loan-emi-guide.html', 'Id=12663'],
+  ['articles/why-a-lower-emi-can-cost-you-more-overall.html', 'FAQRFIR10012025.pdf'],
+  ['articles/how-to-compare-loan-offers-beyond-emi.html', 'Id=12663'],
+  ['articles/how-to-use-a-debt-payoff-calculator.html', 'Id=12663']
+];
+for (const [articlePath, requiredSource] of articleSourceRequirements) {
+  const articleFile = path.join(root, articlePath);
+  if (!fs.existsSync(articleFile)) errors.push(`Article source audit page missing: ${articlePath}`);
+  else if (!read(articleFile).includes(requiredSource)) errors.push(`${articlePath}: expected topic-specific official source ${requiredSource}`);
+}
+
 const calculatorUrls = sitemapLocs.filter(url => {
   try {
     const pathname = new URL(url).pathname;
