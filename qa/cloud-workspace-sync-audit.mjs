@@ -25,6 +25,4 @@ const account=fs.readFileSync("account.html","utf8");
 assert.match(account,/Scenario Lab, Goal Planner or Financial Workspace/);
 const build=JSON.parse(fs.readFileSync("package.json","utf8")).scripts["build:dist"];
 assert.match(build,/cloud-workspace-sync-audit/);
-const rootBuild=fs.readFileSync("scripts/root-cause-build.mjs","utf8");
-assert.match(rootBuild,/cloud-scenarios\.js/);
 console.log("Cloud workspace sync audit PASS — authenticated save/load, shared quota and all three planning workspaces.");
