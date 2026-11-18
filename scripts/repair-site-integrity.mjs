@@ -8,11 +8,22 @@ const write=(f,s)=>fs.writeFileSync(path.join(root,f),s,'utf8');
 // Repair legacy/static pages that were missing the site's base stylesheet.
 for(const name of ['about.html','404.html','privacy-policy.html','editorial-standards.html','income-tax-planner.html','decoding-auto-financing-how-car-loan.html']){
   let s=read(name);
-  if(!s.includes('href="/styles.css"') && !s.includes("href='/styles.css'")){
+  const hasStylesheet=/<link\b(?=[^>]*\brel=["']stylesheet["'])(?=[^>]*\bhref=["']\/styles\.css(?:\?[^"']*)?["'])[^>]*>/i.test(s);
+  if(!hasStylesheet){
     s=s.replace('</head>','<link rel="preload" as="style" href="/styles.css"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/phase3-seo.css?v=20260915-1"></head>');
-    s=s.replace(/<link rel="stylesheet" href=["']\/phase3-seo\.css\?v=20260915-1["']>/g,'');
-    write(name,s);
   }
+  if(name==='404.html'){
+    const seen=new Set();
+    s=s.replace(/<link\b[^>]*>/gi,tag=>{
+      if(!/\b(?:preload|stylesheet)\b/i.test(tag)||! /\bhref=["']\/styles\.css(?:\?[^"']*)?["']/i.test(tag))return tag;
+      const rel=(tag.match(/\brel=["']([^"']+)["']/i)||[])[1]||'';
+      const kind=/preload/i.test(rel)?'preload':/stylesheet/i.test(rel)?'stylesheet':rel;
+      if(seen.has(kind))return '';
+      seen.add(kind);
+      return tag;
+    });
+  }
+  if(s!==read(name))write(name,s);
 }
 
 const redirects={
