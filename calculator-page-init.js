@@ -11,6 +11,7 @@
     if(def){
       host.dataset.waBooted='1';
       window.mountCalculator(def,'calc-widget');
+      if(typeof window.waTrack==='function') window.waTrack('calculator_open',{calculator_id:id});
       /* NOTE: WA_CALCULATOR_ENHANCEMENTS.enhance() is intentionally NOT called here.
        * It re-mounted the calculator a second time and injected a duplicate
        * "Download PDF"/"Download CSV" button that recomputed results directly
