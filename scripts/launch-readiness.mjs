@@ -128,6 +128,24 @@ for (const requiredFile of ['about.html', 'contact.html', 'privacy.html', 'terms
   if (!fs.existsSync(path.join(root, requiredFile))) errors.push(`Production trust/UX asset missing: ${requiredFile}`);
 }
 
+const methodologyPath = path.join(root, 'methodology.html');
+if (fs.existsSync(methodologyPath)) {
+  const methodology = read(methodologyPath);
+  const referenceRows = [...methodology.matchAll(/<tr>\s*<td><a href=["']\/([^/"']+)\//g)].map(m => m[1]);
+  if (referenceRows.length !== 47) errors.push(`Methodology reference must contain 47 calculator rows; found ${referenceRows.length}`);
+  for (const slug of calculatorSlugs) {
+    if (!referenceRows.includes(slug)) errors.push(`Methodology reference missing calculator: ${slug}`);
+  }
+}
+for (const file of htmlFiles) {
+  const html = read(file);
+  const ogImage = attr(html, 'property', 'og:image');
+  const ogType = attr(html, 'property', 'og:image:type');
+  if (ogImage && ogImage.endsWith('/og-card.svg') && ogType && ogType !== 'image/svg+xml') {
+    errors.push(`${rel(file)}: Open Graph image MIME type does not match SVG asset`);
+  }
+}
+
 const calculatorUrls = sitemapLocs.filter(url => {
   try {
     const pathname = new URL(url).pathname;
