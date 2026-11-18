@@ -16,7 +16,7 @@ export function resolveEntitlement(subscription, now = Date.now()) {
     cloud_scenario_limit: active ? MAX_SCENARIO_LIMIT : FREE_SCENARIO_LIMIT,
     features: {
       cloud_scenario_sync: true,
-      cross_device_scenarios: active,
+      cross_device_scenarios: true,
       expanded_scenario_library: active
     }
   };
