@@ -90,8 +90,17 @@ for(const full of allHtml){
   if(!/<meta[^>]+name=["']twitter:card["']/i.test(html)) html=html.replace('</head>','<meta name="twitter:card" content="summary"></head>');
   if(!/<meta[^>]+property=["']og:description["']/i.test(html)) html=html.replace('</head>','<meta property="og:description" content="'+attrSafe(pageDescription)+'"></head>');
   if(!/<meta[^>]+name=["']twitter:description["']/i.test(html)) html=html.replace('</head>','<meta name="twitter:description" content="'+attrSafe(pageDescription)+'"></head>');
-  // Calculator FAQPage schema is intentionally omitted until it can be generated from the exact visible FAQ markup.
-  if(isCalc) html=html.replace(/<script\b(?=[^>]*type=["']application\/ld\+json["'])[^>]*>[\s\S]*?<\/script>/gi,tag=>/"@type"\s*:\s*"FAQPage"/.test(tag)?'':tag);
+  // Calculator schema is emitted once below as a single SoftwareApplication + BreadcrumbList graph.
+  // Remove legacy application/breadcrumb blocks first to prevent duplicate entities.
+  if(isCalc) html=html.replace(/<script\b(?=[^>]*type=["']application\/ld\+json["'])[^>]*>[\s\S]*?<\/script>/gi,tag=>{
+    try{
+      const data=JSON.parse(tag.replace(/^<script[^>]*>/i,'').replace(/<\/script>$/i,''));
+      const hasType=(node,type)=>!!node&&(node["@type"]===type||(Array.isArray(node["@graph"])&&node["@graph"].some(item=>hasType(item,type))));
+      if(hasType(data,"FAQPage"))return '';
+      if(hasType(data,"WebApplication")||hasType(data,"SoftwareApplication")||hasType(data,"BreadcrumbList"))return '';
+      return tag;
+    }catch{return /"@type"\s*:\s*"FAQPage"/.test(tag)?'':tag;}
+  });
   html=html.replace(/\s*<script\s+src=["']([^"']+)[^>]*><\/script>/gi,(tag,src)=>{
     const base=path.basename(src.split('?',1)[0]);
     const keep=managed.has(base)||(isWidget&&['calculators.js','widget.js','widget-bootstrap.js','wa-calculator-runtime.js'].includes(base))||(isScenarioLab&&['financial-engine.js','decision-adapters.js','scenario-lab.js'].includes(base))||(isGoalPlanner&&['financial-engine.js','decision-adapters.js','goal-planner.js'].includes(base))||(isWorkspacePageCurrent&&['financial-engine.js','report-engine.js','financial-workspace.js'].includes(base));

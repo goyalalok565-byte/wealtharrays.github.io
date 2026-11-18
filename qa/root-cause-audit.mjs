@@ -9,7 +9,13 @@ for(const page of calculators){
  if(html.includes('calculators.js'))throw new Error(`${page}: calculators.js must never be page-loaded`);
  if(!html.includes('calculator-definitions/'))throw new Error(`${page}: split definition missing`);
  if(!html.includes('/cls-fixes.css?v='))throw new Error(`${page}: CLS stylesheet missing`);
- if(!html.includes('"@type":"WebApplication"')&&!html.includes('"@type": "WebApplication"'))throw new Error(`${page}: WebApplication schema missing`);
+ const schemaBlocks=[...html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)].map(match=>JSON.parse(match[1]));
+ const schemaTypes=[];
+ const collectTypes=node=>{if(!node||typeof node!=='object')return;if(typeof node['@type']==='string')schemaTypes.push(node['@type']);if(Array.isArray(node['@graph']))node['@graph'].forEach(collectTypes);};
+ schemaBlocks.forEach(collectTypes);
+ if(schemaTypes.filter(type=>type==='SoftwareApplication').length!==1)throw new Error(`${page}: expected exactly one SoftwareApplication entity`);
+ if(schemaTypes.filter(type=>type==='BreadcrumbList').length!==1)throw new Error(`${page}: expected exactly one BreadcrumbList entity`);
+ if(schemaTypes.includes('WebApplication'))throw new Error(`${page}: legacy duplicate WebApplication entity remains`);
  if(html.includes('"@type":"FAQPage"')||html.includes('"@type": "FAQPage"'))throw new Error(`${page}: mismatched FAQPage schema must remain omitted until generated from visible FAQs`);
  if(!/<h2>Frequently asked questions<\/h2>/i.test(html))throw new Error(`${page}: visible FAQ heading missing`);
  if((html.match(/class=["']faq-item["']/gi)||[]).length<2)throw new Error(`${page}: too few visible FAQ items`);
@@ -21,6 +27,10 @@ for(const page of calculators){
  if(!html.includes('sizes="48x48"')||!html.includes('href="/icon-192.png"'))throw new Error(`${page}: 48x48 PNG favicon fallback missing`);
  if(!html.includes('sizes="180x180"')||!html.includes('href="/icon-512.png"'))throw new Error(`${page}: Apple touch icon missing`);
 }
+const notFoundHtml=fs.readFileSync('404.html','utf8');
+const notFoundPreloads=(notFoundHtml.match(/<link\b(?=[^>]*rel=["']preload["'])(?=[^>]*href=["']\/styles\.css(?:\?[^"']*)?["'])[^>]*>/gi)||[]).length;
+const notFoundStylesheets=(notFoundHtml.match(/<link\b(?=[^>]*rel=["']stylesheet["'])(?=[^>]*href=["']\/styles\.css(?:\?[^"']*)?["'])[^>]*>/gi)||[]).length;
+if(notFoundPreloads!==1||notFoundStylesheets!==1)throw new Error(`404.html: expected one stylesheet preload and one stylesheet, found ${notFoundPreloads} and ${notFoundStylesheets}`);
 const guides=fs.readdirSync('articles').filter(x=>x.endsWith('.html'));
 for(const file of guides){const html=fs.readFileSync(path.join('articles',file),'utf8');if(!html.includes('"@type":"Article"')&&!html.includes('"@type": "Article"'))throw new Error(`${file}: Article schema missing`);if(!html.includes('/cls-fixes.css?v='))throw new Error(`${file}: CLS stylesheet missing`);if(!/<h1\b/i.test(html))throw new Error(`${file}: H1 missing`);}
 const allSiteHtml=[];function walkHtml(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){if(e.name==='.git'||e.name==='node_modules')continue;const p=path.join(dir,e.name);if(e.isDirectory())walkHtml(p);else if(e.name.endsWith('.html'))allSiteHtml.push(p)}}walkHtml('.');
