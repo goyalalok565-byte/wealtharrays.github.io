@@ -124,7 +124,7 @@ if (fs.existsSync(headersPath)) {
   }
 }
 
-for (const requiredFile of ['about.html', 'contact.html', 'privacy.html', 'terms.html', 'disclaimer.html', 'methodology.html', 'editorial-policy.html', 'advertising-policy.html', '404.html', 'og-image.png']) {
+for (const requiredFile of ['about.html', 'contact.html', 'privacy.html', 'terms.html', 'disclaimer.html', 'methodology.html', 'editorial-policy.html', 'advertising-policy.html', '404.html', 'og-card.svg']) {
   if (!fs.existsSync(path.join(root, requiredFile))) errors.push(`Production trust/UX asset missing: ${requiredFile}`);
 }
 
