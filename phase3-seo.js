@@ -61,9 +61,15 @@
       m.content = content; document.head.appendChild(m);
     }
   }
+  function schemaHasType(node, type) {
+    return !!node && (node['@type'] === type || (Array.isArray(node['@graph']) && node['@graph'].some(item => schemaHasType(item, type))));
+  }
   function schemaOnce(type, data) {
     const existing = [...document.querySelectorAll('script[type="application/ld+json"]')].some(s => {
-      try { return JSON.parse(s.textContent || '{}')['@type'] === type; } catch { return false; }
+      try {
+        const parsed = JSON.parse(s.textContent || '{}');
+        return schemaHasType(parsed, type) || (type === 'WebApplication' && schemaHasType(parsed, 'SoftwareApplication'));
+      } catch { return false; }
     });
     if (existing) return;
     const s = document.createElement('script'); s.type = 'application/ld+json'; s.textContent = JSON.stringify(data); document.head.appendChild(s);
