@@ -75,6 +75,7 @@ for(const full of allHtml){
   html=html.replace(/(<meta\s+name=["']twitter:image["']\s+content=["'])[^"']*(["'][^>]*>)/gi,'$1https://wealtharrays.com/og-card.svg$2');
   html=html.replace(/https:\/\/wealtharrays\.com\/og-card\.svg/gi,'https://wealtharrays.com/og-card.svg');
   if(!/<meta[^>]+name=["']twitter:image["']/i.test(html)) html=html.replace('</head>','<meta name="twitter:image" content="https://wealtharrays.com/og-card.svg"></head>');
+  html=html.replaceAll('https://wealtharrays.com/og-image.png','https://wealtharrays.com/og-card.svg');
   const headingHtml=(html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)||[])[1]?.trim();
   if(headingHtml) html=html.replace(/<span>\s*Current calculator\s*<\/span>/gi,'<span>'+headingHtml+'</span>');
   const pageTitle=(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)||[])[1]?.trim()||'Wealth Arrays';
