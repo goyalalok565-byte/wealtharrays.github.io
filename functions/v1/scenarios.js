@@ -1,16 +1,26 @@
 import { authenticate, ensureProfile } from "./_auth.js";
 import { error, json, CORS_HEADERS } from "./_shared.js";
+import { getEntitlement, FREE_SCENARIO_LIMIT, MAX_SCENARIO_LIMIT } from "./_entitlements.js";
+
 export async function onRequestOptions() { return new Response(null, { status: 204, headers: CORS_HEADERS }); }
+
 export async function onRequestGet({ request, env }) {
   const auth = await authenticate(request, env); if (auth.response) return auth.response;
   if (!env.DB) return error("DATABASE_NOT_CONFIGURED", "Cloud scenario storage is not configured for this deployment.", 503);
   try {
     await ensureProfile(env, auth.user);
-    const rows = await env.DB.prepare("SELECT id, calculator_id, name, model_version, inputs_json, results_json, created_at, updated_at FROM saved_scenarios WHERE user_id = ? ORDER BY updated_at DESC LIMIT 100").bind(auth.user.id).all();
+    const entitlement = await getEntitlement(env, auth.user.id);
+    const rows = await env.DB.prepare("SELECT id, calculator_id, name, model_version, inputs_json, results_json, created_at, updated_at FROM saved_scenarios WHERE user_id = ? ORDER BY updated_at DESC LIMIT 500").bind(auth.user.id).all();
+    const count = await env.DB.prepare("SELECT COUNT(*) AS total FROM saved_scenarios WHERE user_id = ?").bind(auth.user.id).first();
     const subscription = await env.DB.prepare("SELECT plan_id, status, current_period_end, cancel_at_period_end FROM subscriptions WHERE user_id = ? ORDER BY updated_at DESC LIMIT 1").bind(auth.user.id).first();
-    return json({ scenarios: (rows.results || []).map(row => ({ ...row, inputs: parseJson(row.inputs_json), results: parseJson(row.results_json) })), subscription: subscription || null }, 200, { "Cache-Control": "no-store" });
+    return json({
+      scenarios: (rows.results || []).map(row => ({ ...row, inputs: parseJson(row.inputs_json), results: parseJson(row.results_json) })),
+      subscription: subscription || null,
+      entitlement: { ...entitlement, used: Number(count?.total || 0) }
+    }, 200, { "Cache-Control": "no-store" });
   } catch { return error("DATABASE_ERROR", "Could not load your saved scenarios.", 500); }
 }
+
 export async function onRequestPost({ request, env }) {
   const auth = await authenticate(request, env); if (auth.response) return auth.response;
   if (!env.DB) return error("DATABASE_NOT_CONFIGURED", "Cloud scenario storage is not configured for this deployment.", 503);
@@ -24,11 +34,24 @@ export async function onRequestPost({ request, env }) {
   const id = crypto.randomUUID(), inputs = JSON.stringify(body.inputs), results = body.results && typeof body.results === "object" ? JSON.stringify(body.results) : null;
   try {
     await ensureProfile(env, auth.user);
+    const entitlement = await getEntitlement(env, auth.user.id);
+    const count = await env.DB.prepare("SELECT COUNT(*) AS total FROM saved_scenarios WHERE user_id = ?").bind(auth.user.id).first();
+    const used = Number(count?.total || 0);
+    if (used >= entitlement.cloud_scenario_limit) {
+      const isFree = entitlement.tier === "free";
+      return error(
+        isFree ? "FREE_PLAN_LIMIT_REACHED" : "SCENARIO_LIMIT_REACHED",
+        isFree ? "The Free plan includes 3 cloud-saved scenarios. Upgrade to Pro to save up to 500." : "Your account has reached the 500 cloud-scenario limit. Delete an older scenario to continue.",
+        403,
+        { tier: entitlement.tier, used, limit: entitlement.cloud_scenario_limit, upgrade_url: "/account" }
+      );
+    }
     await env.DB.prepare("INSERT INTO saved_scenarios (id, user_id, calculator_id, name, model_version, inputs_json, results_json) VALUES (?, ?, ?, ?, ?, ?, ?)")
       .bind(id, auth.user.id, body.calculator_id, name, modelVersion, inputs, results).run();
-    return json({ saved: true, id, name, calculator_id: body.calculator_id }, 201, { "Cache-Control": "no-store" });
+    return json({ saved: true, id, name, calculator_id: body.calculator_id, entitlement: { ...entitlement, used: used + 1 } }, 201, { "Cache-Control": "no-store" });
   } catch { return error("DATABASE_ERROR", "Could not save this scenario.", 500); }
 }
+
 export async function onRequestDelete({ request, env }) {
   const auth = await authenticate(request, env); if (auth.response) return auth.response;
   if (!env.DB) return error("DATABASE_NOT_CONFIGURED", "Cloud scenario storage is not configured for this deployment.", 503);
