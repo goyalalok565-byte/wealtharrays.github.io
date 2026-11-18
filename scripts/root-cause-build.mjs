@@ -73,9 +73,14 @@ for(const full of allHtml){
   if(!/<meta[^>]+property=["']og:locale["']/i.test(html)) html=html.replace('</head>','<meta property="og:locale" content="en_IN"></head>');
   html=html.replace(/(<meta\s+name=["']twitter:image["'][^>]*content=["'])[^"']*(["'][^>]*>)/gi,'$1https://wealtharrays.com/og-card.svg$2');
   html=html.replace(/(<meta\s+name=["']twitter:image["']\s+content=["'])[^"']*(["'][^>]*>)/gi,'$1https://wealtharrays.com/og-card.svg$2');
-  html=html.replace(/https:\/\/wealtharrays\.com\/og-card\.svg/gi,'https://wealtharrays.com/og-card.svg');
+  html=html.replace(/(<meta\s+property=["']og:image["'][^>]*content=["'])[^"']*(["'][^>]*>)/gi,'$1https://wealtharrays.com/og-card.svg$2');
+  html=html.replace(/(<meta\s+property=["']og:image["']\s+content=["'])[^"']*(["'][^>]*>)/gi,'$1https://wealtharrays.com/og-card.svg$2');
+  html=html.replace(/(<meta\s+property=["']og:image:type["'][^>]*content=["'])[^"']*(["'][^>]*>)/gi,'$1image/svg+xml$2');
+  html=html.replace(/(<meta\s+property=["']og:image:type["']\s+content=["'])[^"']*(["'][^>]*>)/gi,'$1image/svg+xml$2');
+  if(!/<meta[^>]+property=["']og:image["']/i.test(html)) html=html.replace('</head>','<meta property="og:image" content="https://wealtharrays.com/og-card.svg"><meta property="og:image:type" content="image/svg+xml"></head>');
+  if(!/<meta[^>]+property=["']og:image:type["']/i.test(html)) html=html.replace('</head>','<meta property="og:image:type" content="image/svg+xml"></head>');
+  html=html.replace(/https:\/\/wealtharrays\.com\/og-image\.png/gi,'https://wealtharrays.com/og-card.svg');
   if(!/<meta[^>]+name=["']twitter:image["']/i.test(html)) html=html.replace('</head>','<meta name="twitter:image" content="https://wealtharrays.com/og-card.svg"></head>');
-  html=html.replaceAll('https://wealtharrays.com/og-image.png','https://wealtharrays.com/og-card.svg');
   const headingHtml=(html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)||[])[1]?.trim();
   if(headingHtml) html=html.replace(/<span>\s*Current calculator\s*<\/span>/gi,'<span>'+headingHtml+'</span>');
   const pageTitle=(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)||[])[1]?.trim()||'Wealth Arrays';
