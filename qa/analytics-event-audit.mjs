@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 const core=fs.readFileSync("wa-core.js","utf8");
-for(const event of ["calculator_open","calculator_calculate","pdf_export","embed_copy","scenario_share","scenario_run","goal_run","workspace_calculate","workspace_save","workspace_load","workspace_delete","report_export","login","sign_up","begin_checkout","subscription_cancel_request"]) assert.ok(core.includes("'" + event + "'"),"GA4 event not allow-listed: "+event);
+for(const event of ["calculator_open","calculator_calculate","pdf_export","embed_copy","scenario_share","scenario_run","goal_run","workspace_calculate","workspace_save","workspace_load","workspace_delete","report_export","login","sign_up","begin_checkout","subscription_cancel_request","cloud_scenario_save","cloud_scenario_load"]) assert.ok(core.includes("'" + event + "'"),"GA4 event not allow-listed: "+event);
 assert.match(core,/waAnalyticsConsent/);
 assert.match(core,/allowed=new Set\(\['calculator_id','currency','plan','page_type','result_count','feature','method','status'\]\)/);
 assert.match(core,/Number\.isFinite\(value\)/);
