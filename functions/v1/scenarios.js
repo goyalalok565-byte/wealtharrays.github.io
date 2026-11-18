@@ -1,6 +1,6 @@
 import { authenticate, ensureProfile } from "./_auth.js";
 import { error, json, CORS_HEADERS } from "./_shared.js";
-import { getEntitlement, FREE_SCENARIO_LIMIT, MAX_SCENARIO_LIMIT } from "./_entitlements.js";
+import { getEntitlement } from "./_entitlements.js";
 
 export async function onRequestOptions() { return new Response(null, { status: 204, headers: CORS_HEADERS }); }
 
@@ -46,8 +46,18 @@ export async function onRequestPost({ request, env }) {
         { tier: entitlement.tier, used, limit: entitlement.cloud_scenario_limit, upgrade_url: "/account" }
       );
     }
-    await env.DB.prepare("INSERT INTO saved_scenarios (id, user_id, calculator_id, name, model_version, inputs_json, results_json) VALUES (?, ?, ?, ?, ?, ?, ?)")
-      .bind(id, auth.user.id, body.calculator_id, name, modelVersion, inputs, results).run();
+    // Enforce the quota in the INSERT itself so simultaneous requests cannot race past the limit.
+    const inserted = await env.DB.prepare(
+      "INSERT INTO saved_scenarios (id, user_id, calculator_id, name, model_version, inputs_json, results_json) SELECT ?, ?, ?, ?, ?, ?, ? WHERE (SELECT COUNT(*) FROM saved_scenarios WHERE user_id = ?) < ?"
+    ).bind(id, auth.user.id, body.calculator_id, name, modelVersion, inputs, results, auth.user.id, entitlement.cloud_scenario_limit).run();
+    if (!inserted.meta?.changes) {
+      const latestCount = await env.DB.prepare("SELECT COUNT(*) AS total FROM saved_scenarios WHERE user_id = ?").bind(auth.user.id).first();
+      const latestUsed = Number(latestCount?.total || 0);
+      const isFree = entitlement.tier === "free";
+      return error(isFree ? "FREE_PLAN_LIMIT_REACHED" : "SCENARIO_LIMIT_REACHED",
+        isFree ? "The Free plan includes 3 cloud-saved scenarios. Upgrade to Pro to save up to 500." : "Your account has reached the 500 cloud-scenario limit. Delete an older scenario to continue.",
+        403, { tier: entitlement.tier, used: latestUsed, limit: entitlement.cloud_scenario_limit, upgrade_url: "/account" });
+    }
     return json({ saved: true, id, name, calculator_id: body.calculator_id, entitlement: { ...entitlement, used: used + 1 } }, 201, { "Cache-Control": "no-store" });
   } catch { return error("DATABASE_ERROR", "Could not save this scenario.", 500); }
 }
