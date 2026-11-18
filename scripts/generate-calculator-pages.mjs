@@ -31,16 +31,6 @@ for (const calc of CALCULATORS) {
   ).join('');
   const category = escapeHtml(calc.category || 'finance');
   const categoryLabel = category.charAt(0).toUpperCase() + category.slice(1);
-  const jsonLd = JSON.stringify({
-    '@context': 'https://schema.org',
-    '@type': 'WebApplication',
-    name: calc.title,
-    applicationCategory: 'FinanceApplication',
-    operatingSystem: 'Any',
-    isAccessibleForFree: true,
-    description: calc.desc || calc.short || '',
-    url
-  }).replace(/</g, '\\u003c');
   const html = `<!doctype html>
 <html data-wa-calculator="${escapeHtml(calc.id)}" lang="en">
 <head>
@@ -58,7 +48,6 @@ for (const calc of CALCULATORS) {
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="${title} — Wealth Arrays">
 <meta name="twitter:description" content="${desc}">
-<script type="application/ld+json">${jsonLd}</script>
 <link rel="preload" as="style" href="/styles.css">
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/phase3-seo.css?v=20260915-1">
