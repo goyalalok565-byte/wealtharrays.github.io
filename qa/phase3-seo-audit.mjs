@@ -26,7 +26,7 @@ for (const file of calculators) {
   assert(/<link[^>]+rel=["']canonical["'][^>]+href=["']https:\/\/wealtharrays\.com\//i.test(html), `${file}: missing canonical`);
   assert(/og:title|og:description|og:image/i.test(html), `${file}: missing social metadata`);
   assert(/BreadcrumbList/i.test(html), `${file}: missing BreadcrumbList JSON-LD`);
-  assert(/WebApplication/i.test(html), `${file}: missing WebApplication JSON-LD`);
+  assert(/SoftwareApplication/i.test(html), `${file}: missing SoftwareApplication JSON-LD`);
   assert(/phase3-seo\.js/i.test(html) || fs.existsSync(path.join(root,'phase3-seo.js')), `${file}: Phase 3 runtime not available`);
   for (const old of stale) assert(!html.includes(old), `${file}: stale retired URL ${old}`);
 }
