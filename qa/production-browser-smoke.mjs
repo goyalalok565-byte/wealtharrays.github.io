@@ -51,6 +51,11 @@ async function assertCalculator(path, label, phase2 = false) {
   errors.length = 0;
   failedResponses.length = 0;
   await page.goto(`${baseUrl}/${path}`, { waitUntil: 'networkidle' });
+  const host = page.locator('#calc-widget');
+  const hostClass = (await host.getAttribute('class')) || '';
+  if (!hostClass.split(/\s+/).includes('calc-widget')) throw new Error(`${label} calculator host is missing its static calc-widget class`);
+  const reservedHeight = await host.evaluate(el => parseFloat(getComputedStyle(el).minHeight));
+  if (!Number.isFinite(reservedHeight) || reservedHeight < 520) throw new Error(`${label} calculator host must reserve at least 520px before the runtime mounts; found ${reservedHeight}px`);
   await dismissPrivacyChoices();
   try { await page.locator('#calc-widget').waitFor({ state: 'visible', timeout: 10000 }); }
   catch (error) { await diagnostics(label); throw new Error(`${label} failed to render at ${page.url()}: ${error.message}`); }
