@@ -71,7 +71,7 @@ if (fs.existsSync(headersPath)) {
     const start = headerText.indexOf('/' + asset + '\n');
     const end = start >= 0 ? headerText.indexOf('\n/', start + 1) : -1;
     const block = start >= 0 ? headerText.slice(start, end >= 0 ? end : undefined) : '';
-    if (!block.includes('max-age=31536000') || !block.includes('immutable')) {
+    if (!block.includes('! Cache-Control') || !block.includes('max-age=31536000') || !block.includes('immutable')) {
       failures.push('_headers: ' + asset + ' must use one-year immutable caching because its URL is content-hashed.');
     }
   }
