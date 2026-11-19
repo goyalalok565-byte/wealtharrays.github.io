@@ -21,10 +21,11 @@ function walk(dir,rel=''){
 walk(dist);
 for(const file of files){
   assert.ok(!/\.(zip|bak|old|orig|md)$/i.test(file),`Internal archive/document leaked into dist/: ${file}`);
+  assert.ok(!['wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js','widget.js','widget-bootstrap.js','calculator-safety.js','calculator-page-init.js','pdf-export-fix.js'].includes(file),`Source module leaked into dist/: ${file}`);
   assert.notEqual(file,'package.json','package.json must not be deployed');
   assert.notEqual(file,'calculator-value-content.json','Build-only calculator-value-content.json must not be deployed');
 }
-for(const file of ['index.html','tools.html','robots.txt','sitemap.xml','ads.txt','llms.txt','manifest.webmanifest','_headers','_redirects','sw.js','offline.html','widget.html','widget/index.html','widget.js','widget-bootstrap.js','search-loader.js','calculators.js','wa-site-runtime.js','wa-home-runtime.js','wa-calculator-runtime.js','favicon.svg','og-image.png','icon-192.png','icon-512.png','.well-known/security.txt']){
+for(const file of ['index.html','tools.html','robots.txt','sitemap.xml','ads.txt','llms.txt','manifest.webmanifest','_headers','_redirects','sw.js','offline.html','widget.html','widget/index.html','search-loader.js','calculators.js','wa-site-runtime.js','wa-home-runtime.js','wa-calculator-runtime.js','favicon.svg','og-image.png','icon-192.png','icon-512.png','.well-known/security.txt']){
   assert.ok(fs.existsSync(path.join(dist,file)),`Required production file missing from dist/: ${file}`);
 }
 const htmlFiles=files.filter(file=>file.endsWith('.html'));
