@@ -84,16 +84,12 @@ jobs:
           PROFILE_PATH: /tools.html
           LH_OUTPUT_DIR: /tmp/wa-lighthouse/before
         run: node qa/performance-profile.mjs
-      - name: Capture production baseline Lighthouse for six pages (before)
-        run: node qa/performance-profile.mjs
       - name: Capture production baseline CPU profile /sip-calculator/ (before)
         continue-on-error: true
         env:
           BASE_URL: https://wealtharrays.com
           PROFILE_PATH: /sip-calculator/
           LH_OUTPUT_DIR: /tmp/wa-lighthouse/before
-        run: node qa/performance-profile.mjs
-      - name: Capture production baseline Lighthouse for six pages (before)
         run: node qa/performance-profile.mjs
       - name: Capture production baseline CPU profile /swp-calculator/ (before)
         continue-on-error: true
@@ -102,16 +98,12 @@ jobs:
           PROFILE_PATH: /swp-calculator/
           LH_OUTPUT_DIR: /tmp/wa-lighthouse/before
         run: node qa/performance-profile.mjs
-      - name: Capture production baseline Lighthouse for six pages (before)
-        run: node qa/performance-profile.mjs
       - name: Capture production baseline CPU profile /fire-calculator/ (before)
         continue-on-error: true
         env:
           BASE_URL: https://wealtharrays.com
           PROFILE_PATH: /fire-calculator/
           LH_OUTPUT_DIR: /tmp/wa-lighthouse/before
-        run: node qa/performance-profile.mjs
-      - name: Capture production baseline Lighthouse for six pages (before)
         run: node qa/performance-profile.mjs
       - name: Capture production baseline CPU profile /rent-vs-buy-calculator/ (before)
         continue-on-error: true
@@ -138,15 +130,11 @@ jobs:
           PROFILE_PATH: /tools.html
           LH_OUTPUT_DIR: /tmp/wa-lighthouse/after
         run: node qa/performance-profile.mjs
-      - name: Enforce mobile Lighthouse budgets on six candidate pages
-        run: node qa/performance-profile.mjs
       - name: Capture candidate CPU profile /sip-calculator/ (after)
         env:
           BASE_URL: http://127.0.0.1:4173
           PROFILE_PATH: /sip-calculator/
           LH_OUTPUT_DIR: /tmp/wa-lighthouse/after
-        run: node qa/performance-profile.mjs
-      - name: Enforce mobile Lighthouse budgets on six candidate pages
         run: node qa/performance-profile.mjs
       - name: Capture candidate CPU profile /swp-calculator/ (after)
         env:
@@ -154,15 +142,11 @@ jobs:
           PROFILE_PATH: /swp-calculator/
           LH_OUTPUT_DIR: /tmp/wa-lighthouse/after
         run: node qa/performance-profile.mjs
-      - name: Enforce mobile Lighthouse budgets on six candidate pages
-        run: node qa/performance-profile.mjs
       - name: Capture candidate CPU profile /fire-calculator/ (after)
         env:
           BASE_URL: http://127.0.0.1:4173
           PROFILE_PATH: /fire-calculator/
           LH_OUTPUT_DIR: /tmp/wa-lighthouse/after
-        run: node qa/performance-profile.mjs
-      - name: Enforce mobile Lighthouse budgets on six candidate pages
         run: node qa/performance-profile.mjs
       - name: Capture candidate CPU profile /rent-vs-buy-calculator/ (after)
         env:
