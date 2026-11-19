@@ -105,7 +105,7 @@ for(const file of publicTextFiles){
 }
 const pageBudgets={home:35*1024,tools:35*1024,calculator:40*1024,article:12*1024};
 const totals={};
-const articleRuntime=jsFiles.find(file=>path.posix.basename(file).startsWith('wa-article-runtime.'));
+const articleRuntime=mapping['wa-article-runtime.js'];
 if(!articleRuntime||gzipSync(fs.readFileSync(path.join(dist,articleRuntime))).length>=10*1024)throw new Error('Article runtime bundle must stay under 10 KB gzip');
 for(const file of walk(dist).filter(file=>file.endsWith('.html'))){
   const html=fs.readFileSync(path.join(dist,file),'utf8');
