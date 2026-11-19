@@ -19,7 +19,7 @@ const EXCLUDE_DIRS = new Set([
 const EXCLUDE_ROOT = new Set([
   'ARCHITECTURE.md','PHASE10_AUDIT.md','PHASE3_FINAL.md','QA_TESTS.md',
   'README-RELEASE.md','STABILIZATION-PLAN.md','GLOBAL-PLATFORM-SPEC.md',
-  'wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js','widget.js','widget-bootstrap.js','calculator-safety.js','calculator-page-init.js','pdf-export-fix.js',
+  'wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js','widget.js','widget-bootstrap.js','calculator-safety.js','calculator-page-init.js',
   'GLOBAL-PRODUCT-ROADMAP.md','content-sources.json','CNAME'
 ]);
 
@@ -102,7 +102,7 @@ const forbiddenHits = forbidden.filter(p =>
 if (forbiddenHits.length) {
   throw new Error('Forbidden internal files leaked into dist:\n' + forbiddenHits.join('\n'));
 }
-for (const required of ['index.html','robots.txt','sitemap.xml','ads.txt','_headers','_redirects','sw.js','manifest.webmanifest','widget.html','widget/index.html','wa-site-runtime.js','wa-home-runtime.js','wa-calculator-runtime.js']) {
+for (const required of ['index.html','robots.txt','sitemap.xml','ads.txt','_headers','_redirects','sw.js','manifest.webmanifest','widget.html','widget/index.html','wa-site-runtime.js','wa-home-runtime.js','wa-calculator-runtime.js','wa-article-runtime.js','pdf-export-fix.js']) {
   if (!fs.existsSync(path.join(out, required))) throw new Error('Missing required public output: ' + required);
 }
 const definitionsSrc = path.join(root, 'calculator-definitions');
