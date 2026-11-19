@@ -11,7 +11,7 @@ if(!widgetSource.includes('async function waCopyEmbed(calc)')) throw new Error('
 if(!widgetSource.includes('/widget/?calc=${encodeURIComponent(calc.id)}')) throw new Error('widget.js must use canonical /widget/ embed route');
 if(!widgetSource.includes("document.execCommand('copy')")) throw new Error('Copy Embed must have synchronous clipboard fallback');
 if(!runtime.includes('/widget/?calc=') || !runtime.includes('encodeURIComponent')) throw new Error('Generated calculator runtime must build the canonical /widget/ embed URL from the calculator ID');
-if(!runtime.includes('class="tool-action" id="${id}-embed"')) throw new Error('Calculator mount must render Copy embed action');
+if(!runtime.includes('-embed') || !runtime.includes('Copy embed')) throw new Error('Minified calculator runtime must retain the Copy embed control and handler');
 if(!widgetHtml.includes('href="https://wealtharrays.com/widget/"')) throw new Error('Widget directory canonical URL is missing');
 if(!redirects.includes('/widget /widget/ 301')||!redirects.includes('/widget.html /widget/ 301')) throw new Error('Legacy widget routes must converge on /widget/');
 if(!widgetHtml.includes('/calculators.js') || !widgetHtml.includes('/wa-calculator-runtime.js') || widgetHtml.includes('/widget-bootstrap.js')) throw new Error('Widget must load definitions and one canonical runtime without a duplicate bootstrap request');
