@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: wealtharrays-platform-gates-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   platform:
