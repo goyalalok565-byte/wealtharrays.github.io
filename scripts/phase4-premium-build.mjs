@@ -54,6 +54,10 @@ for(const file of htmlFiles){
   }
   s=s.replace(/<link rel="stylesheet" href="\/phase4-premium\.css[^>]*>/g,'');
   s=s.replace(/<script src="\/phase4-premium\.js[^>]*><\/script>/g,'');
+  // Keep privacy choices available without rebuilding an otherwise static footer at runtime.
+  if(!/data-wa-open-consent/.test(s)){
+    s=s.replace(/(<nav\\b[^>]*class=["'][^"']*footer-nav-box[^"']*["'][^>]*>[\\s\\S]*?)(<\\/nav>)/i,'$1<button class="footer-link" type="button" data-wa-open-consent>Privacy choices</button>$2');
+  }
   if(!s.includes('/phase4-premium.css')) s=s.replace('</head>',`${phase4Css}</head>`);
   if(!s.includes('name="referrer"')) s=s.replace('</head>',`<meta name="referrer" content="strict-origin-when-cross-origin"></head>`);
   // AdSense is intentionally excluded from 404.html and widget.html.
