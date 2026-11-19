@@ -6,5 +6,10 @@ assert.match(sw, /url\.pathname\s*===\s*'\/v1'\s*\|\|\s*url\.pathname\.startsWit
 assert.match(sw, /request\.headers\.has\('Authorization'\)/, 'Service worker must bypass authenticated requests');
 assert.match(sw, /no-store\|private\|no-cache/, 'Cache helper must respect private/no-store/no-cache response directives');
 assert.match(sw, /Do not cache arbitrary same-origin fetches/, 'Only navigations and static assets should be cacheable');
+assert.match(sw, /NAVIGATION_TIMEOUT_MS=3000/, 'Navigation must fall back after three seconds');
+assert.match(sw, /fetch\(request\)/, 'Navigation fetch must not force cache:no-store');
+assert.doesNotMatch(sw, /fetch\(request,\s*\{\s*cache:\s*['"]no-store['"]/, 'Navigation must not disable the browser HTTP cache');
+assert.match(sw, /if\(hit\)\{event\.waitUntil\(refresh\);return hit;\}/, 'Static assets must use stale-while-revalidate');
+assert.match(sw, /wealtharrays-pwa-11/, 'Service worker cache version must be bumped after strategy changes');
 assert.ok((headers.match(/connect-src[^\n]*https:\/\/\*\.supabase\.co/g) || []).length >= 3, 'CSP connect-src must permit Supabase auth on top-level and embed policies');
 console.log('Service worker privacy/CSP audit PASS — API and authenticated requests bypass Cache Storage, cache directives are respected, and Supabase auth is permitted.');
