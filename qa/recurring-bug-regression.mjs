@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 const root=process.cwd();
 const forbiddenRuntime='calculator-runtime.js';
-const siteSources=['wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js','calculator-search.js'];
+const siteSources=['wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js' ];
 const scriptNames=html=>[...html.matchAll(/<script\s+src=["']([^"']+)["'][^>]*><\/script>/gi)].map(m=>path.basename(m[1].split('?',1)[0]));
 const sourceFiles=[];
 for(const dir of ['.','articles','p','.github/workflows']){const fullDir=path.join(root,dir);if(!fs.existsSync(fullDir))continue;const walk=current=>{for(const entry of fs.readdirSync(current,{withFileTypes:true})){const full=path.join(current,entry.name);if(entry.isDirectory())walk(full);else if(/\.(html|css|js|yml|yaml)$/i.test(entry.name))sourceFiles.push(full)}};walk(fullDir)}
@@ -21,7 +21,7 @@ if(!fs.existsSync(path.join(root,'wa-home-runtime.js')))throw new Error('Canonic
 const homepageNames=scriptNames(fs.readFileSync(path.join(root,'index.html'),'utf8'));
 if(!homepageNames.includes('wa-home-runtime.js'))throw new Error('Homepage must load the lightweight home runtime');
 if(homepageNames.includes('wa-site-runtime.js'))throw new Error('Homepage must not load the full shared site runtime');
-if(!homepageNames.includes('homepage-search.js'))throw new Error('Homepage-specific search script is missing');
+if(!homepageNames.includes('search-loader.js'))throw new Error('Homepage lazy search bootstrap is missing');
 const htmlFiles=[];const walkHtml=dir=>{for(const entry of fs.readdirSync(dir,{withFileTypes:true})){const full=path.join(dir,entry.name);if(entry.isDirectory()){if(!['.git','node_modules'].includes(entry.name))walkHtml(full)}else if(/\.html$/i.test(entry.name))htmlFiles.push(full)}};walkHtml(root);
 for(const full of htmlFiles){const rel=path.relative(root,full).replaceAll(path.sep,'/');if(calculatorPages.includes(rel)||rel==='404.html')continue;const names=scriptNames(fs.readFileSync(full,'utf8'));const hasSharedSource=siteSources.some(base=>names.includes(base));const bundleCount=names.filter(name=>name==='wa-site-runtime.js').length;if(hasSharedSource||bundleCount){if(bundleCount!==1)throw new Error(`${rel}: expected exactly one canonical site runtime, found ${bundleCount}`);for(const base of siteSources)if(names.includes(base))throw new Error(`${rel}: direct shared module ${base} bypasses wa-site-runtime.js`)}}
 const build=fs.readFileSync(path.join(root,'scripts/phase-stabilization-build.mjs'),'utf8');if(build.includes("'calculator-runtime.js'"))throw new Error('Stabilization build still revives the retired runtime');if(!build.includes("root-cause-build.mjs"))throw new Error('Stabilization build must delegate to root-cause-build.mjs');
