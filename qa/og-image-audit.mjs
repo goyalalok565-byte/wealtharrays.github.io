@@ -31,7 +31,7 @@ const pages=walk(root).filter(file=>{
 });
 const calculatorCount=fs.readdirSync(path.join(root,'calculator-definitions')).filter(file=>file.endsWith('.js')).length;
 if(calculatorCount!==55)throw new Error('Expected 55 registered calculator definitions; found '+calculatorCount);
-if(pages.length<calculatorCount||pages.length>calculatorCount+2)throw new Error('Expected every registered calculator route plus limited aliases; found '+pages.length+' routes for '+calculatorCount+' definitions);
+if(pages.length<calculatorCount||pages.length>calculatorCount+2)throw new Error('Expected every registered calculator route plus limited aliases; found '+pages.length+' routes for '+calculatorCount+' definitions');
 const failures=[];
 for(const file of pages){
   const html=fs.readFileSync(file,'utf8');
