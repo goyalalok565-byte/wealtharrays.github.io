@@ -43,6 +43,7 @@ jobs:
             --exclude='.git/' \
             --exclude='node_modules/' \
             --exclude='dist/' \
+            --exclude='.github/workflows/' \
             --exclude='wealtharrays_github_io-updated.zip' \
             "$RUNNER_TEMP/wa-release/wealtharrays.github.io-main/" ./
 
