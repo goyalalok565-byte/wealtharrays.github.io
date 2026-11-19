@@ -116,7 +116,7 @@ for(const file of walk(dist).filter(file=>file.endsWith('.html'))){
   else if(file.startsWith('articles/'))type='article';
   if(!type)continue;
   let bytes=0;
-  for(const match of html.matchAll(/<script\\s+[^>]*src=["']([^"']+)["'][^>]*>/gi)){
+  for(const match of html.matchAll(/<script\s+[^>]*src=["']([^"']+)["'][^>]*>/gi)){
     const src=match[1];
     if(!src.startsWith('/'))continue;
     const relative=src.slice(1);
