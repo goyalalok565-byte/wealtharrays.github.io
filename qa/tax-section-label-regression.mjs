@@ -9,6 +9,9 @@ for(const [name,source] of [['widget.js',widget],['wa-calculator-runtime.js',run
  assert.doesNotMatch(source,/Section 87A rebate eligibility/,name+' must not label Tax Year 2026-27 as Section 87A');
 }
 assert.match(widget,/AY 2026–27[\s\S]{0,180}Section 87A/,'Old Act wording must be scoped to AY 2026-27');
+assert.match(widget,/Tax Year 2026–27/,'New Act interface must use Tax Year, not FY terminology');
+assert.doesNotMatch(widget,/Estimate India new-regime tax \(FY 2026–27\)/);
+assert.match(api,/income-and-tax-estimator-um/,'Tax Year guidance must link to the official Income Tax Department estimator manual');
 assert.match(api,/Section 156 rebate/); assert.match(api,/marginal relief/);
 assert.match(api,/265620\.pdf/);
 assert.match(api,/tax_year_guidance_url/);
