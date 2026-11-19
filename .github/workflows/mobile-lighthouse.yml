@@ -28,7 +28,7 @@ jobs:
       - name: Start PR preview server
         if: ${{ github.event_name == 'pull_request' }}
         run: |
-          python3 -m http.server 4173 --directory dist >/tmp/wa-preview.log 2>&1 &
+          nohup python3 -m http.server 4173 --directory dist >/tmp/wa-preview.log 2>&1 &
           echo $! >/tmp/wa-preview.pid
           for attempt in {1..30}; do
             if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
