@@ -3,10 +3,11 @@ import path from 'node:path';
 
 const root=process.cwd();
 const source=fs.readFileSync(path.join(root,'calculators.js'),'utf8');
-const calculators=[...source.matchAll(/\bslug:\s*["']([^"']+)["']/g)].map(m=>m[1]);
+const registry=JSON.parse(fs.readFileSync(path.join(root,'calculator-definitions/registry.json'),'utf8'));
+const calculators=registry.calculators.map(item=>item.slug);
 const failures=[];
 const countWords=html=>html.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&[a-z#0-9]+;/gi,' ').replace(/\s+/g,' ').trim().split(/\s+/).filter(Boolean).length;
-if(calculators.length!==55)failures.push('Expected 55 calculator definitions, found '+calculators.length);
+if(calculators.length!==registry.count)failures.push('Expected '+registry.count+' registered calculator definitions, found '+calculators.length);
 for(const slug of calculators){
   const file=path.join(root,slug,'index.html');
   if(!fs.existsSync(file)){failures.push(slug+': canonical page missing');continue;}
