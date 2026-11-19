@@ -34,6 +34,8 @@ jobs:
         run: node qa/service-worker-privacy-audit.mjs
       - name: Privacy policy consistency audit
         run: node qa/privacy-policy-audit.mjs
+      - name: Synchronize canonical calculator registry
+        run: node scripts/sync-calculator-catalog.mjs
       - name: Calculator regression and catalogue parity
         run: node qa/calculator-regression.mjs
       - name: Generate research datasets
@@ -46,6 +48,10 @@ jobs:
         run: node qa/research-data-audit.mjs
       - name: Accessibility static audit
         run: node qa/accessibility-static-audit.mjs
+      - name: Tax-year Section 156 label regression
+        run: node qa/tax-section-label-regression.mjs
+      - name: Run API/page parity for all registered calculators
+        run: node qa/api-calculator-parity.mjs
       - name: Build production dist
         run: npm run build:dist
       - name: Canonical embed source regression
@@ -94,7 +100,7 @@ jobs:
         env:
           BASE_URL: http://127.0.0.1:4173
         run: node qa/embed-browser-smoke.mjs
-      - name: Browser regression for all 47 calculators and scenario features
+      - name: Browser regression for all registered calculators and scenario features
         env:
           BASE_URL: http://127.0.0.1:4173
         run: node qa/production-browser-smoke.mjs
