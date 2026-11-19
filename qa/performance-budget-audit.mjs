@@ -32,10 +32,18 @@ for (const file of files) {
 const calcRuntimePath = path.join(process.cwd(), 'wa-calculator-runtime.js');
 if (fs.existsSync(calcRuntimePath)) {
   const runtime = fs.readFileSync(calcRuntimePath, 'utf8');
-  if (runtime.includes('WA CANONICAL MODULE | calculator | calculator-search.js |')) {
-    failures.push('wa-calculator-runtime.js includes calculator-search.js, unused on calculator routes.');
+  const forbiddenCalculatorModules=['calculator-search.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js','calculator-enhancements.js','pdf-export-fix.js'];
+  for(const module of forbiddenCalculatorModules){
+    if(runtime.includes('WA CANONICAL MODULE | calculator | '+module+' |')){
+      failures.push('wa-calculator-runtime.js includes '+module+', which is not part of the critical calculator runtime.');
+    }
   }
 }
+const siteRuntimeSource=fs.existsSync('site-runtime.js')?fs.readFileSync('site-runtime.js','utf8'):'';
+if(siteRuntimeSource.includes('pagead2.googlesyndication.com')||siteRuntimeSource.includes('installAdSense')){
+  failures.push('site-runtime.js must not bypass the subscription-aware wa-ad-loader.js with a direct AdSense bootstrap.');
+}
+if(!fs.existsSync('wa-ad-loader.js'))failures.push('Missing the single subscription-aware wa-ad-loader.js bootstrap.');
 
 
  // Regression guard: the production AdSense host is pagead2.googlesyndication.com.
