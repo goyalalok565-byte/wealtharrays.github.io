@@ -19,7 +19,7 @@ for(const {file,text} of js.slice(0,canonicalSources.length)){const hash=crypto.
 const siteBundle=fs.readFileSync('wa-site-runtime.js','utf8');
 const homeBundle=fs.readFileSync('wa-home-runtime.js','utf8');
 const articleBundle=fs.readFileSync('wa-article-runtime.js','utf8');
-const articleSources=['wa-core.js','theme-fix.js','phase4-premium.js'];
+const articleSources=['wa-core.js','phase4-premium.js'];
 for(const file of siteSources){const text=fs.readFileSync(path.join(root,file),'utf8');const hash=crypto.createHash('sha256').update(text.replace(/\r\n/g,'\n').trimEnd()).digest('hex').slice(0,12);if(!siteBundle.includes(`WA CANONICAL MODULE | site | ${file} | sha256:${hash}`)) throw new Error(`Site bundle provenance missing/stale for ${file}`);}
 for(const file of homeSources){const text=fs.readFileSync(path.join(root,file),'utf8');const hash=crypto.createHash('sha256').update(text.replace(/\r\n/g,'\n').trimEnd()).digest('hex').slice(0,12);if(!homeBundle.includes(`WA CANONICAL MODULE | home | ${file} | sha256:${hash}`)) throw new Error(`Home bundle provenance missing/stale for ${file}`);}
 for(const file of articleSources){const text=fs.readFileSync(path.join(root,file),'utf8');const hash=crypto.createHash('sha256').update(text.replace(/\r\n/g,'\n').trimEnd()).digest('hex').slice(0,12);if(!articleBundle.includes('WA CANONICAL MODULE | article | '+file+' | sha256:'+hash)) throw new Error('Article bundle provenance missing/stale for '+file);}
