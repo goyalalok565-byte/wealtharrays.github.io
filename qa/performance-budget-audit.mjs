@@ -45,8 +45,8 @@ function auditHtml(dir) {
     if (entry.isDirectory()) auditHtml(file);
     else if (entry.name.endsWith('.html')) {
       const html = fs.readFileSync(file, 'utf8');
-      const loaders = html.match(/<script\\b(?=[^>]*src=["']\\/wa-ad-loader\\.js(?:\\?[^"']*)?["'])[^>]*>\\s*<\\/script>/gi) || [];
-      const directAds = html.match(/<script\\b(?=[^>]*src=["']https:\\/\\/pagead\\.googlesyndication\\.com\\/pagead\\/js\\/adsbygoogle\\.js)[^>]*>/gi) || [];
+      const loaders = html.match(/<script\b(?=[^>]*src=["']\/wa-ad-loader\.js(?:\?[^"']*)?["'])[^>]*>\s*<\/script>/gi) || [];
+      const directAds = html.match(/<script\b(?=[^>]*src=["']https:\/\/pagead\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js)[^>]*>/gi) || [];
       if (loaders.length > 1) failures.push(file + ': duplicate wa-ad-loader.js tags (' + loaders.length + ').');
       if (directAds.length) failures.push(file + ': direct AdSense script bypasses the single consent/subscription-aware loader.');
     }
