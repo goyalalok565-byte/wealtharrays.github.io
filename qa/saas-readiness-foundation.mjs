@@ -41,7 +41,7 @@ const registryCount = JSON.parse(fs.readFileSync('calculator-definitions/registr
 assert.equal(MODEL_LIST.length, registryCount, 'API model list must be generated from all calculator definitions');
 for (const model of ['sip','loan-emi','home-loan-emi','compound-interest','fixed-deposit','lumpsum','gst','cagr','inflation','simple-interest','currency-converter']) assert.ok(MODEL_LIST.some(item=>item.id===model), 'API registry missing '+model);
 assert.match(calculate, /export async function onRequestPost/);
-assert.match(calculate, /jurisdictional_rules_applied: false/);
+assert.match(calculate, /jurisdictional_rules_applied\s*:\s*false/);
 assert.match(calculate, /Country and currency are metadata only/);
 assert.match(calculate, /MAX_BODY_BYTES/);
 assert.match(worker, /ROUTES = new Map/);
