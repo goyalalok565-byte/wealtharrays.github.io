@@ -73,12 +73,15 @@
   Cache-Control: no-cache, no-store, must-revalidate
 
 /wa-site-runtime.js
+  ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 
 /wa-home-runtime.js
+  ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 
 /wa-calculator-runtime.js
+  ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 
 /*.svg
