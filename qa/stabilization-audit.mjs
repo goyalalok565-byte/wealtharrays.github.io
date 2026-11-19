@@ -4,9 +4,11 @@ import path from 'node:path';
 const calculators = [
   'sip-calculator/index.html','compound-interest-calculator/index.html','mortgage-emi-calculator/index.html','roi-calculator/index.html','simple-interest-calculator/index.html','retirement-calculator/index.html','salary-to-hourly-calculator/index.html','profit-margin-calculator/index.html','fixed-deposit-calculator/index.html','recurring-deposit-calculator/index.html','lumpsum-calculator/index.html','cagr-calculator/index.html','car-loan-calculator/index.html','personal-loan-calculator/index.html','debt-payoff-calculator/index.html','inflation-calculator/index.html','net-worth-calculator/index.html','overtime-pay-calculator/index.html','freelance-rate-calculator/index.html','income-tax-scenario-calculator/index.html'
 ];
-const runtimeSources = ['wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','calculator-page-init.js','phase4-premium.js','widget.js','widget-bootstrap.js','calculator-safety.js','pdf-export-fix.js'];
+const runtimeSources = ['wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','calculator-page-init.js','phase4-premium.js','widget.js','widget-bootstrap.js','calculator-safety.js'];
 for (const file of runtimeSources) if (!fs.existsSync(file)) throw new Error(`Missing runtime source: ${file}`);
 if (fs.existsSync('calculator-runtime.js')) throw new Error('Retired calculator-runtime.js must not exist');
+if (!fs.existsSync('pdf-export-fix.js')) throw new Error('Missing lazy PDF export feature chunk');
+if (!fs.readFileSync('widget.js','utf8').includes("import('/pdf-export-fix.js')")) throw new Error('PDF export must be imported on demand');
 if (!fs.existsSync('wa-calculator-runtime.js')) throw new Error('Missing canonical bundle');
 if (!fs.existsSync('wa-article-runtime.js')) throw new Error('Missing lightweight article bundle');
 const bundle = fs.readFileSync('wa-calculator-runtime.js','utf8');
