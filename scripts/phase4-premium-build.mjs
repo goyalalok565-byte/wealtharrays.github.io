@@ -26,10 +26,10 @@ for(const file of htmlFiles){
   let s=fs.readFileSync(file,'utf8');
   const before=s;
   // Apply the calculator host class before deferred runtime mount so CSS can reserve its space.
-  s=s.replace(/<div\\b[^>]*\\bid=["']calc-widget["'][^>]*>/gi, tag => {
-    const classAttr=tag.match(/\\bclass=(["'])(.*?)\\1/i);
+  s=s.replace(/<div\b[^>]*\bid=["']calc-widget["'][^>]*>/gi, tag => {
+    const classAttr=tag.match(/\bclass=(["'])(.*?)\1/i);
     if(classAttr){
-      if(/(?:^|\\s)calc-widget(?:\\s|$)/.test(classAttr[2])) return tag;
+      if(/(?:^|\s)calc-widget(?:\s|$)/.test(classAttr[2])) return tag;
       return tag.replace(classAttr[0], `class=${classAttr[1]}${classAttr[2]} calc-widget${classAttr[1]}`);
     }
     return tag.replace(/>$/, ' class="calc-widget">');
