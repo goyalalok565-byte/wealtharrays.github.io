@@ -258,7 +258,7 @@ if(isCalc){
     if(faqHeadingIndex>=0){const insertAt=faqHeadingIndex+faqHeading.length;html=html.slice(0,insertAt)+extraFaqs+html.slice(insertAt);}
     else{const articleEnd=html.indexOf('</article>');if(articleEnd>=0)html=html.slice(0,articleEnd)+faqHeading+extraFaqs+html.slice(articleEnd);}
   }
-  const formulaForValidation=calcDefinition?.obj.match(/\\bformula:\\s*["']([^"']+)["']/)?.[1]||'the formula explained in the methodology section';
+  const formulaForValidation=calcDefinition?.obj.match(/\bformula:\s*["']([^"']+)["']/)?.[1]||'the formula explained in the methodology section';
   const validationParagraphs={
     investment:[
       'For '+calcTitleForFaq+', first confirm that '+calcInputsText+' match the actual investment schedule and goal date. Check whether contributions are monthly or annual, whether the return is nominal or effective, and whether the timing is at the beginning or end of each period. The method shown for this calculator is '+formulaForValidation+'.',
@@ -312,7 +312,7 @@ if(isCalc){
   const validationText=validationParagraphs[calcCategoryForFaq]||validationParagraphs.planning;
   if(!html.includes('WA-CALCULATOR-VALIDATION-NOTES')){
     const validationBlock='<!-- WA-CALCULATOR-VALIDATION-NOTES --><section class="calculator-validation-notes"><h2>How to validate '+escapeCalcFaq(calcTitleForFaq)+' before acting</h2>'+validationText.map(paragraph=>'<p>'+escapeCalcFaq(paragraph)+'</p>').join('')+'</section>';
-    html=html.replace(/<\\/article>/i,validationBlock+'</article>');
+    html=html.replace(/<\/article>/i,validationBlock+'</article>');
   }
   const calculatorSources=sourceSetForCalculator(calcDefinition?.obj||'');
   if(!html.includes('WA-CALCULATOR-AUTHORITATIVE-SOURCES')){
