@@ -52,6 +52,8 @@ jobs:
         run: node scripts/fix-route-alias-links.mjs && node scripts/normalize-nested-links.mjs && node scripts/fix-accessible-names.mjs
       - name: Repair static pages and redirect shells
         run: node scripts/repair-site-integrity.mjs
+      - name: Verify 1200x630 social image on all calculator pages
+        run: node qa/og-image-audit.mjs
       - name: Minify canonical bundles and CSS
         run: |
           npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output wa-site-runtime.js -- wa-site-runtime.js
