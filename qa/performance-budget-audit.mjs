@@ -57,6 +57,11 @@ if(!coreRuntimeSource.includes("footer.premium-footer .site-footer-inner")){
 }
 const toolsPageHtml=fs.existsSync('tools.html')?fs.readFileSync('tools.html','utf8'):'';
 if(!toolsPageHtml.includes('data-wa-open-consent'))failures.push('Static tools footer must expose the privacy choices control.');
+const criticalCssFile=fs.existsSync('styles-critical.css')?fs.readFileSync('styles-critical.css','utf8'):'';
+if(!criticalCssFile.includes('WA-CRITICAL-CSS-BUNDLE')||!toolsPageHtml.includes('styles-critical.css'))failures.push('Critical CSS must be merged and preloaded as one stylesheet.');
+if(/href=["'][^"']*(?:phase3-seo|cls-fixes|phase4-premium)\.css/.test(toolsPageHtml))failures.push('Legacy render-blocking CSS links must be removed from tools page.');
+if(!/<script\b[^>]*src=["'][^"']*theme-init\.js[^>]*\bdefer\b[^>]*>/i.test(toolsPageHtml)||!toolsPageHtml.includes('rel="preload" as="script" href="/theme-init.js'))failures.push('Theme bootstrap must be preloaded and deferred, not render-blocking.');
+
 if(!adLoaderSource.includes('heavyRoute?5000:1500')){
   failures.push('Ads on tools/calculator routes must wait until after the initial interaction window.');
 }
