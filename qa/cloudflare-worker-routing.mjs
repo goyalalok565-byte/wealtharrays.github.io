@@ -65,7 +65,7 @@ const unauthenticated = await worker.fetch(new Request("https://example.test/v1/
 assert.equal(unauthenticated.status, 401);
 assert.equal(privateLimiterCalls, 1, "Private scenario requests must pass through their dedicated limiter");
 allowPrivateRateLimitedRequest = false;
-const privateThrottled = await worker.fetch(new Request("https://example.test/v1/scenarios", { headers: { Origin: "https://wealtharrays.com" } }), env, {});
+const privateThrottled = await worker.fetch(new Request("https://example.test/v1/scenarios", { headers: { Origin: "https://wealtharrays.com" } }), { ...env, ALLOWED_ORIGINS: "https://wealtharrays.com" }, {});
 assert.equal(privateThrottled.status, 429);
 assert.equal(privateThrottled.headers.get("Retry-After"), "60");
 assert.equal(privateThrottled.headers.get("Access-Control-Allow-Origin"), "https://wealtharrays.com");
