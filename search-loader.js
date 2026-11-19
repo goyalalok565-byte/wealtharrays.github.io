@@ -5,9 +5,11 @@
   if(!input)return;
   var path=location.pathname;
   var toolsPage=path==='/tools'||path==='/tools/'||path.endsWith('/tools.html');
-  var source=toolsPage?'/calculator-search.js':'/homepage-search.js';
+  var calculatorPage=!!document.documentElement.getAttribute('data-wa-calculator')||!!document.querySelector('.calc-page');
+  var source=(toolsPage||calculatorPage)?'/calculator-search.js':'/homepage-search.js';
   var loading=false,loaded=false;
   window.__WA_SEARCH_LAZY__=true;
+  window.__WA_SEARCH_OWNER__='search-loader';
   function load(){
     if(loading||loaded)return;
     loading=true;
