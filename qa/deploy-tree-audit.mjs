@@ -7,14 +7,14 @@ assert.ok(fs.existsSync(root),'dist/ must exist before deployment audit');
 const files=[];
 function walk(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){const full=path.join(dir,e.name);if(e.isDirectory())walk(full);else files.push(path.relative(root,full).replaceAll(path.sep,'/'));}}
 walk(root);files.sort();
-const forbidden=files.filter(file=>/^(?:qa|scripts|docs|tests|\\.github|functions|migrations|api)(?:\\/|$)/i.test(file)||/\\.(?:md|yml|yaml)$/i.test(file));
+const forbidden=files.filter(file=>/^(?:qa|scripts|docs|tests|\.github|functions|migrations|api)(?:\/|$)/i.test(file)||/\.(?:md|yml|yaml)$/i.test(file));
 assert.deepEqual(forbidden,[], 'Internal source, Markdown or workflow files leaked into dist: '+forbidden.join(', '));
 const html=files.filter(file=>file.endsWith('.html')).length;
-const definitions=files.filter(file=>/^calculator-definitions\\/[^/]+\\.js$/.test(file)).length;
+const definitions=files.filter(file=>/^calculator-definitions\/[^/]+\.js$/.test(file)).length;
 assert.equal(definitions,registry.count);
 assert.ok(files.includes('calculator-definitions/registry.json'));
 assert.ok(files.includes('og-image.png'));
 fs.mkdirSync('docs/audits',{recursive:true});
-fs.writeFileSync('docs/audits/deploy-file-manifest.md',['# Cloudflare assets deployment manifest','',`Files: ${files.length}`,`HTML: ${html}`,`Calculator definitions: ${definitions}`,'Internal source/Markdown/workflow leakage: 0','',...files.map(file=>'- '+file),''].join('\\n'));
+fs.writeFileSync('docs/audits/deploy-file-manifest.md',['# Cloudflare assets deployment manifest','',`Files: ${files.length}`,`HTML: ${html}`,`Calculator definitions: ${definitions}`,'Internal source/Markdown/workflow leakage: 0','',...files.map(file=>'- '+file),''].join('\n'));
 console.log(`DEPLOY TREE PASS: ${files.length} files (${html} HTML, ${definitions} calculator definitions); 0 internal source, Markdown or workflow files published.`);
 console.log('Full file list: docs/audits/deploy-file-manifest.md');
