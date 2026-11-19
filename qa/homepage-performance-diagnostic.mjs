@@ -23,6 +23,7 @@ execFileSync('npx', [
   '--only-categories=performance',
   '--blocked-url-patterns=https://fundingchoicesmessages.google.com/*',
   '--output=json',
+  '--save-assets',
   `--output-path=${diagnosticPath}`,
   '--chrome-flags=--headless --no-sandbox --disable-dev-shm-usage'
 ], { stdio: 'inherit' });
