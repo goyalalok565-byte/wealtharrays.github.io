@@ -7,7 +7,7 @@ const strip=s=>s.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi,'
 for(const c of registry.calculators){
  const file=path.join(c.slug,'index.html');assert.ok(fs.existsSync(file),'Missing '+file);
  const html=fs.readFileSync(file,'utf8'),article=html.match(/<article class="tool-article">([\s\S]*?)<\/article>/i)?.[1]||'';
- const words=strip(article).split(/\s+/).filter(Boolean).length,faqs=[...article.matchAll(/<div\s+class=["']faq-item["'][^>]*>/gi)].length;
+ const words=strip(article).split(/\s+/).filter(Boolean).length,faqBlocks=[...article.matchAll(/<(?:div|details)\s+class=["']faq-item["'][^>]*>([\s\S]*?)<\/(?:div|details)>/gi)].map(match=>match[1]),faqQuestions=faqBlocks.map(block=>strip((block.match(/<(?:h3|summary)\b[^>]*>([\s\S]*?)<\/(?:h3|summary)>/i)||[])[1]||"")).filter(Boolean),faqs=new Set(faqQuestions).size;
  const sources=[...article.matchAll(/<a\b[^>]*href=["']https?:\/\//gi)].length;
  const example=/worked example|example inputs|example calculation|worked calculation/i.test(article);
  const updated=/last updated|updated on|reviewed on/i.test(article);
