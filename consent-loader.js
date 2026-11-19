@@ -33,8 +33,8 @@
   }
   function schedule(){
     if(started)return;
-    if(window.requestIdleCallback)idle=window.requestIdleCallback(load,{timeout:1000});
-    else setTimeout(load,500);
+    if(window.requestIdleCallback)idle=window.requestIdleCallback(load,{timeout:4000});
+    else return;
   }
   if(document.readyState==='complete')schedule();
   else window.addEventListener('load',schedule,{once:true,passive:true});
