@@ -16,7 +16,7 @@ self.addEventListener('install',event=>event.waitUntil(
   caches.open(STATIC_CACHE).then(cache=>cache.addAll(STATIC_ASSETS)).then(()=>self.skipWaiting())
 ));
 self.addEventListener('activate',event=>event.waitUntil(
-  caches.keys().then(keys=>Promise.all(keys.filter(key=>![STATIC_CACHE,RUNTIME_CACHE].includes(key)).map(key=>caches.delete(key))))
+  caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('wealtharrays-pwa-')&&![STATIC_CACHE,RUNTIME_CACHE].includes(key)).map(key=>caches.delete(key))))
     .then(()=>self.clients.claim())
 ));
 self.addEventListener('fetch',event=>{
@@ -49,7 +49,7 @@ self.addEventListener('fetch',event=>{
   if(asset){
     const refresh=fetch(request).then(response=>cachePut(RUNTIME_CACHE,request,response).then(()=>response)).catch(()=>null);
     event.waitUntil(refresh.then(()=>undefined));
-    event.respondWith(caches.open(RUNTIME_CACHE).then(cache=>cache.match(request)).then(hit=>hit||refresh.then(response=>response||matchCached(new Request('/offline.html')))));
+    event.respondWith(caches.open(RUNTIME_CACHE).then(cache=>cache.match(request)).then(hit=>hit||refresh.then(response=>response||new Response('',{status:503,statusText:'Offline'}))));
     return;
   }
   // Do not cache arbitrary same-origin fetches; only navigations and static assets are cacheable.
