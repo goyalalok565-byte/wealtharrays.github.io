@@ -4,8 +4,17 @@ import worker from "../worker.mjs";
 
 const assetCalls = [];
 let limiterCalls = 0;
+let privateLimiterCalls = 0;
 let allowRateLimitedRequest = true;
+let allowPrivateRateLimitedRequest = true;
 const env = {
+  PRIVATE_API_LIMITER: {
+    async limit({ key }) {
+      privateLimiterCalls++;
+      assert.match(key, /^\/v1\/(scenarios|billing\/checkout|billing\/status|billing\/config|billing\/cancel):/);
+      return { success: allowPrivateRateLimitedRequest };
+    }
+  },
   PUBLIC_API_LIMITER: {
     async limit({ key }) {
       limiterCalls++;
@@ -54,6 +63,15 @@ const wrongMethod = await worker.fetch(new Request("https://example.test/v1/calc
 assert.equal(wrongMethod.status, 405);
 const unauthenticated = await worker.fetch(new Request("https://example.test/v1/scenarios"), env, {});
 assert.equal(unauthenticated.status, 401);
+assert.equal(privateLimiterCalls, 1, "Private scenario requests must pass through their dedicated limiter");
+allowPrivateRateLimitedRequest = false;
+const privateThrottled = await worker.fetch(new Request("https://example.test/v1/scenarios", { headers: { Origin: "https://wealtharrays.com" } }), env, {});
+assert.equal(privateThrottled.status, 429);
+assert.equal(privateThrottled.headers.get("Retry-After"), "60");
+assert.equal(privateThrottled.headers.get("Access-Control-Allow-Origin"), "https://wealtharrays.com");
+allowPrivateRateLimitedRequest = true;
+const missingPrivateLimiter = await worker.fetch(new Request("https://example.test/v1/scenarios"), { PUBLIC_API_LIMITER: env.PUBLIC_API_LIMITER, ASSETS: env.ASSETS }, {});
+assert.equal(missingPrivateLimiter.status, 503, "Private APIs must fail closed when their limiter is missing");
 const staticResponse = await worker.fetch(new Request("https://example.test/index.html"), env, {});
 assert.equal(await staticResponse.text(), "static asset");
 assert.deepEqual(assetCalls, ["/index.html"]);
