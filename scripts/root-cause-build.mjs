@@ -186,7 +186,9 @@ if(isCalc){
     if(faqItems) html=html.replace(/<h2>Frequently asked questions<\/h2>[\s\S]*?(?=<h2>Related calculators<\/h2>)/i,'<h2>Frequently asked questions</h2>'+faqItems);
   }
   const calcTitleForFaq=calcDefinition?.obj.match(/\btitle:\s*["']([^"']+)["']/)?.[1]||'this calculator';
-  const calcCategoryForFaq=calcDefinition?.obj.match(/\bcategory:\s*["']([^"']+)["']/)?.[1]||'general';
+  const calcSlugForFaq=calcDefinition?.obj.match(/\bslug:\s*["']([^"']+)["']/)?.[1]||'';
+  const calcCategoryRaw=calcDefinition?.obj.match(/\bcategory:\s*["']([^"']+)["']/)?.[1]||'general';
+  const calcCategoryForFaq=/(?:tax|gst|hra)/i.test(calcSlugForFaq)?'tax':calcCategoryRaw;
   const calcInputLabels=[...(calcDefinition?.obj||'').matchAll(/\blabel:\s*["']([^"']+)["']/g)].map(m=>m[1]).slice(0,4);
   const calcInputsText=calcInputLabels.length?calcInputLabels.join(', '):'the inputs shown in the calculator';
   const categoryFaqAnswers={
@@ -251,8 +253,9 @@ if(isWidget){
 }
 function sourceSetForCalculator(calcObject){
   const category=calcObject.match(/\bcategory:\s*["']([^"']+)["']/)?.[1]||'general';
+  const slug=calcObject.match(/\bslug:\s*["']([^"']+)["']/)?.[1]||'';
   const keys={investment:['investment'],loan:['loans','banking'],banking:['banking'],retirement:['retirement','inflation'],salary:['salary'],business:['business'],planning:['planning','inflation'],tax:['tax']};
-  const selected=(keys[category]||['general']).flatMap(key=>sourceRegistry[key]||[]);
+  const selected=(/(?:tax|gst|hra)/i.test(slug)?sourceRegistry.tax:(keys[category]||['general']).flatMap(key=>sourceRegistry[key]||[]));
   return selected.filter((item,index,all)=>all.findIndex(other=>other.url===item.url)===index);
 }
 function sourceSetForArticle(rel){
