@@ -30,9 +30,9 @@ for(const file of ['index.html','tools.html','robots.txt','sitemap.xml','ads.txt
 const htmlFiles=files.filter(file=>file.endsWith('.html'));
 for(const file of htmlFiles){
   const html=fs.readFileSync(path.join(dist,file),'utf8');
-  const cssLinks=[...html.matchAll(/<link[^>]+rel=["']stylesheet["'][^>]+href=["']([^"']+\\.css)["'][^>]*>/gi)].map(match=>match[1]);
+  const cssLinks=[...html.matchAll(/<link[^>]+rel=["']stylesheet["'][^>]+href=["']([^"']+\.css)["'][^>]*>/gi)].map(match=>match[1]);
   assert.equal(cssLinks.length,1,`${file}: expected exactly one page-type stylesheet, found ${cssLinks.length}`);
-  const cssPath=path.join(dist,cssLinks[0].replace(/^\\//,''));
+  const cssPath=path.join(dist,cssLinks[0].replace(/^\//,''));
   assert.ok(fs.existsSync(cssPath),`${file}: stylesheet asset missing: ${cssLinks[0]}`);
   assert.match(cssLinks[0],/\\.([a-f0-9]{12})\\.css$/,`${file}: stylesheet filename must be content-hashed`);
   assert.ok(gzipSync(fs.readFileSync(cssPath)).length<30*1024,`${file}: CSS exceeds 30 KB gzip budget`);
