@@ -23,7 +23,7 @@ const adLoader = fs.readFileSync('wa-ad-loader.js', 'utf8');
 const migration = fs.readFileSync('migrations/0001_saas.sql', 'utf8');
 const webhookOrderMigration = fs.readFileSync('migrations/0002_billing_webhook_order.sql', 'utf8');
 for (const [name, source] of [['widget.js', widget], ['wa-calculator-runtime.js', runtime]]) {
-  assert.match(source, /toLocaleString\(navigator\.language/, name + ' must use browser locale formatting');
+  assert.match(source, /waLocale\(\)|safeHomepageLocale\(\)|toLocaleString\(navigator\.language/, name + ' must use normalized browser locale formatting');
   assert.match(source, /waScenarioUrl/, name + ' must build scenario links with input values');
   assert.match(source, /waRestoreScenario/, name + ' must restore scenario values from shared links');
   assert.match(source, /waGetSavedScenarios/, name + ' must persist scenarios locally');
