@@ -46,7 +46,24 @@ jobs:
             --exclude='wealtharrays_github_io-updated.zip' \
             "$RUNNER_TEMP/wa-release/wealtharrays.github.io-main/" ./
 
-      - name: Verify Node runtime and project dependency policy
+      - name: Restore the checked-in independent test suite
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = 'package.json';
+          const pkg = JSON.parse(fs.readFileSync(path, 'utf8'));
+          pkg.scripts ||= {};
+          pkg.scripts.test = 'node --test tests/*.test.js';
+          pkg.scripts['test:calculators'] = 'node --test tests/*.test.js';
+          if (!pkg.scripts['build:dist'].startsWith('npm run test:calculators &&')) {
+            pkg.scripts['build:dist'] = 'npm run test:calculators && ' + pkg.scripts['build:dist'];
+          }
+          fs.writeFileSync(path, JSON.stringify(pkg, null, 2) + '\n');
+          NODE
+          test -f tests/helpers.js
+          test "$(find tests -maxdepth 1 -name '*.test.js' | wc -l)" -ge 9
+
+      - name: Verify Node runtime and dependency policy
         run: |
           node --version
           npm --version
