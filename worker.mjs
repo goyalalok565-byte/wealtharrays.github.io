@@ -52,7 +52,7 @@ export default {
     const route = ROUTES.get(url.pathname.replace(/\/$/, ""));
     if (!route) return jsonError("NOT_FOUND", "No API endpoint matches this path.", 404);
     const handler = methodHandler(route, request.method.toUpperCase());
-    const privateApiPath = url.pathname.replace(/\\/$/, "").startsWith("/v1/scenarios") || url.pathname.replace(/\\/$/, "").startsWith("/v1/billing/");
+    const privateApiPath = url.pathname.replace(/\/$/, "").startsWith("/v1/scenarios") || url.pathname.replace(/\/$/, "").startsWith("/v1/billing/");
     const origin = request.headers.get("Origin");
     if (privateApiPath && origin) {
       const configuredOrigins = String(env.ALLOWED_ORIGINS || env.APP_ORIGIN || "").split(",").map(value => value.trim()).filter(Boolean);
