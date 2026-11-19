@@ -45,5 +45,6 @@ for(const file of calculatorPages){
   assert.ok(!html.includes('calculator-value-content.json'),`${file}: build-only content JSON must not load at runtime`);
 }
 assert.ok(!fs.existsSync(path.join(dist,'og-card.svg')),'Retired SVG social preview must not be deployed');
+const swText=fs.readFileSync(path.join(dist,'sw.js'),'utf8');assert.ok(swText.includes('/wa-static.')&&swText.includes('/wa-calculator.'),'Service worker must precache core hashed CSS bundles');assert.ok(!swText.includes("'/styles.css'"),'Service worker must not precache the retired monolithic CSS filename');
 assert.ok(calculatorPages.length>=47,`Expected at least 47 calculator routes in dist/, found ${calculatorPages.length}`);
 console.log(`Deploy hygiene PASS — ${files.length} public files, ${calculatorPages.length} calculator routes; internal source/test/build files and archives excluded.`);
