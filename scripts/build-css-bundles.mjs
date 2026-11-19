@@ -73,11 +73,12 @@ for(const file of retired)fs.rmSync(path.join(dist,file),{force:true});
 // The service worker precaches only the real page-type CSS assets. A content-derived
 // cache version ensures old CSS caches are retired when any page bundle changes.
 const cssAssets=Object.values(outputs).map(item=>'/'+item.filename);
+const coreCssAssets=['/'+outputs.static.filename,'/'+outputs.calculator.filename];
 const cssHash=crypto.createHash('sha256').update(cssAssets.join('|')).digest('hex').slice(0,10);
 const swPath=path.join(dist,'sw.js');
 let sw=fs.readFileSync(swPath,'utf8');
 sw=sw.replace(/const VERSION='[^']+';/,`const VERSION='wealtharrays-pwa-${cssHash}';`);
-sw=sw.replace(/const STATIC_ASSETS=\[[^;]+\];/,`const STATIC_ASSETS=['/offline.html','/theme-init.js','/wa-site-runtime.js','/wa-home-runtime.js','/wa-calculator-runtime.js',${cssAssets.map(asset=>JSON.stringify(asset)).join(',')}];`);
+sw=sw.replace(/const STATIC_ASSETS=\[[^;]+\];/,`const STATIC_ASSETS=['/offline.html','/theme-init.js','/wa-site-runtime.js','/wa-home-runtime.js','/wa-calculator-runtime.js',${coreCssAssets.map(asset=>JSON.stringify(asset)).join(',')}];`);
 fs.writeFileSync(swPath,sw);
 
 console.log('CSS bundles:',JSON.stringify(outputs));
