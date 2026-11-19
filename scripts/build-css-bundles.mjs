@@ -78,7 +78,7 @@ const cssHash=crypto.createHash('sha256').update(cssAssets.join('|')).digest('he
 const swPath=path.join(dist,'sw.js');
 let sw=fs.readFileSync(swPath,'utf8');
 sw=sw.replace(/const VERSION='[^']+';/,`const VERSION='wealtharrays-pwa-${cssHash}';`);
-sw=sw.replace(/const STATIC_ASSETS=\[[^;]+\];/,`const STATIC_ASSETS=['/offline.html','/theme-init.js','/wa-site-runtime.js','/wa-home-runtime.js','/wa-calculator-runtime.js',${coreCssAssets.map(asset=>JSON.stringify(asset)).join(',')}];`);
+sw=sw.replace(/const STATIC_ASSETS=\[[^;]+\];/,`const STATIC_ASSETS=['/offline.html','/theme-init.js','/wa-site-runtime.js','/wa-home-runtime.js','/wa-calculator-runtime.js','/wa-article-runtime.js',${coreCssAssets.map(asset=>JSON.stringify(asset)).join(',')}];`);
 fs.writeFileSync(swPath,sw);
 
 console.log('CSS bundles:',JSON.stringify(outputs));
