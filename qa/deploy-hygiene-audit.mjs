@@ -33,6 +33,11 @@ for(const file of jsFiles)assert.match(file,/\.([a-f0-9]{12})\.js$/,`JavaScript 
 for(const base of ['wa-site-runtime','wa-home-runtime','wa-calculator-runtime','search-loader','calculators'])assert.ok(jsFiles.some(file=>path.posix.basename(file).startsWith(base+'.')),`Missing hashed production JavaScript bundle: ${base}`);
 const definitionFiles=jsFiles.filter(file=>file.startsWith('calculator-definitions/'));
 assert.ok(definitionFiles.length>=47,`Expected split calculator definition scripts, found ${definitionFiles.length}`);
+const jsFiles=files.filter(file=>file.endsWith('.js')&&file!=='sw.js');
+for(const file of jsFiles)assert.match(file,/\.([a-f0-9]{12})\.js$/,`JavaScript asset must be content-hashed: ${file}`);
+for(const base of ['wa-site-runtime','wa-home-runtime','wa-calculator-runtime','search-loader','calculators'])assert.ok(jsFiles.some(file=>path.posix.basename(file).startsWith(base+'.')),`Missing hashed production JavaScript bundle: ${base}`);
+const definitionFiles=jsFiles.filter(file=>file.startsWith('calculator-definitions/'));
+assert.ok(definitionFiles.length>=47,`Expected split calculator definition scripts, found ${definitionFiles.length}`);
 const htmlFiles=files.filter(file=>file.endsWith('.html'));
 for(const file of htmlFiles){
   const html=fs.readFileSync(path.join(dist,file),'utf8');
@@ -51,6 +56,6 @@ for(const file of calculatorPages){
   assert.ok(!html.includes('calculator-value-content.json'),`${file}: build-only content JSON must not load at runtime`);
 }
 assert.ok(!fs.existsSync(path.join(dist,'og-card.svg')),'Retired SVG social preview must not be deployed');
-const swText=fs.readFileSync(path.join(dist,'sw.js'),'utf8');assert.ok(swText.includes('/wa-static.')&&swText.includes('/wa-calculator.'),'Service worker must precache core hashed CSS bundles');assert.ok(swText.includes('/wa-site-runtime.')&&swText.includes('/wa-calculator-runtime.'),'Service worker must precache core hashed JavaScript bundles');assert.ok(!swText.includes("'/styles.css'"),'Service worker must not precache the retired monolithic CSS filename');
+const swText=fs.readFileSync(path.join(dist,'sw.js'),'utf8');assert.ok(swText.includes('/wa-static.')&&swText.includes('/wa-calculator.'),'Service worker must precache core hashed CSS bundles');assert.ok(swText.includes('/wa-site-runtime.')&&swText.includes('/wa-calculator-runtime.'),'Service worker must precache core hashed JavaScript bundles');assert.ok(swText.includes('/wa-site-runtime.')&&swText.includes('/wa-calculator-runtime.'),'Service worker must precache core hashed JavaScript bundles');assert.ok(!swText.includes("'/styles.css'"),'Service worker must not precache the retired monolithic CSS filename');
 assert.ok(calculatorPages.length>=47,`Expected at least 47 calculator routes in dist/, found ${calculatorPages.length}`);
 console.log(`Deploy hygiene PASS — ${files.length} public files, ${calculatorPages.length} calculator routes; internal source/test/build files and archives excluded.`);
