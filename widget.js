@@ -195,7 +195,6 @@ function initSearch(inputId,listSelector,headingId,totalLabel){const input=docum
   window.addEventListener('load',function(){setTimeout(boot,0);});
   setTimeout(boot,0);
 })();
-}
 function waFormatValue(value,format){if(!Number.isFinite(Number(value)))return'—';const n=Number(value);if(format==='percent')return n.toLocaleString(navigator.language||'en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'%';if(format==='number')return Math.round(n).toLocaleString(navigator.language||'en-US');if(format==='years')return n.toLocaleString(navigator.language||'en-US',{minimumFractionDigits:1,maximumFractionDigits:1})+' yrs';return waCurrencySymbol()+n.toLocaleString(navigator.language||'en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function esc(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function applyGlobalTheme(){document.documentElement.dataset.theme=waState.theme;const b=document.getElementById('theme-toggle'),s=b?.querySelector('[data-theme-label]')||document.getElementById('theme-toggle-label');if(s)s.textContent=waState.theme==='dark'?'Light mode':'Dark mode';if(b)b.setAttribute('aria-pressed',String(waState.theme==='dark'))}
