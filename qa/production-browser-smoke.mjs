@@ -143,6 +143,7 @@ try {
   if (shareUrl.searchParams.get('wa_scenario') !== '1' || shareUrl.searchParams.get('wa_monthly') !== '200' || shareUrl.searchParams.get('wa_rate') !== '10' || shareUrl.searchParams.get('wa_years') !== '15' || shareUrl.searchParams.get('wa_inflation') !== '6') throw new Error('Share scenario URL did not preserve all SIP inputs');
   await page.goto(sharePayload.url, { waitUntil: 'domcontentloaded' });
   await dismissPrivacyChoices();
+  await page.locator('#calc-widget input[data-field="monthly"]').waitFor({ state: 'attached', timeout: 10000 });
   for (const [field, expected] of [['monthly','200'],['rate','10'],['years','15'],['inflation','6']]) {
     const actual = await page.locator('#calc-widget input[data-field="' + field + '"]').inputValue();
     if (actual !== expected) throw new Error('Shared scenario did not restore ' + field + ': ' + actual);
