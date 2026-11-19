@@ -1,0 +1,71 @@
+name: Import tested eight-calculator release
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: import-tested-release-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  import-and-validate:
+    if: github.event.pull_request.head.ref == 'release/import-tested-eight-calculators' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out release branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Verify the exact tested archive
+        run: |
+          test -f wealtharrays_github_io-updated.zip
+          echo "3ff81afd411175b9e292180d5c7e6415f6ee3d283a104e7c8d517ab1cec93ed5  wealtharrays_github_io-updated.zip" | sha256sum --check
+          unzip -tq wealtharrays_github_io-updated.zip
+
+      - name: Import source files without deleting newer repository files
+        run: |
+          mkdir -p "$RUNNER_TEMP/wa-release"
+          unzip -q wealtharrays_github_io-updated.zip -d "$RUNNER_TEMP/wa-release"
+          test -d "$RUNNER_TEMP/wa-release/wealtharrays.github.io-main"
+          rsync -a \
+            --exclude='.git/' \
+            --exclude='node_modules/' \
+            --exclude='dist/' \
+            --exclude='wealtharrays_github_io-updated.zip' \
+            "$RUNNER_TEMP/wa-release/wealtharrays.github.io-main/" ./
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Run all calculator reference tests
+        run: npm test
+
+      - name: Run complete production build and static QA
+        run: npm run build
+
+      - name: Commit imported, validated source
+        env:
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git config user.name "wealtharrays-release-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No source changes to commit."
+            exit 0
+          fi
+          git commit -m "Import tested eight-calculator release"
+          git push origin "HEAD:${HEAD_BRANCH}"
