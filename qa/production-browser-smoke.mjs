@@ -67,8 +67,11 @@ async function assertCalculator(path, label, phase2 = false) {
 try {
   await page.goto(`${baseUrl}/index.html`, { waitUntil: 'networkidle' });
   await dismissPrivacyChoices();
-  const stylesheet = await page.locator('link[rel="stylesheet"][href*="styles.css"]').count();
-  if (!stylesheet) throw new Error('Homepage stylesheet link is missing');
+  const stylesheet = page.locator('link[rel="stylesheet"][href*="wa-home."][href$=".css"]');
+  if (!(await stylesheet.count())) throw new Error('Homepage content-hashed stylesheet link is missing');
+  const stylesheetUrl = await stylesheet.first().getAttribute('href');
+  const stylesheetResponse = await page.request.get(new URL(stylesheetUrl, baseUrl).toString());
+  if (!stylesheetResponse.ok()) throw new Error(`Homepage stylesheet failed to load: ${stylesheetResponse.status()} ${stylesheetUrl}`);
   const bodyDisplay = await page.locator('body').evaluate(el => getComputedStyle(el).display);
   if (bodyDisplay === 'inline') throw new Error('Homepage body is rendering with inline/default styling; CSS may be missing');
   if ((await page.locator('h1').count()) !== 1) throw new Error('Homepage must have exactly one H1');
