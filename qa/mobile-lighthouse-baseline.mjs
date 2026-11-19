@@ -38,9 +38,12 @@ for (const route of paths) {
   const network = audits['network-requests']?.details?.items || [];
   const bytes = (type) => network.filter(x => x.resourceType === type)
     .reduce((sum, x) => sum + (Number(x.transferSize) || 0), 0);
-  const dom = audits['dom-size']?.details?.items || [];
+  const domAudit = audits['dom-size-insight'] || audits['dom-size'];
   const inpAudit = audits['interaction-to-next-paint'];
   const longTasks = audits['long-tasks']?.details?.items;
+  const mainThreadItems = audits['mainthread-work-breakdown']?.details?.items || [];
+  const mainThread = Object.fromEntries(mainThreadItems.map(item => [item.group, Math.round(item.duration)]));
+  const bootupItems = audits['bootup-time']?.details?.items || [];
   const row = {
     route,
     performance: Math.round((report.categories?.performance?.score || 0) * 100),
@@ -55,7 +58,12 @@ for (const route of paths) {
     jsTransferBytes: bytes('Script'),
     cssTransferBytes: bytes('Stylesheet'),
     requestCount: network.length,
-    domNodes: audits['dom-size']?.numericValue ?? null,
+    domNodes: domAudit?.numericValue ?? null,
+    domDepth: domAudit?.details?.debugData?.maxDepth ?? null,
+    domMaxChildren: domAudit?.details?.debugData?.maxChildren ?? null,
+    mainThreadMs: audits['mainthread-work-breakdown']?.numericValue ?? null,
+    mainThreadBreakdownMs: mainThread,
+    topBootupScripts: bootupItems.slice(0, 10).map(item => ({ url: item.url, totalMs: Math.round(item.total), scriptingMs: Math.round(item.scripting) })),
     longTaskCount: Array.isArray(longTasks) ? longTasks.length : 'Not exposed by this Lighthouse version',
     reportPath
   };
