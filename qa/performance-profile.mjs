@@ -142,6 +142,7 @@ try {
       }
       stats.rectSnapshots.push({ label, timeMs: +performance.now().toFixed(1), elements });
     };
+    for (const delay of [0, 50, 150, 300, 600]) setTimeout(() => captureRects('document-start+' + delay + 'ms'), delay);
     document.addEventListener('DOMContentLoaded', () => {
       captureRects('domcontentloaded');
       requestAnimationFrame(() => captureRects('first-animation-frame'));
