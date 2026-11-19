@@ -40,35 +40,35 @@ function rewriteReference(text,oldPath,newPath){
   return text;
 }
 
-const dependentFiles=new Set(['search-loader.js','wa-calculator-runtime.js']);
-for(const file of jsFiles){
-  if(dependentFiles.has(path.posix.basename(file)))continue;
-  mapping[file]=makeName(file,contents.get(file));
+// Resolve local JavaScript dependencies before hashing their importers. This
+// handles dynamic import() chunks as well as ordinary script-loader modules.
+const available=new Set(jsFiles);
+const visiting=new Set();
+const complete=new Set();
+function dependencies(file,content){
+  const found=[];
+  for(const match of content.matchAll(/(["'])\/([^"']+\.js)(?:\?[^"']*)?\1/g)){
+    const target=match[2];
+    if(target!==file&&available.has(target)&&!found.includes(target))found.push(target);
+  }
+  return found;
 }
-
-// Rewrite the only known runtime-to-runtime references before hashing dependent files.
-for(const file of jsFiles){
-  const base=path.posix.basename(file);
-  if(!dependentFiles.has(base))continue;
+function hashFile(file){
+  if(complete.has(file))return mapping[file];
+  if(visiting.has(file))throw new Error('Circular local JavaScript dependency: '+[...visiting,file].join(' -> '));
+  visiting.add(file);
   let content=contents.get(file);
-  const dependencies=base==='search-loader.js'?['homepage-search.js','calculator-search.js']:['pdf-export-fix.js'];
-  for(const target of dependencies){
-    if(!mapping[target])throw new Error('Missing local JavaScript dependency in dist/: '+target);
-    content=rewriteReference(content,target,mapping[target]);
+  for(const target of dependencies(file,content)){
+    const targetName=hashFile(target);
+    content=rewriteReference(content,target,targetName);
   }
   contents.set(file,content);
   mapping[file]=makeName(file,content);
+  visiting.delete(file);
+  complete.add(file);
+  return mapping[file];
 }
-
-for(const file of jsFiles){
-  let content=contents.get(file);
-  for(const [oldPath,newPath] of Object.entries(mapping)){
-    if(oldPath!==file)content=rewriteReference(content,oldPath,newPath);
-  }
-  contents.set(file,content);
-  const finalName=makeName(file,content);
-  if(finalName!==mapping[file])throw new Error('Unresolved JavaScript dependency changed hash for '+file+': expected '+mapping[file]+', got '+finalName);
-}
+for(const file of jsFiles)hashFile(file);
 
 for(const file of jsFiles){
   const destination=path.join(dist,mapping[file]);
