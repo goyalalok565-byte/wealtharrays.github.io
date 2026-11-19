@@ -7,7 +7,7 @@ const root=process.cwd();
 const stamp=new Date().toISOString().replace(/\D/g,'').slice(0,14);
 const siteSources=['wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js' ];
 const homeSources=['final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js'];
-const articleSources=['wa-core.js','theme-fix.js','phase4-premium.js'];
+const articleSources=['wa-core.js','phase4-premium.js'];
 const calcSiteSources=siteSources.filter(file=>file!=='calculator-search.js');
 const calcSources=['widget.js','widget-bootstrap.js',...calcSiteSources,'calculator-safety.js','calculator-page-init.js','pdf-export-fix.js'];
 let calculatorPages=[];
