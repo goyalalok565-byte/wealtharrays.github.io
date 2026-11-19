@@ -2,3 +2,15 @@
 /* Skip off-screen card/article rendering while keeping every link in crawlable HTML. */
 .home-tool-card,.tool-card{content-visibility:auto;contain-intrinsic-size:180px}
 .tool-article>section,.article-page section,.content-section{content-visibility:auto;contain-intrinsic-size:520px}
+
+/* Render below-the-fold card grids only when they approach the viewport. */
+.home-tool-card,
+.tools-grid > .tool-card,
+.cat-card {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 170px;
+}
+.tool-article {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 1400px;
+}
