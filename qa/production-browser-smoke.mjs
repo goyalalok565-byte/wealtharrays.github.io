@@ -210,7 +210,7 @@ try {
   if (await page.locator('#calc-widget .calc-result-row').count()) throw new Error('Income tax scenario must not calculate automatically while filling inputs');
   await page.locator('#calc-widget button[id$="-calculate"]').click();
   await page.locator('#calc-widget .calc-result-row').first().waitFor({ state: 'visible', timeout: 5000 });
-  const taxExample = await page.locator('.tool-article').innerText();
+  const taxExample = await page.locator('.tool-article').evaluate(element => element.textContent || '');
   for (const value of ['₹12,00,000','₹1,50,000','₹10,50,000','₹1,57,500','₹10,42,500']) {
     if (!taxExample.includes(value)) throw new Error('Income tax worked example is missing ' + value);
   }
