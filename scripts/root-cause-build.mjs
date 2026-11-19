@@ -8,7 +8,7 @@ const root=process.cwd();
 const sourceRegistry=JSON.parse(fs.readFileSync(path.join(root,'content-sources.json'),'utf8'));
 execFileSync(process.execPath,[path.join(root,'scripts/sync-calculator-catalog.mjs')],{stdio:'inherit'});
 const stamp=new Date().toISOString().replace(/\D/g,'').slice(0,14);
-const siteSources=['wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js','calculator-search.js'];
+const siteSources=['calculator-search.js','wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js'];
 const homeSources=['final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js'];
 const calcSiteSources=['wa-core.js','calculator-page-currency.js'];
 const calcSources=['widget.js','widget-bootstrap.js',...calcSiteSources,'calculator-safety.js','calculator-page-init.js'];
