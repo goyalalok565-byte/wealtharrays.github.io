@@ -3,7 +3,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 
 const root = process.cwd();
-const canonicalSources = ['widget.js','wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','calculator-page-init.js','phase4-premium.js'];
+const canonicalSources = ['widget.js','widget-bootstrap.js','wa-core.js','calculator-page-currency.js','calculator-safety.js','calculator-page-init.js'];
 const siteSources = ['wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js','calculator-search.js'];
 const homeSources = ['final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js'];
 const supportSources = ['theme-init.js','404-runtime.js'];
