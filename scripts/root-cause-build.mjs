@@ -104,7 +104,7 @@ for(const full of allHtml){
   });
   html=html.replace(/\s*<script\s+src=["']([^"']+)[^>]*><\/script>/gi,(tag,src)=>{
     const base=path.basename(src.split('?',1)[0]);
-    const keep=managed.has(base)||(isWidget&&['calculators.js','widget.js','widget-bootstrap.js','wa-calculator-runtime.js'].includes(base))||(isScenarioLab&&['financial-engine.js','decision-adapters.js','scenario-lab.js'].includes(base))||(isGoalPlanner&&['financial-engine.js','decision-adapters.js','goal-planner.js'].includes(base))||(isWorkspacePageCurrent&&['financial-engine.js','report-engine.js','financial-workspace.js'].includes(base));
+    const keep=managed.has(base)||(isWidget&&['calculators.js','widget.js','wa-calculator-runtime.js'].includes(base))||(isScenarioLab&&['financial-engine.js','decision-adapters.js','scenario-lab.js'].includes(base))||(isGoalPlanner&&['financial-engine.js','decision-adapters.js','goal-planner.js'].includes(base))||(isWorkspacePageCurrent&&['financial-engine.js','report-engine.js','financial-workspace.js'].includes(base));
     return keep?'':tag;
   });html=html.replace(/\s*<!-- WA-(?:SITE|HOME|CANONICAL)-RUNTIME:[^>]+-->\s*/g,'\n');
 html=html.replace(/(<link\s+[^>]*rel=["'](?:preload|stylesheet)["'][^>]*href=["'])\/?styles\.css(?:\?[^"']*)?(["'][^>]*>)/gi,'$1/styles.css?v='+stamp+'$2');html=html.replace(/(<link\s+[^>]*href=["'])\/?styles\.css(?:\?[^"']*)?(["'][^>]*rel=["'](?:preload|stylesheet)["'][^>]*>)/gi,'$1/styles.css?v='+stamp+'$2');if(!/href=["']\/styles\.css(?:\?[^"']*)?["']/.test(html))html=html.replace('</head>','<link rel="stylesheet" href="/styles.css?v='+stamp+'"></head>');
@@ -205,11 +205,10 @@ if(isCalc){
 if(isWidget){
   const widgetCalculators='<script src="/calculators.js?v='+stamp+'"></script>';
   const widgetRuntime='<script src="/wa-calculator-runtime.js?v='+stamp+'"></script>';
-  const widgetBootstrap='<script src="/widget-bootstrap.js"></script>';
   html=html.replace(/\s*<script[^>]+src=["']\/calculators\.js[^>]*><\/script>/gi,'');
   html=html.replace(/\s*<script[^>]+src=["']\/wa-calculator-runtime\.js[^>]*><\/script>/gi,'');
   html=html.replace(/\s*<script[^>]+src=["']\/widget-bootstrap\.js[^>]*><\/script>/gi,'');
-  html=html.replace('</body>',widgetCalculators+widgetRuntime+widgetBootstrap+'</body>');
+  html=html.replace('</body>',widgetCalculators+widgetRuntime+'</body>');
 }
 const sourceRegistry=JSON.parse(fs.readFileSync(path.join(root,'content-sources.json'),'utf8'));
 function sourceSetForArticle(rel){
