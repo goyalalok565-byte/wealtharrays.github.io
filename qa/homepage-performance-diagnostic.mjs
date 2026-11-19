@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { execFileSync } from 'node:child_process';
+import { runLighthouse } from './lighthouse-runner.mjs';
 
 const base = (process.env.BASE_URL || 'https://wealtharrays.com').replace(/\/$/, '');
 const outputDir = process.env.LH_OUTPUT_DIR || '/tmp/wa-lighthouse';
@@ -9,8 +9,8 @@ const baselinePath = `${outputDir}/home.json`;
 const diagnosticPath = `${outputDir}/homepage-without-fundingchoices.json`;
 if (!fs.existsSync(baselinePath)) throw new Error(`Missing baseline Lighthouse report: ${baselinePath}`);
 
-execFileSync('npx', [
-  'lighthouse', base + '/',
+runLighthouse([
+  base + '/',
   '--form-factor=mobile',
   '--screenEmulation.mobile=true',
   '--screenEmulation.width=360',
@@ -26,7 +26,8 @@ execFileSync('npx', [
   '--save-assets',
   `--output-path=${diagnosticPath}`,
   '--chrome-flags=--headless --no-sandbox --disable-dev-shm-usage'
-], { stdio: 'inherit' });
+
+], 'Lighthouse homepage diagnostic');
 
 const baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
 const withoutFundingChoices = JSON.parse(fs.readFileSync(diagnosticPath, 'utf8'));
