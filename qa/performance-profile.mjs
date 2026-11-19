@@ -1,7 +1,10 @@
 import { chromium } from 'playwright';
+import fs from 'node:fs';
 
 const base = (process.env.BASE_URL || 'https://wealtharrays.com').replace(/\/$/, '');
 const url = base + '/swp-calculator/';
+const outputDir = process.env.LH_OUTPUT_DIR || '/tmp/wa-lighthouse';
+fs.mkdirSync(outputDir, { recursive: true });
 const browser = await chromium.launch({ headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage'] });
 
 try {
@@ -24,7 +27,7 @@ try {
     await page.waitForTimeout(180);
   }
   for (let i = 0; i < 4; i++) {
-    await page.evaluate(y => window.scrollTo(0, y), i % 2 ? 0 : document.body.scrollHeight);
+    await page.evaluate(toBottom => window.scrollTo(0, toBottom ? document.body.scrollHeight : 0), i % 2 === 0);
     await page.waitForTimeout(160);
   }
   await page.waitForTimeout(500);
@@ -49,6 +52,7 @@ try {
     };
   }).sort((a, b) => b.selfTimeMs - a.selfTimeMs).slice(0, 10);
   console.log('SWP_CPU_PROFILE_TOP_10', JSON.stringify(top));
+  fs.writeFileSync(outputDir + '/swp-cpu-profile-top10.json', JSON.stringify(top, null, 2));
   await page.close();
 
   // Separate instrumented run: observer callback and selector activity per input change.
@@ -101,6 +105,7 @@ try {
   }
   const totals = await probe.evaluate(() => ({ ...window.__waPerfProbe }));
   console.log('SWP_OBSERVER_PROBE', JSON.stringify({ totals, perInput: observations }));
+  fs.writeFileSync(outputDir + '/swp-observer-probe.json', JSON.stringify({ totals, perInput: observations }, null, 2));
   await probe.close();
 } finally {
   await browser.close();
