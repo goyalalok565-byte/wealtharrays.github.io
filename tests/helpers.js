@@ -1,6 +1,19 @@
 const assert = require('node:assert/strict');
-const { CALCULATORS } = require('../calculators.js');
-function calculator(id) { const item = CALCULATORS.find(x => x.id === id); assert.ok(item, `missing calculator ${id}`); return item; }
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+const cache = new Map();
+function calculator(id) {
+  if (cache.has(id)) return cache.get(id);
+  const file = path.join(__dirname, '..', 'calculator-definitions', `${id}.js`);
+  assert.ok(fs.existsSync(file), `missing calculator definition ${file}`);
+  const context = { window: { CALCULATORS: [] } };
+  vm.runInNewContext(fs.readFileSync(file, 'utf8'), context, { filename: file });
+  const item = context.window.CALCULATORS.find(x => x.id === id);
+  assert.ok(item, `missing calculator ${id}`);
+  cache.set(id, item);
+  return item;
+}
 function values(id, input) { return calculator(id).compute(input).map(x => Number(x.value)); }
 function close(actual, expected, label, tolerance = 1e-4) {
   assert.ok(Number.isFinite(actual), `${label}: output must be finite, got ${actual}`);
