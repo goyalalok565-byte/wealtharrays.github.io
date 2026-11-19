@@ -55,6 +55,8 @@ if(!coreRuntimeSource.includes("window.__WA_CALCULATOR_SEARCH_LOADED__&&document
 if(!coreRuntimeSource.includes("footer.premium-footer .site-footer-inner")){
   failures.push('Static premium footer must not be rebuilt by the runtime.');
 }
+const toolsPageHtml=fs.existsSync('tools.html')?fs.readFileSync('tools.html','utf8'):'';
+if(!toolsPageHtml.includes('data-wa-open-consent'))failures.push('Static tools footer must expose the privacy choices control.');
 if(!adLoaderSource.includes('heavyRoute?5000:1500')){
   failures.push('Ads on tools/calculator routes must wait until after the initial interaction window.');
 }
