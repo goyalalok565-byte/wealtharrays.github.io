@@ -79,6 +79,7 @@ if (fs.existsSync(headersPath)) {
 
 // Static assets are content-hashed in their query strings and can safely use
 // one-year immutable caching. Verify both the references and response policy.
+const staticHeaderText = fs.readFileSync(path.join(process.cwd(), '_headers'), 'utf8');
 const staticCacheableAssets = [
   'styles.css','phase3-seo.css','phase4-premium.css','cls-fixes.css',
   'homepage-refresh.css','theme-init.js','homepage-business.js',
@@ -111,9 +112,9 @@ for (const asset of staticCacheableAssets) {
     }
   }
   if (!references) failures.push('No versioned HTML references found for cacheable asset: ' + asset);
-  const start = headerText.indexOf('/' + asset + '\\n');
-  const end = start >= 0 ? headerText.indexOf('\\n/', start + 1) : -1;
-  const block = start >= 0 ? headerText.slice(start, end >= 0 ? end : undefined) : '';
+  const start = staticHeaderText.indexOf('/' + asset + '\\n');
+  const end = start >= 0 ? staticHeaderText.indexOf('\\n/', start + 1) : -1;
+  const block = start >= 0 ? staticHeaderText.slice(start, end >= 0 ? end : undefined) : '';
   if (!block.includes('max-age=31536000') || !block.includes('immutable')) {
     failures.push('_headers: ' + asset + ' must use one-year immutable caching with a content-hashed URL.');
   }
