@@ -784,7 +784,377 @@ const CALCULATORS = [
       ];
     }
   },
-
+  {
+    id: "swp",
+    slug: "swp-calculator",
+    title: "SWP Calculator",
+    category: "investment",
+    short: "See how long a corpus lasts when you withdraw a fixed amount every month.",
+    desc: "Estimate the remaining balance, total withdrawn and how long a corpus can fund a monthly withdrawal at an assumed return.",
+    article: {
+      formula: "Each month the planned withdrawal is taken from the balance at the start of the month, and the remaining balance then earns the monthly equivalent of the assumed annual return (annual rate ÷ 12). The withdrawal is increased once a year by the step-up percentage. If the balance cannot cover a full withdrawal, the corpus is treated as exhausted. Taxes, exit loads, fund expenses and return volatility are not modelled.",
+      exampleInputs: { corpus: 5000000, withdrawal: 30000, rate: 8, years: 20, stepUp: 5 },
+      faqs: [
+        { q: "What is a systematic withdrawal plan?", a: "A systematic withdrawal plan, or SWP, is a standing instruction to redeem a fixed amount from an investment every month. The remaining money stays invested and keeps earning the assumed return." },
+        { q: "Why does the corpus run out even though the return is positive?", a: "Because each withdrawal is larger than the growth on the remaining balance in the later years, especially when the withdrawal steps up every year. The balance falls slowly at first and then faster." },
+        { q: "Does this include tax on withdrawals?", a: "No. Part of every withdrawal from a market-linked fund can be a taxable gain. Check the current capital-gains rules for your fund type before relying on the post-tax amount." }
+      ]
+    },
+    fields: [
+      { id: "corpus", label: "Starting corpus", type: "number", default: 5000000, min: 0, max: 100000000000, step: 10000 },
+      { id: "withdrawal", label: "Monthly withdrawal", type: "number", default: 30000, min: 0, max: 1000000000, step: 1000 },
+      { id: "rate", label: "Assumed annual return", type: "number", default: 8, min: 0, max: 50, step: 0.1, suffix: "%" },
+      { id: "years", label: "Planned withdrawal period", type: "number", default: 20, min: 1, max: 60, step: 1, suffix: "yrs" },
+      { id: "stepUp", label: "Annual increase in withdrawal", type: "number", default: 5, min: 0, max: 50, step: 0.5, suffix: "%" }
+    ],
+    compute(v) {
+      const months = Math.max(0, Math.round((Number(v.years) || 0) * 12));
+      const monthlyRate = Math.max(0, Number(v.rate) || 0) / 1200;
+      let balance = Math.max(0, Number(v.corpus) || 0);
+      const corpus = balance;
+      let planned = Math.max(0, Number(v.withdrawal) || 0);
+      const stepUp = Math.max(0, Number(v.stepUp) || 0) / 100;
+      let withdrawn = 0, fundedMonths = 0, exhausted = false;
+      for (let month = 1; month <= months; month++) {
+        if (month > 1 && (month - 1) % 12 === 0) planned *= 1 + stepUp;
+        const taken = Math.min(planned, balance);
+        balance -= taken;
+        withdrawn += taken;
+        if (taken + 0.005 < planned) { exhausted = true; break; }
+        fundedMonths += 1;
+        balance *= 1 + monthlyRate;
+      }
+      const growth = balance + withdrawn - corpus;
+      return [
+        { label: "Total amount withdrawn", value: withdrawn, format: "currency" },
+        { label: exhausted ? "Balance left (corpus exhausted)" : "Balance left after the period", value: balance, format: "currency", emphasis: exhausted ? "negative" : "positive" },
+        { label: "Investment growth earned", value: growth, format: "currency", emphasis: "neutral" },
+        { label: exhausted ? "Years the corpus pays the full withdrawal" : "Years of full withdrawals funded", value: fundedMonths / 12, format: "years", emphasis: exhausted ? "negative" : "positive" }
+      ];
+    }
+  },
+  {
+    id: "ssy",
+    slug: "ssy-calculator",
+    title: "Sukanya Samriddhi (SSY) Calculator",
+    category: "banking",
+    short: "Project the Sukanya Samriddhi Yojana balance at the 21-year maturity.",
+    desc: "Estimate the maturity value of a Sukanya Samriddhi account from the yearly deposit, deposit period and the interest rate in force.",
+    article: {
+      formula: "This estimate adds the yearly deposit at the start of each year for the chosen number of deposit years (at most 15) and then applies the annual interest rate to the running balance, compounding once a year until the account reaches 21 years from opening. Real accounts credit interest on the lowest monthly balance and the rate is reset every quarter, so the actual maturity value can differ from this simplified projection.",
+      exampleInputs: { yearlyDeposit: 100000, depositYears: 15, rate: 8.2 },
+      faqs: [
+        { q: "Is the 8.2% rate fixed for the whole period?", a: "No. The government notifies the rate for small-savings schemes every quarter, so it can rise or fall. The rate field is an assumption; update it to the latest notified figure." },
+        { q: "How long do deposits continue?", a: "Deposits are made for 15 years from opening, while the account itself matures 21 years after opening. In the last six years the balance keeps earning interest without new deposits." },
+        { q: "What are the deposit limits?", a: "The scheme allows a minimum of ₹250 and a maximum of ₹1.5 lakh in a financial year. Confirm current limits, eligibility and tax treatment with your bank or post office." }
+      ]
+    },
+    fields: [
+      { id: "yearlyDeposit", label: "Yearly deposit", type: "number", default: 100000, min: 0, max: 150000, step: 1000 },
+      { id: "depositYears", label: "Years of deposits", type: "number", default: 15, min: 1, max: 15, step: 1, suffix: "yrs" },
+      { id: "rate", label: "Assumed annual interest rate", type: "number", default: 8.2, min: 0, max: 20, step: 0.05, suffix: "%" }
+    ],
+    compute(v) {
+      const deposit = Math.max(0, Number(v.yearlyDeposit) || 0);
+      const depositYears = Math.min(15, Math.max(0, Math.round(Number(v.depositYears) || 0)));
+      const rate = Math.max(0, Number(v.rate) || 0) / 100;
+      let balance = 0, deposited = 0, afterDeposits = 0;
+      for (let year = 1; year <= 21; year++) {
+        if (year <= depositYears) { balance += deposit; deposited += deposit; }
+        balance *= 1 + rate;
+        if (year === depositYears) afterDeposits = balance;
+      }
+      return [
+        { label: "Total deposited", value: deposited, format: "currency" },
+        { label: "Interest earned", value: balance - deposited, format: "currency", emphasis: "positive" },
+        { label: "Estimated maturity value at 21 years", value: balance, format: "currency", emphasis: "neutral" },
+        { label: "Balance when deposits end", value: afterDeposits, format: "currency" }
+      ];
+    }
+  },
+  {
+    id: "rule-of-72",
+    slug: "rule-of-72-calculator",
+    title: "Rule of 72 Calculator",
+    category: "investment",
+    short: "Find how many years it takes money to double at a given annual return.",
+    desc: "Estimate the doubling time with the Rule of 72, compare it with exact compounding and see the time to reach any growth multiple.",
+    article: {
+      formula: "Rule of 72: years to double ≈ 72 ÷ annual rate in percent. Exact compounding: years to double = ln(2) ÷ ln(1 + rate). Years to reach a multiple M = ln(M) ÷ ln(1 + rate). The rule is a mental shortcut that is most accurate for rates between roughly 6% and 10%.",
+      exampleInputs: { rate: 8, multiple: 3 },
+      faqs: [
+        { q: "Why 72 and not 70 or 69?", a: "72 divides evenly by many common rates such as 6, 8, 9 and 12, which makes mental arithmetic easy. 69.3 is more exact for continuous compounding, and 70 is often used for low rates." },
+        { q: "Is the rule accurate at very high or very low rates?", a: "It drifts. At very low rates the shortcut slightly overstates the doubling time and at very high rates it understates it. The exact figure on this page shows the size of the gap." },
+        { q: "Does it work for inflation?", a: "Yes. Dividing 72 by the inflation rate gives the approximate years in which prices double, which is also the time purchasing power halves." }
+      ]
+    },
+    fields: [
+      { id: "rate", label: "Annual return or inflation rate", type: "number", default: 8, min: 0, max: 100, step: 0.1, suffix: "%" },
+      { id: "multiple", label: "Target growth multiple", type: "number", default: 3, min: 1, max: 1000, step: 0.5, suffix: "x" }
+    ],
+    compute(v) {
+      const rate = Math.max(0, Number(v.rate) || 0);
+      const multiple = Math.max(1, Number(v.multiple) || 1);
+      const growth = 1 + rate / 100;
+      const rule = rate > 0 ? 72 / rate : 0;
+      const exact = rate > 0 ? Math.log(2) / Math.log(growth) : 0;
+      const target = rate > 0 ? Math.log(multiple) / Math.log(growth) : 0;
+      return [
+        { label: "Years to double (Rule of 72)", value: rule, format: "years", emphasis: "neutral" },
+        { label: "Years to double (exact compounding)", value: exact, format: "years", emphasis: "positive" },
+        { label: "Rule of 72 minus exact", value: rule - exact, format: "years" },
+        { label: "Years to reach the target multiple", value: target, format: "years", emphasis: "positive" }
+      ];
+    }
+  },
+  {
+    id: "rent-vs-buy",
+    slug: "rent-vs-buy-calculator",
+    title: "Rent vs Buy Calculator",
+    category: "loan",
+    short: "Compare the net worth from buying a home with renting and investing the difference.",
+    desc: "Compare buying a home on a loan with renting and investing, using price, loan terms, rent, appreciation and investment return.",
+    article: {
+      formula: "Buying: down payment plus buying costs are paid upfront, the loan is repaid at a fixed EMI, and a yearly maintenance and property-tax cost is added. The home value grows at the assumed appreciation rate and the outstanding loan is deducted. Renting: the same upfront cash is invested, rent rises every year, and whichever option has the lower monthly outflow invests the difference at the assumed return. The result compares net worth at the end of the chosen period. Selling costs, tax benefits and capital-gains tax are not modelled.",
+      exampleInputs: { price: 8000000, downPct: 20, loanRate: 8.75, loanYears: 20, appreciation: 5, rent: 25000, rentGrowth: 5, investReturn: 10, maintPct: 1, buyCostPct: 6, horizon: 10 },
+      faqs: [
+        { q: "Is buying always better than renting?", a: "No. The answer depends on the price-to-rent ratio, the loan rate, how fast the home appreciates and what the invested money earns. This calculator lets you test those assumptions side by side." },
+        { q: "Why is the investment return so important?", a: "Renting only wins if the money you do not spend on a down payment and EMI is actually invested and earns a return. A lower return makes buying look better and a higher return makes renting look better." },
+        { q: "Does it include home-loan tax benefits?", a: "No. Tax deductions on interest and principal depend on the regime you choose and change over time, so they are left out. Add them mentally as a small improvement to the buying result." }
+      ]
+    },
+    fields: [
+      { id: "price", label: "Home price", type: "number", default: 8000000, min: 0, max: 100000000000, step: 100000 },
+      { id: "downPct", label: "Down payment", type: "number", default: 20, min: 0, max: 100, step: 1, suffix: "%" },
+      { id: "loanRate", label: "Home-loan interest rate", type: "number", default: 8.75, min: 0, max: 30, step: 0.05, suffix: "%" },
+      { id: "loanYears", label: "Loan term", type: "number", default: 20, min: 1, max: 40, step: 1, suffix: "yrs" },
+      { id: "appreciation", label: "Expected yearly home appreciation", type: "number", default: 5, min: 0, max: 30, step: 0.5, suffix: "%" },
+      { id: "rent", label: "Monthly rent for a similar home", type: "number", default: 25000, min: 0, max: 100000000, step: 500 },
+      { id: "rentGrowth", label: "Yearly rent increase", type: "number", default: 5, min: 0, max: 30, step: 0.5, suffix: "%" },
+      { id: "investReturn", label: "Expected annual return on invested money", type: "number", default: 10, min: 0, max: 30, step: 0.5, suffix: "%" },
+      { id: "maintPct", label: "Yearly maintenance and property tax", type: "number", default: 1, min: 0, max: 10, step: 0.1, suffix: "%" },
+      { id: "buyCostPct", label: "Stamp duty, registration and other buying costs", type: "number", default: 6, min: 0, max: 20, step: 0.5, suffix: "%" },
+      { id: "horizon", label: "How long you plan to stay", type: "number", default: 10, min: 1, max: 40, step: 1, suffix: "yrs" }
+    ],
+    compute(v) {
+      const price = Math.max(0, Number(v.price) || 0);
+      const downPayment = price * Math.min(100, Math.max(0, Number(v.downPct) || 0)) / 100;
+      const loan = price - downPayment;
+      const loanMonths = Math.max(0, Math.round((Number(v.loanYears) || 0) * 12));
+      const loanRate = Math.max(0, Number(v.loanRate) || 0) / 1200;
+      let emi = 0;
+      if (loanMonths > 0 && loan > 0) {
+        emi = loanRate === 0 ? loan / loanMonths : loan * loanRate * Math.pow(1 + loanRate, loanMonths) / (Math.pow(1 + loanRate, loanMonths) - 1);
+      }
+      const horizonMonths = Math.max(0, Math.round((Number(v.horizon) || 0) * 12));
+      const investRate = Math.max(0, Number(v.investReturn) || 0) / 1200;
+      const rentGrowth = Math.max(0, Number(v.rentGrowth) || 0) / 100;
+      const upkeep = price * Math.max(0, Number(v.maintPct) || 0) / 1200;
+      let balance = loan;
+      let rentNow = Math.max(0, Number(v.rent) || 0);
+      let renterPortfolio = downPayment + price * Math.max(0, Number(v.buyCostPct) || 0) / 100;
+      let buyerPortfolio = 0;
+      for (let month = 1; month <= horizonMonths; month++) {
+        if (month > 1 && (month - 1) % 12 === 0) rentNow *= 1 + rentGrowth;
+        let payment = 0;
+        if (month <= loanMonths) {
+          payment = emi;
+          const interest = balance * loanRate;
+          balance = Math.max(0, balance - (payment - interest));
+        }
+        const difference = payment + upkeep - rentNow;
+        if (difference >= 0) renterPortfolio += difference; else buyerPortfolio += -difference;
+        renterPortfolio *= 1 + investRate;
+        buyerPortfolio *= 1 + investRate;
+      }
+      const homeValue = price * Math.pow(1 + Math.max(0, Number(v.appreciation) || 0) / 100, Number(v.horizon) || 0);
+      const buyNetWorth = homeValue - balance + buyerPortfolio;
+      const advantage = buyNetWorth - renterPortfolio;
+      return [
+        { label: "Monthly loan EMI", value: emi, format: "currency" },
+        { label: "Net worth if you buy", value: buyNetWorth, format: "currency", emphasis: "neutral" },
+        { label: "Net worth if you rent and invest", value: renterPortfolio, format: "currency", emphasis: "neutral" },
+        { label: advantage >= 0 ? "Buying comes out ahead by" : "Renting comes out ahead by", value: Math.abs(advantage), format: "currency", emphasis: advantage >= 0 ? "positive" : "negative" }
+      ];
+    }
+  },
+  {
+    id: "fire",
+    slug: "fire-calculator",
+    title: "FIRE Calculator",
+    category: "retirement",
+    short: "Estimate the years left until your savings can cover your spending.",
+    desc: "Estimate how many years until financial independence, using spending, savings, inflation, return and a withdrawal rate.",
+    article: {
+      formula: "Each year the required corpus is annual spending (grown by inflation) ÷ withdrawal rate. The portfolio grows by the assumed return with monthly contributions, and the monthly contribution rises once a year by the step-up percentage. The first year in which the portfolio reaches the required corpus is the estimated time to financial independence, capped at 60 years. Taxes, healthcare shocks and return volatility are not modelled.",
+      exampleInputs: { annualExpenses: 600000, currentSavings: 500000, monthlySavings: 40000, stepUp: 5, returnRate: 10, inflation: 6, withdrawalRate: 3.5 },
+      faqs: [
+        { q: "What withdrawal rate should I use?", a: "The popular 4% guideline comes from long US market history. Because inflation is higher and horizons are longer in many cases, a lower assumption such as 3% to 3.5% is more cautious. Try both." },
+        { q: "Why does the target corpus keep growing?", a: "Spending rises with inflation every year, so the corpus needed in the future is larger in rupee terms. The calculator also shows the corpus in today's money so the two are easy to compare." },
+        { q: "Is this a retirement date I can rely on?", a: "No. It is a planning estimate based on steady returns. Real markets are uneven, so treat the result as a range and review it every year." }
+      ]
+    },
+    fields: [
+      { id: "annualExpenses", label: "Annual spending in today's money", type: "number", default: 600000, min: 0, max: 1000000000, step: 10000 },
+      { id: "currentSavings", label: "Current investable savings", type: "number", default: 500000, min: 0, max: 100000000000, step: 10000 },
+      { id: "monthlySavings", label: "Monthly savings", type: "number", default: 40000, min: 0, max: 1000000000, step: 1000 },
+      { id: "stepUp", label: "Yearly increase in savings", type: "number", default: 5, min: 0, max: 50, step: 0.5, suffix: "%" },
+      { id: "returnRate", label: "Expected annual return", type: "number", default: 10, min: 0, max: 30, step: 0.1, suffix: "%" },
+      { id: "inflation", label: "Expected annual inflation", type: "number", default: 6, min: 0, max: 30, step: 0.1, suffix: "%" },
+      { id: "withdrawalRate", label: "Safe withdrawal rate", type: "number", default: 3.5, min: 0.5, max: 10, step: 0.1, suffix: "%" }
+    ],
+    compute(v) {
+      const spending = Math.max(0, Number(v.annualExpenses) || 0);
+      let portfolio = Math.max(0, Number(v.currentSavings) || 0);
+      let saving = Math.max(0, Number(v.monthlySavings) || 0);
+      const stepUp = Math.max(0, Number(v.stepUp) || 0) / 100;
+      const monthlyRate = Math.max(0, Number(v.returnRate) || 0) / 1200;
+      const inflation = Math.max(0, Number(v.inflation) || 0) / 100;
+      const withdrawal = Math.max(0.1, Number(v.withdrawalRate) || 0) / 100;
+      let reachedYear = -1, target = 0, spendThen = 0, portfolioThen = 0;
+      for (let year = 0; year <= 60; year++) {
+        spendThen = spending * Math.pow(1 + inflation, year);
+        target = spendThen / withdrawal;
+        portfolioThen = portfolio;
+        if (portfolio >= target) { reachedYear = year; break; }
+        if (year === 60) break;
+        for (let month = 0; month < 12; month++) portfolio = (portfolio + saving) * (1 + monthlyRate);
+        saving *= 1 + stepUp;
+      }
+      const reached = reachedYear >= 0;
+      const years = reached ? reachedYear : 60;
+      return [
+        { label: reached ? "Years to financial independence" : "Not reached within 60 years", value: years, format: "years", emphasis: reached ? "positive" : "negative" },
+        { label: "Corpus needed at that point", value: target, format: "currency" },
+        { label: "Same corpus in today's money", value: target / Math.pow(1 + inflation, years), format: "currency", emphasis: "neutral" },
+        { label: "Projected portfolio at that point", value: portfolioThen, format: "currency", emphasis: "positive" },
+        { label: "Annual spending at that point", value: spendThen, format: "currency" }
+      ];
+    }
+  },
+  {
+    id: "budget-50-30-20",
+    slug: "budget-calculator",
+    title: "50/30/20 Budget Calculator",
+    category: "salary",
+    short: "Split take-home pay into needs, wants and savings and compare with what you spend.",
+    desc: "Split monthly take-home pay into needs, wants and savings with the 50/30/20 rule and see how your actual spending compares.",
+    article: {
+      formula: "Target needs = take-home pay × needs percentage. Target wants = take-home pay × wants percentage. Target savings and debt repayment = take-home pay minus the needs and wants targets. Actual savings = take-home pay − actual needs − actual wants. The gap is actual savings minus the target savings amount.",
+      exampleInputs: { income: 80000, needsPct: 50, wantsPct: 30, actualNeeds: 45000, actualWants: 25000 },
+      faqs: [
+        { q: "What counts as a need?", a: "Rent or home-loan EMI, utilities, groceries, transport to work, insurance premiums and minimum debt payments are usually needs. Subscriptions, dining out and travel are usually wants." },
+        { q: "Is 50/30/20 right for every income?", a: "It is a starting template, not a rule. In expensive cities needs can take far more than 50%, and some people save well above 20%. Change the percentages to match your situation." },
+        { q: "Should I use gross or take-home pay?", a: "Use take-home pay, the amount that actually reaches your bank account after tax and deductions such as provident fund." }
+      ]
+    },
+    fields: [
+      { id: "income", label: "Monthly take-home pay", type: "number", default: 80000, min: 0, max: 1000000000, step: 1000 },
+      { id: "needsPct", label: "Target share for needs", type: "number", default: 50, min: 0, max: 100, step: 1, suffix: "%" },
+      { id: "wantsPct", label: "Target share for wants", type: "number", default: 30, min: 0, max: 100, step: 1, suffix: "%" },
+      { id: "actualNeeds", label: "Actual monthly spending on needs", type: "number", default: 45000, min: 0, max: 1000000000, step: 500 },
+      { id: "actualWants", label: "Actual monthly spending on wants", type: "number", default: 25000, min: 0, max: 1000000000, step: 500 }
+    ],
+    compute(v) {
+      const income = Math.max(0, Number(v.income) || 0);
+      const needsPct = Math.min(100, Math.max(0, Number(v.needsPct) || 0));
+      const wantsPct = Math.min(100 - needsPct, Math.max(0, Number(v.wantsPct) || 0));
+      const needs = income * needsPct / 100;
+      const wants = income * wantsPct / 100;
+      const savings = income - needs - wants;
+      const actualSavings = income - Math.max(0, Number(v.actualNeeds) || 0) - Math.max(0, Number(v.actualWants) || 0);
+      const gap = actualSavings - savings;
+      return [
+        { label: "Target for needs", value: needs, format: "currency" },
+        { label: "Target for wants", value: wants, format: "currency" },
+        { label: "Target for savings and debt repayment", value: savings, format: "currency", emphasis: "positive" },
+        { label: "Your actual monthly savings", value: actualSavings, format: "currency", emphasis: actualSavings >= 0 ? "neutral" : "negative" },
+        { label: gap >= 0 ? "Ahead of the savings target by" : "Short of the savings target by", value: Math.abs(gap), format: "currency", emphasis: gap >= 0 ? "positive" : "negative" }
+      ];
+    }
+  },
+  {
+    id: "break-even",
+    slug: "break-even-calculator",
+    title: "Break-Even Calculator",
+    category: "business",
+    short: "Find how many units you must sell to cover fixed costs and reach a profit target.",
+    desc: "Find the break-even units and sales value from fixed costs, selling price and variable cost, plus units needed for a profit target.",
+    article: {
+      formula: "Contribution per unit = selling price − variable cost per unit. Break-even units = fixed costs ÷ contribution per unit, rounded up to a whole unit. Break-even sales = break-even units × selling price. Units for a profit target = (fixed costs + target profit) ÷ contribution per unit. If the selling price does not exceed the variable cost, no sales volume can cover the fixed costs.",
+      exampleInputs: { fixedCosts: 150000, price: 150, variableCost: 60, targetProfit: 50000, days: 30 },
+      faqs: [
+        { q: "What are fixed and variable costs?", a: "Fixed costs such as rent, salaries and licences stay the same however much you sell in a month. Variable costs such as ingredients and packaging rise with every unit sold." },
+        { q: "Why does the answer say there is no break-even?", a: "That happens when the selling price is equal to or below the variable cost. Each sale then loses money or adds nothing, so more sales never cover the fixed costs. Raise the price or cut the variable cost." },
+        { q: "Can I use it for a service business?", a: "Yes. Treat one billable hour, one job or one order as a unit, use the average price per unit, and enter the direct cost of delivering that unit as the variable cost." }
+      ]
+    },
+    fields: [
+      { id: "fixedCosts", label: "Fixed costs per month", type: "number", default: 150000, min: 0, max: 100000000000, step: 1000 },
+      { id: "price", label: "Selling price per unit", type: "number", default: 150, min: 0, max: 1000000000, step: 1 },
+      { id: "variableCost", label: "Variable cost per unit", type: "number", default: 60, min: 0, max: 1000000000, step: 1 },
+      { id: "targetProfit", label: "Target monthly profit", type: "number", default: 50000, min: 0, max: 100000000000, step: 1000 },
+      { id: "days", label: "Days open per month", type: "number", default: 30, min: 1, max: 31, step: 1, suffix: "days" }
+    ],
+    compute(v) {
+      const fixed = Math.max(0, Number(v.fixedCosts) || 0);
+      const price = Math.max(0, Number(v.price) || 0);
+      const variable = Math.max(0, Number(v.variableCost) || 0);
+      const target = Math.max(0, Number(v.targetProfit) || 0);
+      const days = Math.max(1, Number(v.days) || 1);
+      const contribution = price - variable;
+      const viable = contribution > 0;
+      const units = viable ? Math.ceil(fixed / contribution) : 0;
+      const targetUnits = viable ? Math.ceil((fixed + target) / contribution) : 0;
+      return [
+        { label: "Contribution per unit", value: contribution, format: "currency", emphasis: viable ? "positive" : "negative" },
+        { label: viable ? "Break-even units per month" : "No break-even: price does not cover variable cost", value: units, format: "number", emphasis: viable ? "neutral" : "negative" },
+        { label: "Break-even sales per month", value: units * price, format: "currency" },
+        { label: "Break-even units per day", value: units / days, format: "number" },
+        { label: "Units per month for the profit target", value: targetUnits, format: "number", emphasis: "positive" }
+      ];
+    }
+  },
+  {
+    id: "cost-of-delay",
+    slug: "cost-of-delay-sip-calculator",
+    title: "Cost of Delay SIP Calculator",
+    category: "investment",
+    short: "See how much waiting a few years to start a SIP can cost at the end.",
+    desc: "Compare starting a monthly SIP now with starting later for the same end date, and see the extra monthly amount needed to catch up.",
+    article: {
+      formula: "SIP future value = monthly amount × [((1 + i)^n − 1) ÷ i] × (1 + i), where i is the annual rate ÷ 12 and n is the number of monthly instalments. Starting now uses all the months to the goal date. Starting later uses fewer months, ending on the same date. The monthly amount needed to catch up equals the start-now value divided by the delayed future-value factor.",
+      exampleInputs: { monthly: 10000, rate: 12, years: 25, delay: 5 },
+      faqs: [
+        { q: "Why is the cost of delay larger than the contributions missed?", a: "The early instalments have the longest time to compound. Missing the first years removes the money that would have grown the most, so the loss is much larger than the amount you skipped." },
+        { q: "Can a larger SIP make up for starting late?", a: "Yes, but it takes a higher monthly amount. The calculator shows the extra monthly investment that would reach the same end value from the delayed start." },
+        { q: "Are the returns guaranteed?", a: "No. The rate is an assumption used to show the effect of time. Market-linked returns vary year to year and can be negative." }
+      ]
+    },
+    fields: [
+      { id: "monthly", label: "Monthly SIP amount", type: "number", default: 10000, min: 0, max: 1000000000, step: 500 },
+      { id: "rate", label: "Expected annual return", type: "number", default: 12, min: 0, max: 50, step: 0.1, suffix: "%" },
+      { id: "years", label: "Years until the goal", type: "number", default: 25, min: 1, max: 60, step: 1, suffix: "yrs" },
+      { id: "delay", label: "Years you delay the start", type: "number", default: 5, min: 0, max: 59, step: 1, suffix: "yrs" }
+    ],
+    compute(v) {
+      const monthly = Math.max(0, Number(v.monthly) || 0);
+      const months = Math.max(0, Math.round((Number(v.years) || 0) * 12));
+      const delayMonths = Math.min(months, Math.max(0, Math.round((Number(v.delay) || 0) * 12)));
+      const i = Math.max(0, Number(v.rate) || 0) / 1200;
+      const factor = count => i === 0 ? count : ((Math.pow(1 + i, count) - 1) / i) * (1 + i);
+      const startNow = monthly * factor(months);
+      const delayedFactor = factor(months - delayMonths);
+      const startLater = monthly * delayedFactor;
+      const catchUp = delayedFactor > 0 ? startNow / delayedFactor : 0;
+      return [
+        { label: "Value if you start now", value: startNow, format: "currency", emphasis: "positive" },
+        { label: "Value if you start later", value: startLater, format: "currency", emphasis: "neutral" },
+        { label: "Cost of the delay", value: startNow - startLater, format: "currency", emphasis: "negative" },
+        { label: "Monthly SIP needed to catch up after the delay", value: catchUp, format: "currency" }
+      ];
+    }
+  },
 ];
 
 const CURRENCIES = [

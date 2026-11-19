@@ -8,6 +8,7 @@ const expectedIds = [
   'sip','compound-interest','mortgage','roi','simple-interest','freedom-milestone','salary-hourly','profit-margin',
   'fixed-deposit','recurring-deposit','lumpsum','cagr','car-loan','personal-loan','debt-payoff','inflation','net-worth',
   'overtime','freelance-rate','income-tax-planner','home-loan-emi','currency-converter','flat-cost','loan-emi','capital-gain','lumpsum-sip','loan-against-property','home-loan-eligibility','silver-jewelry','advanced-home-loan-eligibility','consumer-durable-loan','gold-jewelry','loan-prepayment-vs-sip','ltv','stamp-duty','property-calculator','loan-interest',
+  'swp','ssy','rule-of-72','rent-vs-buy','fire','budget-50-30-20','break-even','cost-of-delay',
   'ppf-growth','epf-growth','gst','emergency-fund','credit-card-payoff','step-up-sip','sip-goal','gratuity','hra-exemption','nps'
 ];
 
@@ -92,6 +93,66 @@ function reference(id,v) {
     case 'sip-goal': { const n=v.years*12,mr=v.rate/1200,futureCurrent=v.current*Math.pow(1+mr,n),gap=Math.max(0,v.target-futureCurrent),factor=mr===0?n:((Math.pow(1+mr,n)-1)/mr)*(1+mr),required=gap===0?0:factor>0?gap/factor:0;return {'Required monthly SIP':required,'Future value of current corpus':futureCurrent,'Target gap after current corpus growth':gap}; }
     case 'gratuity': { const eligible=v.years>=5,amount=eligible?v.salary*15/26*Math.floor(v.years):0;return {'Estimated gratuity (0 if threshold not met)':amount,'General 5-year threshold met (1 = yes)':eligible?1:0}; }
     case 'hra-exemption': { const exemption=Math.max(0,Math.min(v.hra,v.rent-0.1*v.basicDA,v.basicDA*v.cityPct/100));return {'Estimated HRA exemption per month':exemption,'Estimated taxable HRA per month':Math.max(0,v.hra-exemption),'Annual estimated exemption':exemption*12}; }
+    case 'swp': {
+      const months=Math.round(v.years*12),mr=v.rate/1200;
+      let bal=v.corpus,w0=v.withdrawal,paid=0,full=0,dead=false;
+      for(let m=0;m<months;m++){
+        const w=w0*Math.pow(1+v.stepUp/100,Math.floor(m/12));
+        if(bal<w-0.005){paid+=bal;bal=0;dead=true;break;}
+        bal=(bal-w)*(1+mr);paid+=w;full++;
+      }
+      return {'Total amount withdrawn':paid,[dead?'Balance left (corpus exhausted)':'Balance left after the period']:bal,'Investment growth earned':bal+paid-v.corpus,[dead?'Years the corpus pays the full withdrawal':'Years of full withdrawals funded']:full/12};
+    }
+    case 'ssy': {
+      const r=v.rate/100,d=Math.min(15,Math.round(v.depositYears)),dep=v.yearlyDeposit;
+      const upTo=k=>r===0?dep*k:dep*(1+r)*(Math.pow(1+r,k)-1)/r;
+      return {'Total deposited':dep*d,'Estimated maturity value at 21 years':upTo(d)*Math.pow(1+r,21-d),'Interest earned':upTo(d)*Math.pow(1+r,21-d)-dep*d,'Balance when deposits end':upTo(d)};
+    }
+    case 'rule-of-72': {
+      const g=1+v.rate/100;
+      return {'Years to double (Rule of 72)':v.rate>0?72/v.rate:0,'Years to double (exact compounding)':v.rate>0?Math.log(2)/Math.log(g):0,'Rule of 72 minus exact':v.rate>0?72/v.rate-Math.log(2)/Math.log(g):0,'Years to reach the target multiple':v.rate>0?Math.log(Math.max(1,v.multiple))/Math.log(g):0};
+    }
+    case 'rent-vs-buy': {
+      const L=v.price*(1-v.downPct/100),n=Math.round(v.loanYears*12),r=v.loanRate/1200,H=Math.round(v.horizon*12),i=v.investReturn/1200;
+      const emi=r===0?L/n:L*r/(1-Math.pow(1+r,-n));
+      const balAfter=k=>k>=n?0:(r===0?L-emi*k:L*Math.pow(1+r,k)-emi*(Math.pow(1+r,k)-1)/r);
+      let rentPort=v.price*v.downPct/100+v.price*v.buyCostPct/100,buyPort=0;
+      for(let m=1;m<=H;m++){
+        const rent=v.rent*Math.pow(1+v.rentGrowth/100,Math.floor((m-1)/12));
+        const out=(m<=n?emi:0)+v.price*v.maintPct/1200;
+        rentPort=(rentPort+Math.max(0,out-rent))*(1+i);
+        buyPort=(buyPort+Math.max(0,rent-out))*(1+i);
+      }
+      const buy=v.price*Math.pow(1+v.appreciation/100,v.horizon)-balAfter(H)+buyPort,adv=buy-rentPort;
+      return {'Monthly loan EMI':emi,'Net worth if you buy':buy,'Net worth if you rent and invest':rentPort,[adv>=0?'Buying comes out ahead by':'Renting comes out ahead by']:Math.abs(adv)};
+    }
+    case 'fire': {
+      const wr=Math.max(0.1,v.withdrawalRate)/100,mr=v.returnRate/1200,inf=v.inflation/100;
+      let port=v.currentSavings,sav=v.monthlySavings,found=-1,tgt=0,sp=0,pt=0;
+      for(let y=0;y<=60;y++){
+        sp=v.annualExpenses*Math.pow(1+inf,y);tgt=sp/wr;pt=port;
+        if(port>=tgt){found=y;break;}
+        if(y===60)break;
+        for(let m=0;m<12;m++)port=(port+sav)*(1+mr);
+        sav*=1+v.stepUp/100;
+      }
+      const yrs=found>=0?found:60;
+      return {[found>=0?'Years to financial independence':'Not reached within 60 years']:yrs,'Corpus needed at that point':tgt,"Same corpus in today's money":tgt/Math.pow(1+inf,yrs),'Projected portfolio at that point':pt,'Annual spending at that point':sp};
+    }
+    case 'budget-50-30-20': {
+      const np=Math.min(100,v.needsPct),wp=Math.min(100-np,v.wantsPct),sv=v.income*(1-np/100-wp/100),act=v.income-v.actualNeeds-v.actualWants,gap=act-sv;
+      return {'Target for needs':v.income*np/100,'Target for wants':v.income*wp/100,'Target for savings and debt repayment':sv,'Your actual monthly savings':act,[gap>=0?'Ahead of the savings target by':'Short of the savings target by']:Math.abs(gap)};
+    }
+    case 'break-even': {
+      const cm=v.price-v.variableCost,ok=cm>0,u=ok?Math.ceil(v.fixedCosts/cm):0,tu=ok?Math.ceil((v.fixedCosts+v.targetProfit)/cm):0;
+      return {'Contribution per unit':cm,[ok?'Break-even units per month':'No break-even: price does not cover variable cost']:u,'Break-even sales per month':u*v.price,'Break-even units per day':u/Math.max(1,v.days),'Units per month for the profit target':tu};
+    }
+    case 'cost-of-delay': {
+      const n=Math.round(v.years*12),d=Math.min(n,Math.round(v.delay*12)),i=v.rate/1200;
+      const f=k=>i===0?k:(Math.pow(1+i,k)-1)/i*(1+i);
+      const now=v.monthly*f(n),late=v.monthly*f(n-d);
+      return {'Value if you start now':now,'Value if you start later':late,'Cost of the delay':now-late,'Monthly SIP needed to catch up after the delay':f(n-d)>0?now/f(n-d):0};
+    }
     default: throw new Error(`No independent reference for ${id}`);
   }
 }
@@ -132,7 +193,7 @@ function stressValues(calc) {
 }
 
 let failures=0;
-if(CALCULATORS.length!==47) { console.error(`FAIL: expected 47 calculators, found ${CALCULATORS.length}`); failures++; }
+if(CALCULATORS.length!==55) { console.error(`FAIL: expected 55 calculators, found ${CALCULATORS.length}`); failures++; }
 for(const id of expectedIds) if(!CALCULATORS.some(c=>c.id===id)) { console.error(`FAIL: missing calculator ${id}`); failures++; }
 
 for(const calc of CALCULATORS) {
@@ -147,6 +208,14 @@ for(const calc of CALCULATORS) {
     if(calc.id==='debt-payoff') cases.push({...baseValues(calc),rate:0});
     if(calc.id==='inflation') cases.push({...baseValues(calc),rate:0});
     if(calc.id==='freedom-milestone') cases.push({...baseValues(calc),withdrawal:0});
+    if(calc.id==='swp') { cases.push({...baseValues(calc),withdrawal:80000},{...baseValues(calc),rate:0,stepUp:0}); }
+    if(calc.id==='ssy') cases.push({...baseValues(calc),rate:0},{...baseValues(calc),depositYears:10});
+    if(calc.id==='rule-of-72') cases.push({...baseValues(calc),rate:0});
+    if(calc.id==='rent-vs-buy') cases.push({...baseValues(calc),loanRate:0},{...baseValues(calc),rent:90000},{...baseValues(calc),horizon:30});
+    if(calc.id==='fire') cases.push({...baseValues(calc),monthlySavings:0,currentSavings:0},{...baseValues(calc),returnRate:0,inflation:0});
+    if(calc.id==='budget-50-30-20') cases.push({...baseValues(calc),actualNeeds:20000,actualWants:10000});
+    if(calc.id==='break-even') cases.push({...baseValues(calc),price:50},{...baseValues(calc),price:60});
+    if(calc.id==='cost-of-delay') cases.push({...baseValues(calc),rate:0},{...baseValues(calc),delay:25});
     for(const values of cases) {
       const actual=out(calc,values);
       const expected=reference(calc.id,values);

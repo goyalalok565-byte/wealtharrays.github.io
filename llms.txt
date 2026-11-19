@@ -18,7 +18,7 @@
 - https://wealtharrays.com/disclaimer — Financial, tax and legal disclaimer
 - https://wealtharrays.com/advertising-policy — Advertising and editorial independence
 
-## All 47 calculators
+## All 55 calculators
 
 - SIP Calculator: https://wealtharrays.com/sip-calculator/
 - Compound Interest: https://wealtharrays.com/compound-interest-calculator/
@@ -68,6 +68,14 @@
 - Gratuity Calculator: https://wealtharrays.com/gratuity-calculator/
 - HRA Exemption Calculator: https://wealtharrays.com/hra-exemption-calculator/
 - NPS Calculator: https://wealtharrays.com/nps-calculator/
+- SWP Calculator: https://wealtharrays.com/swp-calculator/
+- Sukanya Samriddhi (SSY) Calculator: https://wealtharrays.com/ssy-calculator/
+- Rule of 72 Calculator: https://wealtharrays.com/rule-of-72-calculator/
+- Rent vs Buy Calculator: https://wealtharrays.com/rent-vs-buy-calculator/
+- FIRE Calculator: https://wealtharrays.com/fire-calculator/
+- 50/30/20 Budget Calculator: https://wealtharrays.com/budget-calculator/
+- Break-Even Calculator: https://wealtharrays.com/break-even-calculator/
+- Cost of Delay SIP Calculator: https://wealtharrays.com/cost-of-delay-sip-calculator/
 
 ## Calculator collections
 

@@ -6,7 +6,7 @@ const source=fs.readFileSync(path.join(root,'calculators.js'),'utf8');
 const calculators=[...source.matchAll(/\bslug:\s*["']([^"']+)["']/g)].map(m=>m[1]);
 const failures=[];
 const countWords=html=>html.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&[a-z#0-9]+;/gi,' ').replace(/\s+/g,' ').trim().split(/\s+/).filter(Boolean).length;
-if(calculators.length!==47)failures.push('Expected 47 calculator definitions, found '+calculators.length);
+if(calculators.length!==55)failures.push('Expected 55 calculator definitions, found '+calculators.length);
 for(const slug of calculators){
   const file=path.join(root,slug,'index.html');
   if(!fs.existsSync(file)){failures.push(slug+': canonical page missing');continue;}

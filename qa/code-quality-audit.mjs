@@ -35,7 +35,7 @@ function walkCalculatorPages(dir){
   }
 }
 walkCalculatorPages(root);
-if(pages.length!==47) throw new Error(`Expected 47 active canonical calculator runtime pages, found ${pages.length}`);
+if(pages.length!==55) throw new Error(`Expected 55 active canonical calculator runtime pages, found ${pages.length}`);
 for(const page of pages){const id=fs.readFileSync(path.join(root,page),'utf8').match(/data-wa-calculator="([^"]+)"/i)?.[1];if(!id||!fs.existsSync(path.join(root,'calculator-definitions',`${id}.js`))) throw new Error(`${page}: missing split calculator definition for ${id||'unknown'}`);}
 const widget=fs.readFileSync('widget/index.html','utf8');
 if(!widget.includes('/calculators.js')||!widget.includes('/wa-calculator-runtime.js')) throw new Error('widget/index.html: calculator bootstrap scripts missing');
