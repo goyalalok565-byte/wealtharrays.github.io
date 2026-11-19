@@ -74,6 +74,11 @@ for(const full of allHtml){
   const indiaCalculatorIds = new Set(['income-tax-planner','ppf-growth','epf-growth','gst','hra-exemption','ssy','nps','gratuity','stamp-duty','gold-jewelry','silver-jewelry','home-loan-eligibility','advanced-home-loan-eligibility','loan-against-property','flat-cost','capital-gain','property-calculator','home-loan-emi']);
   const calculatorId = html.match(/data-wa-calculator=["']([^"']+)["']/i)?.[1];
   const pageLocale = calculatorId && indiaCalculatorIds.has(calculatorId) ? 'en_IN' : 'en_US';
+  const canonicalHref=html.match(/<link[^>]*rel=["']canonical["'][^>]*href=["']([^"']+)["']/i)?.[1]||html.match(/<link[^>]*href=["']([^"']+)["'][^>]*rel=["']canonical["']/i)?.[1];
+  if(canonicalHref){
+    html=html.replace(/<link[^>]*rel=["']alternate["'][^>]*hreflang=["'][^"']+["'][^>]*>/gi,'');
+    html=html.replace('</head>','<link rel="alternate" hreflang="en" href="'+canonicalHref+'"><link rel="alternate" hreflang="x-default" href="'+canonicalHref+'"></head>');
+  }
   const ogPng='https://wealtharrays.com/og-image.png';
   html=html.replace(/(<meta\s+property=["']og:locale["']\s+content=["'])[^"']*(["'][^>]*>)/gi,'$1'+pageLocale+'$2');
   if(!/<meta[^>]+property=["']og:locale["']/i.test(html)) html=html.replace('</head>','<meta property="og:locale" content="'+pageLocale+'"></head>');
