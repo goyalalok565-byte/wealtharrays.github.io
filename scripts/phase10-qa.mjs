@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import { CALCULATORS } from '../calculators.js';
 
 const cases = [
