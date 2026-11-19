@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import assert from "node:assert/strict";
 import worker from "../worker.mjs";
 
@@ -23,6 +24,8 @@ const modelsResponse = await worker.fetch(new Request("https://example.test/v1/m
 assert.equal(modelsResponse.status, 200);
 const modelData = await modelsResponse.json();
 assert.ok(modelData.models.some(model => model.id === "sip" && model.version === "1.0.0"));
+const registryCount = JSON.parse(fs.readFileSync("calculator-definitions/registry.json", "utf8")).count;
+assert.equal(modelData.models.length, registryCount, "API must expose every registered calculator model");
 const calculate = await worker.fetch(new Request("https://example.test/v1/calculate", {
   method: "POST", headers: { "Content-Type": "application/json", "cf-connecting-ip": "203.0.113.10" },
   body: JSON.stringify({ model: "sip", inputs: { monthly: 5000, annualRate: 10, years: 10 } })
