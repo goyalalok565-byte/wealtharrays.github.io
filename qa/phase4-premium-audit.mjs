@@ -45,9 +45,9 @@ for(const file of publicFiles){
   const routeName=rel==='widget/index.html'?'widget/index.html':base;
   const html=fs.readFileSync(file,'utf8');
   const noindex=/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html);
-  const consentExcluded=['404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html'].includes(routeName) || noindex;
+  const consentExcluded=['index.html','404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html'].includes(routeName) || noindex;
   if(consentExcluded){
-    if(html.includes('/consent-loader.js')) failures.push(base+': Funding Choices loader must not run on disclosure/legal document');
+    if(html.includes('/consent-loader.js')) failures.push(base+': Funding Choices loader must not run on an ad-exempt, disclosure, or legal route');
   }else if(!html.includes('/consent-loader.js')){
     failures.push(base+': Funding Choices consent loader missing');
   }
