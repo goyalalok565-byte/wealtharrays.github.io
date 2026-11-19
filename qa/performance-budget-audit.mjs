@@ -101,7 +101,7 @@ for (const asset of staticCacheableAssets) {
     continue;
   }
   const expectedHash = crypto.createHash('sha256').update(fs.readFileSync(assetPath)).digest('hex').slice(0,12);
-  const assetPattern = new RegExp("/" + asset.replace(".", "\\\\.") + "\\\\?v=([^\\\"']+)", "g");
+  const assetPattern = new RegExp("/" + asset.replace(".", "\\.") + "\\?v=([^\"']+)", "g");
   let references = 0;
   for (const htmlFile of htmlFiles) {
     const html = fs.readFileSync(htmlFile, 'utf8');
