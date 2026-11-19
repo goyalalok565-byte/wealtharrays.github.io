@@ -43,8 +43,8 @@ for(const file of htmlFiles){
   s=s.replace(/<script>[^<]*(?:document\.documentElement\.dataset\.theme|localStorage\.(?:waTheme|getItem\(['"]waTheme['"]\)))[^<]*<\/script>/gi, '');
   if(!s.includes('/theme-init.js')) s=s.replace('</head>',`${themePreload}${themeJs}</head>`);
   else {
-    if(!/rel=["']preload["'][^>]*href=["'][^"']*theme-init\\.js/i.test(s)) s=s.replace('</head>',`${themePreload}</head>`);
-    s=s.replace(/<script\\b([^>]*src=["'][^"']*theme-init\\.js[^"']*["'][^>]*)>/gi,tag=>/\\bdefer\\b/i.test(tag)?tag:tag.replace('<script','<script defer'));
+    if(!/rel=["']preload["'][^>]*href=["'][^"']*theme-init\.js/i.test(s)) s=s.replace('</head>',`${themePreload}</head>`);
+    s=s.replace(/<script\b([^>]*src=["'][^"']*theme-init\.js[^"']*["'][^>]*)>/gi,tag=>/\bdefer\b/i.test(tag)?tag:tag.replace('<script','<script defer'));
   }
   // Replace every inline calculator bootstrap, including legacy formatting variants.
   const mountId=(s.match(/mountCalculator\(\s*CALCULATORS\.find\(\s*c\s*=>\s*c\.id\s*===\s*['"]([^'"]+)['"]/i)||[])[1];
