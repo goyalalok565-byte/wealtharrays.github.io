@@ -56,16 +56,14 @@ for(const file of htmlFiles){
     s=s.replace(/<script[^>]+src=["']\/consent-loader\.js[^>]*><\/script>/gi,'');
   }else if(!s.includes('/consent-loader.js')) s=s.replace('</head>',consentJs+'</head>');
 
-  const staticAdScript=/<script\b[^>]*src=["']https:\/\/pagead\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js[^"']*["'][^>]*>\s*<\/script>/gi;
+  const staticAdScript=/<script\b(?=[^>]*src=["']https:\/\/pagead\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js)[^>]*>[\s\S]*?<\/script>/gi;
+  const adLoaderScript=/<script\b(?=[^>]*src=["']\/wa-ad-loader\.js(?:\?[^"']*)?["'])[^>]*>\s*<\/script>/gi;
   s=s.replace(/<script>[^]*?waSubscriptionCache[^]*?<\/script>/gi,'');
-  if(adsenseExcluded){
-    s=s.replace(staticAdScript,'');
-    s=s.replace(/<script\b[^>]*src=["']\/wa-ad-loader\.js[^"']*["'][^>]*>\s*<\/script>/gi,'');
-  } else if(staticAdScript.test(s)) {
-    s=s.replace(staticAdScript,adsenseJs);
-  } else if(!s.includes('/wa-ad-loader.js')) {
-    s=s.replace('</head>',adsenseJs+'</head>');
-  }
+  // Normalize every page to zero or one publisher loader. A static AdSense tag
+  // plus wa-ad-loader.js caused the same third-party library to be injected twice.
+  s=s.replace(staticAdScript,'');
+  s=s.replace(adLoaderScript,'');
+  if(!adsenseExcluded) s=s.replace('</head>',adsenseJs+'</head>');
   if(id && s.includes('id="calc-widget"') && base!=='widget.html'){
     if(!s.includes('/wa-calculator-runtime.js')) s=s.replace('</body>','<script src="/wa-calculator-runtime.js" defer></script></body>');
   }

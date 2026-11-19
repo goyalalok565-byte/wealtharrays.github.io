@@ -52,17 +52,19 @@ try{
         await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({scenarios:stored?[stored]:[],entitlement:{tier:'free',used:stored?1:0,limit:3}})});
       }
     });
-    await page.goto(baseUrl+item.path,{waitUntil:'networkidle'});
+    // Do not wait for networkidle: third-party analytics/ads or persistent requests
+    // can keep a static page busy even after the app is fully usable.
+    await page.goto(baseUrl+item.path,{waitUntil:'domcontentloaded'});
+    await page.locator(item.save).waitFor({state:'visible',timeout:15000});
     await dismissConsent();
-    await page.locator(item.save).waitFor({state:'visible',timeout:10000});
     const original=await page.locator(item.field).inputValue();
     await page.locator(item.save).click();
-    await page.waitForFunction(selector=>document.querySelector(selector)?.textContent.toLowerCase().includes('synced'),item.status);
+    await page.waitForFunction(selector=>document.querySelector(selector)?.textContent.toLowerCase().includes('synced'),item.status,{timeout:15000});
     assert.equal(writes,1,item.kind+' must issue exactly one cloud save');
     assert.ok(stored,'cloud save should persist a plan snapshot');
     await page.locator(item.field).fill('999999');
     await page.locator(item.load).click();
-    await page.waitForFunction(selector=>document.querySelector(selector)?.textContent.toLowerCase().includes('loaded'),item.status);
+    await page.waitForFunction(selector=>document.querySelector(selector)?.textContent.toLowerCase().includes('loaded'),item.status,{timeout:15000});
     assert.equal(await page.locator(item.field).inputValue(),original,item.kind+' must restore saved inputs');
   }
   assert.deepEqual(errors,[],'cloud sync pages must not throw browser errors');
