@@ -52,7 +52,7 @@ jobs:
         run: node qa/embed-regression.mjs
       - name: Install Playwright for all-calculator browser regression
         run: |
-          npm install --no-save playwright@1.55.0
+          npm install --no-save playwright@1.55.0 lighthouse@13.0.1
           npx playwright install --with-deps chromium
       - name: Start built site for browser regression
         run: |
@@ -64,6 +64,32 @@ jobs:
           done
           cat /tmp/wealtharrays-dist-http.log
           exit 1
+      - name: Capture production baseline homepage CPU profile (before)
+        continue-on-error: true
+        env:
+          BASE_URL: https://wealtharrays.com
+          PROFILE_PATH: /
+          LH_OUTPUT_DIR: /tmp/wa-lighthouse/before
+        run: node qa/performance-profile.mjs
+      - name: Capture production baseline Lighthouse for six pages (before)
+        continue-on-error: true
+        env:
+          BASE_URL: https://wealtharrays.com
+          LH_OUTPUT_DIR: /tmp/wa-lighthouse/before
+        run: node qa/mobile-lighthouse-baseline.mjs
+      - name: Capture candidate homepage CPU profile (after)
+        env:
+          BASE_URL: http://127.0.0.1:4173
+          PROFILE_PATH: /
+          LH_OUTPUT_DIR: /tmp/wa-lighthouse/after
+        run: node qa/performance-profile.mjs
+      - name: Enforce mobile Lighthouse budgets on six candidate pages
+        env:
+          BASE_URL: http://127.0.0.1:4173
+          LH_OUTPUT_DIR: /tmp/wa-lighthouse/after
+        run: node qa/mobile-lighthouse-baseline.mjs
+      - name: Prove Lighthouse gate rejects deliberately failing metrics
+        run: node --test qa/performance-thresholds.test.mjs
       - name: Browser regression for canonical calculator embed route
         env:
           BASE_URL: http://127.0.0.1:4173
@@ -89,5 +115,12 @@ jobs:
             cp "$file" "dist/$file"
           done
           node qa/performance-budget-audit.mjs
+      - name: Upload before/after mobile performance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wealtharrays-before-after-mobile-performance
+          path: /tmp/wa-lighthouse/
+          retention-days: 30
       - name: Verify package build output after npm run build
         run: npm run qa:dist
