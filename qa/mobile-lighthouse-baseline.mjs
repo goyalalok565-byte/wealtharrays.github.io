@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 
 const base = (process.env.BASE_URL || 'https://wealtharrays.com').replace(/\/$/, '');
+const firstPartyHost = new URL(base).host;
 const paths = [
   '/', '/tools.html', '/sip-calculator/', '/swp-calculator/',
   '/fire-calculator/', '/rent-vs-buy-calculator/',
@@ -36,8 +37,14 @@ for (const route of paths) {
   const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
   const audits = report.audits || {};
   const network = audits['network-requests']?.details?.items || [];
-  const bytes = (type) => network.filter(x => x.resourceType === type)
-    .reduce((sum, x) => sum + (Number(x.transferSize) || 0), 0);
+  const bytes = (items) => items.reduce((sum, x) => sum + (Number(x.transferSize) || 0), 0);
+  const scripts = network.filter(x => x.resourceType === 'Script');
+  const stylesheets = network.filter(x => x.resourceType === 'Stylesheet');
+  const isFirstParty = item => { try { return new URL(item.url).host === firstPartyHost; } catch { return false; } };
+  const thirdPartyHosts = new Map();
+  for (const item of scripts.filter(item => !isFirstParty(item))) {
+    try { const host = new URL(item.url).host; thirdPartyHosts.set(host, (thirdPartyHosts.get(host) || 0) + (Number(item.transferSize) || 0)); } catch {}
+  }
   const domAudit = audits['dom-size-insight'] || audits['dom-size'];
   const inpAudit = audits['interaction-to-next-paint'];
   const longTasks = audits['long-tasks']?.details?.items;
@@ -55,8 +62,13 @@ for (const route of paths) {
     tbt: audits['total-blocking-time']?.displayValue || null,
     cls: audits['cumulative-layout-shift']?.displayValue || null,
     inp: inpAudit?.displayValue || 'Not available in this Lighthouse lab report',
-    jsTransferBytes: bytes('Script'),
-    cssTransferBytes: bytes('Stylesheet'),
+    jsTransferBytes: bytes(scripts),
+    firstPartyJsTransferBytes: bytes(scripts.filter(isFirstParty)),
+    thirdPartyJsTransferBytes: bytes(scripts.filter(item => !isFirstParty(item))),
+    cssTransferBytes: bytes(stylesheets),
+    firstPartyCssTransferBytes: bytes(stylesheets.filter(isFirstParty)),
+    thirdPartyCssTransferBytes: bytes(stylesheets.filter(item => !isFirstParty(item))),
+    topThirdPartyScriptHosts: [...thirdPartyHosts.entries()].map(([host, transferBytes]) => ({ host, transferBytes })).sort((a, b) => b.transferBytes - a.transferBytes).slice(0, 10),
     requestCount: network.length,
     domNodes: domAudit?.numericValue ?? null,
     domDepth: domAudit?.details?.debugData?.maxDepth ?? null,
@@ -65,6 +77,7 @@ for (const route of paths) {
     mainThreadBreakdownMs: mainThread,
     topBootupScripts: bootupItems.slice(0, 10).map(item => ({ url: item.url, totalMs: Math.round(item.total), scriptingMs: Math.round(item.scripting) })),
     longTaskCount: Array.isArray(longTasks) ? longTasks.length : 'Not exposed by this Lighthouse version',
+    topLongTasks: Array.isArray(longTasks) ? longTasks.slice(0, 10).map(item => ({ url: item.url, durationMs: Math.round(item.duration), startTimeMs: Math.round(item.startTime) })) : [],
     reportPath
   };
   rows.push(row);
