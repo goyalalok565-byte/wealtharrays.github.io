@@ -49,7 +49,7 @@ self.addEventListener('fetch',event=>{
   if(asset){
     const refresh=fetch(request).then(response=>cachePut(RUNTIME_CACHE,request,response).then(()=>response)).catch(()=>null);
     event.waitUntil(refresh.then(()=>undefined));
-    event.respondWith(caches.open(RUNTIME_CACHE).then(cache=>cache.match(request)).then(hit=>hit||refresh||matchCached(new Request('/offline.html'))));
+    event.respondWith(caches.open(RUNTIME_CACHE).then(cache=>cache.match(request)).then(hit=>hit||refresh.then(response=>response||matchCached(new Request('/offline.html')))));
     return;
   }
   // Do not cache arbitrary same-origin fetches; only navigations and static assets are cacheable.
