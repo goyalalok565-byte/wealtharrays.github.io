@@ -17,6 +17,18 @@
 /*.js
   Cache-Control: public, max-age=3600, stale-while-revalidate
 
+/styles.css
+/phase3-seo.css
+/phase4-premium.css
+/cls-fixes.css
+/homepage-refresh.css
+/theme-init.js
+/homepage-business.js
+/homepage-search.js
+/consent-loader.js
+/wa-ad-loader.js
+  Cache-Control: public, max-age=31536000, immutable
+
 /widget
   Cache-Control: no-store
   CDN-Cache-Control: no-store
