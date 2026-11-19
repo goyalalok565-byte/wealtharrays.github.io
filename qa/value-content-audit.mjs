@@ -52,5 +52,39 @@ for(const file of htmlFiles){
     try{JSON.parse(json[1]);}catch{failures.push(rel+': invalid JSON-LD');}
   }
 }
+
+// Keep the SIP Goal worked example tied to the calculator's beginning-of-month model.
+// A hand-written end-of-month example previously overstated the required SIP.
+const sipGoalExamplePath = path.join(root, 'sip-goal-calculator', 'index.html');
+if (!fs.existsSync(sipGoalExamplePath)) {
+  failures.push('sip-goal-calculator: generated worked example page missing');
+} else {
+  const sipGoalHtml = fs.readFileSync(sipGoalExamplePath, 'utf8');
+  if (!sipGoalHtml.includes('Required monthly SIP: ₹6,635.27')) {
+    failures.push('sip-goal-calculator: worked example must match the beginning-of-month model output (₹6,635.27).');
+  }
+  if (sipGoalHtml.includes('₹6,691')) {
+    failures.push('sip-goal-calculator: stale end-of-month worked example must not be published.');
+  }
+}
+
+
+// Regression checks for worked examples whose contribution-timing convention
+// must match the calculator implementation.
+const stepUpHtml = fs.readFileSync(path.join(root, 'step-up-sip-calculator', 'index.html'), 'utf8');
+if (!stepUpHtml.includes('Projected investment value: ₹43,41,924.72')) {
+  failures.push('step-up-sip-calculator: worked example must be generated from the beginning-of-month model (₹43,41,924.72).');
+}
+if (stepUpHtml.includes('42.99 lakh')) {
+  failures.push('step-up-sip-calculator: stale end-of-month worked example must not be published.');
+}
+const lumpSumSipHtml = fs.readFileSync(path.join(root, 'lumpsum-sip-calculator', 'index.html'), 'utf8');
+if (!lumpSumSipHtml.includes('beginning of each month produces about ₹1,26,703')) {
+  failures.push('lumpsum-sip-calculator: worked example must match beginning-of-month SIP timing.');
+}
+if (lumpSumSipHtml.includes('₹1,25,656')) {
+  failures.push('lumpsum-sip-calculator: stale end-of-month SIP figure must not be published.');
+}
+
 if(failures.length){console.error('VALUE CONTENT AUDIT FAILED ('+failures.length+' issues)');console.error(failures.join('\n'));process.exit(1);}
 console.log('Value-content audit passed: all '+calculators.length+' calculators have substantial unique guidance, worked examples, FAQs, internal article links, concise metadata and valid software/breadcrumb schema.');
