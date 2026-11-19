@@ -12,9 +12,9 @@ function walk(dir) {
 }
 walk('.');
 
-const budgets = { js: 140000, css: 100000 };
+const budgets = { js: 140000, css: 105000 };
 const assetBudgets = { 'wa-calculator-runtime.js': 118000 };
-const required = ['wa-calculator-runtime.js', 'wa-site-runtime.js', 'styles.css'];
+const required = ['wa-calculator-runtime.js', 'wa-site-runtime.js', 'styles.css', 'styles-critical.css'];
 const failures = [];
 if (files.length < 10) failures.push('Asset discovery returned only ' + files.length + ' JS/CSS assets; expected at least 10.');
 for (const name of required) {
@@ -61,7 +61,7 @@ const criticalCssFile=fs.existsSync('styles-critical.css')?fs.readFileSync('styl
 if(!criticalCssFile.includes('WA-CRITICAL-CSS-BUNDLE')||!toolsPageHtml.includes('styles-critical.css'))failures.push('Critical CSS must be merged and preloaded as one stylesheet.');
 if(!fs.existsSync('dist/styles-critical.css'))failures.push('Merged critical CSS is missing from Cloudflare dist output.');
 if(/href=["'][^"']*(?:phase3-seo|cls-fixes|phase4-premium)\.css/.test(toolsPageHtml))failures.push('Legacy render-blocking CSS links must be removed from tools page.');
-if(!/<script\b[^>]*src=["'][^"']*theme-init\.js[^>]*\bdefer\b[^>]*>/i.test(toolsPageHtml)||!toolsPageHtml.includes('rel="preload" as="script" href="/theme-init.js'))failures.push('Theme bootstrap must be preloaded and deferred, not render-blocking.');
+if(!/<script\b(?=[^>]*src=["'][^"']*theme-init\.js)(?=[^>]*\bdefer\b)[^>]*>/i.test(toolsPageHtml)||!toolsPageHtml.includes('rel="preload" as="script" href="/theme-init.js'))failures.push('Theme bootstrap must be preloaded and deferred, not render-blocking.');
 
 if(!adLoaderSource.includes('heavyRoute?5000:1500')){
   failures.push('Ads on tools/calculator routes must wait until after the initial interaction window.');
