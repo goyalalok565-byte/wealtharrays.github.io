@@ -1,0 +1,15 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const read=p=>fs.readFileSync(p,'utf8');
+const headers=read('_headers'),worker=read('worker.mjs'),calculate=read('functions/v1/calculate.js'),scenarios=read('functions/v1/scenarios.js'),auth=read('functions/v1/_auth.js'),webhook=read('functions/v1/billing/webhook.js'),deploy=read('.github/workflows/cloudflare-worker-deploy.yml'),wrangler=read('wrangler.toml');
+for(const rule of [/Strict-Transport-Security:\s*max-age=31536000;\s*includeSubDomains/i,/X-Frame-Options:\s*SAMEORIGIN/i,/Referrer-Policy:\s*strict-origin-when-cross-origin/i,/Permissions-Policy:\s*camera=\(\),\s*microphone=\(\),\s*geolocation=\(\)/i,/Content-Security-Policy:[^\n]*default-src 'self'/i,/Content-Security-Policy:[^\n]*object-src 'none'/i,/Content-Security-Policy:[^\n]*frame-ancestors 'self'/i])assert.match(headers,rule);
+assert.doesNotMatch(headers.match(/Content-Security-Policy:[^\n]*/i)?.[0]||'',/unsafe-eval/);
+assert.match(headers,/\/widget\/[\s\S]*?frame-ancestors \*/i);
+assert.match(worker,/privateApiPath/);assert.match(worker,/ALLOWED_ORIGINS/);assert.match(worker,/CORS_ORIGIN_DENIED/);assert.match(worker,/PUBLIC_API_LIMITER/);
+assert.match(calculate,/MAX_BODY_BYTES\s*=\s*32\s*\*\s*1024/);assert.match(calculate,/getReader\(\)/);assert.match(calculate,/INVALID_COUNTRY/);assert.match(calculate,/INVALID_CURRENCY/);
+assert.match(scenarios,/total > 16384/);assert.match(auth,/token\.length > 4096/);assert.match(auth,/AbortSignal\.timeout\(5000\)/);
+assert.match(webhook,/total > 262144/);assert.match(webhook,/crypto\.subtle\.sign/);assert.match(webhook,/constantTimeEqual/);assert.match(webhook,/x-razorpay-event-id/);
+assert.match(deploy,/secrets\.CLOUDFLARE_API_TOKEN/);assert.match(deploy,/secrets\.RAZORPAY_WEBHOOK_SECRET/);
+assert.doesNotMatch(wrangler,/(?:RAZORPAY_KEY_SECRET|RAZORPAY_WEBHOOK_SECRET|SUPABASE_SERVICE_ROLE_KEY)\s*=\s*["'][^"']+["']/i);
+console.log('SECURITY AUDIT PASS: CSP/HSTS/frame policy, private CORS, API body limits, auth timeout, webhook HMAC/idempotency and secret references verified.');
+console.log('Residual risks: public API CORS is intentionally open; account/scenario/billing routes still need a dedicated rate-limit binding; widget embed paths intentionally allow frame-ancestors *; this is not a penetration test.');
