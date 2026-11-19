@@ -63,6 +63,34 @@ export default {
         return new Response(denied.body, { status: denied.status, headers });
       }
     }
+    const normalizedPath = url.pathname.replace(/\/$/, "");
+    const privateRateLimitedPath = normalizedPath.startsWith("/v1/scenarios") ||
+      (normalizedPath.startsWith("/v1/billing/") && !normalizedPath.startsWith("/v1/billing/webhook"));
+    if (handler && request.method !== "OPTIONS" && privateRateLimitedPath) {
+      const limiter = env.PRIVATE_API_LIMITER;
+      const privateRateError = (code, message, status) => {
+        const headers = new Headers({ "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", "Vary": "Origin" });
+        if (origin && privateApiPath) {
+          headers.set("Access-Control-Allow-Origin", origin);
+          headers.set("Access-Control-Allow-Methods", "GET,POST,DELETE,OPTIONS");
+          headers.set("Access-Control-Allow-Headers", "Content-Type,Authorization");
+        }
+        if (status === 429) headers.set("Retry-After", "60");
+        return new Response(JSON.stringify({ error: { code, message } }), { status, headers });
+      };
+      if (!limiter || typeof limiter.limit !== "function") {
+        return privateRateError("PRIVATE_RATE_LIMITER_NOT_CONFIGURED", "The private API rate limiter is not configured.", 503);
+      }
+      try {
+        const ip = request.headers.get("cf-connecting-ip") || request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+        const decision = await limiter.limit({ key: normalizedPath + ":" + ip });
+        if (!decision?.success) {
+          return privateRateError("RATE_LIMITED", "Too many account or billing requests. Please wait before trying again.", 429);
+        }
+      } catch {
+        return privateRateError("PRIVATE_RATE_LIMITER_UNAVAILABLE", "The private API is temporarily unavailable.", 503);
+      }
+    }
     const rateLimitedPaths = new Set(["/v1/calculate", "/v1/india-tax", "/v1/fx"]);
     if (handler && request.method !== "OPTIONS" && rateLimitedPaths.has(url.pathname.replace(/\/$/, ""))) {
       const limiter = env.PUBLIC_API_LIMITER;
