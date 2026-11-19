@@ -43,7 +43,7 @@ const defDir=path.join(root,'calculator-definitions');
 if(definitions.length!==fs.readdirSync(defDir).filter(name=>name.endsWith('.js')).length)throw new Error('Canonical calculator definition count does not match the generated catalogue.');
 
 const allHtml=[];function walk(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){const f=path.join(dir,e.name);if(e.isDirectory()){if(!['.git','node_modules','dist'].includes(e.name))walk(f);}else if(e.name.endsWith('.html'))allHtml.push(f);}}walk(root);
-const managed=new Set([...required,'wa-site-runtime.js','wa-home-runtime.js','wa-calculator-runtime.js','financial-engine.js','decision-adapters.js','scenario-lab.js','goal-planner.js','financial-workspace.js','report-engine.js','formula-registry.js','i18n.js','accessibility.js','analytics.js','visualization.js']);
+const managed=new Set([...required,'calculator-enhancements.js','pdf-export-fix.js','wa-site-runtime.js','wa-home-runtime.js','wa-calculator-runtime.js','financial-engine.js','decision-adapters.js','scenario-lab.js','goal-planner.js','financial-workspace.js','report-engine.js','formula-registry.js','i18n.js','accessibility.js','analytics.js','visualization.js']);
 const isScenarioLabPage=(rel)=>rel==='scenario-lab.html';
 const isGoalPlannerPage=(rel)=>rel==='goal-planner.html';
 const isWorkspacePage=(rel)=>rel==='financial-workspace.html';
