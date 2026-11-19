@@ -24,8 +24,12 @@ for(const page of ['index.html','tools.html']){
 const core=fs.readFileSync('wa-core.js','utf8');
 const home=fs.readFileSync('homepage-business.js','utf8');
 const widget=fs.readFileSync('widget.js','utf8');
+const runtime=fs.readFileSync('wa-calculator-runtime.js','utf8');
 const rootBuild=fs.readFileSync('scripts/root-cause-build.mjs','utf8');
 assert.match(core,/function detectedCountry\(\)/);
+assert.match(core,/replace\(\/_\/g,'-'\)/);
+assert.match(widget,/currency:safeStorage\.get\('waCurrency'\)\|\|'USD'/);
+assert.match(runtime,/currency:safeStorage\.get\(\"waCurrency\"\)\|\|\"USD\"/,'Generated calculator runtime must not default to INR');
 assert.match(core,/function applyCountry\(\)/);
 assert.match(core,/function applyCurrency\(\)/);
 assert.match(home,/getElementById\('country-select'\)/);
