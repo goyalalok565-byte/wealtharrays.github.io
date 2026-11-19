@@ -4,13 +4,7 @@ const { CALCULATORS } = require('../calculators.js');
 
 const EPS = 1e-8;
 const REVIEW_DATE = '2026-09-15';
-const expectedIds = [
-  'sip','compound-interest','mortgage','roi','simple-interest','freedom-milestone','salary-hourly','profit-margin',
-  'fixed-deposit','recurring-deposit','lumpsum','cagr','car-loan','personal-loan','debt-payoff','inflation','net-worth',
-  'overtime','freelance-rate','income-tax-planner','home-loan-emi','currency-converter','flat-cost','loan-emi','capital-gain','lumpsum-sip','loan-against-property','home-loan-eligibility','silver-jewelry','advanced-home-loan-eligibility','consumer-durable-loan','gold-jewelry','loan-prepayment-vs-sip','ltv','stamp-duty','property-calculator','loan-interest',
-  'swp','ssy','rule-of-72','rent-vs-buy','fire','budget-50-30-20','break-even','cost-of-delay',
-  'ppf-growth','epf-growth','gst','emergency-fund','credit-card-payoff','step-up-sip','sip-goal','gratuity','hra-exemption','nps'
-];
+const expectedIds = JSON.parse(fs.readFileSync('calculator-definitions/registry.json','utf8')).calculators.map(item => item.id);
 
 function approx(a,b,tol=Math.max(EPS,Math.abs(b)*1e-9)) {
   return Number.isFinite(a) && Number.isFinite(b) && Math.abs(a-b) <= tol;
@@ -193,7 +187,7 @@ function stressValues(calc) {
 }
 
 let failures=0;
-if(CALCULATORS.length!==55) { console.error(`FAIL: expected 55 calculators, found ${CALCULATORS.length}`); failures++; }
+if(CALCULATORS.length!==expectedIds.length) { console.error(`FAIL: expected ${expectedIds.length} registered calculators, found ${CALCULATORS.length}`); failures++; }
 for(const id of expectedIds) if(!CALCULATORS.some(c=>c.id===id)) { console.error(`FAIL: missing calculator ${id}`); failures++; }
 
 for(const calc of CALCULATORS) {
