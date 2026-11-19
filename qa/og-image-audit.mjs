@@ -22,9 +22,8 @@ function walk(dir){
 }
 function meta(html,attribute,key){
   const escaped=key.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-  const pattern=new RegExp('<meta[^>]+\\b'+attribute+'=["\\']'+escaped+'["\\'][^>]+content=["\\']([^"\\']+)["\\'][^>]*>|<meta[^>]+content=["\\']([^"\\']+)["\\'][^>]+\\b'+attribute+'=["\\']'+escaped+'["\\'][^>]*>','i');
-  const match=html.match(pattern);
-  return match?(match[1]||match[2]||''):'';
+  const tag=html.match(new RegExp('<meta\\b[^>]*\\b'+attribute+'=["\\x27]'+escaped+'["\\x27][^>]*>','i'))?.[0]||'';
+  return (tag.match(/\\bcontent=["']([^"']+)["']/i)||[])[1]||'';
 }
 const pages=walk(root).filter(file=>{
   const html=fs.readFileSync(file,'utf8');
