@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 const registry=JSON.parse(fs.readFileSync('calculator-definitions/registry.json','utf8'));
-const indiaOnly=new Set(['income-tax-planner','ppf-growth','epf-growth','gst','hra-exemption','ssy','nps','gratuity','stamp-duty','gold-jewelry','silver-jewelry','home-loan-eligibility','advanced-home-loan-eligibility','loan-against-property','flat-cost','capital-gain','property-calculator','home-loan-emi']);
+const indiaOnly=new Set(['income-tax-planner','lumpsum-sip','ppf-growth','epf-growth','gst','hra-exemption','ssy','nps','gratuity','stamp-duty','gold-jewelry','silver-jewelry','home-loan-eligibility','advanced-home-loan-eligibility','loan-against-property','flat-cost','capital-gain','property-calculator','home-loan-emi']);
 for(const calc of registry.calculators){
  const html=fs.readFileSync(calc.slug+'/index.html','utf8');
  const locale=html.match(/property=["']og:locale["'] content=["']([^"']+)/i)?.[1];
