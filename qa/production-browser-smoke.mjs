@@ -200,7 +200,7 @@ try {
   await page.locator('#calc-widget .calc-result-row').first().waitFor({ state: 'visible', timeout: 5000 });
   const cagrResult = await page.locator('#calc-widget .calc-result-value').allTextContents();
   if (!cagrResult.some(value => value.includes('10.00%'))) throw new Error('CAGR Calculate click did not produce the expected 10.00% result');
-  const cagrExample = await page.locator('.tool-article').innerText();
+  const cagrExample = await page.locator('.tool-article').evaluate(element => element.textContent || '');
   if (!cagrExample.includes('₹1,00,000') || !cagrExample.includes('₹1,61,051') || !cagrExample.includes('10.00%')) throw new Error('CAGR worked example is missing key verified values');
 
   await assertCalculator('income-tax-scenario-calculator/', 'Income tax scenario calculator');
