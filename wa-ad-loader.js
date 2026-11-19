@@ -41,13 +41,15 @@
   }
   function schedule(){
     if(started)return;
-    if(window.requestIdleCallback)idleId=window.requestIdleCallback(loadAds,{timeout:4000});
-    else return;
+    if(fallbackTimer)return;
+    fallbackTimer=setTimeout(function(){
+      if(window.requestIdleCallback)idleId=window.requestIdleCallback(loadAds,{timeout:1000});
+      else loadAds();
+    },4000);
   }
   if(document.readyState==='complete')schedule();
   else window.addEventListener('load',schedule,{once:true,passive:true});
   ['pointerdown','keydown','touchstart','scroll'].forEach(function(name){
     window.addEventListener(name,loadAds,{once:true,passive:true});
   });
-  fallbackTimer=setTimeout(loadAds,4000);
 })();
