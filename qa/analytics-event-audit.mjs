@@ -12,10 +12,10 @@ assert.doesNotMatch(accountHtml,/cross-device access/);
 for(const [file,event] of [["calculator-page-init.js","calculator_open"],["widget.js","calculator_calculate"],["widget.js","pdf_export"],["widget.js","embed_copy"],["scenario-lab.js","scenario_run"],["goal-planner.js","goal_run"],["financial-workspace.js","workspace_calculate"],["financial-workspace.js","workspace_save"],["financial-workspace.js","workspace_load"],["financial-workspace.js","workspace_delete"],["financial-workspace.js","report_export"],["account.js","login"],["account.js","sign_up"],["account.js","begin_checkout"],["account.js","subscription_cancel_request"]]) assert.ok(fs.readFileSync(file,"utf8").includes("'" + event + "'"),file+" missing event "+event);
 console.log("Privacy-safe GA4 event audit PASS — consent gated, allow-listed parameters, no raw financial input payloads.");
 
-const analyticsBlock=core.match(/function analytics\\(\\)\\{([\\s\\S]*?)\\n  function consentDialog/);
+const analyticsBlock=core.match(/function analytics\(\)\{([\s\S]*?)\n  function consentDialog/);
 assert.ok(analyticsBlock,"Analytics initializer must remain a distinct function");
-assert.match(analyticsBlock[1],/window\\.__WA_ENABLE_ANALYTICS__=enableAnalytics/);
-assert.match(analyticsBlock[1],/if\\(saved==='granted'\\)[\\s\\S]*?enableAnalytics\\(\\)/);
-assert.doesNotMatch(analyticsBlock[1],/if\\(saved\\)gtag\\('consent','update'/);
-assert.match(core,/if\\(granted&&typeof window\\.__WA_ENABLE_ANALYTICS__==='function'\\)window\\.__WA_ENABLE_ANALYTICS__\\(\\)/);
+assert.match(analyticsBlock[1],/window\.__WA_ENABLE_ANALYTICS__=enableAnalytics/);
+assert.match(analyticsBlock[1],/if\(saved==='granted'\)[\s\S]*?enableAnalytics\(\)/);
+assert.doesNotMatch(analyticsBlock[1],/if\(saved\)gtag\('consent','update'/);
+assert.match(core,/if\(granted&&typeof window\.__WA_ENABLE_ANALYTICS__==='function'\)window\.__WA_ENABLE_ANALYTICS__\(\)/);
 console.log("GA4 loader regression PASS — the network script is initialized only after stored or explicit analytics consent.");
