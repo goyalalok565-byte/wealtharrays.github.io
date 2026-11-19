@@ -5,6 +5,7 @@ import vm from 'node:vm';
 import { execFileSync } from 'node:child_process';
 
 const root=process.cwd();
+const sourceRegistry=JSON.parse(fs.readFileSync(path.join(root,'content-sources.json'),'utf8'));
 execFileSync(process.execPath,[path.join(root,'scripts/sync-calculator-catalog.mjs')],{stdio:'inherit'});
 const stamp=new Date().toISOString().replace(/\D/g,'').slice(0,14);
 const siteSources=['wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js','calculator-search.js'];
@@ -184,6 +185,33 @@ if(isCalc){
     const faqItems=[...faqMatch[1].matchAll(/\{\s*q:\s*("(?:\\.|[^"\\])*")\s*,\s*a:\s*("(?:\\.|[^"\\])*")\s*\}/g)].map(m=>'<div class="faq-item"><h3>'+escapeFaqHtml(JSON.parse(m[1]))+'</h3><p>'+escapeFaqHtml(JSON.parse(m[2]))+'</p></div>').join('');
     if(faqItems) html=html.replace(/<h2>Frequently asked questions<\/h2>[\s\S]*?(?=<h2>Related calculators<\/h2>)/i,'<h2>Frequently asked questions</h2>'+faqItems);
   }
+  const calcTitleForFaq=calcDefinition?.obj.match(/\btitle:\s*["']([^"']+)["']/)?.[1]||'this calculator';
+  const calcCategoryForFaq=calcDefinition?.obj.match(/\bcategory:\s*["']([^"']+)["']/)?.[1]||'general';
+  const calcInputLabels=[...(calcDefinition?.obj||'').matchAll(/\blabel:\s*["']([^"']+)["']/g)].map(m=>m[1]).slice(0,4);
+  const calcInputsText=calcInputLabels.length?calcInputLabels.join(', '):'the inputs shown in the calculator';
+  const categoryFaqAnswers={
+    investment:'Compare the assumed return, time horizon and contribution or starting amount. For '+calcTitleForFaq+', the key inputs include '+calcInputsText+'. Test a conservative, middle and optimistic return while holding the other values constant. Investment returns are uncertain, and fees, taxes and inflation may reduce the real outcome.',
+    loan:'Change the interest rate and repayment term one at a time, then compare the monthly payment with total interest. For '+calcTitleForFaq+', check '+calcInputsText+'. Confirm whether the lender rate is fixed or floating and review processing fees, reset rules and prepayment charges in the actual loan documents.',
+    banking:'Test the deposit amount, interest rate, term and compounding convention. For '+calcTitleForFaq+', the inputs include '+calcInputsText+'. Confirm whether the bank pays interest monthly, quarterly or at maturity, and check premature-withdrawal rules; the estimate does not replace the deposit contract.',
+    retirement:'Stress-test contributions, investment horizon, expected return and withdrawal assumptions. For '+calcTitleForFaq+', review '+calcInputsText+'. Inflation, longevity, taxes, fees and annuity terms can change retirement income, so compare several scenarios and verify current scheme rules with the relevant regulator or provider.',
+    salary:'Verify the pay period, paid hours, workweek and local employment rules. For '+calcTitleForFaq+', check '+calcInputsText+'. Overtime eligibility, leave, bonuses and deductions depend on jurisdiction and employer policy; this arithmetic estimate is not a legal wage determination.',
+    business:'Separate direct costs from overhead and test how revenue, price and cost changes affect the result. For '+calcTitleForFaq+', check '+calcInputsText+'. Confirm whether the figure represents gross or net margin; taxes, financing costs and one-off expenses may not be included.',
+    tax:'Confirm the tax year, jurisdiction, filing status and eligibility of every deduction or credit before relying on an estimate. For '+calcTitleForFaq+', verify '+calcInputsText+'. Tax rates and thresholds change, so use the linked tax authority guidance and current forms to validate your inputs.',
+    planning:'Use assumptions that match the country, period and household or business context. For '+calcTitleForFaq+', review '+calcInputsText+'. Compare more than one scenario and remember that a published index or average may not match your personal costs or circumstances.'
+  };
+  const faqAnswer=categoryFaqAnswers[calcCategoryForFaq]||('For '+calcTitleForFaq+', test the main inputs one at a time and compare a conservative and an optimistic case. The calculator applies the formula shown on this page; verify local rules, product terms, fees and tax treatment separately.');
+  const escapeCalcFaq=value=>String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const extraFaqs='<div class="faq-item" data-wa-extra-faq="1"><h3>How should I stress-test '+escapeCalcFaq(calcTitleForFaq)+' results?</h3><p>'+escapeCalcFaq(faqAnswer)+'</p></div><div class="faq-item" data-wa-extra-faq="2"><h3>What should I verify outside the '+escapeCalcFaq(calcTitleForFaq)+'?</h3><p>The calculator cannot confirm eligibility, contract wording or current local rules. Before acting on a '+escapeCalcFaq(calcTitleForFaq)+' result, compare it with the original bank, employer, tax authority, regulator or provider document that governs your situation. Record the assumptions you used and rerun the estimate when rates, fees, dates or circumstances change.</p></div>';
+  if(!html.includes('data-wa-extra-faq="1"')){
+    const faqHeading=html.indexOf('<h2>Frequently asked questions</h2>');
+    if(faqHeading>=0){const insertAt=faqHeading+'<h2>Frequently asked questions</h2>'.length;html=html.slice(0,insertAt)+extraFaqs+html.slice(insertAt);}
+  }
+  const calculatorSources=sourceSetForCalculator(calcDefinition?.obj||'');
+  if(!html.includes('WA-CALCULATOR-AUTHORITATIVE-SOURCES')){
+    const sourceItems=calculatorSources.map(item=>'<li><a href="'+item.url+'" rel="noopener noreferrer">'+item.name+'</a> — '+item.reason+'</li>').join('');
+    const sourceBlock='<!-- WA-CALCULATOR-AUTHORITATIVE-SOURCES --><section class="calculator-sources" id="calculator-sources" aria-labelledby="calculator-sources-title"><h2 id="calculator-sources-title">Official references and further reading</h2><p>These official references provide background for the concepts or rules related to this calculator. Some links describe country-specific requirements; use the relevant authority for your own jurisdiction. They are not product recommendations.</p><ul>'+sourceItems+'</ul></section><p class="content-updated"><strong>Page content updated:</strong> <time datetime="2026-11-19">19 November 2026</time></p>';
+    html=html.replace(/<\/article>/i,sourceBlock+'</article>');
+  }
   const titleMatch=calcDefinition?.obj.match(/\btitle:\s*["']([^"']+)["']/);
   const descMatch=calcDefinition?.obj.match(/\bdesc:\s*["']([^"']+)["']/);
   const seoTitle=(titleMatch?.[1]||'Financial Calculator')+' | Wealth Arrays';
@@ -221,7 +249,12 @@ if(isWidget){
   html=html.replace(/\s*<script[^>]+src=["']\/widget-bootstrap\.js[^>]*><\/script>/gi,'');
   html=html.replace('</body>',widgetCalculators+widgetRuntime+widgetBootstrap+'</body>');
 }
-const sourceRegistry=JSON.parse(fs.readFileSync(path.join(root,'content-sources.json'),'utf8'));
+function sourceSetForCalculator(calcObject){
+  const category=calcObject.match(/\\bcategory:\\s*["']([^"']+)["']/)?.[1]||'general';
+  const keys={investment:['investment'],loan:['loans','banking'],banking:['banking'],retirement:['retirement','inflation'],salary:['salary'],business:['business'],planning:['planning','inflation'],tax:['tax']};
+  const selected=(keys[category]||['general']).flatMap(key=>sourceRegistry[key]||[]);
+  return selected.filter((item,index,all)=>all.findIndex(other=>other.url===item.url)===index);
+}
 function sourceSetForArticle(rel){
   const n=rel.toLowerCase();
   if(n.includes('sip')||n.includes('cagr')||n.includes('compound')||n.includes('return')||n.includes('investment')) return sourceRegistry.investment;
