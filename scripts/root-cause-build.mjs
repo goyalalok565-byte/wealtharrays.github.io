@@ -223,15 +223,33 @@ if(isCalc){
     tax:'No. '+calcTitleForFaq+' is a simplified planning estimate, not tax-return software. It does not verify documents, filing eligibility, every deduction or the complete rules for every jurisdiction and tax year.',
     planning:'No. '+calcTitleForFaq+' is an estimate based on selected assumptions. It cannot represent every household, location, price basket, contract or unexpected expense; use current local data for a decision.'
   };
-  const faqFourthAnswers='For '+calcTitleForFaq+', first save the baseline inputs and result. Then change one assumption at a time, record the new output and compare the difference with the baseline. Keeping other values fixed makes it easier to identify which assumption caused the change.';
-  const faqFifthAnswers='Recalculate '+calcTitleForFaq+' whenever a material input changes, such as a rate, payment, contribution, price, tax year, time horizon or contract term. Keep the date and assumptions with your result so that an older estimate is not mistaken for a current quote or rule.';
+  const faqFourthAnswers={
+    investment:'For '+calcTitleForFaq+', compare scenarios using the same starting balance, contribution schedule and time horizon. Change the return assumption separately, then add fees and inflation as separate checks. This avoids confusing a larger contribution with a better investment return.',
+    loan:'For '+calcTitleForFaq+', keep the principal and repayment term constant while comparing interest rates or prepayment choices. Review monthly affordability, total interest and upfront fees together; a lower EMI can still mean a higher lifetime cost if the term is longer.',
+    banking:'For '+calcTitleForFaq+', compare deposits with the same principal and tenure, then check the effect of compounding frequency and premature-withdrawal rules. Compare the amount actually payable after any applicable tax rather than relying only on the headline rate.',
+    retirement:'For '+calcTitleForFaq+', hold the retirement date and contribution schedule constant while testing return, inflation and withdrawal-rate scenarios. Also compare an earlier and later retirement date; a target that works only under the most optimistic assumptions is not robust.',
+    salary:'For '+calcTitleForFaq+', compare the same annual gross pay across paid weeks and actual hours, then account for overtime and unpaid leave separately. Keep benefits and deductions visible so that an hourly equivalent is not mistaken for take-home pay.',
+    business:'For '+calcTitleForFaq+', compare realistic price, volume and cost combinations over the same accounting period. Identify the break-even point, then test what happens if sales fall or input costs rise; do not mix gross margin with net profit.',
+    tax:'For '+calcTitleForFaq+', compare only scenarios that use the same tax year, jurisdiction and filing status. Change one eligible deduction or regime assumption at a time, then verify the result against the current tax authority rules and forms.',
+    planning:'For '+calcTitleForFaq+', build a base case, a favourable case and a downside case using the same time period. Change one major assumption at a time and compare the difference with current local data rather than relying on a single average.'
+  };
+  const faqFifthAnswers={
+    investment:'Recalculate '+calcTitleForFaq+' when the contribution amount, investment horizon, fees, tax treatment or expected return changes. Review the assumptions periodically and whenever your goal date changes; do not carry an old return assumption forward as though it were guaranteed.',
+    loan:'Recalculate '+calcTitleForFaq+' when the lender changes the rate, you make an extra repayment, the term changes or a fee is added. For a floating-rate loan, use the lender notice and updated repayment schedule rather than assuming the old EMI remains valid.',
+    banking:'Recalculate '+calcTitleForFaq+' when the bank changes the deposit rate, tenure, renewal terms or compounding method. Check the maturity date and any tax withholding or early-closure rule before comparing the new estimate with an older deposit receipt.',
+    retirement:'Recalculate '+calcTitleForFaq+' after a change in contributions, retirement date, expected pension, inflation assumption or withdrawal plan. A periodic review is useful because small changes in the time horizon and withdrawal rate can materially affect the amount available later.',
+    salary:'Recalculate '+calcTitleForFaq+' when pay, scheduled hours, paid weeks, overtime, leave or employment terms change. Keep the pay frequency and currency consistent, and verify statutory overtime or minimum-wage rules with the authority for your jurisdiction.',
+    business:'Recalculate '+calcTitleForFaq+' after changes in selling price, sales volume, supplier costs, staffing, rent or the period being measured. Update actual figures from the latest accounts; forecasts should be labelled separately from realised performance.',
+    tax:'Recalculate '+calcTitleForFaq+' whenever the tax year, jurisdiction, income, filing status or eligible deductions change. Tax thresholds and rules can change between years, so never reuse last year’s assumptions without checking current official guidance.',
+    planning:'Recalculate '+calcTitleForFaq+' when the country, local price data, planning period, household costs or target date changes. Record the date and source of each major assumption so the result can be refreshed consistently.'
+  };
   const faqType=calcCategoryForFaq;
   const faqEntries=[
     ['How should I stress-test '+calcTitleForFaq+' results?',faqAnswer],
     ['Which inputs can move the '+calcTitleForFaq+' result most?',faqSecondAnswers[faqType]||faqSecondAnswers.planning],
     ['What does the '+calcTitleForFaq+' estimate leave out?',faqThirdAnswers[faqType]||faqThirdAnswers.planning],
-    ['How should I compare two '+calcTitleForFaq+' scenarios?',faqFourthAnswers],
-    ['When should I recalculate the '+calcTitleForFaq+' estimate?',faqFifthAnswers]
+    ['How should I compare two '+calcTitleForFaq+' scenarios?',faqFourthAnswers[faqType]||faqFourthAnswers.planning],
+    ['When should I recalculate the '+calcTitleForFaq+' estimate?',faqFifthAnswers[faqType]||faqFifthAnswers.planning]
   ];
   const extraFaqs=faqEntries.map((item,index)=>'<div class="faq-item" data-wa-extra-faq="'+(index+1)+'"><h3>'+escapeCalcFaq(item[0])+'</h3><p>'+escapeCalcFaq(item[1])+'</p></div>').join('');
   if(!html.includes('data-wa-extra-faq="1"')){
