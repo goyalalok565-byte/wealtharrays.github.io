@@ -9,7 +9,7 @@ assert.match(sw, /Do not cache arbitrary same-origin fetches/, 'Only navigations
 assert.match(sw, /NAVIGATION_TIMEOUT_MS=3000/, 'Navigation must fall back after three seconds');
 assert.match(sw, /fetch\(request\)/, 'Navigation fetch must not force cache:no-store');
 assert.doesNotMatch(sw, /fetch\(request,\s*\{\s*cache:\s*['"]no-store['"]/, 'Navigation must not disable the browser HTTP cache');
-assert.match(sw, /if\(hit\)\{event\.waitUntil\(refresh\);return hit;\}/, 'Static assets must use stale-while-revalidate');
+assert.match(sw, /cache\.match\(request\)\)\.then\(hit=>hit\|\|refresh\.then/, 'Static assets must return cache hits immediately and revalidate in the background');
 assert.match(sw, /wealtharrays-pwa-11/, 'Service worker cache version must be bumped after strategy changes');
 assert.ok((headers.match(/connect-src[^\n]*https:\/\/\*\.supabase\.co/g) || []).length >= 3, 'CSP connect-src must permit Supabase auth on top-level and embed policies');
 console.log('Service worker privacy/CSP audit PASS — API and authenticated requests bypass Cache Storage, cache directives are respected, and Supabase auth is permitted.');
