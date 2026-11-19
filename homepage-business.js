@@ -16,7 +16,7 @@ if(homeCurrency){
   document.documentElement.setAttribute('data-currency',savedCurrency);
   homeCurrency.addEventListener('change',function(){document.documentElement.setAttribute('data-currency',homeCurrency.value||'INR');window.dispatchEvent(new CustomEvent('wa-currency',{detail:{currency:homeCurrency.value||'INR'}}));});
 }
-if(grid&&toggle){document.documentElement.classList.add('wa-home-ready');var setExpanded=function(expanded){grid.classList.toggle('is-expanded',expanded);toggle.setAttribute('aria-expanded',String(expanded));toggle.textContent=expanded?'Show fewer calculators':'Show all 47 calculators';toggle.hidden=!!(search&&search.value.trim());};toggle.addEventListener('click',function(){setExpanded(!grid.classList.contains('is-expanded'));});if(search){search.addEventListener('input',function(){if(search.value.trim()){grid.classList.add('is-expanded');toggle.hidden=true;}else{setExpanded(false);}});}}
+if(grid&&toggle){document.documentElement.classList.add('wa-home-ready');var setExpanded=function(expanded){grid.classList.toggle('is-expanded',expanded);toggle.setAttribute('aria-expanded',String(expanded));toggle.textContent=expanded?'Show fewer calculators':'Show all 55 calculators';toggle.hidden=!!(search&&search.value.trim());};toggle.addEventListener('click',function(){setExpanded(!grid.classList.contains('is-expanded'));});if(search){search.addEventListener('input',function(){if(search.value.trim()){grid.classList.add('is-expanded');toggle.hidden=true;}else{setExpanded(false);}});}}
 if(!form)return;
 var principal=document.getElementById('wa-emi-principal');
 var rate=document.getElementById('wa-emi-rate');

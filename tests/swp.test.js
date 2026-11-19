@@ -1,0 +1,5 @@
+const test = require('node:test');
+const { values, close, safeOutputs } = require('./helpers');
+function ref(v) { let b=Math.max(0,Number(v.corpus)||0),w=Math.max(0,Number(v.withdrawal)||0),rate=(Number(v.rate)||0)/1200,step=(Number(v.stepUp)||0)/100,total=0,funded=0; const n=Math.max(0,Math.round((Number(v.years)||0)*12)); for(let m=1;m<=n;m++){if(m>1&&(m-1)%12===0)w*=1+step;const taken=Math.min(w,b);b-=taken;total+=taken;if(taken+0.005<w)break;funded++;b*=1+rate;}return [total,b,b+total-Math.max(0,Number(v.corpus)||0),funded/12]; }
+const cases=[['default',{corpus:5000000,withdrawal:30000,rate:8,years:20,stepUp:5}],['zero return',{corpus:120000,withdrawal:10000,rate:0,years:3,stepUp:0}],['blank',{corpus:'',withdrawal:'',rate:'',years:'',stepUp:''}],['maximum',{corpus:100000000000,withdrawal:1000000000,rate:50,years:60,stepUp:50}],['negative',{corpus:-100,withdrawal:-10,rate:-5,years:-2,stepUp:-3}]];
+for(const [name,v] of cases)test(`SWP ${name}: independent monthly withdrawal model`,()=>{const r=ref(v),a=values('swp',v);for(let i=0;i<4;i++)close(a[i],r[i],`metric ${i}`);safeOutputs('swp',v);});

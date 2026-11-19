@@ -55,8 +55,8 @@ try {
     id: c.id, slug: c.slug, title: c.title,
     fields: c.fields.map(f => ({ id: f.id, label: f.label, type: f.type, default: f.default, min: f.min, max: f.max, step: f.step, options: f.options }))
   }));
-  assert(calculators.length === 47, 'Expected 47 source calculator definitions, found ' + calculators.length);
-  assert(new Set(calculators.map(c => c.id)).size === 47, 'Calculator IDs are not unique');
+  assert(calculators.length === 55, 'Expected 55 source calculator definitions, found ' + calculators.length);
+  assert(new Set(calculators.map(c => c.id)).size === 55, 'Calculator IDs are not unique');
 
   for (const calc of calculators) {
     try {
