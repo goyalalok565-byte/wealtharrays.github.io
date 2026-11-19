@@ -250,7 +250,7 @@ if(isWidget){
   html=html.replace('</body>',widgetCalculators+widgetRuntime+widgetBootstrap+'</body>');
 }
 function sourceSetForCalculator(calcObject){
-  const category=calcObject.match(/\\bcategory:\\s*["']([^"']+)["']/)?.[1]||'general';
+  const category=calcObject.match(/\bcategory:\s*["']([^"']+)["']/)?.[1]||'general';
   const keys={investment:['investment'],loan:['loans','banking'],banking:['banking'],retirement:['retirement','inflation'],salary:['salary'],business:['business'],planning:['planning','inflation'],tax:['tax']};
   const selected=(keys[category]||['general']).flatMap(key=>sourceRegistry[key]||[]);
   return selected.filter((item,index,all)=>all.findIndex(other=>other.url===item.url)===index);
