@@ -203,10 +203,42 @@ if(isCalc){
   };
   const faqAnswer=categoryFaqAnswers[calcCategoryForFaq]||('For '+calcTitleForFaq+', test the main inputs one at a time and compare a conservative and an optimistic case. The calculator applies the formula shown on this page; verify local rules, product terms, fees and tax treatment separately.');
   const escapeCalcFaq=value=>String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  const extraFaqs='<div class="faq-item" data-wa-extra-faq="1"><h3>How should I stress-test '+escapeCalcFaq(calcTitleForFaq)+' results?</h3><p>'+escapeCalcFaq(faqAnswer)+'</p></div><div class="faq-item" data-wa-extra-faq="2"><h3>What should I verify outside the '+escapeCalcFaq(calcTitleForFaq)+'?</h3><p>The calculator cannot confirm eligibility, contract wording or current local rules. Before acting on a '+escapeCalcFaq(calcTitleForFaq)+' result, compare it with the original bank, employer, tax authority, regulator or provider document that governs your situation. Record the assumptions you used and rerun the estimate when rates, fees, dates or circumstances change.</p></div>';
+  const faqSecondAnswers={
+    investment:'For '+calcTitleForFaq+', the biggest changes usually come from the assumed return, investment duration and contribution size. The labels on this page are '+calcInputsText+'. Change one assumption at a time and compare the ending value with the amount contributed; a higher projection is not a guaranteed return.',
+    loan:'For '+calcTitleForFaq+', the interest rate and repayment term often change both the monthly payment and total borrowing cost. The inputs on this page include '+calcInputsText+'. Compare total interest as well as affordability, and confirm whether the quoted rate can reset.',
+    banking:'For '+calcTitleForFaq+', the deposit amount, rate, term and compounding frequency can change the maturity estimate. The inputs on this page include '+calcInputsText+'. Match the bank statement or product illustration for the actual crediting convention.',
+    retirement:'For '+calcTitleForFaq+', contribution size, time remaining, return and withdrawal assumptions can materially change the projection. The inputs on this page include '+calcInputsText+'. Test a lower-return and higher-inflation case before treating a target as affordable.',
+    salary:'For '+calcTitleForFaq+', pay rate, paid hours and the number of working weeks are key drivers. The inputs on this page include '+calcInputsText+'. Check unpaid leave, bonuses, deductions and local overtime rules before comparing the estimate with a payslip.',
+    business:'For '+calcTitleForFaq+', revenue, direct costs and overhead assumptions drive the result. The inputs on this page include '+calcInputsText+'. Separate one-off expenses from recurring costs and use the same accounting period for every value.',
+    tax:'For '+calcTitleForFaq+', taxable income, eligible deductions, filing status and the applicable tax year can change the estimate. The inputs on this page include '+calcInputsText+'. Confirm each item against current tax-authority rules before relying on a comparison.',
+    planning:'For '+calcTitleForFaq+', the result is most sensitive to the assumptions that describe your time period, costs and rates. The inputs on this page include '+calcInputsText+'. Test a second set of assumptions that reflects a less favourable but plausible case.'
+  };
+  const faqThirdAnswers={
+    investment:'No. '+calcTitleForFaq+' is a mathematical scenario and does not automatically include market volatility, fund expenses, tax on gains, inflation or the timing of actual returns unless those items are explicit inputs.',
+    loan:'No. '+calcTitleForFaq+' is not a lender quote and may not include processing fees, insurance, taxes, prepayment charges, rate-reset clauses or lender-specific rounding. Read the loan agreement and repayment schedule.',
+    banking:'No. '+calcTitleForFaq+' may not include tax withholding, premature-closure penalties, special deposit conditions or every bank-specific compounding rule. Check the current deposit receipt and terms for the product you plan to use.',
+    retirement:'No. '+calcTitleForFaq+' cannot determine scheme eligibility, future policy changes, insurer annuity pricing, tax treatment, longevity or every fee. Confirm current scheme rules and obtain provider illustrations before acting.',
+    salary:'No. '+calcTitleForFaq+' does not decide legal employee status, statutory overtime eligibility, benefits, leave entitlement or payroll deductions. Those depend on local law, contract terms and employer policy.',
+    business:'No. '+calcTitleForFaq+' does not replace financial statements or accounting advice. Inventory valuation, depreciation, financing, tax, cash-flow timing and one-off costs can change the business result.',
+    tax:'No. '+calcTitleForFaq+' is a simplified planning estimate, not tax-return software. It does not verify documents, filing eligibility, every deduction or the complete rules for every jurisdiction and tax year.',
+    planning:'No. '+calcTitleForFaq+' is an estimate based on selected assumptions. It cannot represent every household, location, price basket, contract or unexpected expense; use current local data for a decision.'
+  };
+  const faqFourthAnswers='For '+calcTitleForFaq+', first save the baseline inputs and result. Then change one assumption at a time, record the new output and compare the difference with the baseline. Keeping other values fixed makes it easier to identify which assumption caused the change.';
+  const faqFifthAnswers='Recalculate '+calcTitleForFaq+' whenever a material input changes, such as a rate, payment, contribution, price, tax year, time horizon or contract term. Keep the date and assumptions with your result so that an older estimate is not mistaken for a current quote or rule.';
+  const faqType=calcCategoryForFaq;
+  const faqEntries=[
+    ['How should I stress-test '+calcTitleForFaq+' results?',faqAnswer],
+    ['Which inputs can move the '+calcTitleForFaq+' result most?',faqSecondAnswers[faqType]||faqSecondAnswers.planning],
+    ['What does the '+calcTitleForFaq+' estimate leave out?',faqThirdAnswers[faqType]||faqThirdAnswers.planning],
+    ['How should I compare two '+calcTitleForFaq+' scenarios?',faqFourthAnswers],
+    ['When should I recalculate the '+calcTitleForFaq+' estimate?',faqFifthAnswers]
+  ];
+  const extraFaqs=faqEntries.map((item,index)=>'<div class="faq-item" data-wa-extra-faq="'+(index+1)+'"><h3>'+escapeCalcFaq(item[0])+'</h3><p>'+escapeCalcFaq(item[1])+'</p></div>').join('');
   if(!html.includes('data-wa-extra-faq="1"')){
-    const faqHeading=html.indexOf('<h2>Frequently asked questions</h2>');
-    if(faqHeading>=0){const insertAt=faqHeading+'<h2>Frequently asked questions</h2>'.length;html=html.slice(0,insertAt)+extraFaqs+html.slice(insertAt);}
+    const faqHeading='<h2>Frequently asked questions</h2>';
+    const faqHeadingIndex=html.indexOf(faqHeading);
+    if(faqHeadingIndex>=0){const insertAt=faqHeadingIndex+faqHeading.length;html=html.slice(0,insertAt)+extraFaqs+html.slice(insertAt);}
+    else{const articleEnd=html.indexOf('</article>');if(articleEnd>=0)html=html.slice(0,articleEnd)+faqHeading+extraFaqs+html.slice(articleEnd);}
   }
   const calculatorSources=sourceSetForCalculator(calcDefinition?.obj||'');
   if(!html.includes('WA-CALCULATOR-AUTHORITATIVE-SOURCES')){
