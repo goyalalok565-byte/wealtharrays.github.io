@@ -14,7 +14,7 @@ if (!fs.existsSync('wa-article-runtime.js')) throw new Error('Missing lightweigh
 const bundle = fs.readFileSync('wa-calculator-runtime.js','utf8');
 const articleBundle = fs.readFileSync('wa-article-runtime.js','utf8');
 if (!articleBundle.includes('WA CANONICAL MODULE')) throw new Error('Article bundle provenance markers missing');
-for (const file of fs.readdirSync('articles').filter(name=>name.endsWith('.html'))) { const html=fs.readFileSync(path.join('articles',file),'utf8'); const tags=[...html.matchAll(/<script\s+src=["']([^"']+)[^>]*><\/script>/gi)].map(m=>path.basename(m[1].split('?')[0])); if(tags.filter(name=>name==='wa-article-runtime.js').length!==1||tags.includes('wa-site-runtime.js')) throw new Error(file+': article runtime is not isolated'); }
+if(fs.existsSync('dist/articles')){for(const file of fs.readdirSync('dist/articles').filter(name=>name.endsWith('.html'))){const html=fs.readFileSync(path.join('dist/articles',file),'utf8');const tags=[...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi)].map(m=>path.basename(m[1].split('?')[0]));if(tags.filter(name=>/^wa-article-runtime\.[a-f0-9]{12}\.js$/.test(name)).length!==1||tags.some(name=>/^wa-site-runtime\./.test(name)))throw new Error(file+': article runtime is not isolated');}}
 if (!bundle.includes('WA CANONICAL MODULE')) throw new Error('Bundle provenance markers missing');
 for (const file of calculators) {
   if (!fs.existsSync(file)) throw new Error(`Missing calculator page: ${file}`);
