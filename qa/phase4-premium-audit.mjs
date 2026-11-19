@@ -42,7 +42,7 @@ for(const full of publicFiles){
 for(const file of publicFiles){
   const base=path.basename(file);
   const rel=path.relative(root,file).replaceAll(path.sep,'/');
-  const routeName=rel==='widget/index.html'?'widget/index.html':base;
+  const routeName=rel;
   const html=fs.readFileSync(file,'utf8');
   const noindex=/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html);
   const consentExcluded=['index.html','404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html'].includes(routeName) || noindex;
