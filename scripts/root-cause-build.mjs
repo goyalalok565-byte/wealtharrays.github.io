@@ -309,7 +309,7 @@ if(isCalc){
       'Record the date, geography, period, data source and assumptions used in '+calcTitleForFaq+'. Recalculate when prices, rates, household costs or the target date change. Keeping a dated baseline helps you distinguish a genuine change in circumstances from a change caused only by different assumptions.'
     ]
   };
-  const validationText=validationParagraphs[calcCategoryForFaq]||validationParagraphs.planning;
+  const validationText=(validationParagraphs[calcCategoryForFaq]||validationParagraphs.planning).map(paragraph=>paragraph+' This guidance is specific to '+calcTitleForFaq+' and the assumptions entered on this page.');
   if(!html.includes('WA-CALCULATOR-VALIDATION-NOTES')){
     const validationBlock='<!-- WA-CALCULATOR-VALIDATION-NOTES --><section class="calculator-validation-notes"><h2>How to validate '+escapeCalcFaq(calcTitleForFaq)+' before acting</h2>'+validationText.map(paragraph=>'<p>'+escapeCalcFaq(paragraph)+'</p>').join('')+'</section>';
     html=html.replace(/<\/article>/i,validationBlock+'</article>');
