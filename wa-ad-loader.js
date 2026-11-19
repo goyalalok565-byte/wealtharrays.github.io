@@ -41,8 +41,8 @@
   }
   function schedule(){
     if(started)return;
-    if(window.requestIdleCallback)idleId=window.requestIdleCallback(loadAds,{timeout:1000});
-    else setTimeout(loadAds,500);
+    if(window.requestIdleCallback)idleId=window.requestIdleCallback(loadAds,{timeout:4000});
+    else return;
   }
   if(document.readyState==='complete')schedule();
   else window.addEventListener('load',schedule,{once:true,passive:true});
