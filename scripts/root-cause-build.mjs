@@ -117,7 +117,7 @@ html=html.replace('</head>','<link rel="icon" type="image/png" href="/favicon.sv
 if(isCalc){const rawId=html.match(/data-wa-calculator="([^"]+)"/i)?.[1];if(!rawId)throw new Error(`Calculator page missing data-wa-calculator: ${full}`);const base=path.basename(full).toLowerCase()==='index.html'?path.basename(path.dirname(full)):path.basename(full,'.html');const id=byId.get(rawId)||bySlug.get(base)||pageAliases.get(base);if(!id)throw new Error(`No calculator definition matches ${full} (${rawId}, ${base})`);html=html.replace(/data-wa-calculator="[^"]+"/i,`data-wa-calculator="${id}"`);html=html.replace(/\s*<script[^>]+calculator-definitions[^>]*><\/script>/gi,'');const def=`<script src="/calculator-definitions/${id}.js?v=${stamp}" defer></script>`;const runtime=`<script src="/wa-calculator-runtime.js?v=${stamp}" defer></script>`;html=html.replace(/\s*<script[^>]+wa-calculator-runtime\.js[^>]*><\/script>/gi,'');
 const searchMarkup='<div class="tool-search-shell wa-calculator-search"><input id="tool-search" type="search" autocomplete="off" placeholder="Search any calculator: SIP, EMI, FD, ROI…" aria-label="Search calculators"><div id="tool-search-results" class="tool-search-results" hidden></div></div>';
 if(!html.includes('id="tool-search"')){
-  const titlePattern=/(<h1\\b[^>]*class=["'][^"']*\\bcalc-title\\b[^"']*["'][^>]*>[\\s\\S]*?<\\/h1>)/i;
+  const titlePattern=/(<h1\b[^>]*class=["'][^"']*\bcalc-title\b[^"']*["'][^>]*>[\s\S]*?<\/h1>)/i;
   if(!titlePattern.test(html))throw new Error('Calculator page is missing a title anchor for its static search field: '+full);
   html=html.replace(titlePattern,'$1'+searchMarkup);
 }
