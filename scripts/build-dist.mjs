@@ -93,10 +93,10 @@ function auditTree(dir, rel='') {
 }
 auditTree(out);
 const forbiddenHits = forbidden.filter(p =>
-  /^(qa|scripts|country-modules|api|p|privacy|reports)(\/|$)/.test(p) ||
+  /^(qa|scripts|docs|tests|functions|migrations|country-modules|api|p|privacy|reports)(\/|$)/.test(p) ||
   /\.(md)$/i.test(p) ||
   p === 'content-sources.json' ||
-  p.startsWith('.github/') || /\\.(zip|bak|old|orig)$/i.test(p) || p === 'package.json' || p === 'calculator-value-content.json'
+  p.startsWith('.github/') || /\.(zip|bak|old|orig)$/i.test(p) || p === 'package.json' || p === 'calculator-value-content.json'
 );
 if (forbiddenHits.length) {
   throw new Error('Forbidden internal files leaked into dist:\n' + forbiddenHits.join('\n'));
