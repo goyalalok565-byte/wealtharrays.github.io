@@ -9,7 +9,7 @@ const siteSources=['wa-core.js','site-runtime.js','final-polish.js','theme-fix.j
 const homeSources=['final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js'];
 const articleSources=['wa-core.js','phase4-premium.js'];
 const calcSiteSources=siteSources.filter(file=>file!=='calculator-search.js');
-const calcSources=['widget.js','widget-bootstrap.js',...calcSiteSources,'calculator-safety.js','calculator-page-init.js','pdf-export-fix.js'];
+const calcSources=['widget.js','widget-bootstrap.js',...calcSiteSources,'calculator-safety.js','calculator-page-init.js'];
 let calculatorPages=[];
 let slugs=[];
 const required=[...new Set([...siteSources,...calcSources,...articleSources,'calculators.js'])];
