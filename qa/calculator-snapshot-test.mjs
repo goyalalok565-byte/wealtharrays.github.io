@@ -18,7 +18,7 @@ function normalize(value) {
     const rounded = Number(value.toPrecision(14));
     return Object.is(rounded, -0) ? 0 : rounded;
   }
-  if (Array.isArray(value)) return value.map(normalize);
+  if (Array.isArray(value)) return Array.from(value, normalize);
   if (typeof value === 'object') {
     return Object.fromEntries(Object.keys(value).sort().map(key => [key, normalize(value[key])]));
   }
@@ -55,7 +55,7 @@ function loadDefinitions() {
     const full = path.join(definitionsDir, file);
     vm.runInContext(fs.readFileSync(full, 'utf8'), context, { filename: file, timeout: 5_000 });
   }
-  const calculators = context.window.CALCULATORS;
+  const calculators = Array.from(context.window.CALCULATORS || []);
   if (!Array.isArray(calculators) || !calculators.length) throw new Error('No calculator definitions were loaded.');
   const ids = calculators.map(calc => calc.id);
   if (new Set(ids).size !== ids.length) throw new Error('Duplicate calculator IDs detected in split definitions.');
