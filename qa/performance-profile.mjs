@@ -58,7 +58,8 @@ try {
   // Separate instrumented run: observer callback and selector activity per input change.
   const probe = await browser.newPage({ viewport: { width: 360, height: 800 }, deviceScaleFactor: 2 });
   await probe.addInitScript(() => {
-    const stats = window.__waPerfProbe = { observers: 0, bodyObservers: 0, callbacks: 0, records: 0, callbackMs: 0, qsaCalls: 0 };
+    const stats = window.__waPerfProbe = { observers: 0, bodyObservers: 0, callbacks: 0, records: 0, callbackMs: 0, qsaCalls: 0, longTasks: [] };
+    try { new PerformanceObserver(list => { for (const entry of list.getEntries()) stats.longTasks.push({ durationMs: +entry.duration.toFixed(2), startTimeMs: +entry.startTime.toFixed(2), name: entry.name }); }).observe({ type: 'longtask', buffered: true }); } catch {}
     const NativeObserver = window.MutationObserver;
     window.MutationObserver = new Proxy(NativeObserver, {
       construct(Target, args) {
@@ -105,7 +106,7 @@ try {
   }
   const totals = await probe.evaluate(() => ({ ...window.__waPerfProbe }));
   console.log('SWP_OBSERVER_PROBE', JSON.stringify({ totals, perInput: observations }));
-  fs.writeFileSync(outputDir + '/swp-observer-probe.json', JSON.stringify({ totals, perInput: observations }, null, 2));
+  fs.writeFileSync(outputDir + '/swp-observer-probe.json', JSON.stringify({ totals, perInput: observations, longTasks: totals.longTasks }, null, 2));
   await probe.close();
 } finally {
   await browser.close();
