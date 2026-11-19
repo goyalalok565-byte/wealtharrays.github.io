@@ -1,0 +1,6977 @@
+{
+  "schemaVersion": 1,
+  "calculatorCount": 55,
+  "caseNames": [
+    "default",
+    "zero",
+    "blank",
+    "large"
+  ],
+  "calculators": [
+    {
+      "id": "advanced-home-loan-eligibility",
+      "slug": "advanced-home-loan-eligibility-calculator",
+      "title": "Advanced Home Loan Eligibility Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "coIncome": 75000,
+            "existing": 20000,
+            "foir": 50,
+            "income": 150000,
+            "rate": 8.5,
+            "years": 20
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Combined monthly income",
+              "value": 225000
+            },
+            {
+              "format": "currency",
+              "label": "Indicative EMI capacity",
+              "value": 92500
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Indicative eligible loan",
+              "value": 10658852.683774
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "coIncome": 0,
+            "existing": 0,
+            "foir": 0,
+            "income": 0,
+            "rate": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Combined monthly income",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Indicative EMI capacity",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Indicative eligible loan",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "coIncome": "",
+            "existing": "",
+            "foir": "",
+            "income": "",
+            "rate": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Combined monthly income",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Indicative EMI capacity",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Indicative eligible loan",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "coIncome": 1000000000000,
+            "existing": 1000000000000,
+            "foir": 100,
+            "income": 1000000000000,
+            "rate": 100,
+            "years": 100
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Combined monthly income",
+              "value": 2000000000000
+            },
+            {
+              "format": "currency",
+              "label": "Indicative EMI capacity",
+              "value": 1000000000000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Indicative eligible loan",
+              "value": 12000000000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "break-even",
+      "slug": "break-even-calculator",
+      "title": "Break-Even Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "days": 30,
+            "fixedCosts": 150000,
+            "price": 150,
+            "targetProfit": 50000,
+            "variableCost": 60
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Contribution per unit",
+              "value": 90
+            },
+            {
+              "emphasis": "neutral",
+              "format": "number",
+              "label": "Break-even units per month",
+              "value": 1667
+            },
+            {
+              "format": "currency",
+              "label": "Break-even sales per month",
+              "value": 250050
+            },
+            {
+              "format": "number",
+              "label": "Break-even units per day",
+              "value": 55.566666666667
+            },
+            {
+              "emphasis": "positive",
+              "format": "number",
+              "label": "Units per month for the profit target",
+              "value": 2223
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "days": 0,
+            "fixedCosts": 0,
+            "price": 0,
+            "targetProfit": 0,
+            "variableCost": 0
+          },
+          "output": [
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Contribution per unit",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "number",
+              "label": "No break-even: price does not cover variable cost",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Break-even sales per month",
+              "value": 0
+            },
+            {
+              "format": "number",
+              "label": "Break-even units per day",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "number",
+              "label": "Units per month for the profit target",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "days": "",
+            "fixedCosts": "",
+            "price": "",
+            "targetProfit": "",
+            "variableCost": ""
+          },
+          "output": [
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Contribution per unit",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "number",
+              "label": "No break-even: price does not cover variable cost",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Break-even sales per month",
+              "value": 0
+            },
+            {
+              "format": "number",
+              "label": "Break-even units per day",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "number",
+              "label": "Units per month for the profit target",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "days": 31,
+            "fixedCosts": 100000000000,
+            "price": 1000000000,
+            "targetProfit": 100000000000,
+            "variableCost": 1000000000
+          },
+          "output": [
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Contribution per unit",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "number",
+              "label": "No break-even: price does not cover variable cost",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Break-even sales per month",
+              "value": 0
+            },
+            {
+              "format": "number",
+              "label": "Break-even units per day",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "number",
+              "label": "Units per month for the profit target",
+              "value": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "budget-50-30-20",
+      "slug": "budget-calculator",
+      "title": "50/30/20 Budget Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "actualNeeds": 45000,
+            "actualWants": 25000,
+            "income": 80000,
+            "needsPct": 50,
+            "wantsPct": 30
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Target for needs",
+              "value": 40000
+            },
+            {
+              "format": "currency",
+              "label": "Target for wants",
+              "value": 24000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Target for savings and debt repayment",
+              "value": 16000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Your actual monthly savings",
+              "value": 10000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Short of the savings target by",
+              "value": 6000
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "actualNeeds": 0,
+            "actualWants": 0,
+            "income": 0,
+            "needsPct": 0,
+            "wantsPct": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Target for needs",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Target for wants",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Target for savings and debt repayment",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Your actual monthly savings",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Ahead of the savings target by",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "actualNeeds": "",
+            "actualWants": "",
+            "income": "",
+            "needsPct": "",
+            "wantsPct": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Target for needs",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Target for wants",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Target for savings and debt repayment",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Your actual monthly savings",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Ahead of the savings target by",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "actualNeeds": 1000000000,
+            "actualWants": 1000000000,
+            "income": 1000000000,
+            "needsPct": 100,
+            "wantsPct": 100
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Target for needs",
+              "value": 1000000000
+            },
+            {
+              "format": "currency",
+              "label": "Target for wants",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Target for savings and debt repayment",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Your actual monthly savings",
+              "value": -1000000000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Short of the savings target by",
+              "value": 1000000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cagr",
+      "slug": "cagr-calculator",
+      "title": "CAGR Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "end": 161051,
+            "start": 100000,
+            "years": 5
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Absolute gain",
+              "value": 61051
+            },
+            {
+              "format": "percent",
+              "label": "Total growth",
+              "value": 61.051
+            },
+            {
+              "emphasis": "neutral",
+              "format": "percent",
+              "label": "CAGR",
+              "value": 10
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "end": 0,
+            "start": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Absolute gain",
+              "value": 0
+            },
+            {
+              "format": "percent",
+              "label": "Total growth",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "percent",
+              "label": "CAGR",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "end": "",
+            "start": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Absolute gain",
+              "value": 0
+            },
+            {
+              "format": "percent",
+              "label": "Total growth",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "percent",
+              "label": "CAGR",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "end": 161051000,
+            "start": 100000000,
+            "years": 200
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Absolute gain",
+              "value": 61051000
+            },
+            {
+              "format": "percent",
+              "label": "Total growth",
+              "value": 61.051
+            },
+            {
+              "emphasis": "neutral",
+              "format": "percent",
+              "label": "CAGR",
+              "value": 0.23855955106329
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "capital-gain",
+      "slug": "capital-gain-calculator",
+      "title": "Capital Gain Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "buyCosts": 50000,
+            "purchase": 1000000,
+            "sale": 1600000,
+            "sellCosts": 30000,
+            "taxRate": 10
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated capital gain",
+              "value": 520000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Assumed tax",
+              "value": 52000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated gain after assumed tax",
+              "value": 468000
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "buyCosts": 0,
+            "purchase": 0,
+            "sale": 0,
+            "sellCosts": 0,
+            "taxRate": 0
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated capital gain",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Assumed tax",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated gain after assumed tax",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "buyCosts": "",
+            "purchase": "",
+            "sale": "",
+            "sellCosts": "",
+            "taxRate": ""
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated capital gain",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Assumed tax",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated gain after assumed tax",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "buyCosts": 1000000000000,
+            "purchase": 1000000000000,
+            "sale": 1000000000000,
+            "sellCosts": 1000000000000,
+            "taxRate": 100
+          },
+          "output": [
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Estimated capital gain",
+              "value": -2000000000000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Assumed tax",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Estimated gain after assumed tax",
+              "value": -2000000000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "car-loan",
+      "slug": "car-loan-calculator",
+      "title": "Car Loan EMI Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "down": 200000,
+            "price": 1000000,
+            "rate": 9,
+            "years": 5
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Loan amount",
+              "value": 800000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly payment",
+              "value": 16606.684181083
+            },
+            {
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 996401.05086499
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 196401.05086499
+            },
+            {
+              "format": "currency",
+              "label": "Total cost including down payment",
+              "value": 1196401.050865
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "down": 0,
+            "price": 0,
+            "rate": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Loan amount",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly payment",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Total cost including down payment",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "down": "",
+            "price": "",
+            "rate": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Loan amount",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly payment",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Total cost including down payment",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "down": 200000000,
+            "price": 1000000000,
+            "rate": 40,
+            "years": 15
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Loan amount",
+              "value": 800000000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly payment",
+              "value": 26739760.117551
+            },
+            {
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 4813156821.1592
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 4013156821.1592
+            },
+            {
+              "format": "currency",
+              "label": "Total cost including down payment",
+              "value": 5013156821.1592
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "compound-interest",
+      "slug": "compound-interest-calculator",
+      "title": "Compound Interest",
+      "cases": {
+        "default": {
+          "inputs": {
+            "freq": "12",
+            "inflation": 6,
+            "principal": 5000,
+            "rate": 6,
+            "years": 10
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Principal",
+              "value": 5000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Interest earned",
+              "value": 4096.9836701614
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Final amount (future money)",
+              "value": 9096.9836701614
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Value in today's purchasing power",
+              "value": 5079.7081671003
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "freq": "12",
+            "inflation": 0,
+            "principal": 0,
+            "rate": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Principal",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Interest earned",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Final amount (future money)",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Value in today's purchasing power",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "freq": "",
+            "inflation": "",
+            "principal": "",
+            "rate": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Principal",
+              "value": ""
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Interest earned",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Final amount (future money)",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Value in today's purchasing power",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "freq": "365",
+            "inflation": 30,
+            "principal": 5000000,
+            "rate": 100,
+            "years": 100
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Principal",
+              "value": 5000000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Interest earned",
+              "value": 1.1722877829771e+50
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Final amount (future money)",
+              "value": 1.1722877829771e+50
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Value in today's purchasing power",
+              "value": 4.7282345084862e+38
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "consumer-durable-loan",
+      "slug": "consumer-durable-loan-calculator",
+      "title": "Consumer Durable Loan Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "down": 10000,
+            "fee": 2,
+            "price": 60000,
+            "rate": 12,
+            "years": 2
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Financed amount",
+              "value": 50000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly EMI",
+              "value": 2353.6736111632
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 6488.1666679176
+            },
+            {
+              "format": "currency",
+              "label": "Estimated all-in cost",
+              "value": 67488.166667918
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "down": 0,
+            "fee": 0,
+            "price": 0,
+            "rate": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Financed amount",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly EMI",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Estimated all-in cost",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "down": "",
+            "fee": "",
+            "price": "",
+            "rate": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Financed amount",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly EMI",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Estimated all-in cost",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "down": 1000000000000,
+            "fee": 100,
+            "price": 1000000000000,
+            "rate": 100,
+            "years": 100
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Financed amount",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly EMI",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Estimated all-in cost",
+              "value": 1000000000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cost-of-delay",
+      "slug": "cost-of-delay-sip-calculator",
+      "title": "Cost of Delay SIP Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "delay": 5,
+            "monthly": 10000,
+            "rate": 12,
+            "years": 25
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Value if you start now",
+              "value": 18976350.924544
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Value if you start later",
+              "value": 9991479.1904124
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Cost of the delay",
+              "value": 8984871.7341313
+            },
+            {
+              "format": "currency",
+              "label": "Monthly SIP needed to catch up after the delay",
+              "value": 18992.53410121
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "delay": 0,
+            "monthly": 0,
+            "rate": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Value if you start now",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Value if you start later",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Cost of the delay",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Monthly SIP needed to catch up after the delay",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "delay": "",
+            "monthly": "",
+            "rate": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Value if you start now",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Value if you start later",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Cost of the delay",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Monthly SIP needed to catch up after the delay",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "delay": 59,
+            "monthly": 1000000000,
+            "rate": 50,
+            "years": 60
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Value if you start now",
+              "value": 1.454294026233e+23
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Value if you start later",
+              "value": 15802353318.073
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Cost of the delay",
+              "value": 1.4542940262329e+23
+            },
+            {
+              "format": "currency",
+              "label": "Monthly SIP needed to catch up after the delay",
+              "value": 9.2030218345375e+21
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "credit-card-payoff",
+      "slug": "credit-card-payoff-calculator",
+      "title": "Credit Card Payoff Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "apr": 36,
+            "balance": 80000,
+            "payment": 8000
+          },
+          "output": [
+            {
+              "format": "number",
+              "label": "Months to pay off",
+              "value": 13
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest paid",
+              "value": 16540.373489041
+            },
+            {
+              "format": "currency",
+              "label": "Total payments",
+              "value": 96540.373489041
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "apr": 0,
+            "balance": 0,
+            "payment": 0
+          },
+          "output": [
+            {
+              "format": "number",
+              "label": "Months to pay off",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest paid",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Total payments",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "apr": "",
+            "balance": "",
+            "payment": ""
+          },
+          "output": [
+            {
+              "format": "number",
+              "label": "Months to pay off",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest paid",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Total payments",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "apr": 300,
+            "balance": 1000000000,
+            "payment": 100000000
+          },
+          "output": [
+            {
+              "format": "number",
+              "label": "Months to clear (0 = payment too low)",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Monthly interest at current balance",
+              "value": 250000000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Payment needed to start reducing balance",
+              "value": 250000001
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "currency-converter",
+      "slug": "currency-converter",
+      "title": "Currency Converter",
+      "cases": {
+        "default": {
+          "inputs": {
+            "amount": 100,
+            "from": "USD",
+            "rate": 0,
+            "to": "INR"
+          },
+          "output": [
+            {
+              "format": "number",
+              "label": "USD amount",
+              "value": 100
+            },
+            {
+              "emphasis": "neutral",
+              "format": "number",
+              "label": "Converted amount in INR",
+              "value": 0
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "amount": 0,
+            "from": "USD",
+            "rate": 0,
+            "to": "INR"
+          },
+          "output": [
+            {
+              "format": "number",
+              "label": "USD amount",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "number",
+              "label": "Converted amount in INR",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "amount": "",
+            "from": "",
+            "rate": "",
+            "to": ""
+          },
+          "output": [
+            {
+              "format": "number",
+              "label": " amount",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "number",
+              "label": "Converted amount in ",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "amount": 1000000000000,
+            "from": "AED",
+            "rate": 1000000,
+            "to": "AED"
+          },
+          "output": [
+            {
+              "format": "number",
+              "label": "AED amount",
+              "value": 1000000000000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "number",
+              "label": "Converted amount in AED",
+              "value": 1000000000000000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "debt-payoff",
+      "slug": "debt-payoff-calculator",
+      "title": "Debt Payoff Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "balance": 100000,
+            "payment": 3000,
+            "rate": 18
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "number",
+              "label": "Months to payoff",
+              "value": 47
+            },
+            {
+              "format": "years",
+              "label": "Estimated years",
+              "value": 3.9166666666667
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Estimated interest",
+              "value": 39672.089722858
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "balance": 0,
+            "payment": 0,
+            "rate": 0
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "number",
+              "label": "Months to payoff",
+              "value": 0
+            },
+            {
+              "format": "years",
+              "label": "Estimated years",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated interest",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "balance": "",
+            "payment": "",
+            "rate": ""
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "number",
+              "label": "Months to payoff",
+              "value": 0
+            },
+            {
+              "format": "years",
+              "label": "Estimated years",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated interest",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "balance": 100000000,
+            "payment": 3000000,
+            "rate": 100
+          },
+          "output": [
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Monthly interest at current balance",
+              "value": 8333333.3333333
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Current monthly payment",
+              "value": 3000000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Payment gap to stop negative amortization",
+              "value": 5333333.3333333
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "emergency-fund",
+      "slug": "emergency-fund-calculator",
+      "title": "Emergency Fund Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "currentSavings": 100000,
+            "expenses": 40000,
+            "monthlySaving": 10000,
+            "targetMonths": 6
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Emergency fund target",
+              "value": 240000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Additional savings needed",
+              "value": 140000
+            },
+            {
+              "format": "number",
+              "label": "Months to target (0 = already funded or no monthly saving)",
+              "value": 14
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "currentSavings": 0,
+            "expenses": 0,
+            "monthlySaving": 0,
+            "targetMonths": 0
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Emergency fund target",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Additional savings needed",
+              "value": 0
+            },
+            {
+              "format": "number",
+              "label": "Months to target (0 = already funded or no monthly saving)",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "currentSavings": "",
+            "expenses": "",
+            "monthlySaving": "",
+            "targetMonths": ""
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Emergency fund target",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Additional savings needed",
+              "value": 0
+            },
+            {
+              "format": "number",
+              "label": "Months to target (0 = already funded or no monthly saving)",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "currentSavings": 1000000000,
+            "expenses": 100000000,
+            "monthlySaving": 100000000,
+            "targetMonths": 36
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Emergency fund target",
+              "value": 3600000000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Additional savings needed",
+              "value": 2600000000
+            },
+            {
+              "format": "number",
+              "label": "Months to target (0 = already funded or no monthly saving)",
+              "value": 26
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "epf-growth",
+      "slug": "epf-calculator",
+      "title": "EPF Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "employeePct": 12,
+            "employerPct": 3.67,
+            "monthlyBasic": 30000,
+            "rate": 8.25,
+            "salaryGrowth": 5,
+            "years": 25
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Projected EPF balance",
+              "value": 7312578.7994831
+            },
+            {
+              "format": "currency",
+              "label": "Total contributions",
+              "value": 2692381.0985203
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated interest",
+              "value": 4620197.7009628
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "employeePct": 0,
+            "employerPct": 0,
+            "monthlyBasic": 0,
+            "rate": 0,
+            "salaryGrowth": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Projected EPF balance",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Total contributions",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated interest",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "employeePct": "",
+            "employerPct": "",
+            "monthlyBasic": "",
+            "rate": "",
+            "salaryGrowth": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Projected EPF balance",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Total contributions",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated interest",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "employeePct": 100,
+            "employerPct": 100,
+            "monthlyBasic": 10000000,
+            "rate": 30,
+            "salaryGrowth": 50,
+            "years": 45
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Projected EPF balance",
+              "value": 151966910359710000
+            },
+            {
+              "format": "currency",
+              "label": "Total contributions",
+              "value": 40303975829826000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated interest",
+              "value": 111662934529880000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "fire",
+      "slug": "fire-calculator",
+      "title": "FIRE Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "annualExpenses": 600000,
+            "currentSavings": 500000,
+            "inflation": 6,
+            "monthlySavings": 40000,
+            "returnRate": 10,
+            "stepUp": 5,
+            "withdrawalRate": 3.5
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "years",
+              "label": "Years to financial independence",
+              "value": 23
+            },
+            {
+              "format": "currency",
+              "label": "Corpus needed at that point",
+              "value": 65481422.769824
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Same corpus in today's money",
+              "value": 17142857.142857
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Projected portfolio at that point",
+              "value": 68003284.611712
+            },
+            {
+              "format": "currency",
+              "label": "Annual spending at that point",
+              "value": 2291849.7969438
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "annualExpenses": 0,
+            "currentSavings": 0,
+            "inflation": 0,
+            "monthlySavings": 0,
+            "returnRate": 0,
+            "stepUp": 0,
+            "withdrawalRate": 0
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "years",
+              "label": "Years to financial independence",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Corpus needed at that point",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Same corpus in today's money",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Projected portfolio at that point",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Annual spending at that point",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "annualExpenses": "",
+            "currentSavings": "",
+            "inflation": "",
+            "monthlySavings": "",
+            "returnRate": "",
+            "stepUp": "",
+            "withdrawalRate": ""
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "years",
+              "label": "Years to financial independence",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Corpus needed at that point",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Same corpus in today's money",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Projected portfolio at that point",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Annual spending at that point",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "annualExpenses": 1000000000,
+            "currentSavings": 100000000000,
+            "inflation": 30,
+            "monthlySavings": 1000000000,
+            "returnRate": 30,
+            "stepUp": 50,
+            "withdrawalRate": 10
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "years",
+              "label": "Years to financial independence",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Corpus needed at that point",
+              "value": 10000000000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Same corpus in today's money",
+              "value": 10000000000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Projected portfolio at that point",
+              "value": 100000000000
+            },
+            {
+              "format": "currency",
+              "label": "Annual spending at that point",
+              "value": 1000000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "fixed-deposit",
+      "slug": "fixed-deposit-calculator",
+      "title": "Fixed Deposit Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "freq": "4",
+            "inflation": 6,
+            "principal": 100000,
+            "rate": 7,
+            "years": 5
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Deposit",
+              "value": 100000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Interest earned",
+              "value": 41477.81957558
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Maturity value (future money)",
+              "value": 141477.81957558
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Value in today's purchasing power",
+              "value": 105720.45695712
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "freq": "4",
+            "inflation": 0,
+            "principal": 0,
+            "rate": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Deposit",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Interest earned",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Maturity value (future money)",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Value in today's purchasing power",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "freq": "",
+            "inflation": "",
+            "principal": "",
+            "rate": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Deposit",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Interest earned",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Maturity value (future money)",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Value in today's purchasing power",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "freq": "12",
+            "inflation": 30,
+            "principal": 100000000,
+            "rate": 100,
+            "years": 100
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Deposit",
+              "value": 100000000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Interest earned",
+              "value": 5.1823591942168e+49
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Maturity value (future money)",
+              "value": 5.1823591942168e+49
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Value in today's purchasing power",
+              "value": 2.0902213546267e+38
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "flat-cost",
+      "slug": "flat-cost-calculator",
+      "title": "Flat Cost Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "furnishing": 300000,
+            "other": 100000,
+            "price": 6000000,
+            "registration": 1,
+            "stamp": 5
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Stamp duty",
+              "value": 300000
+            },
+            {
+              "format": "currency",
+              "label": "Registration / transfer",
+              "value": 60000
+            },
+            {
+              "format": "currency",
+              "label": "Other purchase costs",
+              "value": 400000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated all-in purchase cost",
+              "value": 6760000
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "furnishing": 0,
+            "other": 0,
+            "price": 0,
+            "registration": 0,
+            "stamp": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Stamp duty",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Registration / transfer",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Other purchase costs",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated all-in purchase cost",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "furnishing": "",
+            "other": "",
+            "price": "",
+            "registration": "",
+            "stamp": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Stamp duty",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Registration / transfer",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Other purchase costs",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated all-in purchase cost",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "furnishing": 1000000000000,
+            "other": 1000000000000,
+            "price": 1000000000000,
+            "registration": 100,
+            "stamp": 100
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Stamp duty",
+              "value": 1000000000000
+            },
+            {
+              "format": "currency",
+              "label": "Registration / transfer",
+              "value": 1000000000000
+            },
+            {
+              "format": "currency",
+              "label": "Other purchase costs",
+              "value": 2000000000000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated all-in purchase cost",
+              "value": 5000000000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "freedom-milestone",
+      "slug": "retirement-calculator",
+      "title": "Freedom Milestone",
+      "cases": {
+        "default": {
+          "inputs": {
+            "current": 20000,
+            "expenses": 30000,
+            "withdrawal": 4
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Target corpus",
+              "value": 750000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Still needed",
+              "value": 730000
+            },
+            {
+              "emphasis": "positive",
+              "format": "percent",
+              "label": "Progress",
+              "value": 2.6666666666667
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "current": 0,
+            "expenses": 0,
+            "withdrawal": 0
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Target corpus",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Still needed",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "percent",
+              "label": "Progress",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "current": "",
+            "expenses": "",
+            "withdrawal": ""
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Target corpus",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Still needed",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "percent",
+              "label": "Progress",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "current": 20000000,
+            "expenses": 30000000,
+            "withdrawal": 10
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Target corpus",
+              "value": 300000000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Still needed",
+              "value": 280000000
+            },
+            {
+              "emphasis": "positive",
+              "format": "percent",
+              "label": "Progress",
+              "value": 6.6666666666667
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "freelance-rate",
+      "slug": "freelance-rate-calculator",
+      "title": "Freelance Rate Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "expenses": 200000,
+            "hours": 25,
+            "income": 1200000,
+            "weeks": 48
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Annual amount to cover",
+              "value": 1400000
+            },
+            {
+              "format": "number",
+              "label": "Billable hours / year",
+              "value": 1200
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Target hourly rate",
+              "value": 1166.6666666667
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "expenses": 0,
+            "hours": 0,
+            "income": 0,
+            "weeks": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Annual amount to cover",
+              "value": 0
+            },
+            {
+              "format": "number",
+              "label": "Billable hours / year",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Target hourly rate",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "expenses": "",
+            "hours": "",
+            "income": "",
+            "weeks": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Annual amount to cover",
+              "value": 0
+            },
+            {
+              "format": "number",
+              "label": "Billable hours / year",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Target hourly rate",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "expenses": 200000000,
+            "hours": 100,
+            "income": 1200000000,
+            "weeks": 52
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Annual amount to cover",
+              "value": 1400000000
+            },
+            {
+              "format": "number",
+              "label": "Billable hours / year",
+              "value": 5200
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Target hourly rate",
+              "value": 269230.76923077
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "gold-jewelry",
+      "slug": "gold-jewelry-calculator",
+      "title": "Gold Jewelry Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "making": 10,
+            "purity": 91.6,
+            "rate": 7500,
+            "tax": 3,
+            "wastage": 5,
+            "weight": 10
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Fine-gold value",
+              "value": 68700
+            },
+            {
+              "format": "currency",
+              "label": "Wastage value",
+              "value": 3435
+            },
+            {
+              "format": "currency",
+              "label": "Making charge",
+              "value": 7213.5
+            },
+            {
+              "format": "currency",
+              "label": "Tax / GST",
+              "value": 2380.455
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated jewellery price",
+              "value": 81728.955
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "making": 0,
+            "purity": 0,
+            "rate": 0,
+            "tax": 0,
+            "wastage": 0,
+            "weight": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Fine-gold value",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Wastage value",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Making charge",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Tax / GST",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated jewellery price",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "making": "",
+            "purity": "",
+            "rate": "",
+            "tax": "",
+            "wastage": "",
+            "weight": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Fine-gold value",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Wastage value",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Making charge",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Tax / GST",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated jewellery price",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "making": 100,
+            "purity": 100,
+            "rate": 1000000000,
+            "tax": 100,
+            "wastage": 100,
+            "weight": 1000000
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Fine-gold value",
+              "value": 1000000000000000
+            },
+            {
+              "format": "currency",
+              "label": "Wastage value",
+              "value": 1000000000000000
+            },
+            {
+              "format": "currency",
+              "label": "Making charge",
+              "value": 2000000000000000
+            },
+            {
+              "format": "currency",
+              "label": "Tax / GST",
+              "value": 4000000000000000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated jewellery price",
+              "value": 8000000000000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "gratuity",
+      "slug": "gratuity-calculator",
+      "title": "Gratuity Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "salary": 50000,
+            "years": 10
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated gratuity (0 if threshold not met)",
+              "value": 288461.53846154
+            },
+            {
+              "format": "number",
+              "label": "General 5-year threshold met (1 = yes)",
+              "value": 1
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "salary": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated gratuity (0 if threshold not met)",
+              "value": 0
+            },
+            {
+              "format": "number",
+              "label": "General 5-year threshold met (1 = yes)",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "salary": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated gratuity (0 if threshold not met)",
+              "value": 0
+            },
+            {
+              "format": "number",
+              "label": "General 5-year threshold met (1 = yes)",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "salary": 100000000,
+            "years": 60
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated gratuity (0 if threshold not met)",
+              "value": 3461538461.5385
+            },
+            {
+              "format": "number",
+              "label": "General 5-year threshold met (1 = yes)",
+              "value": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "gst",
+      "slug": "gst-calculator",
+      "title": "GST Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "amount": 100000,
+            "rate": 18
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "GST amount",
+              "value": 18000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Total including GST",
+              "value": 118000
+            },
+            {
+              "format": "currency",
+              "label": "Pre-tax amount",
+              "value": 100000
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "amount": 0,
+            "rate": 0
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "GST amount",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Total including GST",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Pre-tax amount",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "amount": "",
+            "rate": ""
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "GST amount",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Total including GST",
+              "value": "0"
+            },
+            {
+              "format": "currency",
+              "label": "Pre-tax amount",
+              "value": ""
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "amount": 100000000000,
+            "rate": 100
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "GST amount",
+              "value": 100000000000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Total including GST",
+              "value": 200000000000
+            },
+            {
+              "format": "currency",
+              "label": "Pre-tax amount",
+              "value": 100000000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "home-loan-eligibility",
+      "slug": "home-loan-eligibility-calculator",
+      "title": "Home Loan Eligibility Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "existing": 15000,
+            "foir": 50,
+            "income": 150000,
+            "rate": 8.5,
+            "years": 20
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Indicative EMI capacity",
+              "value": 60000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Indicative eligible loan",
+              "value": 6913850.3894753
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "existing": 0,
+            "foir": 0,
+            "income": 0,
+            "rate": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Indicative EMI capacity",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Indicative eligible loan",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "existing": "",
+            "foir": "",
+            "income": "",
+            "rate": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Indicative EMI capacity",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Indicative eligible loan",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "existing": 1000000000000,
+            "foir": 100,
+            "income": 1000000000000,
+            "rate": 100,
+            "years": 100
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Indicative EMI capacity",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Indicative eligible loan",
+              "value": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "home-loan-emi",
+      "slug": "home-loan-emi-calculator",
+      "title": "Home Loan EMI Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "principal": 5000000,
+            "rate": 8.5,
+            "years": 20
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly home-loan EMI",
+              "value": 43391.161668277
+            },
+            {
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 10413878.800386
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 5413878.8003864
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "principal": 0,
+            "rate": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly home-loan EMI",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "principal": "",
+            "rate": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly home-loan EMI",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "principal": 1000000000000,
+            "rate": 100,
+            "years": 100
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly home-loan EMI",
+              "value": 83333333333.333
+            },
+            {
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 100000000000000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 99000000000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "hra-exemption",
+      "slug": "hra-exemption-calculator",
+      "title": "HRA Exemption Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "basicDA": 50000,
+            "cityPct": 50,
+            "hra": 20000,
+            "rent": 25000
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated HRA exemption per month",
+              "value": 20000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated taxable HRA per month",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Annual estimated exemption",
+              "value": 240000
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "basicDA": 0,
+            "cityPct": 0,
+            "hra": 0,
+            "rent": 0
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated HRA exemption per month",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated taxable HRA per month",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Annual estimated exemption",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "basicDA": "",
+            "cityPct": "",
+            "hra": "",
+            "rent": ""
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated HRA exemption per month",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated taxable HRA per month",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Annual estimated exemption",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "basicDA": 100000000,
+            "cityPct": 100,
+            "hra": 100000000,
+            "rent": 100000000
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated HRA exemption per month",
+              "value": 90000000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated taxable HRA per month",
+              "value": 10000000
+            },
+            {
+              "format": "currency",
+              "label": "Annual estimated exemption",
+              "value": 1080000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "income-tax-planner",
+      "slug": "income-tax-planner",
+      "title": "Income Tax Planner",
+      "cases": {
+        "default": {
+          "inputs": {
+            "deductions": 150000,
+            "income": 1200000,
+            "rate": 15
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Estimated taxable income",
+              "value": 1050000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Estimated tax",
+              "value": 157500
+            },
+            {
+              "format": "percent",
+              "label": "Effective tax on gross income",
+              "value": 13.125
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated after-tax income",
+              "value": 1042500
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "deductions": 0,
+            "income": 0,
+            "rate": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Estimated taxable income",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Estimated tax",
+              "value": 0
+            },
+            {
+              "format": "percent",
+              "label": "Effective tax on gross income",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated after-tax income",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "deductions": "",
+            "income": "",
+            "rate": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Estimated taxable income",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Estimated tax",
+              "value": 0
+            },
+            {
+              "format": "percent",
+              "label": "Effective tax on gross income",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated after-tax income",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "deductions": 150000000,
+            "income": 1200000000,
+            "rate": 100
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Estimated taxable income",
+              "value": 1050000000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Estimated tax",
+              "value": 1050000000
+            },
+            {
+              "format": "percent",
+              "label": "Effective tax on gross income",
+              "value": 87.5
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated after-tax income",
+              "value": 150000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "inflation",
+      "slug": "inflation-calculator",
+      "title": "Inflation Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "amount": 100000,
+            "rate": 6,
+            "years": 20
+          },
+          "output": [
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Future amount needed to buy the same thing",
+              "value": 320713.54722128
+            },
+            {
+              "format": "currency",
+              "label": "Price increase",
+              "value": 220713.54722128
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Today's amount worth after inflation",
+              "value": 31180.472688608
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "amount": 0,
+            "rate": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Future amount needed to buy the same thing",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Price increase",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Today's amount worth after inflation",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "amount": "",
+            "rate": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Future amount needed to buy the same thing",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Price increase",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Today's amount worth after inflation",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "amount": 100000000,
+            "rate": 1000,
+            "years": 200
+          },
+          "output": [
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Future amount needed to buy the same thing",
+              "value": 1.8990527646046e+216
+            },
+            {
+              "format": "currency",
+              "label": "Price increase",
+              "value": 1.8990527646046e+216
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Today's amount worth after inflation",
+              "value": 5.2657831242946e-201
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "loan-against-property",
+      "slug": "loan-against-property-calculator",
+      "title": "Loan Against Property Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "ltv": 60,
+            "property": 8000000,
+            "rate": 10,
+            "years": 15
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Indicative loan amount",
+              "value": 4800000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly EMI",
+              "value": 51581.04564999
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 4484588.2169981
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "ltv": 0,
+            "property": 0,
+            "rate": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Indicative loan amount",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly EMI",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "ltv": "",
+            "property": "",
+            "rate": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Indicative loan amount",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly EMI",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "ltv": 100,
+            "property": 1000000000000,
+            "rate": 100,
+            "years": 100
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Indicative loan amount",
+              "value": 1000000000000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly EMI",
+              "value": 83333333333.333
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 99000000000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "loan-emi",
+      "slug": "loan-emi-calculator",
+      "title": "Loan EMI Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "principal": 500000,
+            "rate": 12,
+            "years": 5
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly EMI",
+              "value": 11122.223842451
+            },
+            {
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 667333.43054705
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 167333.43054705
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "principal": 0,
+            "rate": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly EMI",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "principal": "",
+            "rate": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly EMI",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "principal": 1000000000000,
+            "rate": 100,
+            "years": 100
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly EMI",
+              "value": 83333333333.333
+            },
+            {
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 100000000000000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 99000000000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "loan-interest",
+      "slug": "loan-interest-calculator",
+      "title": "Loan Interest Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "principal": 1000000,
+            "rate": 10,
+            "years": 10
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Monthly EMI",
+              "value": 13215.073688176
+            },
+            {
+              "format": "currency",
+              "label": "Principal repaid",
+              "value": 1000000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 585808.84258114
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 1585808.8425811
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "principal": 0,
+            "rate": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Monthly EMI",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Principal repaid",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "principal": "",
+            "rate": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Monthly EMI",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Principal repaid",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "principal": 1000000000000,
+            "rate": 100,
+            "years": 100
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Monthly EMI",
+              "value": 83333333333.333
+            },
+            {
+              "format": "currency",
+              "label": "Principal repaid",
+              "value": 1000000000000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 99000000000000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 100000000000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "loan-prepayment-vs-sip",
+      "slug": "loan-prepayment-vs-sip-calculator",
+      "title": "Loan Prepayment vs SIP Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "balance": 3000000,
+            "investmentReturn": 10,
+            "prepay": 500000,
+            "rate": 9,
+            "years": 10
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated loan interest saved",
+              "value": 260054.64250149
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Investment value of the same cash",
+              "value": 1353520.7454311
+            },
+            {
+              "format": "currency",
+              "label": "Loan EMI after prepayment",
+              "value": 31668.943437562
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Difference (investment value − interest saved)",
+              "value": 1093466.1029296
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "balance": 0,
+            "investmentReturn": 0,
+            "prepay": 0,
+            "rate": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated loan interest saved",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Investment value of the same cash",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Loan EMI after prepayment",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Difference (investment value − interest saved)",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "balance": "",
+            "investmentReturn": "",
+            "prepay": "",
+            "rate": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated loan interest saved",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Investment value of the same cash",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Loan EMI after prepayment",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Difference (investment value − interest saved)",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "balance": 1000000000000,
+            "investmentReturn": 100,
+            "prepay": 1000000000000,
+            "rate": 100,
+            "years": 100
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated loan interest saved",
+              "value": 99000000000000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Investment value of the same cash",
+              "value": 5.1823591942168e+53
+            },
+            {
+              "format": "currency",
+              "label": "Loan EMI after prepayment",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Difference (investment value − interest saved)",
+              "value": 5.1823591942168e+53
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ltv",
+      "slug": "loan-to-value-ltv-calculator",
+      "title": "Loan-to-Value (LTV) Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "loan": 4800000,
+            "property": 8000000
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "percent",
+              "label": "LTV",
+              "value": 60
+            },
+            {
+              "format": "currency",
+              "label": "Equity / value not financed",
+              "value": 3200000
+            },
+            {
+              "format": "currency",
+              "label": "Loan amount",
+              "value": 4800000
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "loan": 0,
+            "property": 0
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "percent",
+              "label": "LTV",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Equity / value not financed",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Loan amount",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "loan": "",
+            "property": ""
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "percent",
+              "label": "LTV",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Equity / value not financed",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Loan amount",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "loan": 1000000000000,
+            "property": 1000000000000
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "percent",
+              "label": "LTV",
+              "value": 100
+            },
+            {
+              "format": "currency",
+              "label": "Equity / value not financed",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Loan amount",
+              "value": 1000000000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lumpsum",
+      "slug": "lumpsum-calculator",
+      "title": "Lumpsum Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "inflation": 6,
+            "principal": 100000,
+            "rate": 10,
+            "years": 10
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Amount invested",
+              "value": 100000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated gain",
+              "value": 159374.24601
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Projected value (future money)",
+              "value": 259374.24601
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Value in today's purchasing power",
+              "value": 144833.22423828
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "inflation": 0,
+            "principal": 0,
+            "rate": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Amount invested",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated gain",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Projected value (future money)",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Value in today's purchasing power",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "inflation": "",
+            "principal": "",
+            "rate": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Amount invested",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated gain",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Projected value (future money)",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Value in today's purchasing power",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "inflation": 30,
+            "principal": 100000000,
+            "rate": 100,
+            "years": 100
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Amount invested",
+              "value": 100000000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated gain",
+              "value": 1.2676506002282e+38
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Projected value (future money)",
+              "value": 1.2676506002282e+38
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Value in today's purchasing power",
+              "value": 5.1128651170286e+26
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lumpsum-sip",
+      "slug": "lumpsum-sip-calculator",
+      "title": "Lumpsum + SIP Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "lumpsum": 500000,
+            "monthly": 10000,
+            "rate": 10,
+            "years": 10
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Total invested",
+              "value": 1700000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated growth",
+              "value": 1719040.9493744
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Projected value",
+              "value": 3419040.9493744
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "lumpsum": 0,
+            "monthly": 0,
+            "rate": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Total invested",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated growth",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Projected value",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "lumpsum": "",
+            "monthly": "",
+            "rate": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Total invested",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated growth",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Projected value",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "lumpsum": 1000000000000,
+            "monthly": 1000000000000,
+            "rate": 100,
+            "years": 100
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Total invested",
+              "value": 1201000000000000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated growth",
+              "value": 7.2553028719036e+54
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Projected value",
+              "value": 7.2553028719036e+54
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "mortgage",
+      "slug": "mortgage-emi-calculator",
+      "title": "Mortgage / Loan EMI",
+      "cases": {
+        "default": {
+          "inputs": {
+            "principal": 250000,
+            "rate": 6.5,
+            "years": 25
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly payment",
+              "value": 1688.0179033691
+            },
+            {
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 506405.37101073
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 256405.37101073
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "principal": 0,
+            "rate": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly payment",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "principal": "",
+            "rate": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly payment",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "principal": 250000000,
+            "rate": 30,
+            "years": 40
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly payment",
+              "value": 6250044.5069385
+            },
+            {
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 3000021363.3305
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 2750021363.3305
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "net-worth",
+      "slug": "net-worth-calculator",
+      "title": "Net Worth Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "cash": 200000,
+            "debt": 1500000,
+            "investments": 500000,
+            "property": 3000000
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Total assets",
+              "value": 3700000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total liabilities",
+              "value": 1500000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Net worth",
+              "value": 2200000
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "cash": 0,
+            "debt": 0,
+            "investments": 0,
+            "property": 0
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Total assets",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total liabilities",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Net worth",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "cash": "",
+            "debt": "",
+            "investments": "",
+            "property": ""
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Total assets",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total liabilities",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Net worth",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "cash": 200000000,
+            "debt": 1500000000,
+            "investments": 500000000,
+            "property": 3000000000
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Total assets",
+              "value": 3700000000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total liabilities",
+              "value": 1500000000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Net worth",
+              "value": 2200000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "nps",
+      "slug": "nps-calculator",
+      "title": "NPS Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "annuityRate": 6,
+            "annuityShare": 40,
+            "monthly": 5000,
+            "rate": 9,
+            "years": 25
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Total contributions",
+              "value": 1500000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated investment growth",
+              "value": 4105609.6865892
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated retirement corpus",
+              "value": 5605609.6865892
+            },
+            {
+              "format": "currency",
+              "label": "Illustrative lump-sum allocation",
+              "value": 3363365.8119535
+            },
+            {
+              "format": "currency",
+              "label": "Illustrative annuity allocation",
+              "value": 2242243.8746357
+            },
+            {
+              "format": "currency",
+              "label": "Illustrative monthly annuity income before tax",
+              "value": 11211.219373178
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "annuityRate": 0,
+            "annuityShare": 0,
+            "monthly": 0,
+            "rate": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Total contributions",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated investment growth",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated retirement corpus",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Illustrative lump-sum allocation",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Illustrative annuity allocation",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Illustrative monthly annuity income before tax",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "annuityRate": "",
+            "annuityShare": "",
+            "monthly": "",
+            "rate": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Total contributions",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated investment growth",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated retirement corpus",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Illustrative lump-sum allocation",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Illustrative annuity allocation",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Illustrative monthly annuity income before tax",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "annuityRate": 100,
+            "annuityShare": 100,
+            "monthly": 100000000,
+            "rate": 100,
+            "years": 60
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Total contributions",
+              "value": 72000000000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Estimated investment growth",
+              "value": 1.2820287150582e+34
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated retirement corpus",
+              "value": 1.2820287150582e+34
+            },
+            {
+              "format": "currency",
+              "label": "Illustrative lump-sum allocation",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Illustrative annuity allocation",
+              "value": 1.2820287150582e+34
+            },
+            {
+              "format": "currency",
+              "label": "Illustrative monthly annuity income before tax",
+              "value": 1.0683572625485e+33
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "overtime",
+      "slug": "overtime-pay-calculator",
+      "title": "Overtime Pay Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "hourly": 500,
+            "multiplier": 1.5,
+            "overtime": 20,
+            "regular": 160
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Regular pay",
+              "value": 80000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Overtime pay",
+              "value": 15000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Total gross pay",
+              "value": 95000
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "hourly": 0,
+            "multiplier": 0,
+            "overtime": 0,
+            "regular": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Regular pay",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Overtime pay",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Total gross pay",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "hourly": "",
+            "multiplier": "",
+            "overtime": "",
+            "regular": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Regular pay",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Overtime pay",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Total gross pay",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "hourly": 1000000,
+            "multiplier": 5,
+            "overtime": 744,
+            "regular": 744
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Regular pay",
+              "value": 744000000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Overtime pay",
+              "value": 3720000000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Total gross pay",
+              "value": 4464000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "personal-loan",
+      "slug": "personal-loan-calculator",
+      "title": "Personal Loan Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "principal": 500000,
+            "rate": 12,
+            "years": 5
+          },
+          "output": [
+            {
+              "format": "number",
+              "label": "Loan months",
+              "value": 60
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly payment",
+              "value": 11122.223842451
+            },
+            {
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 667333.43054705
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 167333.43054705
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "principal": 0,
+            "rate": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "format": "number",
+              "label": "Loan months",
+              "value": 1
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly payment",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "principal": "",
+            "rate": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "format": "number",
+              "label": "Loan months",
+              "value": 1
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly payment",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "principal": 500000000,
+            "rate": 60,
+            "years": 20
+          },
+          "output": [
+            {
+              "format": "number",
+              "label": "Loan months",
+              "value": 240
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly payment",
+              "value": 25000205.358082
+            },
+            {
+              "format": "currency",
+              "label": "Total repayment",
+              "value": 6000049285.9397
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total interest",
+              "value": 5500049285.9397
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ppf-growth",
+      "slug": "ppf-calculator",
+      "title": "PPF Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "initialBalance": 0,
+            "rate": 7.1,
+            "yearlyContribution": 150000,
+            "years": 15
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Projected balance",
+              "value": 4068209.2202879
+            },
+            {
+              "format": "currency",
+              "label": "Total contributions incl. opening balance",
+              "value": 2250000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated growth",
+              "value": 1818209.2202879
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "initialBalance": 0,
+            "rate": 0,
+            "yearlyContribution": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Projected balance",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Total contributions incl. opening balance",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated growth",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "initialBalance": "",
+            "rate": "",
+            "yearlyContribution": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Projected balance",
+              "value": ""
+            },
+            {
+              "format": "currency",
+              "label": "Total contributions incl. opening balance",
+              "value": ""
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated growth",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "initialBalance": 1000000000,
+            "rate": 30,
+            "yearlyContribution": 100000000,
+            "years": 50
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Projected balance",
+              "value": 713698119603420
+            },
+            {
+              "format": "currency",
+              "label": "Total contributions incl. opening balance",
+              "value": 6000000000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated growth",
+              "value": 713692119603420
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "profit-margin",
+      "slug": "profit-margin-calculator",
+      "title": "Profit Margin",
+      "cases": {
+        "default": {
+          "inputs": {
+            "cogs": 28000,
+            "expenses": 9000,
+            "revenue": 50000
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Gross profit",
+              "value": 22000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "percent",
+              "label": "Gross margin",
+              "value": 44
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Net profit",
+              "value": 13000
+            },
+            {
+              "emphasis": "positive",
+              "format": "percent",
+              "label": "Net margin",
+              "value": 26
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "cogs": 0,
+            "expenses": 0,
+            "revenue": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Gross profit",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "percent",
+              "label": "Gross margin",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Net profit",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "percent",
+              "label": "Net margin",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "cogs": "",
+            "expenses": "",
+            "revenue": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Gross profit",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "percent",
+              "label": "Gross margin",
+              "value": {
+                "__number": "NaN"
+              }
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Net profit",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "percent",
+              "label": "Net margin",
+              "value": {
+                "__number": "NaN"
+              }
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "cogs": 28000000,
+            "expenses": 9000000,
+            "revenue": 50000000
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Gross profit",
+              "value": 22000000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "percent",
+              "label": "Gross margin",
+              "value": 44
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Net profit",
+              "value": 13000000
+            },
+            {
+              "emphasis": "positive",
+              "format": "percent",
+              "label": "Net margin",
+              "value": 26
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "property-calculator",
+      "slug": "property-calculator",
+      "title": "Property Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "down": 1200000,
+            "other": 100000,
+            "price": 6000000,
+            "rate": 8.5,
+            "registration": 1,
+            "stamp": 5,
+            "years": 20
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Loan amount",
+              "value": 4800000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly EMI",
+              "value": 41655.515201546
+            },
+            {
+              "format": "currency",
+              "label": "Cash needed upfront",
+              "value": 1660000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total loan interest",
+              "value": 5197323.648371
+            },
+            {
+              "format": "currency",
+              "label": "Estimated total cash cost",
+              "value": 11657323.648371
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "down": 0,
+            "other": 0,
+            "price": 0,
+            "rate": 0,
+            "registration": 0,
+            "stamp": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Loan amount",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly EMI",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Cash needed upfront",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total loan interest",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Estimated total cash cost",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "down": "",
+            "other": "",
+            "price": "",
+            "rate": "",
+            "registration": "",
+            "stamp": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Loan amount",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly EMI",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Cash needed upfront",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total loan interest",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Estimated total cash cost",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "down": 1000000000000,
+            "other": 1000000000000,
+            "price": 1000000000000,
+            "rate": 100,
+            "registration": 100,
+            "stamp": 100,
+            "years": 100
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Loan amount",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Monthly EMI",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Cash needed upfront",
+              "value": 4000000000000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Total loan interest",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Estimated total cash cost",
+              "value": 4000000000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "recurring-deposit",
+      "slug": "recurring-deposit-calculator",
+      "title": "Recurring Deposit Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "inflation": 6,
+            "monthly": 5000,
+            "rate": 7,
+            "years": 5
+          },
+          "output": [
+            {
+              "format": "number",
+              "label": "Monthly deposits",
+              "value": 60
+            },
+            {
+              "format": "currency",
+              "label": "Total deposits",
+              "value": 300000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Interest earned",
+              "value": 57964.508240563
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated maturity (future money)",
+              "value": 357964.50824056
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Value in today's purchasing power",
+              "value": 267491.90437874
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "inflation": 0,
+            "monthly": 0,
+            "rate": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "format": "number",
+              "label": "Monthly deposits",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Total deposits",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Interest earned",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated maturity (future money)",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Value in today's purchasing power",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "inflation": "",
+            "monthly": "",
+            "rate": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "format": "number",
+              "label": "Monthly deposits",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Total deposits",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Interest earned",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated maturity (future money)",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Value in today's purchasing power",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "inflation": 30,
+            "monthly": 5000000,
+            "rate": 100,
+            "years": 100
+          },
+          "output": [
+            {
+              "format": "number",
+              "label": "Monthly deposits",
+              "value": 1200
+            },
+            {
+              "format": "currency",
+              "label": "Total deposits",
+              "value": 6000000000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Interest earned",
+              "value": 3.1094155165301e+49
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated maturity (future money)",
+              "value": 3.1094155165301e+49
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Value in today's purchasing power",
+              "value": 1.254132812776e+38
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "rent-vs-buy",
+      "slug": "rent-vs-buy-calculator",
+      "title": "Rent vs Buy Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "appreciation": 5,
+            "buyCostPct": 6,
+            "downPct": 20,
+            "horizon": 10,
+            "investReturn": 10,
+            "loanRate": 8.75,
+            "loanYears": 20,
+            "maintPct": 1,
+            "price": 8000000,
+            "rent": 25000,
+            "rentGrowth": 5
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Monthly loan EMI",
+              "value": 56557.485370204
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Net worth if you buy",
+              "value": 8518354.6659967
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Net worth if you rent and invest",
+              "value": 12447875.612051
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Renting comes out ahead by",
+              "value": 3929520.9460547
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "appreciation": 0,
+            "buyCostPct": 0,
+            "downPct": 0,
+            "horizon": 0,
+            "investReturn": 0,
+            "loanRate": 0,
+            "loanYears": 0,
+            "maintPct": 0,
+            "price": 0,
+            "rent": 0,
+            "rentGrowth": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Monthly loan EMI",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Net worth if you buy",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Net worth if you rent and invest",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Buying comes out ahead by",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "appreciation": "",
+            "buyCostPct": "",
+            "downPct": "",
+            "horizon": "",
+            "investReturn": "",
+            "loanRate": "",
+            "loanYears": "",
+            "maintPct": "",
+            "price": "",
+            "rent": "",
+            "rentGrowth": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Monthly loan EMI",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Net worth if you buy",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Net worth if you rent and invest",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Buying comes out ahead by",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "appreciation": 30,
+            "buyCostPct": 20,
+            "downPct": 100,
+            "horizon": 40,
+            "investReturn": 30,
+            "loanRate": 30,
+            "loanYears": 40,
+            "maintPct": 10,
+            "price": 100000000000,
+            "rent": 100000000,
+            "rentGrowth": 30
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Monthly loan EMI",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Net worth if you buy",
+              "value": 5399868178921300
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Net worth if you rent and invest",
+              "value": 20151485581389000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Renting comes out ahead by",
+              "value": 14751617402468000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "roi",
+      "slug": "roi-calculator",
+      "title": "ROI Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "cost": 10000,
+            "finalValue": 14500,
+            "years": 3
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Net gain",
+              "value": 4500
+            },
+            {
+              "emphasis": "positive",
+              "format": "percent",
+              "label": "Total ROI",
+              "value": 45
+            },
+            {
+              "emphasis": "neutral",
+              "format": "percent",
+              "label": "Annualized ROI",
+              "value": 13.185119596295
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "cost": 0,
+            "finalValue": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Net gain",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "percent",
+              "label": "Total ROI",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "percent",
+              "label": "Annualized ROI",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "cost": "",
+            "finalValue": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Net gain",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "percent",
+              "label": "Total ROI",
+              "value": {
+                "__number": "NaN"
+              }
+            },
+            {
+              "emphasis": "neutral",
+              "format": "percent",
+              "label": "Annualized ROI",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "cost": 10000000,
+            "finalValue": 14500000,
+            "years": 200
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Net gain",
+              "value": 4500000
+            },
+            {
+              "emphasis": "positive",
+              "format": "percent",
+              "label": "Total ROI",
+              "value": 45
+            },
+            {
+              "emphasis": "neutral",
+              "format": "percent",
+              "label": "Annualized ROI",
+              "value": 0.18595445948204
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "rule-of-72",
+      "slug": "rule-of-72-calculator",
+      "title": "Rule of 72 Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "multiple": 3,
+            "rate": 8
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "years",
+              "label": "Years to double (Rule of 72)",
+              "value": 9
+            },
+            {
+              "emphasis": "positive",
+              "format": "years",
+              "label": "Years to double (exact compounding)",
+              "value": 9.0064683420006
+            },
+            {
+              "format": "years",
+              "label": "Rule of 72 minus exact",
+              "value": -0.0064683420005878
+            },
+            {
+              "emphasis": "positive",
+              "format": "years",
+              "label": "Years to reach the target multiple",
+              "value": 14.274914586003
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "multiple": 0,
+            "rate": 0
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "years",
+              "label": "Years to double (Rule of 72)",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "years",
+              "label": "Years to double (exact compounding)",
+              "value": 0
+            },
+            {
+              "format": "years",
+              "label": "Rule of 72 minus exact",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "years",
+              "label": "Years to reach the target multiple",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "multiple": "",
+            "rate": ""
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "years",
+              "label": "Years to double (Rule of 72)",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "years",
+              "label": "Years to double (exact compounding)",
+              "value": 0
+            },
+            {
+              "format": "years",
+              "label": "Rule of 72 minus exact",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "years",
+              "label": "Years to reach the target multiple",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "multiple": 1000,
+            "rate": 100
+          },
+          "output": [
+            {
+              "emphasis": "neutral",
+              "format": "years",
+              "label": "Years to double (Rule of 72)",
+              "value": 0.72
+            },
+            {
+              "emphasis": "positive",
+              "format": "years",
+              "label": "Years to double (exact compounding)",
+              "value": 1
+            },
+            {
+              "format": "years",
+              "label": "Rule of 72 minus exact",
+              "value": -0.28
+            },
+            {
+              "emphasis": "positive",
+              "format": "years",
+              "label": "Years to reach the target multiple",
+              "value": 9.9657842846621
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "salary-hourly",
+      "slug": "salary-to-hourly-calculator",
+      "title": "Salary ↔ Hourly",
+      "cases": {
+        "default": {
+          "inputs": {
+            "amount": 60000,
+            "direction": "toHourly",
+            "hoursPerWeek": 40,
+            "weeksPerYear": 48
+          },
+          "output": [
+            {
+              "format": "number",
+              "label": "Working hours / year",
+              "value": 1920
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Hourly rate",
+              "value": 31.25
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "amount": 0,
+            "direction": "toHourly",
+            "hoursPerWeek": 0,
+            "weeksPerYear": 0
+          },
+          "output": [
+            {
+              "format": "number",
+              "label": "Working hours / year",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Hourly rate",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "amount": "",
+            "direction": "",
+            "hoursPerWeek": "",
+            "weeksPerYear": ""
+          },
+          "output": [
+            {
+              "format": "number",
+              "label": "Working hours / year",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Annual salary",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "amount": 60000000,
+            "direction": "toSalary",
+            "hoursPerWeek": 100,
+            "weeksPerYear": 52
+          },
+          "output": [
+            {
+              "format": "number",
+              "label": "Working hours / year",
+              "value": 5200
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Annual salary",
+              "value": 312000000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "silver-jewelry",
+      "slug": "silver-jewelry-calculator",
+      "title": "Silver Jewelry Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "making": 10,
+            "purity": 92.5,
+            "rate": 100,
+            "tax": 3,
+            "weight": 50
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Fine-silver value",
+              "value": 4625
+            },
+            {
+              "format": "currency",
+              "label": "Making charge",
+              "value": 462.5
+            },
+            {
+              "format": "currency",
+              "label": "Tax / GST",
+              "value": 152.625
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated jewellery price",
+              "value": 5240.125
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "making": 0,
+            "purity": 0,
+            "rate": 0,
+            "tax": 0,
+            "weight": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Fine-silver value",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Making charge",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Tax / GST",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated jewellery price",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "making": "",
+            "purity": "",
+            "rate": "",
+            "tax": "",
+            "weight": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Fine-silver value",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Making charge",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Tax / GST",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated jewellery price",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "making": 100,
+            "purity": 100,
+            "rate": 1000000000,
+            "tax": 100,
+            "weight": 1000000
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Fine-silver value",
+              "value": 1000000000000000
+            },
+            {
+              "format": "currency",
+              "label": "Making charge",
+              "value": 1000000000000000
+            },
+            {
+              "format": "currency",
+              "label": "Tax / GST",
+              "value": 2000000000000000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated jewellery price",
+              "value": 4000000000000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "simple-interest",
+      "slug": "simple-interest-calculator",
+      "title": "Simple Interest",
+      "cases": {
+        "default": {
+          "inputs": {
+            "principal": 5000,
+            "rate": 8,
+            "years": 2
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Interest",
+              "value": 800
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Total amount",
+              "value": 5800
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "principal": 0,
+            "rate": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Interest",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Total amount",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "principal": "",
+            "rate": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Interest",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Total amount",
+              "value": "0"
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "principal": 5000000,
+            "rate": 1000,
+            "years": 40
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Interest",
+              "value": 2000000000
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Total amount",
+              "value": 2005000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "sip",
+      "slug": "sip-calculator",
+      "title": "SIP Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "inflation": 6,
+            "monthly": 200,
+            "rate": 10,
+            "years": 15
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "You put in",
+              "value": 36000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Your growth / profit",
+              "value": 47584.853151914
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "You could have in the future",
+              "value": 83584.853151914
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "What that future money is worth in today's money",
+              "value": 34877.038827005
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "inflation": 0,
+            "monthly": 0,
+            "rate": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "You put in",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Your growth / profit",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "You could have in the future",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "What that future money is worth in today's money",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "inflation": "",
+            "monthly": "",
+            "rate": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "You put in",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Your growth / profit",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "You could have in the future",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "What that future money is worth in today's money",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "inflation": 30,
+            "monthly": 1000000,
+            "rate": 100,
+            "years": 100
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "You put in",
+              "value": 1200000000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Your growth / profit",
+              "value": 6.7370669524819e+48
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "You could have in the future",
+              "value": 6.7370669524819e+48
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "What that future money is worth in today's money",
+              "value": 2.7172877610147e+37
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "sip-goal",
+      "slug": "sip-goal-calculator",
+      "title": "SIP Goal Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "current": 500000,
+            "rate": 10,
+            "target": 5000000,
+            "years": 15
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Required monthly SIP",
+              "value": 6635.2697158995
+            },
+            {
+              "format": "currency",
+              "label": "Future value of current corpus",
+              "value": 2226959.775866
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Target gap after current corpus growth",
+              "value": 2773040.224134
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "current": 0,
+            "rate": 0,
+            "target": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Required monthly SIP",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Future value of current corpus",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Target gap after current corpus growth",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "current": "",
+            "rate": "",
+            "target": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Required monthly SIP",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Future value of current corpus",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Target gap after current corpus growth",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "current": 10000000000,
+            "rate": 100,
+            "target": 100000000000,
+            "years": 80
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Required monthly SIP",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Future value of current corpus",
+              "value": 2.3530004424727e+43
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Target gap after current corpus growth",
+              "value": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ssy",
+      "slug": "ssy-calculator",
+      "title": "Sukanya Samriddhi (SSY) Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "depositYears": 15,
+            "rate": 8.2,
+            "yearlyDeposit": 100000
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Total deposited",
+              "value": 1500000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Interest earned",
+              "value": 3288079.4466167
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated maturity value at 21 years",
+              "value": 4788079.4466167
+            },
+            {
+              "format": "currency",
+              "label": "Balance when deposits end",
+              "value": 2983992.8847543
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "depositYears": 0,
+            "rate": 0,
+            "yearlyDeposit": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Total deposited",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Interest earned",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated maturity value at 21 years",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Balance when deposits end",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "depositYears": "",
+            "rate": "",
+            "yearlyDeposit": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Total deposited",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Interest earned",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated maturity value at 21 years",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Balance when deposits end",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "depositYears": 15,
+            "rate": 20,
+            "yearlyDeposit": 150000
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Total deposited",
+              "value": 2250000
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Interest earned",
+              "value": 36467222.318433
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated maturity value at 21 years",
+              "value": 38717222.318433
+            },
+            {
+              "format": "currency",
+              "label": "Balance when deposits end",
+              "value": 12966319.417128
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "stamp-duty",
+      "slug": "stamp-duty-calculator",
+      "title": "Stamp Duty Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "registration": 1,
+            "stamp": 5,
+            "value": 6000000
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Stamp duty",
+              "value": 300000
+            },
+            {
+              "format": "currency",
+              "label": "Registration / transfer",
+              "value": 60000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Estimated total charges",
+              "value": 360000
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "registration": 0,
+            "stamp": 0,
+            "value": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Stamp duty",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Registration / transfer",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Estimated total charges",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "registration": "",
+            "stamp": "",
+            "value": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Stamp duty",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Registration / transfer",
+              "value": 0
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Estimated total charges",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "registration": 100,
+            "stamp": 100,
+            "value": 1000000000000
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Stamp duty",
+              "value": 1000000000000
+            },
+            {
+              "format": "currency",
+              "label": "Registration / transfer",
+              "value": 1000000000000
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Estimated total charges",
+              "value": 2000000000000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "step-up-sip",
+      "slug": "step-up-sip-calculator",
+      "title": "Step-Up SIP Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "monthly": 5000,
+            "rate": 12,
+            "stepUp": 10,
+            "years": 15
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Projected investment value",
+              "value": 4341924.715487
+            },
+            {
+              "format": "currency",
+              "label": "Total contributions",
+              "value": 1906348.9016494
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated growth",
+              "value": 2435575.8138376
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "monthly": 0,
+            "rate": 0,
+            "stepUp": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Projected investment value",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Total contributions",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated growth",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "monthly": "",
+            "rate": "",
+            "stepUp": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Projected investment value",
+              "value": 0
+            },
+            {
+              "format": "currency",
+              "label": "Total contributions",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated growth",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "monthly": 100000000,
+            "rate": 100,
+            "stepUp": 100,
+            "years": 60
+          },
+          "output": [
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Projected investment value",
+              "value": 3.6544178632746e+34
+            },
+            {
+              "format": "currency",
+              "label": "Total contributions",
+              "value": 1.3835058055282e+27
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Estimated growth",
+              "value": 3.654417724924e+34
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "swp",
+      "slug": "swp-calculator",
+      "title": "SWP Calculator",
+      "cases": {
+        "default": {
+          "inputs": {
+            "corpus": 5000000,
+            "rate": 8,
+            "stepUp": 5,
+            "withdrawal": 30000,
+            "years": 20
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Total amount withdrawn",
+              "value": 10703822.196682
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Balance left (corpus exhausted)",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Investment growth earned",
+              "value": 5703822.1966822
+            },
+            {
+              "emphasis": "negative",
+              "format": "years",
+              "label": "Years the corpus pays the full withdrawal",
+              "value": 18.583333333333
+            }
+          ]
+        },
+        "zero": {
+          "inputs": {
+            "corpus": 0,
+            "rate": 0,
+            "stepUp": 0,
+            "withdrawal": 0,
+            "years": 0
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Total amount withdrawn",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Balance left after the period",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Investment growth earned",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "years",
+              "label": "Years of full withdrawals funded",
+              "value": 0
+            }
+          ]
+        },
+        "blank": {
+          "inputs": {
+            "corpus": "",
+            "rate": "",
+            "stepUp": "",
+            "withdrawal": "",
+            "years": ""
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Total amount withdrawn",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "currency",
+              "label": "Balance left after the period",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Investment growth earned",
+              "value": 0
+            },
+            {
+              "emphasis": "positive",
+              "format": "years",
+              "label": "Years of full withdrawals funded",
+              "value": 0
+            }
+          ]
+        },
+        "large": {
+          "inputs": {
+            "corpus": 100000000000,
+            "rate": 50,
+            "stepUp": 50,
+            "withdrawal": 1000000000,
+            "years": 60
+          },
+          "output": [
+            {
+              "format": "currency",
+              "label": "Total amount withdrawn",
+              "value": 141676029844880
+            },
+            {
+              "emphasis": "negative",
+              "format": "currency",
+              "label": "Balance left (corpus exhausted)",
+              "value": 0
+            },
+            {
+              "emphasis": "neutral",
+              "format": "currency",
+              "label": "Investment growth earned",
+              "value": 141576029844880
+            },
+            {
+              "emphasis": "negative",
+              "format": "years",
+              "label": "Years the corpus pays the full withdrawal",
+              "value": 21.333333333333
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
