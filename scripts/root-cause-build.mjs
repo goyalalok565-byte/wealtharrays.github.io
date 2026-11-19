@@ -53,7 +53,7 @@ for(const full of allHtml){
   html=html.replace(/href=[\"']{2}/g, 'href="/"');
   const relPath=path.relative(root,full).replaceAll(path.sep,'/');
   const isWidget=relPath==='widget.html'||relPath==='widget/index.html';
-  const isArticle=relPath.startsWith('articles/')&&relPath.endsWith('.html');
+  const isArticlePage=relPath.startsWith('articles/')&&relPath.endsWith('.html');
   if(isUtilityNoindexPage(relPath) && !/<meta\s+name=[\"']robots[\"']/i.test(html)) html=html.replace('</head>','<meta name="robots" content="noindex,follow"></head>');
   const isScenarioLab=isScenarioLabPage(relPath);
   const isGoalPlanner=isGoalPlannerPage(relPath);
@@ -123,7 +123,7 @@ else{
     if(relPath==='index.html'){
       if(!html.includes('wa-home-runtime.js'))html=html.replace('</body>',`<script src="/wa-home-runtime.js?v=${stamp}" defer></script></body>`);
       html=html.replace(/(<body[^>]*>)/i,'$1\n<!-- WA-HOME-RUNTIME:v1 -->');
-    }else if(isArticle){
+    }else if(isArticlePage){
       if(!html.includes('wa-article-runtime.js'))html=html.replace('</body>',`<script src="/wa-article-runtime.js?v=${stamp}" defer></script></body>`);
       html=html.replace(/(<body[^>]*>)/i,'$1\n<!-- WA-ARTICLE-RUNTIME:v1 -->');
     }else{
