@@ -46,8 +46,11 @@ jobs:
             --exclude='wealtharrays_github_io-updated.zip' \
             "$RUNNER_TEMP/wa-release/wealtharrays.github.io-main/" ./
 
-      - name: Install locked dependencies
-        run: npm ci
+      - name: Verify Node runtime and project dependency policy
+        run: |
+          node --version
+          npm --version
+          node -e "const p=require('./package.json'); if(p.dependencies || p.devDependencies) { console.log('Dependencies declared; install step required.'); process.exit(1); } console.log('No npm dependencies declared; install step intentionally omitted.');"
 
       - name: Run all calculator reference tests
         run: npm test
