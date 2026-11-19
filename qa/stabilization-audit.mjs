@@ -22,8 +22,8 @@ for (const file of calculators) {
   // The publisher ID belongs in the subscription-aware loader, not a static page tag.
   // These routes are intentionally excluded from AdSense by Phase 4 policy.
   const adExemptPages = new Set(['income-tax-scenario-calculator/index.html','loan-emi-calculator/index.html','loan-interest-calculator/index.html']);
-  const adLoaderTags = html.match(/<script\\b(?=[^>]*src=["']\\/wa-ad-loader\\.js(?:\\?[^"']*)?["'])[^>]*>\\s*<\\/script>/gi) || [];
-  const directAdTags = html.match(/<script\\b(?=[^>]*src=["']https:\\/\\/pagead2?\\.googlesyndication\\.com\\/pagead\\/js\\/adsbygoogle\\.js)[^>]*>/gi) || [];
+  const adLoaderTags = html.match(/<script\b(?=[^>]*src=["']\/wa-ad-loader\.js(?:\?[^"']*)?["'])[^>]*>\s*<\/script>/gi) || [];
+  const directAdTags = html.match(/<script\b(?=[^>]*src=["']https:\/\/pagead2?\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js)[^>]*>/gi) || [];
   const adLoaderSource = fs.existsSync('wa-ad-loader.js') ? fs.readFileSync('wa-ad-loader.js','utf8') : '';
   if (!adExemptPages.has(file) && adLoaderTags.length !== 1) throw new Error(`${file}: expected exactly one subscription-aware AdSense loader, found ${adLoaderTags.length}`);
   if (!adExemptPages.has(file) && !adLoaderSource.includes('ca-pub-6507600103785450')) throw new Error(`${file}: AdSense publisher id missing from wa-ad-loader.js`);
