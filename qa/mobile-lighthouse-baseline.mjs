@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { execFileSync } from 'node:child_process';
+import { runLighthouse } from './lighthouse-runner.mjs';
 
 const base = (process.env.BASE_URL || 'https://wealtharrays.com').replace(/\/$/, '');
 const paths = [
@@ -16,8 +16,8 @@ for (const route of paths) {
   const reportPath = `${outputDir}/${safe}.json`;
   const url = base + route;
   console.log(`\n=== Lighthouse: ${url} ===`);
-  execFileSync('npx', [
-    'lighthouse', url,
+  runLighthouse([
+  url,
     '--form-factor=mobile',
     '--screenEmulation.mobile=true',
     '--screenEmulation.width=360',
@@ -32,7 +32,8 @@ for (const route of paths) {
   '--save-assets',
     `--output-path=${reportPath}`,
     '--chrome-flags=--headless --no-sandbox --disable-dev-shm-usage'
-  ], { stdio: 'inherit' });
+  
+], 'Lighthouse route');
 
   const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
   const audits = report.audits || {};
