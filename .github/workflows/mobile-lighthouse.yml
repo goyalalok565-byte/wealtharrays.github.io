@@ -48,6 +48,26 @@ jobs:
         run: |
           npm install --no-save lighthouse@13.0.1 playwright
           npx playwright install chromium --with-deps
+      - name: PR browser smoke — canonical calculator embed
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          BASE_URL: http://127.0.0.1:4173
+        run: node qa/embed-browser-smoke.mjs
+      - name: PR browser smoke — all 55 calculators and scenario features
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          BASE_URL: http://127.0.0.1:4173
+        run: node qa/production-browser-smoke.mjs
+      - name: PR browser smoke — responsive, currency, theme, language and exports
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          BASE_URL: http://127.0.0.1:4173
+        run: node qa/all-47-calculators-browser-smoke.mjs
+      - name: PR browser smoke — cloud workspace save and load
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          BASE_URL: http://127.0.0.1:4173
+        run: node qa/cloud-workspace-sync-browser-smoke.mjs
       - name: Run seven-page mobile Lighthouse baseline
         env:
           BASE_URL: ${{ github.event_name == 'pull_request' && 'http://127.0.0.1:4173' || 'https://wealtharrays.com' }}
