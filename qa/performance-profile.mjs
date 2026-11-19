@@ -124,9 +124,32 @@ try {
   await probe.addInitScript(() => {
     const stats = window.__waPerfProbe = {
       observers: 0, bodyObservers: 0, callbacks: 0, records: 0,
-      callbackMs: 0, qsaCalls: 0, longTasks: [], layoutShifts: [], observerTargets: []
+      callbackMs: 0, qsaCalls: 0, longTasks: [], layoutShifts: [], observerTargets: [], rectSnapshots: []
     };
     const observerStacks = new WeakMap();
+    const rectSelectors = ['header', '.masthead', '.site-header', 'nav.breadcrumbs', '.calc-page', '.calc-category-tag', 'h1.calc-title', 'p.calc-desc', '.wa-review-stamp', '.calc-body', '#calc-widget', '.calc-sidebar'];
+    const captureRects = label => {
+      const elements = {};
+      for (const selector of rectSelectors) {
+        const node = document.querySelector(selector);
+        if (!node) continue;
+        const rect = node.getBoundingClientRect();
+        elements[selector] = {
+          x: +rect.x.toFixed(1), y: +rect.y.toFixed(1),
+          width: +rect.width.toFixed(1), height: +rect.height.toFixed(1),
+          text: (node.textContent || '').trim().slice(0, 90)
+        };
+      }
+      stats.rectSnapshots.push({ label, timeMs: +performance.now().toFixed(1), elements });
+    };
+    document.addEventListener('DOMContentLoaded', () => {
+      captureRects('domcontentloaded');
+      requestAnimationFrame(() => captureRects('first-animation-frame'));
+      setTimeout(() => captureRects('200ms'), 200);
+      setTimeout(() => captureRects('500ms'), 500);
+      setTimeout(() => captureRects('1000ms'), 1000);
+      setTimeout(() => captureRects('1600ms'), 1600);
+    }, { once: true });
     try {
       new PerformanceObserver(list => {
         for (const entry of list.getEntries()) {
