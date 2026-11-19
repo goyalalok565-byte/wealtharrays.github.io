@@ -35,6 +35,7 @@ assert.doesNotMatch(home,/Intl\.NumberFormat\(['"]en-IN/);
 assert.doesNotMatch(widget,/toLocaleString\(['"]en-IN/);
 assert.match(rootBuild,/priceCurrency.*pageLocale/);
 const seo=JSON.parse(fs.readFileSync('global-seo-config.json','utf8'));
-assert.equal(seo.hreflangRule,'emit only when translated/localized equivalent exists');
+assert.match(seo.hreflangRule,/self-referencing en and x-default/);
+for(const calc of registry.calculators){const html=fs.readFileSync(calc.slug+'/index.html','utf8');assert.match(html,/hreflang=[\"']en[\"']/i,calc.id+': en hreflang missing');assert.match(html,/hreflang=[\"']x-default[\"']/i,calc.id+': x-default hreflang missing');assert.doesNotMatch(html,/hreflang=[\"']en-(?:IN|US|GB)[\"']/i,calc.id+': do not publish regional hreflang without distinct localized URLs');}
 console.log('Globalization regression PASS: '+registry.count+' calculator pages have page-aware og:locale, 1200x630 PNG social images and country/currency selectors; browser-locale currency defaults are configured.');
 console.log('Hreflang variants en-IN/en-US/en-GB remain gated until distinct localized URLs exist; generic en/x-default tags are not fabricated.');
