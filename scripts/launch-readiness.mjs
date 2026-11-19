@@ -2,7 +2,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
-const calculatorSlugs = new Set(['swp-calculator','ssy-calculator','rule-of-72-calculator','rent-vs-buy-calculator','fire-calculator','budget-calculator','break-even-calculator','cost-of-delay-sip-calculator','sip-calculator','compound-interest-calculator','mortgage-emi-calculator','roi-calculator','simple-interest-calculator','retirement-calculator','salary-to-hourly-calculator','profit-margin-calculator','fixed-deposit-calculator','recurring-deposit-calculator','lumpsum-calculator','cagr-calculator','car-loan-calculator','personal-loan-calculator','debt-payoff-calculator','inflation-calculator','net-worth-calculator','overtime-pay-calculator','freelance-rate-calculator','income-tax-planner','home-loan-emi-calculator','currency-converter','flat-cost-calculator','loan-emi-calculator','capital-gain-calculator','lumpsum-sip-calculator','loan-against-property-calculator','home-loan-eligibility-calculator','silver-jewelry-calculator','advanced-home-loan-eligibility-calculator','consumer-durable-loan-calculator','gold-jewelry-calculator','loan-prepayment-vs-sip-calculator','loan-to-value-ltv-calculator','stamp-duty-calculator','property-calculator','loan-interest-calculator','ppf-calculator','epf-calculator','gst-calculator','emergency-fund-calculator','credit-card-payoff-calculator','step-up-sip-calculator','sip-goal-calculator','gratuity-calculator','hra-exemption-calculator','nps-calculator']);
+const registry = JSON.parse(fs.readFileSync(path.join(root,'calculator-definitions/registry.json'),'utf8'));
+const registryCount = registry.count;
+const calculatorSlugs = new Set(registry.calculators.map(item => item.slug));
 const errors = [];
 const warnings = [];
 const htmlFiles = [];
@@ -132,7 +134,7 @@ const methodologyPath = path.join(root, 'methodology.html');
 if (fs.existsSync(methodologyPath)) {
   const methodology = read(methodologyPath);
   const referenceRows = [...methodology.matchAll(/<tr>\s*<td><a href=["']\/([^/"']+)\//g)].map(m => m[1]);
-  if (referenceRows.length !== 55) errors.push(`Methodology reference must contain 55 calculator rows; found ${referenceRows.length}`);
+  if (referenceRows.length !== registryCount) errors.push(`Methodology reference must contain ${registryCount} calculator rows; found ${referenceRows.length}`);
   for (const slug of calculatorSlugs) {
     if (!referenceRows.includes(slug)) errors.push(`Methodology reference missing calculator: ${slug}`);
   }
@@ -168,7 +170,7 @@ const calculatorUrls = sitemapLocs.filter(url => {
     return calculatorSlugs.has(pathname.replace(/^\//,'').replace(/\/$/,''));
   } catch { return false; }
 });
-if (calculatorUrls.length !== 55) errors.push(`Expected 55 calculator pages in sitemap, found ${calculatorUrls.length}`);
+if (calculatorUrls.length !== registryCount) errors.push(`Expected ${registryCount} calculator pages in sitemap, found ${calculatorUrls.length}`);
 for (const url of calculatorUrls) {
   const file = repositoryFileForUrl(url);
   if (!file) continue;
