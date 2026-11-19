@@ -2,3 +2,9 @@ node_modules/
 .DS_Store
 
 dist/
+
+# Local archives and backups must never be committed or published.
+*.zip
+*.bak
+*.old
+*.orig
