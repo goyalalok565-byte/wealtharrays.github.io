@@ -30,10 +30,10 @@ jobs:
         run: npm run build:dist
       - name: Serve built production output
         run: |
-          python3 -m http.server 4173 --directory dist > /tmp/wealtharrays-lighthouse-http.log 2>&1 &
+          node qa/performance-preview-server.mjs > /tmp/wealtharrays-lighthouse-http.log 2>&1 &
           echo $! > /tmp/wealtharrays-lighthouse-http.pid
           for i in $(seq 1 20); do
-            curl -fsS http://127.0.0.1:4173/index.html >/dev/null && exit 0
+            curl -fsS -H 'Accept-Encoding: br' http://127.0.0.1:4173/index.html >/dev/null && exit 0
             sleep 1
           done
           cat /tmp/wealtharrays-lighthouse-http.log
@@ -45,7 +45,7 @@ jobs:
         run: node qa/mobile-lighthouse-baseline.mjs
       - name: Capture SWP typing and scroll CPU profile
         env:
-          BASE_URL: https://wealtharrays.com
+          BASE_URL: http://127.0.0.1:4173
         run: node qa/performance-profile.mjs
       - name: Upload Lighthouse and CPU profile reports
         if: always()
