@@ -30,7 +30,7 @@ for(const file of ['index.html','tools.html','robots.txt','sitemap.xml','ads.txt
 }
 const jsFiles=files.filter(file=>file.endsWith('.js')&&file!=='sw.js');
 for(const file of jsFiles)assert.match(file,/\.([a-f0-9]{12})\.js$/,`JavaScript asset must be content-hashed: ${file}`);
-for(const base of ['wa-site-runtime','wa-home-runtime','wa-calculator-runtime','search-loader','calculators'])assert.ok(jsFiles.some(file=>path.posix.basename(file).startsWith(base+'.')),`Missing hashed production JavaScript bundle: ${base}`);
+for(const base of ['wa-site-runtime','wa-home-runtime','wa-calculator-runtime','wa-article-runtime','search-loader','calculators'])assert.ok(jsFiles.some(file=>path.posix.basename(file).startsWith(base+'.')),`Missing hashed production JavaScript bundle: ${base}`);
 const definitionFiles=jsFiles.filter(file=>file.startsWith('calculator-definitions/'));
 assert.ok(definitionFiles.length>=47,`Expected split calculator definition scripts, found ${definitionFiles.length}`);
 const htmlFiles=files.filter(file=>file.endsWith('.html'));
