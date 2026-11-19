@@ -53,6 +53,21 @@ function auditHtml(dir) {
   }
 }
 auditHtml(process.cwd());
+
+// Canonical runtime URLs carry content hashes, so long-lived immutable caching
+// is safe and avoids revalidating the shared bundles on repeat visits.
+const headersPath = path.join(process.cwd(), '_headers');
+if (fs.existsSync(headersPath)) {
+  const headerText = fs.readFileSync(headersPath, 'utf8');
+  for (const asset of ['wa-site-runtime.js', 'wa-home-runtime.js', 'wa-calculator-runtime.js']) {
+    const start = headerText.indexOf('/' + asset + '\\n');
+    const end = start >= 0 ? headerText.indexOf('\\n/', start + 1) : -1;
+    const block = start >= 0 ? headerText.slice(start, end >= 0 ? end : undefined) : '';
+    if (!block.includes('max-age=31536000') || !block.includes('immutable')) {
+      failures.push('_headers: ' + asset + ' must use one-year immutable caching because its URL is content-hashed.');
+    }
+  }
+}
 if (failures.length) {
   console.error('Performance budget audit FAIL:\n' + failures.join('\n'));
   process.exit(1);
