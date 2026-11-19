@@ -92,3 +92,13 @@ jobs:
         run: node qa/performance-budget-audit.mjs
       - name: Verify package build output after npm run build
         run: npm run qa:dist
+      - name: Package verified static site
+        if: success()
+        run: cd dist && zip -qr ../wealth-arrays-site.zip .
+      - name: Upload verified static site ZIP
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wealth-arrays-production-dist
+          path: wealth-arrays-site.zip
+          retention-days: 14
