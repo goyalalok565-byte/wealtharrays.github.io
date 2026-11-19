@@ -11,7 +11,7 @@ assert.match(sw, /fetch\(request\)/, 'Navigation fetch must not force cache:no-s
 assert.doesNotMatch(sw, /fetch\(request,\s*\{\s*cache:\s*['"]no-store['"]/, 'Navigation must not disable the browser HTTP cache');
 assert.match(sw, /cache\.match\(request\)\)\.then\(hit=>hit\|\|refresh\.then/, 'Static assets must return cache hits immediately and revalidate in the background');
 assert.match(sw, /wealtharrays-pwa-11/, 'Service worker cache version must be bumped after strategy changes');
-assert.match(sw, /key\.startsWith\('wealtharrays-pwa-'\)/, 'Activation must only delete this application's older caches');
+assert.match(sw, /key\.startsWith\('wealtharrays-pwa-'\)/, 'Activation must only delete older Wealth Arrays caches');
 assert.match(sw, /new Response\('',\{status:503,statusText:'Offline'\}\)/, 'Uncached offline assets must not receive an HTML offline page as JavaScript/CSS');
 assert.ok((headers.match(/connect-src[^\n]*https:\/\/\*\.supabase\.co/g) || []).length >= 3, 'CSP connect-src must permit Supabase auth on top-level and embed policies');
 console.log('Service worker privacy/CSP audit PASS — API and authenticated requests bypass Cache Storage, cache directives are respected, and Supabase auth is permitted.');
