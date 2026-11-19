@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { gzipSync } from 'node:zlib';
 
 const dist=path.join(process.cwd(),'dist');
 if(!fs.existsSync(dist))throw new Error('dist/ is missing; run build-dist.mjs first');
@@ -101,5 +102,31 @@ for(const file of publicTextFiles){
     if(ref==='sw.js')continue;
     if(!fs.existsSync(path.join(dist,ref)))throw new Error(file+': local JavaScript reference does not resolve: /'+ref);
   }
+}
+const pageBudgets={home:35*1024,tools:35*1024,calculator:40*1024,article:10*1024};
+const totals={};
+for(const file of walk(dist).filter(file=>file.endsWith('.html'))){
+  const html=fs.readFileSync(path.join(dist,file),'utf8');
+  let type=null;
+  if(file==='index.html')type='home';
+  else if(file==='tools.html'||html.includes('class="tools-page"'))type='tools';
+  else if(html.includes('data-wa-calculator='))type='calculator';
+  else if(file.startsWith('articles/'))type='article';
+  if(!type)continue;
+  let bytes=0;
+  for(const match of html.matchAll(/<script\\s+[^>]*src=["']([^"']+)["'][^>]*>/gi)){
+    const src=match[1];
+    if(!src.startsWith('/'))continue;
+    const relative=src.slice(1);
+    if(relative==='sw.js')continue;
+    const full=path.join(dist,relative);
+    if(!fs.existsSync(full))throw new Error(file+': missing first-party script '+src);
+    bytes+=gzipSync(fs.readFileSync(full)).length;
+  }
+  totals[type]=Math.max(totals[type]||0,bytes);
+}
+for(const [type,bytes] of Object.entries(totals)){
+  console.log(type+' first-party JS gzip max: '+bytes+' bytes');
+  if(bytes>pageBudgets[type])throw new Error(type+' page JS gzip budget exceeded: '+bytes+' > '+pageBudgets[type]);
 }
 console.log('JavaScript hash build PASS — '+jsFiles.length+' first-party scripts now use content-hashed filenames; service worker cache version updated.');
