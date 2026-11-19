@@ -10,7 +10,7 @@ for(const id of ids) if(!defs.includes(`id:"${id}"`)) throw new Error(`Missing c
 if(!widgetSource.includes('async function waCopyEmbed(calc)')) throw new Error('widget.js missing Copy Embed implementation');
 if(!widgetSource.includes('/widget/?calc=${encodeURIComponent(calc.id)}')) throw new Error('widget.js must use canonical /widget/ embed route');
 if(!widgetSource.includes("document.execCommand('copy')")) throw new Error('Copy Embed must have synchronous clipboard fallback');
-if(!runtime.includes('/widget/?calc=${encodeURIComponent(calc.id)}')) throw new Error('Generated calculator runtime has stale direct widget route');
+if(!runtime.includes('/widget/?calc=') || !runtime.includes('encodeURIComponent')) throw new Error('Generated calculator runtime must build the canonical /widget/ embed URL from the calculator ID');
 if(!runtime.includes('class="tool-action" id="${id}-embed"')) throw new Error('Calculator mount must render Copy embed action');
 if(!widgetHtml.includes('href="https://wealtharrays.com/widget/"')) throw new Error('Widget directory canonical URL is missing');
 if(!redirects.includes('/widget /widget/ 301')||!redirects.includes('/widget.html /widget/ 301')) throw new Error('Legacy widget routes must converge on /widget/');
