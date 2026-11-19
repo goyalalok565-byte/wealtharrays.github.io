@@ -64,6 +64,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: wealtharrays-before-after-mobile-performance
+          name: wealtharrays-before-after-mobile-performance-attempt-${{ github.run_attempt }}
           path: /tmp/wa-lighthouse/
           retention-days: 30
