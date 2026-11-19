@@ -14,3 +14,8 @@ not_found_handling = "404-page"
 name = "PUBLIC_API_LIMITER"
 namespace_id = "2026103001"
 simple = { limit = 120, period = 60 }
+
+[[ratelimits]]
+name = "PRIVATE_API_LIMITER"
+namespace_id = "2026111901"
+simple = { limit = 30, period = 60 }
