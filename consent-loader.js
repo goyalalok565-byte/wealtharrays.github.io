@@ -1,6 +1,6 @@
 /*
  * Wealth Arrays — deferred Google Funding Choices loader.
- * Funding Choices is requested after window load/idle, first interaction, or a 4 s fallback.
+ * Funding Choices is requested on first interaction, or after a 4 s post-load idle fallback.
  * The shared promise lets the AdSense loader wait for the CMP script to load or fail.
  */
 (function(){
@@ -32,14 +32,15 @@
     });
   }
   function schedule(){
-    if(started)return;
-    if(window.requestIdleCallback)idle=window.requestIdleCallback(load,{timeout:4000});
-    else return;
+    if(started||timer)return;
+    timer=setTimeout(function(){
+      if(window.requestIdleCallback)idle=window.requestIdleCallback(load,{timeout:1000});
+      else load();
+    },4000);
   }
   if(document.readyState==='complete')schedule();
   else window.addEventListener('load',schedule,{once:true,passive:true});
   ['pointerdown','keydown','touchstart','scroll'].forEach(function(name){
     window.addEventListener(name,load,{once:true,passive:true});
   });
-  timer=setTimeout(load,4000);
 })();
