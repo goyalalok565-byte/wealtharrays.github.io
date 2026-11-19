@@ -23,11 +23,11 @@ function walk(dir){
 function meta(html,attribute,key){
   const escaped=key.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
   const tag=html.match(new RegExp('<meta\\b[^>]*\\b'+attribute+'=["\\x27]'+escaped+'["\\x27][^>]*>','i'))?.[0]||'';
-  return (tag.match(/\\bcontent=["']([^"']+)["']/i)||[])[1]||'';
+  return (tag.match(/\bcontent=["']([^"']+)["']/i)||[])[1]||'';
 }
 const pages=walk(root).filter(file=>{
   const html=fs.readFileSync(file,'utf8');
-  return /data-wa-calculator/.test(html)&&/wa-calculator-runtime\\.js/.test(html);
+  return /data-wa-calculator/.test(html)&&/wa-calculator-runtime\.js/.test(html);
 });
 if(pages.length!==55)throw new Error('Expected 55 calculator pages with canonical runtime; found '+pages.length);
 const failures=[];
@@ -43,5 +43,5 @@ for(const file of pages){
   if(w!=='1200'||h!=='630')failures.push(file+': OG dimensions are '+w+'x'+h);
   if(twitter!=='https://wealtharrays.com/og-image.png')failures.push(file+': twitter:image is '+twitter);
 }
-if(failures.length)throw new Error(failures.join('\\n'));
+if(failures.length)throw new Error(failures.join('\n'));
 console.log('OG image audit PASS — 1200x630 PNG verified and referenced by all 55 calculator pages.');
