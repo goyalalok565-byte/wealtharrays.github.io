@@ -88,4 +88,4 @@ if (lumpSumSipHtml.includes('₹1,25,656')) {
 }
 
 if(failures.length){console.error('VALUE CONTENT AUDIT FAILED ('+failures.length+' issues)');console.error(failures.join('\n'));process.exit(1);}
-console.log('Value-content audit passed: all '+calculators.length+' calculators have substantial unique guidance, worked examples, FAQs, internal article links, concise metadata and valid software/breadcrumb schema.');
+console.log('Value-content baseline checks passed for '+calculators.length+' registered calculators. See docs/audits/content-quality-audit.md for strict word-count, FAQ, source, updated-date and duplicate-paragraph results.');
