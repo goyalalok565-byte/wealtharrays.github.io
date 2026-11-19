@@ -124,8 +124,9 @@ try {
   await probe.addInitScript(() => {
     const stats = window.__waPerfProbe = {
       observers: 0, bodyObservers: 0, callbacks: 0, records: 0,
-      callbackMs: 0, qsaCalls: 0, longTasks: [], layoutShifts: []
+      callbackMs: 0, qsaCalls: 0, longTasks: [], layoutShifts: [], observerTargets: []
     };
+    const observerStacks = new WeakMap();
     try {
       new PerformanceObserver(list => {
         for (const entry of list.getEntries()) {
@@ -168,6 +169,7 @@ try {
       construct(Target, args) {
         stats.observers++;
         const callback = args[0];
+        const stack = new Error('MutationObserver created').stack;
         args[0] = function(records, observer) {
           const start = performance.now();
           stats.callbacks++;
@@ -175,12 +177,16 @@ try {
           try { return callback(records, observer); }
           finally { stats.callbackMs += performance.now() - start; }
         };
-        return Reflect.construct(Target, args);
+        const observer = Reflect.construct(Target, args);
+        observerStacks.set(observer, stack);
+        return observer;
       }
     });
     const observe = NativeObserver.prototype.observe;
     NativeObserver.prototype.observe = function(target, options) {
       if (target === document.body) stats.bodyObservers++;
+      const tag = target === document.body ? 'document.body' : target === document.documentElement ? 'document.documentElement' : (target?.tagName?.toLowerCase() || target?.nodeName || 'unknown') + (target?.id ? '#'+target.id : '');
+      stats.observerTargets.push({ target: tag, options: options || {}, stack: observerStacks.get(this) || '' });
       return observe.call(this, target, options);
     };
     const documentQuery = Document.prototype.querySelectorAll;
