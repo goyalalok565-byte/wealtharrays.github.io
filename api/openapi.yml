@@ -224,3 +224,12 @@ components:
             code: {type: string}
             message: {type: string}
             details: {type: object, additionalProperties: true}
+
+  /v1/health:
+    get:
+      summary: Check API and dependency health
+      responses:
+        '200':
+          description: API and configured dependencies are healthy
+        '503':
+          description: One or more dependencies are unavailable or not configured

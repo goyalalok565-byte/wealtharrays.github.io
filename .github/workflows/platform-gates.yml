@@ -34,6 +34,8 @@ jobs:
         run: node qa/service-worker-privacy-audit.mjs
       - name: Privacy policy consistency audit
         run: node qa/privacy-policy-audit.mjs
+      - name: Synchronize canonical calculator registry
+        run: node scripts/sync-calculator-catalog.mjs
       - name: Calculator regression and catalogue parity
         run: node qa/calculator-regression.mjs
       - name: Generate research datasets
@@ -46,13 +48,27 @@ jobs:
         run: node qa/research-data-audit.mjs
       - name: Accessibility static audit
         run: node qa/accessibility-static-audit.mjs
+      - name: Tax-year Section 156 label regression
+        run: node qa/tax-section-label-regression.mjs
+      - name: Run API/page parity for all registered calculators
+        run: node qa/api-calculator-parity.mjs
       - name: Build production dist
-        run: npm run build:dist
+        run: npm run build
       - name: Canonical embed source regression
         run: node qa/embed-regression.mjs
+      - name: Verify 1200x630 social image on all calculator pages
+        run: node qa/og-image-audit.mjs
+      - name: Minify production bundles before browser measurement
+        run: |
+          for file in wa-site-runtime.js wa-home-runtime.js wa-calculator-runtime.js; do
+            npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output "$file" -- "$file"
+            cp "$file" "dist/$file"
+          done
+          node qa/performance-budget-audit.mjs
+          npm run qa:dist
       - name: Install Playwright for all-calculator browser regression
         run: |
-          npm install --no-save playwright@1.55.0
+          npm install --no-save playwright@1.55.0 lighthouse@13.0.1
           npx playwright install --with-deps chromium
       - name: Start built site for browser regression
         run: |
@@ -64,11 +80,97 @@ jobs:
           done
           cat /tmp/wealtharrays-dist-http.log
           exit 1
+      - name: Capture production baseline homepage CPU profile (before)
+        continue-on-error: true
+        env:
+          BASE_URL: https://wealtharrays.com
+          PROFILE_PATH: /
+          LH_OUTPUT_DIR: /tmp/wa-lighthouse/before
+        run: node qa/performance-profile.mjs
+      - name: Capture production baseline CPU profile /tools.html (before)
+        continue-on-error: true
+        env:
+          BASE_URL: https://wealtharrays.com
+          PROFILE_PATH: /tools.html
+          LH_OUTPUT_DIR: /tmp/wa-lighthouse/before
+        run: node qa/performance-profile.mjs
+      - name: Capture production baseline CPU profile /sip-calculator/ (before)
+        continue-on-error: true
+        env:
+          BASE_URL: https://wealtharrays.com
+          PROFILE_PATH: /sip-calculator/
+          LH_OUTPUT_DIR: /tmp/wa-lighthouse/before
+        run: node qa/performance-profile.mjs
+      - name: Capture production baseline CPU profile /swp-calculator/ (before)
+        continue-on-error: true
+        env:
+          BASE_URL: https://wealtharrays.com
+          PROFILE_PATH: /swp-calculator/
+          LH_OUTPUT_DIR: /tmp/wa-lighthouse/before
+        run: node qa/performance-profile.mjs
+      - name: Capture production baseline CPU profile /fire-calculator/ (before)
+        continue-on-error: true
+        env:
+          BASE_URL: https://wealtharrays.com
+          PROFILE_PATH: /fire-calculator/
+          LH_OUTPUT_DIR: /tmp/wa-lighthouse/before
+        run: node qa/performance-profile.mjs
+      - name: Capture production baseline CPU profile /rent-vs-buy-calculator/ (before)
+        continue-on-error: true
+        env:
+          BASE_URL: https://wealtharrays.com
+          PROFILE_PATH: /rent-vs-buy-calculator/
+          LH_OUTPUT_DIR: /tmp/wa-lighthouse/before
+        run: node qa/performance-profile.mjs
+      - name: Capture production baseline Lighthouse for six pages (before)
+        continue-on-error: true
+        env:
+          BASE_URL: https://wealtharrays.com
+          LH_OUTPUT_DIR: /tmp/wa-lighthouse/before
+        run: node qa/mobile-lighthouse-baseline.mjs
+      - name: Capture candidate homepage CPU profile (after)
+        env:
+          BASE_URL: http://127.0.0.1:4173
+          PROFILE_PATH: /
+          LH_OUTPUT_DIR: /tmp/wa-lighthouse/after
+        run: node qa/performance-profile.mjs
+      - name: Capture candidate CPU profile /tools.html (after)
+        env:
+          BASE_URL: http://127.0.0.1:4173
+          PROFILE_PATH: /tools.html
+          LH_OUTPUT_DIR: /tmp/wa-lighthouse/after
+        run: node qa/performance-profile.mjs
+      - name: Capture candidate CPU profile /sip-calculator/ (after)
+        env:
+          BASE_URL: http://127.0.0.1:4173
+          PROFILE_PATH: /sip-calculator/
+          LH_OUTPUT_DIR: /tmp/wa-lighthouse/after
+        run: node qa/performance-profile.mjs
+      - name: Capture candidate CPU profile /swp-calculator/ (after)
+        env:
+          BASE_URL: http://127.0.0.1:4173
+          PROFILE_PATH: /swp-calculator/
+          LH_OUTPUT_DIR: /tmp/wa-lighthouse/after
+        run: node qa/performance-profile.mjs
+      - name: Capture candidate CPU profile /fire-calculator/ (after)
+        env:
+          BASE_URL: http://127.0.0.1:4173
+          PROFILE_PATH: /fire-calculator/
+          LH_OUTPUT_DIR: /tmp/wa-lighthouse/after
+        run: node qa/performance-profile.mjs
+      - name: Capture candidate CPU profile /rent-vs-buy-calculator/ (after)
+        env:
+          BASE_URL: http://127.0.0.1:4173
+          PROFILE_PATH: /rent-vs-buy-calculator/
+          LH_OUTPUT_DIR: /tmp/wa-lighthouse/after
+        run: node qa/performance-profile.mjs
+      - name: Prove Lighthouse gate rejects deliberately failing metrics
+        run: node --test qa/performance-thresholds.test.mjs
       - name: Browser regression for canonical calculator embed route
         env:
           BASE_URL: http://127.0.0.1:4173
         run: node qa/embed-browser-smoke.mjs
-      - name: Browser regression for all 47 calculators and scenario features
+      - name: Browser regression for all registered calculators and scenario features
         env:
           BASE_URL: http://127.0.0.1:4173
         run: node qa/production-browser-smoke.mjs
@@ -80,14 +182,18 @@ jobs:
         run: npm run qa:dist
       - name: Diff check
         run: git diff --check
-      - name: Verify literal npm run build
-        run: npm run build
-      - name: Minify bundles and enforce production asset budget
-        run: |
-          for file in wa-site-runtime.js wa-home-runtime.js wa-calculator-runtime.js; do
-            npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output "$file" -- "$file"
-            cp "$file" "dist/$file"
-          done
-          node qa/performance-budget-audit.mjs
-      - name: Verify package build output after npm run build
-        run: npm run qa:dist
+      - name: Enforce mobile Lighthouse budgets on six candidate pages
+        env:
+          BASE_URL: http://127.0.0.1:4173
+          LH_OUTPUT_DIR: /tmp/wa-lighthouse/after
+        run: node qa/mobile-lighthouse-baseline.mjs
+      - name: Upload before/after mobile performance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wealtharrays-before-after-mobile-performance-attempt-${{ github.run_attempt }}
+          path: |
+            /tmp/wa-lighthouse/
+            docs/audits/content-quality-audit.md
+            docs/audits/deploy-file-manifest.md
+          retention-days: 30

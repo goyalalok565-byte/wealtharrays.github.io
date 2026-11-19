@@ -8,7 +8,7 @@ for(const page of calculators){
  if(runtime.length!==1)throw new Error(`${page}: expected exactly one versioned calculator runtime`);
  if(html.includes('calculators.js'))throw new Error(`${page}: calculators.js must never be page-loaded`);
  if(!html.includes('calculator-definitions/'))throw new Error(`${page}: split definition missing`);
- if(!html.includes('/cls-fixes.css?v='))throw new Error(`${page}: CLS stylesheet missing`);
+ if(!html.includes('/styles-critical.css?v='))throw new Error(`${page}: merged critical CSS stylesheet missing`);
  const schemaBlocks=[...html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)].map(match=>JSON.parse(match[1]));
  const schemaTypes=[];
  const collectTypes=node=>{if(!node||typeof node!=='object')return;if(typeof node['@type']==='string')schemaTypes.push(node['@type']);if(Array.isArray(node['@graph']))node['@graph'].forEach(collectTypes);};
@@ -32,7 +32,7 @@ const notFoundPreloads=(notFoundHtml.match(/<link\b(?=[^>]*rel=["']preload["'])(
 const notFoundStylesheets=(notFoundHtml.match(/<link\b(?=[^>]*rel=["']stylesheet["'])(?=[^>]*href=["']\/styles\.css(?:\?[^"']*)?["'])[^>]*>/gi)||[]).length;
 if(notFoundPreloads!==1||notFoundStylesheets!==1)throw new Error(`404.html: expected one stylesheet preload and one stylesheet, found ${notFoundPreloads} and ${notFoundStylesheets}`);
 const guides=fs.readdirSync('articles').filter(x=>x.endsWith('.html'));
-for(const file of guides){const html=fs.readFileSync(path.join('articles',file),'utf8');if(!html.includes('"@type":"Article"')&&!html.includes('"@type": "Article"'))throw new Error(`${file}: Article schema missing`);if(!html.includes('/cls-fixes.css?v='))throw new Error(`${file}: CLS stylesheet missing`);if(!/<h1\b/i.test(html))throw new Error(`${file}: H1 missing`);}
+for(const file of guides){const html=fs.readFileSync(path.join('articles',file),'utf8');if(!html.includes('"@type":"Article"')&&!html.includes('"@type": "Article"'))throw new Error(`${file}: Article schema missing`);if(!html.includes('/styles-critical.css?v='))throw new Error(`${file}: merged critical CSS stylesheet missing`);if(!/<h1\b/i.test(html))throw new Error(`${file}: H1 missing`);}
 const allSiteHtml=[];function walkHtml(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){if(e.name==='.git'||e.name==='node_modules')continue;const p=path.join(dir,e.name);if(e.isDirectory())walkHtml(p);else if(e.name.endsWith('.html'))allSiteHtml.push(p)}}walkHtml('.');
 for(const file of allSiteHtml){
  const html=fs.readFileSync(file,'utf8');
@@ -56,4 +56,6 @@ if(!fs.existsSync('p/README.md'))throw new Error('Legacy /p namespace marker mis
 for(const [legacy,target] of [['/p/building-corporate-personal-cash.html','/category-business.html'],['/p/optimizing-fixed-term-certificates.html','/fixed-deposit-calculator/'],['/p/the-ultimate-guide-to-systematic.html','/articles/sip-calculator-guide.html']])if(!redirects.includes(`${legacy} ${target} 301`))throw new Error(`Missing hardened legacy /p redirect: ${legacy}`);
 const widget=fs.readFileSync('widget.html','utf8');if(!widget.includes('/calculators.js')||!widget.includes('/wa-calculator-runtime.js'))throw new Error('Widget must load calculator definitions and canonical runtime');
 const runtime=fs.readFileSync('wa-calculator-runtime.js','utf8');if(runtime.includes('WA CANONICAL MODULE | calculator | calculators.js'))throw new Error('All 20 definitions are still bundled');
+const criticalCss=fs.existsSync('styles-critical.css')?fs.readFileSync('styles-critical.css','utf8'):'';
+if(!criticalCss.includes('min-height:520px'))throw new Error('Merged critical CSS is missing the 520px calculator reservation.');
 console.log(`Root-cause audit PASS — ${calculators.length} calculators, ${guides.length} guides, search stacking/matching, current PDF branding, production hotfix, favicon metadata, schemas, canonical routes and generated sitemap verified.`);

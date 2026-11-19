@@ -3,7 +3,8 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 const calcContext={window:{},console};vm.createContext(calcContext);vm.runInContext(fs.readFileSync('calculators.js','utf8')+'\n;globalThis.__WA_TEST_CALCULATORS__=CALCULATORS;',calcContext);
 const allCalculators=calcContext.__WA_TEST_CALCULATORS__;
-if(!Array.isArray(allCalculators)||allCalculators.length!==55)throw new Error('Expected 55 calculator definitions, found '+(allCalculators?.length??'none'));
+const registryCount=JSON.parse(fs.readFileSync('calculator-definitions/registry.json','utf8')).count;
+if(!Array.isArray(allCalculators)||allCalculators.length!==registryCount)throw new Error('Expected '+registryCount+' registered calculator definitions, found '+(allCalculators?.length??'none'));
 
 const baseUrl = (process.env.BASE_URL || 'http://127.0.0.1:4173').replace(/\/$/, '');
 const browser = await chromium.launch({ headless: true });
@@ -282,5 +283,5 @@ try {
 
   if (failedResponses.length) throw new Error(`Failed network responses: ${failedResponses.join(' | ')}`);
   if (errors.length) throw new Error(`Browser errors: ${errors.join(' | ')}`);
-  console.log(`Production browser smoke passed at ${baseUrl}: homepage, all 55 calculators, explicit Calculate/Compare interactions, shareable inputs, local save/load, PDF download, and 375px mobile overflow checks are healthy.`);
+  console.log(`Production browser smoke passed at ${baseUrl}: homepage, all registered calculators, explicit Calculate/Compare interactions, shareable inputs, local save/load, PDF download, and 375px mobile overflow checks are healthy.`);
 } finally { await browser.close(); }

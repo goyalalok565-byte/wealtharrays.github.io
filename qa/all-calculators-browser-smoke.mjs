@@ -55,8 +55,9 @@ try {
     id: c.id, slug: c.slug, title: c.title,
     fields: c.fields.map(f => ({ id: f.id, label: f.label, type: f.type, default: f.default, min: f.min, max: f.max, step: f.step, options: f.options }))
   }));
-  assert(calculators.length === 55, 'Expected 55 source calculator definitions, found ' + calculators.length);
-  assert(new Set(calculators.map(c => c.id)).size === 55, 'Calculator IDs are not unique');
+  const registryCount = JSON.parse(fs.readFileSync('calculator-definitions/registry.json','utf8')).count;
+  assert(calculators.length === registryCount, 'Expected ' + registryCount + ' registered calculator definitions, found ' + calculators.length);
+  assert(new Set(calculators.map(c => c.id)).size === registryCount, 'Calculator IDs are not unique');
 
   for (const calc of calculators) {
     try {

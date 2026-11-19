@@ -22,7 +22,7 @@ if(!fs.existsSync(path.join(root,'404-runtime.js'))) failures.push('404-runtime.
 for(const f of calc){if(!fs.existsSync(path.join(root,f))) failures.push(`Missing calculator: ${f}`);}
 for(const full of publicFiles){
  const r=path.relative(root,full).replaceAll(path.sep,'/'), s=fs.readFileSync(full,'utf8');
- if(!s.includes('/phase4-premium.css')) failures.push(`${r}: missing Phase 4 CSS`);
+ if(!s.includes('/styles-critical.css?v=')) failures.push(`${r}: missing merged premium CSS`);
  if(r!=='offline.html' && r!=='widget.html' && !s.includes('/theme-init.js')) failures.push(`${r}: missing external theme bootstrap`);
  if(!s.includes('name="referrer" content="strict-origin-when-cross-origin"')) failures.push(`${r}: missing referrer policy meta`);
  if(/<script[^>]+src=["']\/?(?:phase4-premium|calculator-page-init|site-runtime|wa-core|final-polish|theme-fix|phase2-intelligence|phase2-retirement|phase3-seo)\.js(?:[?#][^"']*)?["']/i.test(s)) failures.push(`${r}: legacy runtime source loaded directly; use canonical bundle`);
@@ -87,5 +87,7 @@ if(!headers.includes('X-Content-Type-Options: nosniff')) failures.push('_headers
 if(!headers.includes('Referrer-Policy: strict-origin-when-cross-origin')) failures.push('_headers: referrer policy missing');
 if(!headers.includes('frame-ancestors')) failures.push('_headers: frame-ancestors missing');
 if(!headers.includes("script-src 'self' https://www.googletagmanager.com")) failures.push('_headers: CSP script source policy not hardened');
+const criticalCss=fs.existsSync(path.join(root,'styles-critical.css'))?fs.readFileSync(path.join(root,'styles-critical.css'),'utf8'):'';
+if(!criticalCss.includes('.wa-skip-link')||!criticalCss.includes('min-height:520px')) failures.push('Merged critical CSS is missing premium shell or CLS reservation rules');
 if(failures.length){console.error(failures.join('\n'));process.exit(1)}
 console.log(`Phase 4 premium audit PASS — ${publicFiles.length} HTML files and ${calc.length} canonical calculators checked.`);

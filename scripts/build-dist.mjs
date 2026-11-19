@@ -13,7 +13,7 @@ const PUBLIC_ROOT_EXACT = new Set([
 ]);
 const PUBLIC_DIRS = new Set(['articles','research','calculator-definitions','assets']);
 const EXCLUDE_DIRS = new Set([
-  '.git','.github','node_modules','qa','scripts',
+  '.git','.github','node_modules','qa','scripts','docs','tests','functions','migrations',
   'country-modules','api','p','privacy','reports','dist'
 ]);
 const EXCLUDE_ROOT = new Set([
@@ -93,15 +93,15 @@ function auditTree(dir, rel='') {
 }
 auditTree(out);
 const forbiddenHits = forbidden.filter(p =>
-  /^(qa|scripts|country-modules|api|p|privacy|reports)(\/|$)/.test(p) ||
-  /\.(md)$/i.test(p) ||
+  /^(qa|scripts|docs|tests|functions|migrations|country-modules|api|p|privacy|reports)(\/|$)/.test(p) ||
+  /\.(md|yml|yaml)$/i.test(p) ||
   p === 'content-sources.json' ||
   p.startsWith('.github/')
 );
 if (forbiddenHits.length) {
   throw new Error('Forbidden internal files leaked into dist:\n' + forbiddenHits.join('\n'));
 }
-for (const required of ['index.html','robots.txt','sitemap.xml','ads.txt','_headers','_redirects','sw.js','manifest.webmanifest','widget.html','widget/index.html','widget.js','widget-bootstrap.js','wa-site-runtime.js','wa-home-runtime.js','wa-calculator-runtime.js']) {
+for (const required of ['index.html','robots.txt','sitemap.xml','ads.txt','_headers','_redirects','sw.js','manifest.webmanifest','widget.html','widget/index.html','widget.js','widget-bootstrap.js','wa-site-runtime.js','wa-home-runtime.js','wa-calculator-runtime.js','styles-critical.css']) {
   if (!fs.existsSync(path.join(out, required))) throw new Error('Missing required public output: ' + required);
 }
 const definitionsSrc = path.join(root, 'calculator-definitions');

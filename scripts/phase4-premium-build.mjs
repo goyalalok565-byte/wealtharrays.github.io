@@ -14,7 +14,13 @@ function walk(dir){
 walk(root);
 
 const phase4Css='<link rel="stylesheet" href="/phase4-premium.css?v=20260915-1">';
-const themeJs='<script src="/theme-init.js?v=20260915-1"></script>';
+const themeJs='<script src="/theme-init.js?v=20260915-1" defer></script>';
+const themePreload='<link rel="preload" as="script" href="/theme-init.js?v=20260915-1">';
+const cssVersion=(process.env.GITHUB_SHA||'20261119').slice(0,8);
+const criticalCssFiles=['styles.css','phase3-seo.css','cls-fixes.css','phase4-premium.css'];
+const criticalCss='/* WA-CRITICAL-CSS-BUNDLE '+cssVersion+' */\n'+criticalCssFiles.filter(file=>fs.existsSync(path.join(root,file))).map(file=>fs.readFileSync(path.join(root,file),'utf8')).join('\n');
+fs.writeFileSync(path.join(root,'styles-critical.css'),criticalCss,'utf8');
+const criticalCssHref='/styles-critical.css?v='+cssVersion;
 const redirectJs='<script src="/404-runtime.js?v=20260915-1" defer></script>';
 const adsenseJs='<script src="/wa-ad-loader.js" defer></script>';
 const consentJs='<script data-cfasync="false" src="/consent-loader.js" defer></script>';
@@ -25,8 +31,21 @@ let changed=0;
 for(const file of htmlFiles){
   let s=fs.readFileSync(file,'utf8');
   const before=s;
+  // Apply the calculator host class before deferred runtime mount so CSS can reserve its space.
+  s=s.replace(/<div\b[^>]*\bid=["']calc-widget["'][^>]*>/gi, tag => {
+    const classAttr=tag.match(/\bclass=(["'])(.*?)\1/i);
+    if(classAttr){
+      if(/(?:^|\s)calc-widget(?:\s|$)/.test(classAttr[2])) return tag;
+      return tag.replace(classAttr[0], `class=${classAttr[1]}${classAttr[2]} calc-widget${classAttr[1]}`);
+    }
+    return tag.replace(/>$/, ' class="calc-widget">');
+  });
   s=s.replace(/<script>[^<]*(?:document\.documentElement\.dataset\.theme|localStorage\.(?:waTheme|getItem\(['"]waTheme['"]\)))[^<]*<\/script>/gi, '');
-  if(!s.includes('/theme-init.js')) s=s.replace('</head>',`${themeJs}</head>`);
+  if(!s.includes('/theme-init.js')) s=s.replace('</head>',`${themePreload}${themeJs}</head>`);
+  else {
+    if(!/rel=["']preload["'][^>]*href=["'][^"']*theme-init\.js/i.test(s)) s=s.replace('</head>',`${themePreload}</head>`);
+    s=s.replace(/<script\b([^>]*src=["'][^"']*theme-init\.js[^"']*["'][^>]*)>/gi,tag=>/\bdefer\b/i.test(tag)?tag:tag.replace('<script','<script defer'));
+  }
   // Replace every inline calculator bootstrap, including legacy formatting variants.
   const mountId=(s.match(/mountCalculator\(\s*CALCULATORS\.find\(\s*c\s*=>\s*c\.id\s*===\s*['"]([^'"]+)['"]/i)||[])[1];
   if(mountId) s=s.replace(/<script>[^<]*mountCalculator\([^<]*<\/script>/gi,'');
@@ -45,7 +64,15 @@ for(const file of htmlFiles){
   }
   s=s.replace(/<link rel="stylesheet" href="\/phase4-premium\.css[^>]*>/g,'');
   s=s.replace(/<script src="\/phase4-premium\.js[^>]*><\/script>/g,'');
+  // Keep privacy choices available without rebuilding an otherwise static footer at runtime.
+  if(!/data-wa-open-consent/.test(s)){
+    s=s.replace(/(<nav\b[^>]*class=["'][^"']*footer-nav-box[^"']*["'][^>]*>[\s\S]*?)(<\/nav>)/i,'$1<button class="footer-link" type="button" data-wa-open-consent>Privacy choices</button>$2');
+  }
   if(!s.includes('/phase4-premium.css')) s=s.replace('</head>',`${phase4Css}</head>`);
+  // Fold the small SEO, CLS and premium stylesheets into the preloaded main CSS.
+  s=s.replace(/href=(["'])(?:\/|\.\/)?styles\.css(?:\?[^"']*)?\1/gi, 'href="'+criticalCssHref+'"');
+  s=s.replace(/<link\b[^>]*href=["'][^"']*(?:phase3-seo|cls-fixes|phase4-premium)\.css[^"']*["'][^>]*>\s*/gi,'');
+
   if(!s.includes('name="referrer"')) s=s.replace('</head>',`<meta name="referrer" content="strict-origin-when-cross-origin"></head>`);
   // AdSense is intentionally excluded from 404.html and widget.html.
   // 404 is an error/low-value page; widget.html may be embedded on third-party domains.

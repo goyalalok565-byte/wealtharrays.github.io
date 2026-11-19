@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import { CALCULATORS } from '../calculators.js';
 
 const cases = [
@@ -27,7 +28,8 @@ const cases = [
 const byId = new Map(CALCULATORS.map(c => [c.id, c]));
 const failures = [];
 
-if (CALCULATORS.length !== 55) failures.push(`Expected 55 calculators, found ${CALCULATORS.length}`);
+const registryCount = JSON.parse(fs.readFileSync('calculator-definitions/registry.json','utf8')).count;
+if (CALCULATORS.length !== registryCount) failures.push(`Expected ${registryCount} registered calculators, found ${CALCULATORS.length}`);
 if (new Set(CALCULATORS.map(c => c.id)).size !== CALCULATORS.length) failures.push('Calculator IDs are not unique');
 
 for (const [id, values, label, expected] of cases) {

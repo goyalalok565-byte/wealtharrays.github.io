@@ -1,0 +1,35 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { createRequire } from 'node:module';
+const require=createRequire(import.meta.url);
+const {CALCULATORS}=require('../calculators.js');
+const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const notes={investment:'contribution timing, market-return assumptions, inflation, fees and investment risk',loan:'principal, annual interest, repayment term, payment timing and lender fees',banking:'deposit amount, interest rate, tenure, compounding schedule and product terms',retirement:'contribution limits, vesting rules, inflation, withdrawal timing and longevity assumptions',salary:'gross pay, deductions, hours worked, pay frequency and local employment rules',business:'revenue, fixed and variable costs, margin, taxes and operating assumptions',tax:'the applicable tax year, tax regime, jurisdiction, eligible deductions and special-rate income',planning:'time horizon, cash flow, target amount, affordability and changes in personal circumstances'};
+let changed=0,replaced=0;
+for(const calc of CALCULATORS){
+ const file=path.join(calc.slug,'index.html');if(!fs.existsSync(file))continue;
+ let html=fs.readFileSync(file,'utf8');
+ const fields=(calc.fields||[]).map(f=>f.label).filter(Boolean),fieldText=esc(fields.slice(0,5).join(', ')||'the calculator inputs');
+ const formula=esc(String(calc.article?.formula||calc.short||'the documented calculation model').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,220));
+ const category=calc.category||'planning',domain=notes[category]||notes.planning,title=esc(calc.title);
+ const sample=calc.article?.exampleInputs||Object.fromEntries((calc.fields||[]).filter(f=>f.default!==undefined).map(f=>[f.id,f.default]));
+ let outputs='the displayed result components';try{const rows=calc.compute(sample);if(Array.isArray(rows)&&rows.length)outputs=rows.slice(0,4).map(r=>r.label).join(', ');}catch{}
+ const items=[
+ [/<p[^>]*>(?:(?!<\/p>)[\s\S])*?The output is the mathematical result of the assumptions entered(?:(?!<\/p>)[\s\S])*?<\/p>/i,'<p>'+title+' reports '+esc(outputs)+' from '+fieldText+'. Read contribution, cost, growth and timing components separately where they are shown. A larger headline result is not automatically a better decision: compare the cash flow, risk, liquidity and time horizon represented by these inputs.</p>'],
+ [/<p[^>]*>(?:(?!<\/p>)[\s\S])*?Run a baseline estimate first\.(?:(?!<\/p>)[\s\S])*?<\/p>/i,'<p>For '+title+', save a baseline with '+fieldText+', then change one assumption at a time. Compare a cautious case with a central case and a stressed case; this reveals whether the result is mainly driven by the rate, amount, timing or duration. Keep the other inputs unchanged so each comparison has a clear explanation.</p>'],
+ [/<p[^>]*>(?:(?!<\/p>)[\s\S])*?This calculator does not automatically know current product terms(?:(?!<\/p>)[\s\S])*?<\/p>/i,'<p>'+title+' does not fetch live '+esc(domain)+'. Those details can change the real outcome even when the arithmetic is correct. Check current terms and rules for the country and product being modelled, and verify eligibility or tax treatment with the relevant official source before acting.</p>'],
+ [/<p[^>]*>(?:(?!<\/p>)[\s\S])*?This tool models the formula and assumptions described above(?:(?!<\/p>)[\s\S])*?<\/p>/i,'<p>'+title+' applies this model: '+formula+'. The calculation does not automatically include every fee, tax, legal rule, product condition or personal circumstance. Use the result to compare scenarios, then confirm the omitted items that apply to your case.</p>'],
+ [/<p[^>]*>(?:(?!<\/p>)[\s\S])*?For more context, read our(?:(?!<\/p>)[\s\S])*?calculator methodology(?:(?!<\/p>)[\s\S])*?<\/p>/i,'<p>For '+title+', read the <a href="/methodology">calculator methodology</a> to understand how the formula is applied, then use the <a href="/articles">money guides</a> for context on '+fieldText+'. Results are educational estimates, not financial, tax, legal or investment advice.</p>'],
+ [/<p[^>]*>(?:(?!<\/p>)[\s\S])*?Wealth Arrays uses deterministic formulas:(?:(?!<\/p>)[\s\S])*?<\/p>/i,'<p>'+title+' is deterministic: identical valid inputs produce identical outputs. Real-world results can still differ when '+esc(domain)+' differ from the assumptions entered. This model does not claim to apply a jurisdiction-specific rule unless that rule is explicitly described on this page.</p>'],
+ [/<p[^>]*>(?:(?!<\/p>)[\s\S])*?The formula is deliberately transparent(?:(?!<\/p>)[\s\S])*?<\/p>/i,'<p>The '+title+' formula is documented so you can inspect the relationship between '+fieldText+'. The calculation can be mathematically exact while assumptions remain uncertain; test the assumptions independently rather than treating displayed precision as a prediction.</p>'],
+ [/<p[^>]*>(?:(?!<\/p>)[\s\S])*?Good financial planning is usually a range exercise(?:(?!<\/p>)[\s\S])*?<\/p>/i,'<p>Use '+title+' as a range exercise: compare conservative, central and stressed assumptions. The comparison is most useful when you change one of '+fieldText+' at a time and record why that change is plausible.</p>'],
+ [/<p[^>]*>(?:(?!<\/p>)[\s\S])*?Continue exploring the(?:(?!<\/p>)[\s\S])*?full Wealth Arrays calculator library(?:(?!<\/p>)[\s\S])*?<\/p>/i,'<p>After using '+title+', compare its result with other '+esc(category)+' tools in the <a href="/tools">calculator library</a>. A related calculation can expose a cost, constraint or time horizon that this model does not represent on its own.</p>'],
+ [/<p[^>]*>(?:(?!<\/p>)[\s\S])*?This page therefore presents the result as an estimate(?:(?!<\/p>)[\s\S])*?<\/p>/i,'<p>Treat the '+title+' result as an estimate for planning, not a promise or a personalized recommendation. Confirm the assumptions, product terms and rules that apply to your situation before making a financial, tax, legal or investment decision.</p>'],
+ [/<p[^>]*>(?:(?!<\/p>)[\s\S])*?Wealth Arrays performs deterministic browser-side calculations(?:(?!<\/p>)[\s\S])*?<\/p>/i,'<p>The '+title+' calculator processes entered values in the browser using its documented formula. It does not automatically retrieve live '+esc(domain)+'; check current provider or regulator information when those external facts affect your result.</p>'],
+ [/<p[^>]*>(?:(?!<\/p>)[\s\S])*?Explore the(?:(?!<\/p>)[\s\S])*?full calculator library(?:(?!<\/p>)[\s\S])*?<\/p>/i,'<p>For a second view of '+title+', open the <a href="/tools">calculator library</a> and compare a related '+esc(category)+' model. The result is an educational estimate, not financial, tax, legal or investment advice.</p>']
+ ];
+ let did=false;
+ for(const [pattern,replacement] of items){if(pattern.test(html)){html=html.replace(pattern,replacement);replaced++;did=true;}}
+ if(did){fs.writeFileSync(file,html,'utf8');changed++;}
+}
+console.log('Unique content rewrite PASS: '+changed+' pages updated; '+replaced+' repeated boilerplate paragraphs replaced with title-, field-, formula- and category-specific guidance.');

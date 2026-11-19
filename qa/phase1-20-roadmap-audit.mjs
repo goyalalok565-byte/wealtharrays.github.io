@@ -12,9 +12,10 @@ const calculators = (() => {
   vm.runInContext(source+';globalThis.__WA_CALCS__=CALCULATORS;',ctx);
   return ctx.__WA_CALCS__;
 })();
-if (!Array.isArray(calculators) || calculators.length !== 55) fail('Calculator registry expected 55 calculators (20 legacy calculators plus 35 additions)');
+const registryCount = JSON.parse(fs.readFileSync('calculator-definitions/registry.json','utf8')).count;
+if (!Array.isArray(calculators) || calculators.length !== registryCount) fail('Calculator registry expected '+registryCount+' registered calculators');
 const legacyCalculators = calculators.slice(0, 20);
-if (legacyCalculators.length !== 20 || new Set(calculators.map(c => c.id)).size !== 55) fail('Calculator registry must retain the 20-calculator legacy baseline and 55 unique IDs');
+if (legacyCalculators.length !== 20 || new Set(calculators.map(c => c.id)).size !== registryCount) fail('Calculator registry must retain the 20-calculator legacy baseline and '+registryCount+' unique IDs');
 
 const models = json('model-registry.json').models;
 const formulas = (() => {
@@ -32,9 +33,11 @@ const adapters = (() => {
   return ctx.window.WA_DECISION_ADAPTERS;
 })();
 const modelIds = new Set(models.map(x=>x.id));
-const modelAlias = Object.freeze({'compound-interest':'compound'});
+const modelAlias = Object.freeze({'compound-interest':'compound','home-loan-emi':'mortgage'});
+const engineExcluded = new Set(['currency-converter']);
 if (modelIds.size !== 20) fail('Phase 1: model registry must contain 20 unique IDs');
 for (const c of legacyCalculators) {
+  if (engineExcluded.has(c.id)) continue;
   const modelId=modelAlias[c.id]||c.id;
   if (!modelIds.has(modelId)) fail('Phase 1/3: calculator missing model registry entry: '+c.id);
   if (!formulas[modelId]) fail('Phase 1: formula registry missing: '+c.id);

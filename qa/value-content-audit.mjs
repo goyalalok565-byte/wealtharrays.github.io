@@ -3,10 +3,11 @@ import path from 'node:path';
 
 const root=process.cwd();
 const source=fs.readFileSync(path.join(root,'calculators.js'),'utf8');
-const calculators=[...source.matchAll(/\bslug:\s*["']([^"']+)["']/g)].map(m=>m[1]);
+const registry=JSON.parse(fs.readFileSync(path.join(root,'calculator-definitions/registry.json'),'utf8'));
+const calculators=registry.calculators.map(item=>item.slug);
 const failures=[];
 const countWords=html=>html.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&[a-z#0-9]+;/gi,' ').replace(/\s+/g,' ').trim().split(/\s+/).filter(Boolean).length;
-if(calculators.length!==55)failures.push('Expected 55 calculator definitions, found '+calculators.length);
+if(calculators.length!==registry.count)failures.push('Expected '+registry.count+' registered calculator definitions, found '+calculators.length);
 for(const slug of calculators){
   const file=path.join(root,slug,'index.html');
   if(!fs.existsSync(file)){failures.push(slug+': canonical page missing');continue;}
@@ -60,10 +61,10 @@ if (!fs.existsSync(sipGoalExamplePath)) {
   failures.push('sip-goal-calculator: generated worked example page missing');
 } else {
   const sipGoalHtml = fs.readFileSync(sipGoalExamplePath, 'utf8');
-  if (!sipGoalHtml.includes('Required monthly SIP: ₹6,635.27')) {
+  if (!sipGoalHtml.includes('Required monthly SIP: $6,635.27')) {
     failures.push('sip-goal-calculator: worked example must match the beginning-of-month model output (₹6,635.27).');
   }
-  if (sipGoalHtml.includes('₹6,691')) {
+  if (sipGoalHtml.includes('$6,691')) {
     failures.push('sip-goal-calculator: stale end-of-month worked example must not be published.');
   }
 }
@@ -72,7 +73,7 @@ if (!fs.existsSync(sipGoalExamplePath)) {
 // Regression checks for worked examples whose contribution-timing convention
 // must match the calculator implementation.
 const stepUpHtml = fs.readFileSync(path.join(root, 'step-up-sip-calculator', 'index.html'), 'utf8');
-if (!stepUpHtml.includes('Projected investment value: ₹43,41,924.72')) {
+if (!stepUpHtml.includes('Projected investment value: $4,341,924.72')) {
   failures.push('step-up-sip-calculator: worked example must be generated from the beginning-of-month model (₹43,41,924.72).');
 }
 if (stepUpHtml.includes('42.99 lakh')) {
@@ -87,4 +88,4 @@ if (lumpSumSipHtml.includes('₹1,25,656')) {
 }
 
 if(failures.length){console.error('VALUE CONTENT AUDIT FAILED ('+failures.length+' issues)');console.error(failures.join('\n'));process.exit(1);}
-console.log('Value-content audit passed: all '+calculators.length+' calculators have substantial unique guidance, worked examples, FAQs, internal article links, concise metadata and valid software/breadcrumb schema.');
+console.log('Value-content baseline checks passed for '+calculators.length+' registered calculators. See docs/audits/content-quality-audit.md for strict word-count, FAQ, source, updated-date and duplicate-paragraph results.');

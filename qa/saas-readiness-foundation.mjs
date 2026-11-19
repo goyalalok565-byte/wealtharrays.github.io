@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
+import { MODEL_LIST, calculate as calculateModel } from '../functions/v1/_shared.js';
 const widget = fs.readFileSync('widget.js', 'utf8');
 const runtime = fs.readFileSync('wa-calculator-runtime.js', 'utf8');
 const shared = fs.readFileSync('functions/v1/_shared.js', 'utf8');
@@ -22,7 +23,7 @@ const adLoader = fs.readFileSync('wa-ad-loader.js', 'utf8');
 const migration = fs.readFileSync('migrations/0001_saas.sql', 'utf8');
 const webhookOrderMigration = fs.readFileSync('migrations/0002_billing_webhook_order.sql', 'utf8');
 for (const [name, source] of [['widget.js', widget], ['wa-calculator-runtime.js', runtime]]) {
-  assert.match(source, /toLocaleString\(['"]en-IN['"]/ , name + ' must format numbers using Indian grouping');
+  assert.match(source, /waLocale\(\)|safeHomepageLocale\(\)|toLocaleString\(navigator\.language/, name + ' must use normalized browser locale formatting');
   assert.match(source, /waScenarioUrl/, name + ' must build scenario links with input values');
   assert.match(source, /waRestoreScenario/, name + ' must restore scenario values from shared links');
   assert.match(source, /waGetSavedScenarios/, name + ' must persist scenarios locally');
@@ -36,10 +37,13 @@ for (const [name, source] of [['widget.js', widget], ['wa-calculator-runtime.js'
   assert.match(source, /addEventListener\(['"]click['"],(?:function\(\)|recompute)/, name + ' must keep calculation behind the explicit button');
   assert.doesNotMatch(source, /if\(inputsComplete\(\)\)recompute\(\)/, name + ' must not auto-calculate during typing');
 }
-for (const model of ['sip','loan-emi','home-loan-emi','compound-interest','fixed-deposit','lumpsum','gst','cagr','inflation','simple-interest','currency-converter']) assert.ok(shared.includes('id: "'+model+'"'), 'API registry missing '+model);
+const registryCount = JSON.parse(fs.readFileSync('calculator-definitions/registry.json','utf8')).count;
+assert.equal(MODEL_LIST.length, registryCount, 'API model list must be generated from all calculator definitions');
+for (const model of ['sip','loan-emi','home-loan-emi','compound-interest','fixed-deposit','lumpsum','gst','cagr','inflation','simple-interest','currency-converter']) assert.ok(MODEL_LIST.some(item=>item.id===model), 'API registry missing '+model);
 assert.match(calculate, /export async function onRequestPost/);
-assert.match(calculate, /jurisdictional_rules_applied: false/);
-assert.match(calculate, /Country is metadata only/);
+assert.match(calculate, /jurisdictional_rules_applied\s*:\s*false/);
+assert.match(calculate, /Country and currency are metadata only/);
+assert.match(calculate, /MAX_BODY_BYTES/);
 assert.match(worker, /ROUTES = new Map/);
 assert.match(worker, /billing/);
 assert.match(wrangler, /main/);
@@ -50,6 +54,7 @@ assert.match(fx, /open\.er-api\.com/);
 assert.match(tax, /2026-27-new-regime-v1/);
 assert.match(widget, /Estimate India new-regime tax/);
 assert.match(auth, /auth\/v1\/user/);
+assert.match(auth, /AbortSignal\.timeout\(5000\)/);
 assert.match(authConfig, /SUPABASE_ANON_KEY/);
 assert.match(scenarios, /DELETE FROM saved_scenarios WHERE id = \? AND user_id = \?/);
 assert.match(checkout, /RAZORPAY_PLAN_MONTHLY/);
@@ -57,6 +62,7 @@ assert.match(checkout, /SUBSCRIPTION_ALREADY_ACTIVE/);
 assert.match(checkout, /CHECKOUT_ALREADY_PENDING/);
 assert.ok(checkout.includes("https://api.razorpay.com/v1/subscriptions/"), "Existing checkout must be reused instead of creating a duplicate.");
 assert.match(webhook, /crypto\.subtle\.sign/);
+assert.match(webhook, /total > 262144/);
 assert.match(webhook, /x-razorpay-event-id/);
 assert.match(webhook, /processed_at/);
 assert.match(webhook, /last_provider_event_at/);
@@ -76,16 +82,15 @@ assert.ok(account.includes('/auth/v1/signup'));
 assert.match(migration, /CREATE TABLE IF NOT EXISTS saved_scenarios/);
 assert.match(migration, /CREATE TABLE IF NOT EXISTS subscriptions/);
 
-const sharedModule = await import('data:text/javascript;base64,' + Buffer.from(shared).toString('base64'));
-const sip = sharedModule.calculate('sip', { monthly: 200, annualRate: 10, years: 15 });
+const sip = calculateModel('sip', { monthly: 200, annualRate: 10, years: 15 });
 assert.ok(Math.abs(sip.results[2].value - 83584.85) < 0.02, 'SIP API golden vector must match the documented example');
-const gstExclusive = sharedModule.calculate('gst', { amount: 100000, rate: 18, mode: 'exclusive' });
-assert.equal(gstExclusive.results[1].value, 18000, 'GST exclusive tax amount must be correct');
-const gstInclusive = sharedModule.calculate('gst', { amount: 118000, rate: 18, mode: 'inclusive' });
-assert.equal(gstInclusive.results[0].value, 100000, 'GST inclusive taxable base must be correct');
-const zeroInterest = sharedModule.calculate('loan-emi', { principal: 120000, annualRate: 0, months: 12 });
+const gstExclusive = calculateModel('gst', { amount: 100000, rate: 18, mode: 'exclusive' });
+assert.equal(gstExclusive.results[0].value, 18000, 'GST exclusive tax amount must be correct');
+const gstInclusive = calculateModel('gst', { amount: 118000, rate: 18, mode: 'inclusive' });
+assert.equal(gstInclusive.results[2].value, 100000, 'GST inclusive taxable base must be correct');
+const zeroInterest = calculateModel('loan-emi', { principal: 120000, annualRate: 0, months: 12 });
 assert.equal(zeroInterest.results[0].value, 10000, 'Zero-rate loan EMI must avoid divide-by-zero');
-assert.throws(() => sharedModule.calculate('cagr', { startValue: 100, endValue: 110, years: 0 }), /years must be greater than zero/);
+assert.throws(() => calculateModel('cagr', { startValue: 100, endValue: 110, years: 0 }), /years must be at least/);
 
 const taxHarness = tax
   .replace(/^import \{ CORS_HEADERS, error, json \} from "\.\/\_shared\.js";\n/, 'const CORS_HEADERS = {}; const error = (code, message, status = 400, details) => new Response(JSON.stringify({error:{code,message,...(details?{details}:{})}}), {status, headers:{"Content-Type":"application/json"}}); const json = (data, status = 200) => new Response(JSON.stringify(data), {status, headers:{"Content-Type":"application/json"}});\n')

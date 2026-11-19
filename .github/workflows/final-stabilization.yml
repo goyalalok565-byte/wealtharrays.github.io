@@ -34,9 +34,11 @@ jobs:
         run: node qa/service-worker-privacy-audit.mjs
       - name: Privacy policy consistency audit
         run: node qa/privacy-policy-audit.mjs
+      - name: Synchronize canonical calculator registry
+        run: node scripts/sync-calculator-catalog.mjs
       - name: Calculator regression before build
         run: node qa/calculator-regression.mjs
-      - name: Independent 47-calculator formula audit
+      - name: Independent formula audit for all registered calculators
         run: node qa/phase1-calculator-audit.mjs
       - name: Generate new calculator routes
         run: node scripts/generate-calculator-pages.mjs
@@ -50,6 +52,8 @@ jobs:
         run: node scripts/fix-route-alias-links.mjs && node scripts/normalize-nested-links.mjs && node scripts/fix-accessible-names.mjs
       - name: Repair static pages and redirect shells
         run: node scripts/repair-site-integrity.mjs
+      - name: Verify 1200x630 social image on all calculator pages
+        run: node qa/og-image-audit.mjs
       - name: Minify canonical bundles and CSS
         run: |
           npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output wa-site-runtime.js -- wa-site-runtime.js
@@ -61,6 +65,10 @@ jobs:
           done
       - name: Version assets by content hash
         run: node scripts/version-runtime-assets.mjs
+      - name: Tax-year Section 156 label regression
+        run: node qa/tax-section-label-regression.mjs
+      - name: API/page parity for all registered calculators
+        run: node qa/api-calculator-parity.mjs
       - name: Run canonical regression gates
         run: |
           node qa/root-cause-audit.mjs

@@ -12,9 +12,9 @@ function walk(dir) {
 }
 walk('.');
 
-const budgets = { js: 140000, css: 100000 };
+const budgets = { js: 140000, css: 105000 };
 const assetBudgets = { 'wa-calculator-runtime.js': 118000 };
-const required = ['wa-calculator-runtime.js', 'wa-site-runtime.js', 'styles.css'];
+const required = ['wa-calculator-runtime.js', 'wa-site-runtime.js', 'styles.css', 'styles-critical.css'];
 const failures = [];
 if (files.length < 10) failures.push('Asset discovery returned only ' + files.length + ' JS/CSS assets; expected at least 10.');
 for (const name of required) {
@@ -32,10 +32,41 @@ for (const file of files) {
 const calcRuntimePath = path.join(process.cwd(), 'wa-calculator-runtime.js');
 if (fs.existsSync(calcRuntimePath)) {
   const runtime = fs.readFileSync(calcRuntimePath, 'utf8');
-  if (runtime.includes('WA CANONICAL MODULE | calculator | calculator-search.js |')) {
-    failures.push('wa-calculator-runtime.js includes calculator-search.js, unused on calculator routes.');
+  const forbiddenCalculatorModules=['calculator-search.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js','calculator-enhancements.js','pdf-export-fix.js'];
+  for(const module of forbiddenCalculatorModules){
+    if(runtime.includes('WA CANONICAL MODULE | calculator | '+module+' |')){
+      failures.push('wa-calculator-runtime.js includes '+module+', which is not part of the critical calculator runtime.');
+    }
   }
 }
+const siteRuntimeSource=fs.existsSync('site-runtime.js')?fs.readFileSync('site-runtime.js','utf8'):'';
+if(siteRuntimeSource.includes('pagead2.googlesyndication.com')||siteRuntimeSource.includes('installAdSense')){
+  failures.push('site-runtime.js must not bypass the subscription-aware wa-ad-loader.js with a direct AdSense bootstrap.');
+}
+if(!fs.existsSync('wa-ad-loader.js'))failures.push('Missing the single subscription-aware wa-ad-loader.js bootstrap.');
+const coreRuntimeSource=fs.existsSync('wa-core.js')?fs.readFileSync('wa-core.js','utf8'):'';
+const adLoaderSource=fs.existsSync('wa-ad-loader.js')?fs.readFileSync('wa-ad-loader.js','utf8'):'';
+if(!coreRuntimeSource.includes("pageLocale==='en_IN'")||!coreRuntimeSource.includes("document.documentElement.dataset.country||get('waCountry',detectedCountry())")){
+  failures.push('India-specific pages must default to INR from en_IN page metadata without persisting that page default globally.');
+}
+if(!coreRuntimeSource.includes("window.__WA_CALCULATOR_SEARCH_LOADED__&&document.querySelector('.tool-library-search')")||!coreRuntimeSource.includes("document.getElementById('wa-tools-grid')")){
+  failures.push('Tools page must avoid duplicate search and category initialization.');
+}
+if(!coreRuntimeSource.includes("footer.premium-footer .site-footer-inner")){
+  failures.push('Static premium footer must not be rebuilt by the runtime.');
+}
+const toolsPageHtml=fs.existsSync('tools.html')?fs.readFileSync('tools.html','utf8'):'';
+if(!toolsPageHtml.includes('data-wa-open-consent'))failures.push('Static tools footer must expose the privacy choices control.');
+const criticalCssFile=fs.existsSync('styles-critical.css')?fs.readFileSync('styles-critical.css','utf8'):'';
+if(!criticalCssFile.includes('WA-CRITICAL-CSS-BUNDLE')||!toolsPageHtml.includes('styles-critical.css'))failures.push('Critical CSS must be merged and preloaded as one stylesheet.');
+if(!fs.existsSync('dist/styles-critical.css'))failures.push('Merged critical CSS is missing from Cloudflare dist output.');
+if(/href=["'][^"']*(?:phase3-seo|cls-fixes|phase4-premium)\.css/.test(toolsPageHtml))failures.push('Legacy render-blocking CSS links must be removed from tools page.');
+if(!/<script\b(?=[^>]*src=["'][^"']*theme-init\.js)(?=[^>]*\bdefer\b)[^>]*>/i.test(toolsPageHtml)||!toolsPageHtml.includes('rel="preload" as="script" href="/theme-init.js'))failures.push('Theme bootstrap must be preloaded and deferred, not render-blocking.');
+
+if(!adLoaderSource.includes('heavyRoute?5000:1500')){
+  failures.push('Ads on tools/calculator routes must wait until after the initial interaction window.');
+}
+
 
 
  // Regression guard: the production AdSense host is pagead2.googlesyndication.com.

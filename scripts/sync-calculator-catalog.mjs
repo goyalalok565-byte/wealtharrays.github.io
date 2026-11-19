@@ -1,0 +1,74 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import vm from 'node:vm';
+const root=process.cwd(), dir=path.join(root,'calculator-definitions'), catalogPath=path.join(root,'calculators.js');
+const previous=fs.readFileSync(catalogPath,'utf8');
+const previousOrder=[...previous.matchAll(/\bid:\s*["']([^"']+)["']/g)].map(m=>m[1]);
+const files=fs.readdirSync(dir).filter(name=>name.endsWith('.js')&&name!=='index.js').sort();
+if(!files.length)throw new Error('No calculator definitions found.');
+const defs=files.map(file=>{
+ let source=fs.readFileSync(path.join(dir,file),'utf8');
+ const oldHeader='/* Generated from calculators.js — do not edit directly. */';
+ if(source.startsWith(oldHeader)){source=source.replace(oldHeader,'/* Canonical calculator definition — edit this file; calculators.js is generated. */');fs.writeFileSync(path.join(dir,file),source);}
+ const marker='window.CALCULATORS.push(', start=source.indexOf(marker), end=source.lastIndexOf(');');
+ if(start<0||end<=start)throw new Error('Invalid definition wrapper: '+file);
+ const object=source.slice(start+marker.length,end).trim();
+ const id=object.match(/\bid:\s*["']([^"']+)["']/)?.[1], slug=object.match(/\bslug:\s*["']([^"']+)["']/)?.[1], title=object.match(/\btitle:\s*["']([^"']+)["']/)?.[1];
+ if(!id||!slug||!title||file!==id+'.js')throw new Error('Invalid id/slug/title or filename: '+file);
+ return {file,id,slug,title,object};
+});
+for(const key of ['id','slug'])if(new Set(defs.map(d=>d[key])).size!==defs.length)throw new Error('Duplicate calculator '+key);
+const order=new Map(previousOrder.map((id,i)=>[id,i]));
+defs.sort((a,b)=>(order.has(a.id)?order.get(a.id):Number.MAX_SAFE_INTEGER)-(order.has(b.id)?order.get(b.id):Number.MAX_SAFE_INTEGER)||a.id.localeCompare(b.id));
+const start=previous.indexOf('const CALCULATORS = ['), end=previous.indexOf('\n];',start);
+if(start<0||end<0)throw new Error('Could not find generated CALCULATORS array.');
+const catalog=previous.slice(0,start+'const CALCULATORS = ['.length)+'\n'+defs.map(d=>d.object).join(',\n')+previous.slice(end);
+const context={module:{exports:{}},console};vm.createContext(context);vm.runInContext(catalog,context,{filename:'calculators.js'});
+const exported=context.module.exports;
+if(!Array.isArray(exported.CALCULATORS)||exported.CALCULATORS.length!==defs.length)throw new Error('Compatibility catalogue validation failed.');
+fs.writeFileSync(catalogPath,catalog);
+const registry={schema_version:1,generated_from:'calculator-definitions/*.js',count:defs.length,calculators:exported.CALCULATORS.map(c=>({id:c.id,slug:c.slug,title:c.title,category:c.category,short:c.short||c.desc||''}))};
+fs.writeFileSync(path.join(dir,'registry.json'),JSON.stringify(registry,null,2)+'\n');
+fs.writeFileSync(path.join(root,'functions/v1/calculator-models.js'),'/* Generated from calculator-definitions; do not edit. */\nexport const CALCULATOR_MODELS = [\n'+defs.map(d=>d.object).join(',\n')+'\n];\n');
+const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const labels={investment:'Investing',loan:'Loans',banking:'Banking',retirement:'Retirement',salary:'Income',business:'Business',planning:'Planning',tax:'Tax'};
+const filters={investment:'investing',loan:'loans',banking:'banking',retirement:'retirement',salary:'income',business:'business',planning:'planning',tax:'tax'};
+const codes={investment:'INVEST',loan:'LOANS',banking:'BANK',retirement:'RETIRE',salary:'INCOME',business:'BIZ',planning:'PLAN',tax:'TAX'};
+const catalogItems=exported.CALCULATORS.map(c=>[c.title,c.slug+'/',c.short||c.desc||c.title,(c.id+' '+c.title+' '+(c.category||'')+' '+(c.short||'')+' '+(c.desc||'')).toLowerCase()]);
+const corePath=path.join(root,'wa-core.js');
+let core=fs.readFileSync(corePath,'utf8');
+if(!/const CALCULATOR_CATALOG=\[[\s\S]*?\];/.test(core))throw new Error('wa-core.js catalogue marker missing.');
+core=core.replace(/const CALCULATOR_CATALOG=\[[\s\S]*?\];/,'const CALCULATOR_CATALOG='+JSON.stringify(catalogItems)+';');
+fs.writeFileSync(corePath,core);
+const toolsPath=path.join(root,'tools.html');
+let tools=fs.readFileSync(toolsPath,'utf8');
+const cards=exported.CALCULATORS.map((c,i)=>{
+ const cat=c.category||'planning', filter=filters[cat]||'planning', code=codes[cat]||'PLAN', search=escapeHtml((c.title+' '+c.id+' '+(c.short||'')+' '+(c.desc||'')).toLowerCase());
+ return '<a class="tool-card" data-category="'+filter+'" data-new="'+(i>=20)+'" href="/'+c.slug+'/" data-search="'+search+'"><div class="tool-num" aria-hidden="true">'+String(i+1).padStart(2,'0')+' / '+code+'</div><h2>'+escapeHtml(c.title)+'</h2><p>'+escapeHtml(c.short||c.desc||'')+'</p><span>Open →</span></a>';
+}).join('');
+const toolsStart=tools.indexOf('<section class="tools-grid" id="wa-tools-grid"'), toolsEnd=toolsStart>=0?tools.indexOf('</section>',toolsStart):-1;
+if(toolsStart<0||toolsEnd<0)throw new Error('Tools grid marker missing.');
+tools=tools.slice(0,toolsStart)+'<section class="tools-grid" id="wa-tools-grid" aria-label="Financial calculators">'+cards+'</section>'+tools.slice(toolsEnd+10);
+tools=tools.replace(/\d+ calculators for<br>/,defs.length+' calculators for<br>').replace(/All calculators <span>\d+<\/span>/,'All calculators <span>'+defs.length+'</span>').replace(/New calculators <span>\d+<\/span>/,'New calculators <span>'+Math.max(0,defs.length-20)+'</span>').replace(/Showing all \d+ calculators\./,'Showing all '+defs.length+' calculators.');
+fs.writeFileSync(toolsPath,tools);
+const homePath=path.join(root,'index.html');
+let home=fs.readFileSync(homePath,'utf8');
+const homeCards=exported.CALCULATORS.map((c,i)=>{
+ const cat=c.category||'planning', label=labels[cat]||'Planning', search=escapeHtml((c.title+' '+c.id+' '+(c.short||'')+' '+(c.desc||'')).toLowerCase());
+ return '<a class="home-tool-card" href="/'+c.slug+'/" data-search="'+search+'"><span class="home-tool-index" aria-hidden="true">'+String(i+1).padStart(2,'0')+'</span><div><small>'+escapeHtml(label)+'</small><b>'+escapeHtml(c.title)+'</b><p>'+escapeHtml(c.short||c.desc||'')+'</p></div><strong>→</strong></a>';
+}).join('');
+const homeStartMarker='<div class="home-tool-grid" id="wa-home-tool-grid">', homeStart=home.indexOf(homeStartMarker), homeEndMarker='</div><div class="wa-library-actions">', homeEnd=homeStart>=0?home.indexOf(homeEndMarker,homeStart+homeStartMarker.length):-1;
+if(homeStart<0||homeEnd<0)throw new Error('Homepage calculator grid marker missing.');
+home=home.slice(0,homeStart+homeStartMarker.length)+homeCards+home.slice(homeEnd);
+home=home.replace(/Show all \d+ calculators/g,'Show all '+defs.length+' calculators').replace(/all \d+ calculators/gi,'all '+defs.length+' calculators');
+if(!/id=["']country-select["']/.test(home))home=home.replace(/(<div class=["']masthead-controls["'][^>]*>)/i,'$1<label class="control"><span>Country</span><select id="country-select" aria-label="Country or region"></select></label>');
+fs.writeFileSync(homePath,home);
+const llmsPath=path.join(root,'llms.txt');
+if(fs.existsSync(llmsPath)){
+ let llms=fs.readFileSync(llmsPath,'utf8');
+ const section=['## All '+defs.length+' calculators','',...exported.CALCULATORS.map(c=>'- '+c.title+': https://wealtharrays.com/'+c.slug+'/')].join('\n');
+ const sectionStart=llms.indexOf('## All '), sectionEnd=sectionStart>=0?llms.indexOf('\n## Calculator collections',sectionStart):-1;
+ if(sectionStart>=0&&sectionEnd>sectionStart)llms=llms.slice(0,sectionStart)+section+'\n'+llms.slice(sectionEnd+1);else llms+='\n'+section+'\n';
+ fs.writeFileSync(llmsPath,llms);
+}
+console.log('Canonical calculator registry sync PASS: '+defs.length+' definitions feed pages, tools, sitemap input, llms.txt, API models and search catalogue.');

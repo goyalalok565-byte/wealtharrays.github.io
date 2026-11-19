@@ -21,7 +21,23 @@ const SUBSCRIPTION_STATUS = {
 export async function onRequestPost({ request, env }) {
   if (!env.RAZORPAY_WEBHOOK_SECRET) return error("WEBHOOK_NOT_CONFIGURED", "Razorpay webhook secret is not configured.", 503);
   if (!env.DB) return error("DATABASE_NOT_CONFIGURED", "Billing event storage is not configured.", 503);
-  const raw = await request.text();
+  const declaredLength = Number(request.headers.get("content-length") || 0);
+  if (declaredLength > 262144) return error("PAYLOAD_TOO_LARGE", "Webhook payload must be 256 KB or smaller.", 413);
+  let raw;
+  try {
+    const reader = request.body?.getReader();
+    if (!reader) return error("INVALID_BODY", "Webhook body is required.", 400);
+    const chunks = []; let total = 0;
+    while (true) {
+      const { done, value } = await reader.read(); if (done) break;
+      total += value.byteLength;
+      if (total > 262144) { await reader.cancel(); return error("PAYLOAD_TOO_LARGE", "Webhook payload must be 256 KB or smaller.", 413); }
+      chunks.push(value);
+    }
+    const bytes = new Uint8Array(total); let offset = 0;
+    for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+    raw = new TextDecoder().decode(bytes);
+  } catch { return error("INVALID_BODY", "Could not read webhook body.", 400); }
   const signature = request.headers.get("x-razorpay-signature") || "";
   try {
     const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(env.RAZORPAY_WEBHOOK_SECRET), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);

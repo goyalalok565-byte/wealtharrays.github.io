@@ -2,10 +2,12 @@ import { error } from "./_shared.js";
 export async function authenticate(request, env) {
   const token = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "").trim();
   if (!token) return { response: error("AUTH_REQUIRED", "Sign in to access cloud scenarios or billing.", 401) };
+  if (token.length > 4096 || !/^[A-Za-z0-9._~-]+$/.test(token)) return { response: error("INVALID_SESSION", "Your session token is malformed. Please sign in again.", 401) };
   if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) return { response: error("AUTH_NOT_CONFIGURED", "Account authentication is not configured for this deployment.", 503) };
   try {
     const response = await fetch(env.SUPABASE_URL.replace(/\/$/, "") + "/auth/v1/user", {
-      headers: { apikey: env.SUPABASE_ANON_KEY, Authorization: "Bearer " + token, Accept: "application/json" }
+      headers: { apikey: env.SUPABASE_ANON_KEY, Authorization: "Bearer " + token, Accept: "application/json" },
+      signal: AbortSignal.timeout(5000)
     });
     if (!response.ok) return { response: error("INVALID_SESSION", "Your session is invalid or expired. Please sign in again.", 401) };
     const user = await response.json();

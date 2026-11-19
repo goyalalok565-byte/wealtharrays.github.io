@@ -25,8 +25,22 @@ export async function onRequestPost({ request, env }) {
   const auth = await authenticate(request, env); if (auth.response) return auth.response;
   if (!env.DB) return error("DATABASE_NOT_CONFIGURED", "Cloud scenario storage is not configured for this deployment.", 503);
   let raw, body;
-  try { raw = await request.text(); } catch { return error("INVALID_BODY", "Could not read request body.", 400); }
-  if (raw.length > 16384) return error("PAYLOAD_TOO_LARGE", "Scenario payload must be 16 KB or smaller.", 413);
+  const declaredLength = Number(request.headers.get("content-length") || 0);
+  if (declaredLength > 16384) return error("PAYLOAD_TOO_LARGE", "Scenario payload must be 16 KB or smaller.", 413);
+  try {
+    const reader = request.body?.getReader();
+    if (!reader) return error("INVALID_BODY", "Request body is required.", 400);
+    const chunks = []; let total = 0;
+    while (true) {
+      const { done, value } = await reader.read(); if (done) break;
+      total += value.byteLength;
+      if (total > 16384) { await reader.cancel(); return error("PAYLOAD_TOO_LARGE", "Scenario payload must be 16 KB or smaller.", 413); }
+      chunks.push(value);
+    }
+    const bytes = new Uint8Array(total); let offset = 0;
+    for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+    raw = new TextDecoder().decode(bytes);
+  } catch { return error("INVALID_BODY", "Could not read request body.", 400); }
   try { body = JSON.parse(raw); } catch { return error("INVALID_JSON", "Request body must be valid JSON.", 400); }
   if (!body || typeof body.calculator_id !== "string" || !/^[a-z0-9-]{1,80}$/.test(body.calculator_id) || !body.inputs || typeof body.inputs !== "object" || Array.isArray(body.inputs)) return error("INVALID_SCENARIO", "Provide calculator_id and an inputs object.", 400);
   const name = String(body.name || "Saved scenario").trim().slice(0, 120);

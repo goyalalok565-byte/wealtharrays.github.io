@@ -51,6 +51,8 @@ jobs:
           echo "Current source and canonical runtime bundle provenance did not match within five minutes."
           exit 1
 
+      - name: Synchronize canonical calculator registry
+        run: node scripts/sync-calculator-catalog.mjs
       - name: Install Playwright
         run: |
           npm install --no-save playwright@1.55.0
@@ -72,8 +74,8 @@ jobs:
       - name: Embed browser smoke
         run: node qa/embed-browser-smoke.mjs
 
-      - name: Deep audit all 47 calculator pages in browser
-        run: node qa/all-47-calculators-browser-smoke.mjs
+      - name: Deep audit all registered calculator pages in browser
+        run: node qa/all-calculators-browser-smoke.mjs
 
       - name: Visual and calculator browser smoke
         run: node qa/production-browser-smoke.mjs

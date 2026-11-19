@@ -3,8 +3,8 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 
 const root = process.cwd();
-const canonicalSources = ['widget.js','wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','calculator-page-init.js','phase4-premium.js'];
-const siteSources = ['wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js','calculator-search.js'];
+const canonicalSources = ['widget.js','widget-bootstrap.js','wa-core.js','calculator-page-currency.js','calculator-safety.js','calculator-page-init.js'];
+const siteSources = ['calculator-search.js','wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js'];
 const homeSources = ['final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js'];
 const supportSources = ['theme-init.js','404-runtime.js'];
 const sourceFiles = [...canonicalSources,...supportSources];
@@ -35,7 +35,8 @@ function walkCalculatorPages(dir){
   }
 }
 walkCalculatorPages(root);
-if(pages.length!==55) throw new Error(`Expected 55 active canonical calculator runtime pages, found ${pages.length}`);
+const registryCount=JSON.parse(fs.readFileSync('calculator-definitions/registry.json','utf8')).count;
+if(pages.length!==registryCount) throw new Error(`Expected ${registryCount} active canonical calculator runtime pages, found ${pages.length}`);
 for(const page of pages){const id=fs.readFileSync(path.join(root,page),'utf8').match(/data-wa-calculator="([^"]+)"/i)?.[1];if(!id||!fs.existsSync(path.join(root,'calculator-definitions',`${id}.js`))) throw new Error(`${page}: missing split calculator definition for ${id||'unknown'}`);}
 const widget=fs.readFileSync('widget/index.html','utf8');
 if(!widget.includes('/calculators.js')||!widget.includes('/wa-calculator-runtime.js')) throw new Error('widget/index.html: calculator bootstrap scripts missing');

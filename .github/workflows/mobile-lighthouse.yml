@@ -1,49 +1,77 @@
 name: Mobile Lighthouse Quality Gate
 
 on:
-  workflow_run:
-    workflows: ["Wealth Arrays Canonical CI"]
-    types: [completed]
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: wealtharrays-mobile-lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lighthouse:
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[canonical-build]')) }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - name: Wait for production routes
-        run: |
-          set -euo pipefail
-          routes=(/ /tools.html /sip-calculator/ /swp-calculator/ /fire-calculator/ /rent-vs-buy-calculator/ /articles/compound-interest-guide.html)
-          for route in "${routes[@]}"; do
-            curl -fsSL --max-time 30 "https://wealtharrays.com$route" >/dev/null
-          done
       - uses: actions/checkout@v4
-        with:
-          ref: main
       - uses: actions/setup-node@v4
         with:
           node-version: 24
       - name: Install browser measurement tools
         run: |
-          npm install --no-save lighthouse@13.0.1 playwright
+          npm install --no-save lighthouse@13.0.1 playwright@1.55.0
           npx playwright install chromium --with-deps
-      - name: Run seven-page mobile Lighthouse baseline
+      - name: Capture current production baseline (before)
+        continue-on-error: true
         env:
           BASE_URL: https://wealtharrays.com
-          LH_OUTPUT_DIR: /tmp/wa-lighthouse
-        run: node qa/mobile-lighthouse-baseline.mjs
-      - name: Capture SWP typing and scroll CPU profile
+          PROFILE_PATH: /
+          LH_OUTPUT_DIR: /tmp/wa-lighthouse/before
+        run: |
+          node qa/performance-profile.mjs
+          node qa/mobile-lighthouse-baseline.mjs
+      - name: Build exact pull-request or commit source
+        run: npm run build
+      - name: Minify production bundles before browser measurement
+        run: |
+          for file in wa-site-runtime.js wa-home-runtime.js wa-calculator-runtime.js; do
+            npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output "$file" -- "$file"
+            cp "$file" "dist/$file"
+          done
+          node qa/performance-budget-audit.mjs
+          npm run qa:dist
+      - name: Start candidate static build
+        run: |
+          python3 -m http.server 4173 --directory dist > /tmp/wealtharrays-dist-http.log 2>&1 &
+          echo $! > /tmp/wealtharrays-dist-http.pid
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:4173/index.html >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/wealtharrays-dist-http.log
+          exit 1
+      - name: Capture candidate homepage CPU profile (after)
         env:
-          BASE_URL: https://wealtharrays.com
+          BASE_URL: http://127.0.0.1:4173
+          PROFILE_PATH: /
+          LH_OUTPUT_DIR: /tmp/wa-lighthouse/after
         run: node qa/performance-profile.mjs
-      - name: Upload Lighthouse and CPU profile reports
+      - name: Prove threshold gate rejects a deliberately failing sample
+        run: node --test qa/performance-thresholds.test.mjs
+      - name: Enforce mobile Lighthouse budgets on all six critical pages
+        env:
+          BASE_URL: http://127.0.0.1:4173
+          LH_OUTPUT_DIR: /tmp/wa-lighthouse/after
+        run: node qa/mobile-lighthouse-baseline.mjs
+      - name: Upload before/after Lighthouse and CPU profiles
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: wealtharrays-seven-page-mobile-performance
+          name: wealtharrays-before-after-mobile-performance-attempt-${{ github.run_attempt }}
           path: /tmp/wa-lighthouse/
-          retention-days: 14
+          retention-days: 30
