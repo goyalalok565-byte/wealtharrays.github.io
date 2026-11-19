@@ -1,28 +1,24 @@
-/*
- * Wealth Arrays — Google Funding Choices loader
- * The publisher-specific tag is kept in one external file so CSP does not
- * require inline script execution. Message configuration itself is managed
- * in Google AdSense / Privacy & messaging.
- */
-(function () {
-  if (window.__waFundingChoicesLoaded) return;
-  window.__waFundingChoicesLoaded = true;
-
-  var script = document.createElement('script');
-  script.async = true;
-  script.src = 'https://fundingchoicesmessages.google.com/i/pub-6507600103785450?ers=1';
-  document.head.appendChild(script);
-
-  function signalGooglefcPresent() {
-    if (window.frames.googlefcPresent) return;
-    if (!document.body) {
-      window.setTimeout(signalGooglefcPresent, 0);
-      return;
-    }
-    var iframe = document.createElement('iframe');
-    iframe.style.cssText = 'width:0;height:0;border:none;z-index:-1000;left:-1000px;top:-1000px;display:none;';
-    iframe.name = 'googlefcPresent';
-    document.body.appendChild(iframe);
+(function(){
+  'use strict';
+  if(window.__waFundingChoicesScheduled)return;
+  window.__waFundingChoicesScheduled=true;
+  var started=false,timer=0,idle=0;
+  function load(){
+    if(started)return;started=true;
+    if(timer)clearTimeout(timer);
+    if(idle&&window.cancelIdleCallback)window.cancelIdleCallback(idle);
+    if(document.querySelector('script[data-wa-funding-choices="1"]'))return;
+    var script=document.createElement('script');
+    script.async=true;script.dataset.waFundingChoices='1';script.src='/consent-loader.js';
+    document.head.appendChild(script);
   }
-  signalGooglefcPresent();
-}());
+  function schedule(){
+    if(started)return;
+    if(window.requestIdleCallback)idle=window.requestIdleCallback(load,{timeout:1000});
+    else setTimeout(load,500);
+  }
+  if(document.readyState==='complete')schedule();
+  else window.addEventListener('load',schedule,{once:true,passive:true});
+  ['pointerdown','keydown','touchstart','scroll'].forEach(function(name){window.addEventListener(name,load,{once:true,passive:true})});
+  timer=setTimeout(load,4000);
+})();
