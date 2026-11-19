@@ -34,7 +34,7 @@ for(const file of htmlFiles){
   assert.equal(cssLinks.length,1,`${file}: expected exactly one page-type stylesheet, found ${cssLinks.length}`);
   const cssPath=path.join(dist,cssLinks[0].replace(/^\//,''));
   assert.ok(fs.existsSync(cssPath),`${file}: stylesheet asset missing: ${cssLinks[0]}`);
-  assert.match(cssLinks[0],/\\.([a-f0-9]{12})\\.css$/,`${file}: stylesheet filename must be content-hashed`);
+  assert.match(cssLinks[0],/\.([a-f0-9]{12})\.css$/,`${file}: stylesheet filename must be content-hashed`);
   assert.ok(gzipSync(fs.readFileSync(cssPath)).length<30*1024,`${file}: CSS exceeds 30 KB gzip budget`);
 }
 const calculatorPages=files.filter(file=>/^[^/]+\/index\.html$/.test(file)&&fs.readFileSync(path.join(dist,file),'utf8').includes('data-wa-calculator='));
