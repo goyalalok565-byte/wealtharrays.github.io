@@ -11,9 +11,12 @@ try {
   // Clean CPU profile: no instrumentation wrappers, so function timings are less perturbed.
   const page = await browser.newPage({ viewport: { width: 360, height: 800 }, deviceScaleFactor: 2 });
   page.on('pageerror', error => console.error('PAGE_ERROR', String(error)));
+  const client = await page.context().newCDPSession(page);
+  await client.send('Network.enable');
+  await client.send('Network.emulateNetworkConditions', { offline: false, latency: 150, downloadThroughput: 1600 * 1024 / 8, uploadThroughput: 750 * 1024 / 8, connectionType: 'cellular4g' });
+  await client.send('Emulation.setCPUThrottlingRate', { rate: 4 });
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
   await page.locator('#calc-widget input[data-field]').first().waitFor({ state: 'visible', timeout: 20000 });
-  const client = await page.context().newCDPSession(page);
   await client.send('Profiler.enable');
   await client.send('Profiler.setSamplingInterval', { interval: 1000 });
   await client.send('Profiler.start');
@@ -52,11 +55,15 @@ try {
     };
   }).sort((a, b) => b.selfTimeMs - a.selfTimeMs).slice(0, 10);
   console.log('SWP_CPU_PROFILE_TOP_10', JSON.stringify(top));
-  fs.writeFileSync(outputDir + '/swp-cpu-profile-top10.json', JSON.stringify(top, null, 2));
+  fs.writeFileSync(outputDir + '/swp-cpu-profile-top10.json', JSON.stringify({ environment: { viewport: '360x800 DPR 2', cpuSlowdown: '4x', network: '150ms RTT / 1600 Kbps down / 750 Kbps up' }, top10: top }, null, 2));
   await page.close();
 
   // Separate instrumented run: observer callback and selector activity per input change.
   const probe = await browser.newPage({ viewport: { width: 360, height: 800 }, deviceScaleFactor: 2 });
+  const probeClient = await probe.context().newCDPSession(probe);
+  await probeClient.send('Network.enable');
+  await probeClient.send('Network.emulateNetworkConditions', { offline: false, latency: 150, downloadThroughput: 1600 * 1024 / 8, uploadThroughput: 750 * 1024 / 8, connectionType: 'cellular4g' });
+  await probeClient.send('Emulation.setCPUThrottlingRate', { rate: 4 });
   await probe.addInitScript(() => {
     const stats = window.__waPerfProbe = { observers: 0, bodyObservers: 0, callbacks: 0, records: 0, callbackMs: 0, qsaCalls: 0, longTasks: [] };
     try { new PerformanceObserver(list => { for (const entry of list.getEntries()) stats.longTasks.push({ durationMs: +entry.duration.toFixed(2), startTimeMs: +entry.startTime.toFixed(2), name: entry.name }); }).observe({ type: 'longtask', buffered: true }); } catch {}
@@ -106,7 +113,7 @@ try {
   }
   const totals = await probe.evaluate(() => ({ ...window.__waPerfProbe }));
   console.log('SWP_OBSERVER_PROBE', JSON.stringify({ totals, perInput: observations }));
-  fs.writeFileSync(outputDir + '/swp-observer-probe.json', JSON.stringify({ totals, perInput: observations, longTasks: totals.longTasks }, null, 2));
+  fs.writeFileSync(outputDir + '/swp-observer-probe.json', JSON.stringify({ environment: { viewport: '360x800 DPR 2', cpuSlowdown: '4x', network: '150ms RTT / 1600 Kbps down / 750 Kbps up' }, totals, perInput: observations, longTasks: totals.longTasks }, null, 2));
   await probe.close();
 } finally {
   await browser.close();
