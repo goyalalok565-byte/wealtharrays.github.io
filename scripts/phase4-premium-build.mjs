@@ -56,7 +56,7 @@ for(const file of htmlFiles){
     s=s.replace(/<script[^>]+src=["']\/consent-loader\.js[^>]*><\/script>/gi,'');
   }else if(!s.includes('/consent-loader.js')) s=s.replace('</head>',consentJs+'</head>');
 
-  const staticAdScript=/<script\b(?=[^>]*src=["']https:\/\/pagead\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js)[^>]*>[\s\S]*?<\/script>/gi;
+  const staticAdScript=/<script\b(?=[^>]*src=["']https:\/\/pagead2?\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js)[^>]*>[\s\S]*?<\/script>/gi;
   const adLoaderScript=/<script\b(?=[^>]*src=["']\/wa-ad-loader\.js(?:\?[^"']*)?["'])[^>]*>\s*<\/script>/gi;
   s=s.replace(/<script>[^]*?waSubscriptionCache[^]*?<\/script>/gi,'');
   // Normalize every page to zero or one publisher loader. A static AdSense tag

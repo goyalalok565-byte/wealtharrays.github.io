@@ -19,9 +19,15 @@ for (const file of calculators) {
   for (const name of runtimeSources) if (tags.includes(name)) throw new Error(`${file}: runtime source ${name} still loaded directly`);
   const definitionMatch=html.match(/(?:src|href)=["'](?:[^"']*\/)?calculator-definitions\/([^"'?]+)\.js(?:\?[^"']*)?["']/i);
   if (!definitionMatch || !fs.existsSync(`calculator-definitions/${definitionMatch[1]}.js`)) throw new Error(`${file}: split calculator definition missing`);
-  // The retired income-tax-scenario route is a canonical alias to /income-tax-planner/ and is intentionally excluded from AdSense.
+  // The publisher ID belongs in the subscription-aware loader, not a static page tag.
+  // These routes are intentionally excluded from AdSense by Phase 4 policy.
   const adExemptPages = new Set(['income-tax-scenario-calculator/index.html','loan-emi-calculator/index.html','loan-interest-calculator/index.html']);
-  if (!adExemptPages.has(file) && !html.includes('ca-pub-6507600103785450')) throw new Error(`${file}: AdSense publisher id missing`);
+  const adLoaderTags = html.match(/<script\b(?=[^>]*src=["']\/wa-ad-loader\.js(?:\?[^"']*)?["'])[^>]*>\s*<\/script>/gi) || [];
+  const directAdTags = html.match(/<script\b(?=[^>]*src=["']https:\/\/pagead2?\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js)[^>]*>/gi) || [];
+  const adLoaderSource = fs.existsSync('wa-ad-loader.js') ? fs.readFileSync('wa-ad-loader.js','utf8') : '';
+  if (!adExemptPages.has(file) && adLoaderTags.length !== 1) throw new Error(`${file}: expected exactly one subscription-aware AdSense loader, found ${adLoaderTags.length}`);
+  if (!adExemptPages.has(file) && !adLoaderSource.includes('ca-pub-6507600103785450')) throw new Error(`${file}: AdSense publisher id missing from wa-ad-loader.js`);
+  if (directAdTags.length) throw new Error(`${file}: direct AdSense bootstrap bypasses the subscription-aware loader`);
   if (!html.includes('rel="canonical"')) throw new Error(`${file}: canonical tag missing`);
 }
 if (!fs.existsSync('ads.txt') || !fs.readFileSync('ads.txt','utf8').includes('google.com, pub-6507600103785450, DIRECT')) throw new Error('ads.txt authorization missing');
