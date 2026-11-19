@@ -13,7 +13,7 @@ const PUBLIC_ROOT_EXACT = new Set([
 ]);
 const PUBLIC_DIRS = new Set(['articles','research','calculator-definitions','assets']);
 const EXCLUDE_DIRS = new Set([
-  '.git','.github','node_modules','qa','scripts',
+  '.git','.github','node_modules','qa','scripts','docs','tests','functions','migrations',
   'country-modules','api','p','privacy','reports','dist'
 ]);
 const EXCLUDE_ROOT = new Set([
@@ -96,7 +96,7 @@ const forbiddenHits = forbidden.filter(p =>
   /^(qa|scripts|country-modules|api|p|privacy|reports)(\/|$)/.test(p) ||
   /\.(md)$/i.test(p) ||
   p === 'content-sources.json' ||
-  p.startsWith('.github/')
+  p.startsWith('.github/') || /\\.(zip|bak|old|orig)$/i.test(p) || p === 'package.json' || p === 'calculator-value-content.json'
 );
 if (forbiddenHits.length) {
   throw new Error('Forbidden internal files leaked into dist:\n' + forbiddenHits.join('\n'));
@@ -116,6 +116,7 @@ for (const name of definitionFiles) {
   }
 }
 if (!definitionFiles.length) throw new Error('No calculator definition JavaScript files found.');
+if (fs.existsSync(path.join(out, 'calculator-value-content.json'))) throw new Error('Build-only calculator-value-content.json must not be deployed.');
 if (fs.existsSync(path.join(out, 'calculator-value-content.json'))) throw new Error('Build-only calculator-value-content.json must not be deployed.');
 console.log('Cloudflare public build PASS:', forbidden.length, 'public files emitted to dist/.');
 console.log('Calculator definitions PASS:', definitionFiles.length, 'definition scripts copied to dist/.');
