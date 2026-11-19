@@ -36,7 +36,15 @@ jobs:
           node qa/performance-profile.mjs
           node qa/mobile-lighthouse-baseline.mjs
       - name: Build exact pull-request or commit source
-        run: npm run build:dist
+        run: npm run build
+      - name: Minify production bundles before browser measurement
+        run: |
+          for file in wa-site-runtime.js wa-home-runtime.js wa-calculator-runtime.js; do
+            npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output "$file" -- "$file"
+            cp "$file" "dist/$file"
+          done
+          node qa/performance-budget-audit.mjs
+          npm run qa:dist
       - name: Start candidate static build
         run: |
           python3 -m http.server 4173 --directory dist > /tmp/wealtharrays-dist-http.log 2>&1 &
@@ -53,13 +61,13 @@ jobs:
           PROFILE_PATH: /
           LH_OUTPUT_DIR: /tmp/wa-lighthouse/after
         run: node qa/performance-profile.mjs
+      - name: Prove threshold gate rejects a deliberately failing sample
+        run: node --test qa/performance-thresholds.test.mjs
       - name: Enforce mobile Lighthouse budgets on all six critical pages
         env:
           BASE_URL: http://127.0.0.1:4173
           LH_OUTPUT_DIR: /tmp/wa-lighthouse/after
         run: node qa/mobile-lighthouse-baseline.mjs
-      - name: Prove threshold gate rejects a deliberately failing sample
-        run: node --test qa/performance-thresholds.test.mjs
       - name: Upload before/after Lighthouse and CPU profiles
         if: always()
         uses: actions/upload-artifact@v4
