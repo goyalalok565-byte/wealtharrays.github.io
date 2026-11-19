@@ -124,7 +124,7 @@ if (fs.existsSync(headersPath)) {
   }
 }
 
-for (const requiredFile of ['about.html', 'contact.html', 'privacy.html', 'terms.html', 'disclaimer.html', 'methodology.html', 'editorial-policy.html', 'advertising-policy.html', '404.html', 'og-card.svg']) {
+for (const requiredFile of ['about.html', 'contact.html', 'privacy.html', 'terms.html', 'disclaimer.html', 'methodology.html', 'editorial-policy.html', 'advertising-policy.html', '404.html', 'og-image.png']) {
   if (!fs.existsSync(path.join(root, requiredFile))) errors.push(`Production trust/UX asset missing: ${requiredFile}`);
 }
 
@@ -141,8 +141,8 @@ for (const file of htmlFiles) {
   const html = read(file);
   const ogImage = attr(html, 'property', 'og:image');
   const ogType = attr(html, 'property', 'og:image:type');
-  if (ogImage && ogImage.endsWith('/og-card.svg') && ogType && ogType !== 'image/svg+xml') {
-    errors.push(`${rel(file)}: Open Graph image MIME type does not match SVG asset`);
+  if (ogImage && ogImage.endsWith('/og-image.png') && ogType && ogType !== 'image/png') {
+    errors.push(`${rel(file)}: Open Graph image MIME type does not match PNG asset`);
   }
 }
 
