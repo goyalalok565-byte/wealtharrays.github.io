@@ -163,20 +163,23 @@ if(isCalc){
         const rows=guideCalc.compute(sample)||[];
         const numberFmt=new Intl.NumberFormat(pageLocale==='en_IN'?'en-IN':'en-US',{maximumFractionDigits:2});
         const currencySymbol=pageLocale==='en_IN'?'₹':"$";
-        const outputLabels=rows.slice(0,3).map(row=>row.label+': '+(row.format==='currency'?currencySymbol:'')+numberFmt.format(row.value)+(row.format==='percent'?'%':row.format==='years'?' years':''));
-        workedText='Example inputs — '+inputLabels.join('; ')+'. Using the calculator formula, the illustrative outputs are '+outputLabels.join('; ')+'. These results follow the stated assumptions and are not a guarantee of a real-world outcome.';
-      }catch(error){workedText='Example inputs — '+inputLabels.join('; ')+'. Enter these values to reproduce a worked scenario, then change one input at a time to see how the result responds.';}
-    }
-    const workedTitle=pageLocale==='en_IN'?'Worked example in Indian rupees':'Worked example';
-    const worked=workedText?'<section class="worked-example" aria-labelledby="worked-example-title"><h2 id="worked-example-title">'+workedTitle+'</h2><p>'+escText(workedText)+'</p></section>':'';
-    const relatedArticleMap={investment:['/articles/how-to-compare-sip-scenarios-properly','Compare investment scenarios'],loan:['/articles/how-to-compare-loan-offers-beyond-emi','Compare loan offers beyond EMI'],banking:['/articles/compound-interest-guide','Understand compounding'],retirement:['/articles/how-to-stress-test-a-retirement-goal','Stress-test a retirement goal'],salary:['/articles/how-to-use-a-salary-to-hourly-calculator','Understand pay calculations'],business:['/articles/how-to-use-financial-calculators','How to use financial calculators']};
-    const relatedArticle=value.article?[value.article,'Read the related Wealth Arrays guide']:(relatedArticleMap[guideCalc?.category]||relatedArticleMap.business);
-    const articleLink='<p class="related-reading">Related reading: <a href="'+escText(relatedArticle[0])+'">'+escText(relatedArticle[1])+'</a> for additional context.</p>';
-    const extras=extraSections+worked+articleLink;
-    html=html.replace(/<!-- WA-CALCULATOR-EXTRA-GUIDANCE -->[\s\S]*?<!-- \/WA-CALCULATOR-EXTRA-GUIDANCE -->/i,'');
-    if(extras)html=html.replace(/<\/article>/i,'<!-- WA-CALCULATOR-EXTRA-GUIDANCE -->'+extras+'<!-- /WA-CALCULATOR-EXTRA-GUIDANCE --></article>');
-  }
-  const pageCalcId=html.match(/data-wa-calculator="([^"]+)"/i)?.[1];
+
+for (const full of allHtml) {
+  let html=fs.readFileSync(full,'utf8');
+  const relPath=path.relative(root,full).replaceAll(path.sep,'/');
+  const isWidget=relPath==='widget.html'||relPath==='widget/index.html';
+  const isCalc=/<html[^>]+data-wa-calculator=/i.test(html);
+  const isScenarioLab=isScenarioLabPage(relPath);
+  const isGoalPlanner=isGoalPlannerPage(relPath);
+  const isWorkspacePageCurrent=isWorkspacePage(relPath);
+  const calculatorValueContent=JSON.parse(fs.readFileSync(path.join(root,'calculator-value-content.json'),'utf8'));
+  const valueSlug=relPath.match(/^([^/]+)\/index\.html$/)?.[1];
+  const value=valueSlug?calculatorValueContent[valueSlug]:null;
+  const calculatorId=html.match(/data-wa-calculator=["']([^"']+)["']/i)?.[1];
+  const indiaCalculatorIds=new Set(['income-tax-planner','lumpsum-sip','ppf-growth','epf-growth','gst','hra-exemption','ssy','nps','gratuity','stamp-duty','gold-jewelry','silver-jewelry','home-loan-eligibility','advanced-home-loan-eligibility','loan-against-property','flat-cost','capital-gain','property-calculator','home-loan-emi']);
+  const pageLocale=calculatorId&&indiaCalculatorIds.has(calculatorId)?'en_IN':'en_US';
+  const pageCalcId=calculatorId;
+html.match(/data-wa-calculator="([^"]+)"/i)?.[1];
   const calcDefinition=definitions.find(x=>x.id===pageCalcId);
   const faqMatch=calcDefinition?.obj.match(/faqs\s*:\s*\[([\s\S]*?)\](?=,?\s*\},\s*fields)/);
   if(faqMatch){
