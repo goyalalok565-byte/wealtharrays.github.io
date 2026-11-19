@@ -1,19 +1,112 @@
 {
   "investment": [
-    {"name":"SEBI Investor Education","url":"https://investor.sebi.gov.in/iematerial.html","reason":"Official investor-education material covering securities, mutual funds and financial planning."},
-    {"name":"SEBI Investor Education Programme — Mutual Funds","url":"https://www.sebi.gov.in/sebi_data/commondocs/siep_h.html","reason":"Official SEBI educational material on mutual funds, risks and investor decisions."}
+    {
+      "name": "SEBI Investor Education — Power of Compounding",
+      "url": "https://investor.sebi.gov.in/moneymatters-powerofcom.html",
+      "reason": "Official investor education explaining compounding and illustrating how time and assumed rates affect investment growth."
+    },
+    {
+      "name": "Investor.gov — Compound Interest Calculator",
+      "url": "https://www.investor.gov/financial-tools-calculators/calculators/compound-interest-calculator",
+      "reason": "U.S. SEC investor tool for checking principal, contributions, rate and compounding-frequency assumptions."
+    },
+    {
+      "name": "SEBI Investor Education Programme — Mutual Funds",
+      "url": "https://www.sebi.gov.in/sebi_data/commondocs/siep_h.html",
+      "reason": "Official investor education covering mutual funds, investment risk and responsible investment decisions."
+    }
   ],
-  "inflation": [
-    {"name":"Government of India — Consumer Price Index","url":"https://cpi.mospi.gov.in/","reason":"Official CPI information from the Ministry of Statistics and Programme Implementation."}
+  "loans": [
+    {
+      "name": "Reserve Bank of India — Floating-rate EMI Personal Loan FAQs",
+      "url": "https://www.rbi.org.in/commonman/Upload/English/FAQs/PDFs/FAQRFIR10012025.pdf",
+      "reason": "RBI guidance on interest-rate resets and their impact on EMI-based personal-loan repayments in India."
+    },
+    {
+      "name": "Consumer Financial Protection Bureau — Mortgage Amortization",
+      "url": "https://www.consumerfinance.gov/ask-cfpb/how-does-paying-down-a-mortgage-work-en-1943/",
+      "reason": "Explains how mortgage payments are split between principal and interest and how amortization changes over time."
+    }
   ],
   "banking": [
-    {"name":"Reserve Bank of India — Master Circulars","url":"https://www.rbi.org.in/commonperson/english/scripts/MasterCircular.aspx","reason":"Official RBI source for banking, deposits, lending and related regulatory material."}
+    {
+      "name": "Reserve Bank of India — Interest Rate on Deposits Directions",
+      "url": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=13157",
+      "reason": "Official RBI directions covering disclosed deposit rates, term deposits and deposit-interest practices in India."
+    }
+  ],
+  "retirement": [
+    {
+      "name": "Pension Fund Regulatory and Development Authority",
+      "url": "https://www.pfrda.org.in/",
+      "reason": "Official regulator for India's National Pension System; verify current NPS rules, annuity requirements and subscriber guidance here."
+    },
+    {
+      "name": "Employees' Provident Fund Organisation",
+      "url": "https://www.epfindia.gov.in/site_en/index.php",
+      "reason": "Official EPFO source for current provident-fund scheme rules, contribution information and member services in India."
+    }
+  ],
+  "salary": [
+    {
+      "name": "U.S. Department of Labor — Overtime Pay",
+      "url": "https://www.dol.gov/agencies/whd/overtime",
+      "reason": "U.S.-specific official guidance on FLSA overtime eligibility and premium-pay rules; other countries have different laws."
+    }
+  ],
+  "business": [
+    {
+      "name": "U.S. Small Business Administration — Plan Your Business",
+      "url": "https://www.sba.gov/counseling/plan-your-business/",
+      "reason": "U.S.-specific official guidance on startup costs, break-even analysis, fixed and variable costs, and business planning."
+    }
+  ],
+  "planning": [
+    {
+      "name": "Ministry of Statistics and Programme Implementation — Consumer Price Index",
+      "url": "https://cpi.mospi.gov.in/",
+      "reason": "Official Government of India CPI source for understanding measured consumer-price changes."
+    },
+    {
+      "name": "U.S. Bureau of Labor Statistics — Consumer Price Index",
+      "url": "https://www.bls.gov/cpi/",
+      "reason": "Official U.S. CPI data and methodology; use the relevant national statistics agency for other countries."
+    }
+  ],
+  "inflation": [
+    {
+      "name": "Ministry of Statistics and Programme Implementation — Consumer Price Index",
+      "url": "https://cpi.mospi.gov.in/",
+      "reason": "Official Government of India CPI source for understanding measured consumer-price changes."
+    },
+    {
+      "name": "U.S. Bureau of Labor Statistics — Consumer Price Index",
+      "url": "https://www.bls.gov/cpi/",
+      "reason": "Official U.S. CPI data and methodology; use the relevant national statistics agency for other countries."
+    }
   ],
   "tax": [
-    {"name":"Income Tax Department — e-Filing Portal","url":"https://www.incometax.gov.in/iec/foportal/","reason":"Official Government of India source for current income-tax information and taxpayer services."}
+    {
+      "name": "Income Tax Department — Income and Tax Estimator User Manual",
+      "url": "https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/income-and-tax-estimator-um",
+      "reason": "Official guidance for India's tax estimator, including the distinction between Tax Year 2026–27 under the 2025 Act and AY 2026–27 under the 1961 Act."
+    },
+    {
+      "name": "Income Tax Department — e-Filing Portal",
+      "url": "https://www.incometax.gov.in/iec/foportal/",
+      "reason": "Official Government of India source for current income-tax forms, rules, notifications and taxpayer services."
+    }
   ],
   "general": [
-    {"name":"SEBI Investor Education","url":"https://investor.sebi.gov.in/iematerial.html","reason":"Official investor-education and financial-planning material."},
-    {"name":"Reserve Bank of India","url":"https://www.rbi.org.in/","reason":"Official central-bank source for Indian banking and monetary information."}
+    {
+      "name": "SEBI Investor Education",
+      "url": "https://investor.sebi.gov.in/iematerial.html",
+      "reason": "Official investor-education material covering financial products, risk and informed decisions."
+    },
+    {
+      "name": "Reserve Bank of India",
+      "url": "https://www.rbi.org.in/",
+      "reason": "Official central-bank source for Indian banking, monetary and financial information."
+    }
   ]
 }
