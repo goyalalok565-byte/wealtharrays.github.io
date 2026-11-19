@@ -7,7 +7,10 @@ const previousOrder=[...previous.matchAll(/\bid:\s*["']([^"']+)["']/g)].map(m=>m
 const files=fs.readdirSync(dir).filter(name=>name.endsWith('.js')&&name!=='index.js').sort();
 if(!files.length)throw new Error('No calculator definitions found.');
 const defs=files.map(file=>{
- const source=fs.readFileSync(path.join(dir,file),'utf8'), marker='window.CALCULATORS.push(', start=source.indexOf(marker), end=source.lastIndexOf(');');
+ let source=fs.readFileSync(path.join(dir,file),'utf8');
+ const oldHeader='/* Generated from calculators.js — do not edit directly. */';
+ if(source.startsWith(oldHeader)){source=source.replace(oldHeader,'/* Canonical calculator definition — edit this file; calculators.js is generated. */');fs.writeFileSync(path.join(dir,file),source);}
+ const marker='window.CALCULATORS.push(', start=source.indexOf(marker), end=source.lastIndexOf(');');
  if(start<0||end<=start)throw new Error('Invalid definition wrapper: '+file);
  const object=source.slice(start+marker.length,end).trim();
  const id=object.match(/\bid:\s*["']([^"']+)["']/)?.[1], slug=object.match(/\bslug:\s*["']([^"']+)["']/)?.[1], title=object.match(/\btitle:\s*["']([^"']+)["']/)?.[1];
