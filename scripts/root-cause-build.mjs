@@ -162,7 +162,8 @@ if(isCalc){
       try{
         const rows=guideCalc.compute(sample)||[];
         const numberFmt=new Intl.NumberFormat(pageLocale==='en_IN'?'en-IN':'en-US',{maximumFractionDigits:2});
-        const currencySymbol=pageLocale==='en_IN'?'₹':'
+        const currencySymbol=pageLocale==='en_IN'?'₹':"$";
+        const outputLabels=rows.slice(0,3).map(row=>row.label+': '+(row.format==='currency'?currencySymbol:'')+numberFmt.format(row.value)+(row.format==='percent'?'%':row.format==='years'?' years':''));
         workedText='Example inputs — '+inputLabels.join('; ')+'. Using the calculator formula, the illustrative outputs are '+outputLabels.join('; ')+'. These results follow the stated assumptions and are not a guarantee of a real-world outcome.';
       }catch(error){workedText='Example inputs — '+inputLabels.join('; ')+'. Enter these values to reproduce a worked scenario, then change one input at a time to see how the result responds.';}
     }
