@@ -51,6 +51,12 @@ for (const route of paths) {
     lcp: audits['largest-contentful-paint']?.displayValue || null,
     tbt: audits['total-blocking-time']?.displayValue || null,
     cls: audits['cumulative-layout-shift']?.displayValue || null,
+    layoutShiftElements: (audits['layout-shift-elements']?.details?.items || []).slice(0, 5).map(item => ({
+      score: item.score ?? null,
+      selector: item.node?.selector ?? null,
+      snippet: item.node?.snippet ?? null,
+      path: item.node?.path ?? null
+    })),
     inp: inpAudit?.displayValue || 'Not available in this Lighthouse lab report',
     jsTransferBytes: bytes('Script'),
     cssTransferBytes: bytes('Stylesheet'),
