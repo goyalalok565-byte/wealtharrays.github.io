@@ -44,6 +44,21 @@ if(siteRuntimeSource.includes('pagead2.googlesyndication.com')||siteRuntimeSourc
   failures.push('site-runtime.js must not bypass the subscription-aware wa-ad-loader.js with a direct AdSense bootstrap.');
 }
 if(!fs.existsSync('wa-ad-loader.js'))failures.push('Missing the single subscription-aware wa-ad-loader.js bootstrap.');
+const coreRuntimeSource=fs.existsSync('wa-core.js')?fs.readFileSync('wa-core.js','utf8'):'';
+const adLoaderSource=fs.existsSync('wa-ad-loader.js')?fs.readFileSync('wa-ad-loader.js','utf8'):'';
+if(!coreRuntimeSource.includes("pageLocale==='en_IN'")||!coreRuntimeSource.includes("document.documentElement.dataset.country||get('waCountry',detectedCountry())")){
+  failures.push('India-specific pages must default to INR from en_IN page metadata without persisting that page default globally.');
+}
+if(!coreRuntimeSource.includes("window.__WA_CALCULATOR_SEARCH_LOADED__&&document.querySelector('.tool-library-search')")||!coreRuntimeSource.includes("document.getElementById('wa-tools-grid')")){
+  failures.push('Tools page must avoid duplicate search and category initialization.');
+}
+if(!coreRuntimeSource.includes("footer.premium-footer .site-footer-inner")){
+  failures.push('Static premium footer must not be rebuilt by the runtime.');
+}
+if(!adLoaderSource.includes('heavyRoute?5000:1500')){
+  failures.push('Ads on tools/calculator routes must wait until after the initial interaction window.');
+}
+
 
 
  // Regression guard: the production AdSense host is pagead2.googlesyndication.com.
