@@ -55,3 +55,38 @@ const staticResponse = await worker.fetch(new Request("https://example.test/inde
 assert.equal(await staticResponse.text(), "static asset");
 assert.deepEqual(assetCalls, ["/index.html"]);
 console.log("Cloudflare Worker API routing and static-asset fallback tests passed.");
+
+
+// Health endpoint checks D1 and Supabase without returning credentials or project URLs.
+const originalFetch = globalThis.fetch;
+let healthFetchUrl = '';
+globalThis.fetch = async (url, init) => {
+  healthFetchUrl = String(url);
+  assert.equal(init?.headers?.apikey, 'health-test-anon-key');
+  return new Response('ok', { status: 200 });
+};
+try {
+  const healthResponse = await worker.fetch(new Request('https://example.test/v1/health'), {
+    DB: { prepare(sql) { assert.equal(sql, 'SELECT 1 AS ok'); return { async first() { return { ok: 1 }; } }; } },
+    SUPABASE_URL: 'https://health-test.supabase.co', SUPABASE_ANON_KEY: 'health-test-anon-key', ASSETS: env.ASSETS
+  }, {});
+  assert.equal(healthResponse.status, 200);
+  const healthBody = await healthResponse.json();
+  assert.equal(healthBody.status, 'ok'); assert.equal(healthBody.version, '1.0.0');
+  assert.equal(healthBody.checks.d1.status, 'ok'); assert.equal(healthBody.checks.supabase.status, 'ok');
+  assert.equal(healthFetchUrl, 'https://health-test.supabase.co/auth/v1/health');
+  assert.doesNotMatch(JSON.stringify(healthBody), /health-test-anon-key|health-test\\.supabase\\.co/);
+  const degraded = await worker.fetch(new Request('https://example.test/v1/health'), { ASSETS: env.ASSETS }, {});
+  assert.equal(degraded.status, 503);
+  const degradedBody = await degraded.json();
+  assert.equal(degradedBody.status, 'degraded');
+  assert.equal(degradedBody.checks.d1.status, 'not_configured');
+  assert.equal(degradedBody.checks.supabase.status, 'not_configured');
+} finally { globalThis.fetch = originalFetch; }
+
+const deniedOrigin = await worker.fetch(new Request('https://example.test/v1/scenarios', { headers: { Origin: 'https://evil.example' } }), { ...env, ALLOWED_ORIGINS: 'https://wealtharrays.com' }, {});
+assert.equal(deniedOrigin.status, 403);
+assert.equal(deniedOrigin.headers.get('Access-Control-Allow-Origin'), null);
+const allowedOrigin = await worker.fetch(new Request('https://example.test/v1/scenarios', { headers: { Origin: 'https://wealtharrays.com' } }), { ...env, ALLOWED_ORIGINS: 'https://wealtharrays.com' }, {});
+assert.equal(allowedOrigin.status, 401);
+assert.equal(allowedOrigin.headers.get('Access-Control-Allow-Origin'), 'https://wealtharrays.com');
