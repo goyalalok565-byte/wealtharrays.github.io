@@ -93,3 +93,5 @@ assert.equal(events.get("evt_unlinked").processed_at, null);
 response = await deliver({ created_at: 1500, event: "subscription.activated", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_bad_signature", true);
 assert.equal(response.status, 401);
 console.log("Razorpay webhook audit PASS: signature, header idempotency, event ordering, retryable unlinked events, payment failure and refund recording.");
+
+assert.match(source,/total > 262144/,'Webhook request body must be streaming-limited to 256 KB');
