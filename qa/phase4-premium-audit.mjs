@@ -21,8 +21,8 @@ if(!fs.existsSync(path.join(root,'theme-init.js'))) failures.push('theme-init.js
 if(!fs.existsSync(path.join(root,'404-runtime.js'))) failures.push('404-runtime.js missing');
 const phase4Runtime=read('phase4-premium.js');if(phase4Runtime.includes('MutationObserver')||phase4Runtime.includes('dedupeSharedControls')) failures.push('phase4-premium.js: DOM mutation dedupe observer must remain removed.');
 if(fs.existsSync(path.join(root,'production-hotfix.js'))) failures.push('production-hotfix.js: retired duplicate loader must remain deleted.');
-const adRuntime=read('wa-ad-loader.js');if(!adRuntime.includes('requestIdleCallback')||!adRuntime.includes('setTimeout(loadAds,4000)')||!adRuntime.includes("addEventListener('load'")) failures.push('wa-ad-loader.js: AdSense must be deferred until load/idle, interaction or 4 s fallback.');
-const consentRuntime=read('consent-loader.js');if(!consentRuntime.includes('requestIdleCallback')||!consentRuntime.includes('setTimeout(load,4000)')||!consentRuntime.includes("addEventListener('load'")) failures.push('consent-loader.js: Funding Choices must be deferred until load/idle, interaction or 4 s fallback.');
+const adRuntime=read('wa-ad-loader.js');if(!adRuntime.includes('requestIdleCallback')||!adRuntime.includes('fallbackTimer=setTimeout(function')||!adRuntime.includes('},4000);')||!adRuntime.includes("addEventListener('load'")) failures.push('wa-ad-loader.js: AdSense must wait for first interaction or a 4 s post-load idle fallback.');
+const consentRuntime=read('consent-loader.js');if(!consentRuntime.includes('requestIdleCallback')||!consentRuntime.includes('timer=setTimeout(function')||!consentRuntime.includes('},4000);')||!consentRuntime.includes("addEventListener('load'")) failures.push('consent-loader.js: Funding Choices must wait for first interaction or a 4 s post-load idle fallback.');
 for(const f of calc){if(!fs.existsSync(path.join(root,f))) failures.push(`Missing calculator: ${f}`);}
 for(const full of publicFiles){
  const r=path.relative(root,full).replaceAll(path.sep,'/'), s=fs.readFileSync(full,'utf8');
