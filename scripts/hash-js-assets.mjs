@@ -39,7 +39,7 @@ function rewriteReference(text,oldPath,newPath){
   return text;
 }
 
-const dependentFiles=new Set(['search-loader.js','wa-site-runtime.js','wa-home-runtime.js','wa-calculator-runtime.js']);
+const dependentFiles=new Set(['search-loader.js']);
 for(const file of jsFiles){
   if(dependentFiles.has(path.posix.basename(file)))continue;
   mapping[file]=makeName(file,contents.get(file));
@@ -50,9 +50,7 @@ for(const file of jsFiles){
   const base=path.posix.basename(file);
   if(!dependentFiles.has(base))continue;
   let content=contents.get(file);
-  const dependencies=base==='search-loader.js'
-    ? ['homepage-search.js','calculator-search.js']
-    : ['extra-calculators-runtime.js'];
+  const dependencies=['homepage-search.js','calculator-search.js'];
   for(const target of dependencies){
     if(!mapping[target])throw new Error('Missing local JavaScript dependency in dist/: '+target);
     content=rewriteReference(content,target,mapping[target]);
