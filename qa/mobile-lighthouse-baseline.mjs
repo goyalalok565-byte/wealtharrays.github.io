@@ -12,7 +12,25 @@ for (const route of paths) {
   const reportPath = `${outputDir}/${safe}.json`;
   const url = base + route;
   console.log(`\n=== Lighthouse: ${url} ===`);
-  execFileSync('npx', ['lighthouse', url, '--form-factor=mobile', '--screenEmulation.mobile=true', '--screenEmulation.width=360', '--screenEmulation.height=800', '--screenEmulation.deviceScaleFactor=2', '--throttling-method=simulate', '--throttling.rttMs=150', '--throttling.throughputKbps=1600', '--throttling.cpuSlowdownMultiplier=4', '--only-categories=performance,accessibility,best-practices,seo', '--output=json', `--output-path=${reportPath}`, '--chrome-flags=--headless --no-sandbox --disable-dev-shm-usage'], { stdio: 'inherit' });
+  const lighthouseArgs = ['lighthouse', url, '--form-factor=mobile', '--screenEmulation.mobile=true', '--screenEmulation.width=360', '--screenEmulation.height=800', '--screenEmulation.deviceScaleFactor=2', '--throttling-method=simulate', '--throttling.rttMs=150', '--throttling.throughputKbps=1600', '--throttling.cpuSlowdownMultiplier=4', '--only-categories=performance,accessibility,best-practices,seo', '--output=json', '--output-path=' + reportPath, '--chrome-flags=--headless --no-sandbox --disable-dev-shm-usage'];
+  let measured = false;
+  for (let attempt = 1; attempt <= 3 && !measured; attempt++) {
+    try {
+      const result = execFileSync('npx', lighthouseArgs, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+      if (result) process.stdout.write(result);
+      measured = true;
+    } catch (error) {
+      const stdout = String(error.stdout || ''), stderr = String(error.stderr || '');
+      if (stdout) process.stdout.write(stdout);
+      if (stderr) process.stderr.write(stderr);
+      const diagnostic = stdout + '\n' + stderr + '\n' + String(error.message || '');
+      const transientTraceFailure = /NO_NAVSTART|recording the trace over your page load|Chrome did not respond/i.test(diagnostic);
+      if (!transientTraceFailure || attempt === 3) throw error;
+      console.warn('Transient Lighthouse trace failure on ' + route + '; retry ' + (attempt + 1) + '/3.');
+      await new Promise(resolve => setTimeout(resolve, 1500));
+    }
+  }
+  if (!measured) throw new Error('Lighthouse did not produce a report for ' + route + ' after three attempts.');
   const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
   const audits = report.audits || {};
   const network = audits['network-requests']?.details?.items || [];
