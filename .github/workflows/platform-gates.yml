@@ -44,10 +44,10 @@ jobs:
         run: node qa/phase1-20-roadmap-audit.mjs
       - name: Research data audit
         run: node qa/research-data-audit.mjs
-      - name: Accessibility static audit
-        run: node qa/accessibility-static-audit.mjs
       - name: Build production dist
         run: npm run build:dist
+      - name: Accessibility static audit after build normalization
+        run: node qa/accessibility-static-audit.mjs
       - name: Canonical embed source regression
         run: node qa/embed-regression.mjs
       - name: Install Playwright for all-calculator browser regression
