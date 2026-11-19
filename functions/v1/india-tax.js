@@ -56,7 +56,7 @@ export async function onRequestPost({ request }) {
     tax_year: year, regime, model_version: VERSION, taxable_income: income, rebate_eligible: rebateEligible,
     results: [
       { label: "Tax before rebate", value: output.grossTax, format: "currency" },
-      { label: "Section 87A rebate / marginal relief", value: output.rebate, format: "currency" },
+      { label: "Section 156 rebate / marginal relief", value: output.rebate, format: "currency" },
       { label: "Surcharge after marginal relief", value: output.surcharge, format: "currency" },
       { label: "Health and Education Cess (4%)", value: output.cess, format: "currency" },
       { label: "Estimated total tax", value: output.totalTax, format: "currency", emphasis: "positive" },
@@ -66,8 +66,8 @@ export async function onRequestPost({ request }) {
       income_basis: "Taxable income after eligible deductions; do not pass gross salary unless deductions have already been accounted for.",
       slabs: SLABS.map(s => ({ upper_limit: Number.isFinite(s.limit) ? s.limit : null, rate: s.rate })),
       standard_deduction: "Not applied automatically. If applicable, subtract the eligible amount before submitting taxable_income.",
-      rebate_eligibility: "Section 87A rebate and rebate-related marginal relief are applied only when rebate_eligible is true; eligibility is supplied by the caller and is not independently verified.",
-      excludes: ["special-rate income such as certain capital gains or winnings", "tax credits other than the implemented Section 87A rebate", "individual-specific deductions and exemptions", "advance tax, TDS and interest"],
+      rebate_eligibility: "Section 156 rebate and rebate-related marginal relief are applied only when rebate_eligible is true; eligibility is supplied by the caller and is not independently verified.",
+      excludes: ["special-rate income such as certain capital gains or winnings", "tax credits other than the implemented Section 156 rebate", "individual-specific deductions and exemptions", "advance tax, TDS and interest"],
       source: "Income Tax Department, tax rates and computation, current rules for tax year 2026-27; confirm with current official guidance before filing.",
       source_url: "https://www.incometaxindia.gov.in/w/tax-rates-and-computation"
     },

@@ -95,7 +95,8 @@ const taxModule = await import('data:text/javascript;base64,' + Buffer.from(taxH
 const taxAt12L = await taxModule.onRequestPost({ request: new Request('https://example.test/v1/india-tax', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tax_year:'2026-27',regime:'new',taxable_income:1200000,rebate_eligible:true}) }) });
 const tax12L = await taxAt12L.json();
 assert.equal(taxAt12L.status, 200);
-assert.equal(tax12L.results.find(x=>x.label==='Estimated total tax').value, 0, 'Section 87A rebate should reduce normal tax to zero at ₹12 lakh taxable income');
+assert.ok(tax12L.results.some(x=>x.label==='Section 156 rebate / marginal relief'), 'Tax Year 2026-27 must identify the rebate under Section 156 of the Income-tax Act, 2025');
+assert.equal(tax12L.results.find(x=>x.label==='Estimated total tax').value, 0, 'Section 156 rebate should reduce normal tax to zero at ₹12 lakh taxable income');
 const taxAt125L = await taxModule.onRequestPost({ request: new Request('https://example.test/v1/india-tax', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tax_year:'2026-27',regime:'new',taxable_income:1250000,rebate_eligible:true}) }) });
 const tax125L = await taxAt125L.json();
 assert.equal(tax125L.results.find(x=>x.label==='Estimated total tax').value, 52000, 'Marginal relief and cess should be applied at ₹12.5 lakh taxable income');
