@@ -37,6 +37,13 @@ if (fs.existsSync(calcRuntimePath)) {
   }
 }
 
+
+ // Regression guard: the production AdSense host is pagead2.googlesyndication.com.
+ const adsenseHostRegression = '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-test" crossorigin="anonymous"></script>';
+ if (!/<script\b(?=[^>]*src=["']https:\/\/pagead2?\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js)[^>]*>/i.test(adsenseHostRegression)) {
+   failures.push('AdSense host regression: pagead2.googlesyndication.com must be recognized as a direct bootstrap.');
+ }
+
 // Keep third-party advertising bootstrap singular on every generated page.
 function auditHtml(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -46,7 +53,7 @@ function auditHtml(dir) {
     else if (entry.name.endsWith('.html')) {
       const html = fs.readFileSync(file, 'utf8');
       const loaders = html.match(/<script\b(?=[^>]*src=["']\/wa-ad-loader\.js(?:\?[^"']*)?["'])[^>]*>\s*<\/script>/gi) || [];
-      const directAds = html.match(/<script\b(?=[^>]*src=["']https:\/\/pagead\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js)[^>]*>/gi) || [];
+      const directAds = html.match(/<script\b(?=[^>]*src=["']https:\/\/pagead2?\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js)[^>]*>/gi) || [];
       if (loaders.length > 1) failures.push(file + ': duplicate wa-ad-loader.js tags (' + loaders.length + ').');
       if (directAds.length) failures.push(file + ': direct AdSense script bypasses the single consent/subscription-aware loader.');
     }
