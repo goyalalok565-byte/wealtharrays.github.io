@@ -18,7 +18,11 @@ for (const row of rows) {
   }
   const cls = Number.parseFloat(row.cls);
   if (!Number.isFinite(cls) || cls > maxCLS) {
-    failures.push(`${row.route}: CLS ${row.cls} exceeds the maximum ${maxCLS}`);
+    const sources = (row.layoutShiftElements || [])
+      .map(item => item.selector || item.snippet || item.path)
+      .filter(Boolean)
+      .join(' | ');
+    failures.push(`${row.route}: CLS ${row.cls} exceeds the maximum ${maxCLS}; top shifted elements: ${sources || 'not exposed by Lighthouse'}`);
   }
 }
 
