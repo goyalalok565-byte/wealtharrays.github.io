@@ -16,7 +16,6 @@ if(!widgetHtml.includes('href="https://wealtharrays.com/widget/"')) throw new Er
 if(!redirects.includes('/widget /widget/ 301')||!redirects.includes('/widget.html /widget/ 301')) throw new Error('Legacy widget routes must converge on /widget/');
 if(!widgetHtml.includes('/calculators.js') || !widgetHtml.includes('/wa-calculator-runtime.js') || widgetHtml.includes('/widget-bootstrap.js')) throw new Error('Widget must load definitions and one canonical runtime without a duplicate bootstrap request');
 if(!runtime.includes('WA CANONICAL MODULE | calculator | widget-bootstrap.js')) throw new Error('Widget bootstrap must be bundled into the canonical calculator runtime');
-if(!runtime.includes('WA CANONICAL MODULE | calculator | widget-bootstrap.js')) throw new Error('Widget bootstrap must be included in the canonical calculator runtime');
 if(/document\.addEventListener\("DOMContentLoaded", \(\) =>/.test(widgetHtml)) throw new Error('Widget must not use the pre-runtime racing bootstrap');
 if(!pageInit.includes("new URLSearchParams(location.search).get('calc')")) throw new Error('Calculator bootstrap must resolve widget calc query parameter');
 console.log(`Embed regression PASS — all ${ids.length} calculators share the canonical Copy Embed path, widget bootstrap, and clipboard fallback.`);
