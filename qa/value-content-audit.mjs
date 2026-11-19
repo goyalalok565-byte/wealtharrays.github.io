@@ -52,5 +52,21 @@ for(const file of htmlFiles){
     try{JSON.parse(json[1]);}catch{failures.push(rel+': invalid JSON-LD');}
   }
 }
+
+// Keep the SIP Goal worked example tied to the calculator's beginning-of-month model.
+// A hand-written end-of-month example previously overstated the required SIP.
+const sipGoalExamplePath = path.join(root, 'sip-goal-calculator', 'index.html');
+if (!fs.existsSync(sipGoalExamplePath)) {
+  failures.push('sip-goal-calculator: generated worked example page missing');
+} else {
+  const sipGoalHtml = fs.readFileSync(sipGoalExamplePath, 'utf8');
+  if (!sipGoalHtml.includes('Required monthly SIP: ₹6,635.27')) {
+    failures.push('sip-goal-calculator: worked example must match the beginning-of-month model output (₹6,635.27).');
+  }
+  if (sipGoalHtml.includes('₹6,691')) {
+    failures.push('sip-goal-calculator: stale end-of-month worked example must not be published.');
+  }
+}
+
 if(failures.length){console.error('VALUE CONTENT AUDIT FAILED ('+failures.length+' issues)');console.error(failures.join('\n'));process.exit(1);}
 console.log('Value-content audit passed: all '+calculators.length+' calculators have substantial unique guidance, worked examples, FAQs, internal article links, concise metadata and valid software/breadcrumb schema.');
