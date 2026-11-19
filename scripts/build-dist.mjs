@@ -46,7 +46,7 @@ for (const e of fs.readdirSync(root, { withFileTypes: true })) {
   if (e.isDirectory()) continue;
   if (PUBLIC_ROOT_EXACT.has(e.name) || PUBLIC_ROOT_EXTS.has(path.extname(e.name).toLowerCase())) {
     // JSON is intentionally limited to known browser-facing files.
-    if (path.extname(e.name).toLowerCase() === '.json' && !['ai-contract.json','global-seo-config.json','calculator-value-content.json','model-registry.json'].includes(e.name)) continue;
+    if (path.extname(e.name).toLowerCase() === '.json' && !['ai-contract.json','global-seo-config.json','model-registry.json'].includes(e.name)) continue;
     copyFile(path.join(root, e.name), e.name);
   }
 }
@@ -116,5 +116,6 @@ for (const name of definitionFiles) {
   }
 }
 if (!definitionFiles.length) throw new Error('No calculator definition JavaScript files found.');
+if (fs.existsSync(path.join(out, 'calculator-value-content.json'))) throw new Error('Build-only calculator-value-content.json must not be deployed.');
 console.log('Cloudflare public build PASS:', forbidden.length, 'public files emitted to dist/.');
 console.log('Calculator definitions PASS:', definitionFiles.length, 'definition scripts copied to dist/.');
