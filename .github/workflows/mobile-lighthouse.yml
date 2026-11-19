@@ -41,6 +41,7 @@ jobs:
           BASE_URL: https://wealtharrays.com
         run: node qa/performance-profile.mjs
       - name: Upload Lighthouse and CPU profile reports
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: wealtharrays-seven-page-mobile-performance
