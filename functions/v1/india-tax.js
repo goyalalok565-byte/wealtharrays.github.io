@@ -70,7 +70,7 @@ export async function onRequestPost({ request }) {
       excludes: ["special-rate income such as certain capital gains or winnings", "tax credits other than the implemented Section 156 rebate", "individual-specific deductions and exemptions", "advance tax, TDS and interest"],
       source: "Income Tax Department, tax rates and computation, Income-tax Act, 2025, Section 156, for Tax Year 2026-27; confirm with current official guidance before filing.",
       source_url: "https://egazette.gov.in/WriteReadData/2025/265620.pdf",
-      tax_year_guidance_url: "https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/General%20Questions-faqs",
+      tax_year_guidance_url: "https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/income-and-tax-estimator-um",
       old_act_ay_guidance_url: "https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/itr-2/itr-2-faqs"
     },
     metadata: { calculated_at: new Date().toISOString(), deterministic: true, not_for_filing: true }
