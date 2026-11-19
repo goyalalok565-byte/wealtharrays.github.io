@@ -41,9 +41,9 @@ for(const file of files){
 const homepageCss=fs.readFileSync('homepage-refresh.css','utf8');
 const contrastRules=[
   '.wa-emi-result{color:var(--text)!important}',
-  '.wa-emi-result>span{color:color-mix(in srgb,var(--muted) 90%,var(--text))!important;opacity:1!important}',
+  '.wa-emi-result>span{color:var(--text)!important;opacity:1!important}',
   '.wa-emi-result output{color:var(--text)!important}',
-  '.wa-emi-result-meta span{color:color-mix(in srgb,var(--muted) 90%,var(--text))!important;opacity:1!important}',
+  '.wa-emi-result-meta span{color:var(--text)!important;opacity:1!important}',
   '.wa-emi-result-meta strong{color:var(--text)!important;opacity:1!important}'
 ];
 for(const rule of contrastRules)if(!homepageCss.includes(rule))errors.push('homepage-refresh.css: quick EMI contrast rule missing: '+rule);
