@@ -29,6 +29,7 @@ for (const route of paths) {
     '--throttling.cpuSlowdownMultiplier=4',
     '--only-categories=performance,accessibility,best-practices,seo',
     '--output=json',
+  '--save-assets',
     `--output-path=${reportPath}`,
     '--chrome-flags=--headless --no-sandbox --disable-dev-shm-usage'
   ], { stdio: 'inherit' });
