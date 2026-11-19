@@ -7,17 +7,19 @@ const root=process.cwd();
 const stamp=new Date().toISOString().replace(/\D/g,'').slice(0,14);
 const siteSources=['wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js' ];
 const homeSources=['final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js'];
+const articleSources=['wa-core.js','theme-fix.js','phase4-premium.js'];
 const calcSiteSources=siteSources.filter(file=>file!=='calculator-search.js');
 const calcSources=['widget.js','widget-bootstrap.js',...calcSiteSources,'calculator-safety.js','calculator-page-init.js','pdf-export-fix.js'];
 let calculatorPages=[];
 let slugs=[];
-const required=[...new Set([...siteSources,...calcSources,'calculators.js'])];
+const required=[...new Set([...siteSources,...calcSources,...articleSources,'calculators.js'])];
 for(const f of required)if(!fs.existsSync(path.join(root,f)))throw new Error(`Missing runtime source: ${f}`);
 if(!fs.existsSync(path.join(root,'homepage-search.js')))throw new Error('Missing homepage-specific search source: homepage-search.js');
 function bundle(sources,label){const parts=sources.map(file=>{const body=fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n').trimEnd();const hash=crypto.createHash('sha256').update(body).digest('hex').slice(0,12);return `/* ===== WA CANONICAL MODULE | ${label} | ${file} | sha256:${hash} ===== */\n${body}\n`;});return `/* Wealth Arrays canonical ${label} runtime. Generated ${stamp}. */\n(function(){const k='__WA_CANONICAL_${label.toUpperCase()}_RUNTIME__';if(window[k])return;window[k]=true;})();\n${parts.join('\n')}`;}
 fs.writeFileSync(path.join(root,'wa-site-runtime.js'),bundle(siteSources,'site'),'utf8');
 fs.writeFileSync(path.join(root,'wa-home-runtime.js'),bundle(homeSources,'home'),'utf8');
 fs.writeFileSync(path.join(root,'wa-calculator-runtime.js'),bundle(calcSources,'calculator'),'utf8');
+fs.writeFileSync(path.join(root,'wa-article-runtime.js'),bundle(articleSources,'article'),'utf8');
 
 const source=fs.readFileSync(path.join(root,'calculators.js'),'utf8');
 const calculatorContext={console};vm.createContext(calculatorContext);vm.runInContext(source+'\n;globalThis.__WA_CALCULATORS__=CALCULATORS;',calculatorContext,{filename:'calculators.js'});
@@ -40,7 +42,7 @@ const defDir=path.join(root,'calculator-definitions');fs.mkdirSync(defDir,{recur
 for(const {obj,id} of definitions)fs.writeFileSync(path.join(defDir,`${id}.js`),`/* Generated from calculators.js — do not edit directly. */\nwindow.CALCULATORS=window.CALCULATORS||[];window.CALCULATORS.push(${obj});\n`,'utf8');
 
 const allHtml=[];function walk(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){const f=path.join(dir,e.name);if(e.isDirectory()){if(!['.git','node_modules','dist'].includes(e.name))walk(f);}else if(e.name.endsWith('.html'))allHtml.push(f);}}walk(root);
-const managed=new Set([...required,'wa-site-runtime.js','wa-home-runtime.js','wa-calculator-runtime.js','financial-engine.js','decision-adapters.js','scenario-lab.js','goal-planner.js','financial-workspace.js','report-engine.js','formula-registry.js','i18n.js','accessibility.js','analytics.js','visualization.js']);
+const managed=new Set([...required,'wa-site-runtime.js','wa-home-runtime.js','wa-calculator-runtime.js','wa-article-runtime.js','financial-engine.js','decision-adapters.js','scenario-lab.js','goal-planner.js','financial-workspace.js','report-engine.js','formula-registry.js','i18n.js','accessibility.js','analytics.js','visualization.js']);
 const isScenarioLabPage=(rel)=>rel==='scenario-lab.html';
 const isGoalPlannerPage=(rel)=>rel==='goal-planner.html';
 const isWorkspacePage=(rel)=>rel==='financial-workspace.html';
@@ -51,6 +53,7 @@ for(const full of allHtml){
   html=html.replace(/href=[\"']{2}/g, 'href="/"');
   const relPath=path.relative(root,full).replaceAll(path.sep,'/');
   const isWidget=relPath==='widget.html'||relPath==='widget/index.html';
+  const isArticle=relPath.startsWith('articles/')&&relPath.endsWith('.html');
   if(isUtilityNoindexPage(relPath) && !/<meta\s+name=[\"']robots[\"']/i.test(html)) html=html.replace('</head>','<meta name="robots" content="noindex,follow"></head>');
   const isScenarioLab=isScenarioLabPage(relPath);
   const isGoalPlanner=isGoalPlannerPage(relPath);
@@ -120,6 +123,9 @@ else{
     if(relPath==='index.html'){
       if(!html.includes('wa-home-runtime.js'))html=html.replace('</body>',`<script src="/wa-home-runtime.js?v=${stamp}" defer></script></body>`);
       html=html.replace(/(<body[^>]*>)/i,'$1\n<!-- WA-HOME-RUNTIME:v1 -->');
+    }else if(isArticle){
+      if(!html.includes('wa-article-runtime.js'))html=html.replace('</body>',`<script src="/wa-article-runtime.js?v=${stamp}" defer></script></body>`);
+      html=html.replace(/(<body[^>]*>)/i,'$1\n<!-- WA-ARTICLE-RUNTIME:v1 -->');
     }else{
       if(!html.includes('wa-site-runtime.js'))html=html.replace('</body>',`<script src="/wa-site-runtime.js?v=${stamp}" defer></script></body>`);
       html=html.replace(/(<body[^>]*>)/i,'$1\n<!-- WA-SITE-RUNTIME:v3 -->');
