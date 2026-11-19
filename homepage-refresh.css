@@ -400,7 +400,7 @@ html.wa-home-ready #wa-home-tool-grid:not(.is-expanded) .home-tool-card:nth-chil
 
 /* Keep the quick EMI result readable in both light and dark themes. */
 .wa-emi-result{color:var(--text)!important}
-.wa-emi-result>span{color:color-mix(in srgb,var(--muted) 90%,var(--text))!important;opacity:1!important}
+.wa-emi-result>span{color:var(--text)!important;opacity:1!important}
 .wa-emi-result output{color:var(--text)!important}
-.wa-emi-result-meta span{color:color-mix(in srgb,var(--muted) 90%,var(--text))!important;opacity:1!important}
+.wa-emi-result-meta span{color:var(--text)!important;opacity:1!important}
 .wa-emi-result-meta strong{color:var(--text)!important;opacity:1!important}
