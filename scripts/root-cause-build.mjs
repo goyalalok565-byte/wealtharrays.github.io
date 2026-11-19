@@ -10,8 +10,8 @@ execFileSync(process.execPath,[path.join(root,'scripts/sync-calculator-catalog.m
 const stamp=new Date().toISOString().replace(/\D/g,'').slice(0,14);
 const siteSources=['wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js','calculator-search.js'];
 const homeSources=['final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js'];
-const calcSiteSources=siteSources.filter(file=>file!=='calculator-search.js');
-const calcSources=['widget.js','widget-bootstrap.js',...calcSiteSources,'calculator-safety.js','calculator-page-init.js','calculator-enhancements.js','pdf-export-fix.js'];
+const calcSiteSources=['wa-core.js','calculator-page-currency.js'];
+const calcSources=['widget.js','widget-bootstrap.js',...calcSiteSources,'calculator-safety.js','calculator-page-init.js'];
 let calculatorPages=[];
 let slugs=[];
 const required=[...new Set([...siteSources,...calcSources,'calculators.js'])];
