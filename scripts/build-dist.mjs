@@ -13,7 +13,7 @@ const PUBLIC_ROOT_EXACT = new Set([
 ]);
 const PUBLIC_DIRS = new Set(['articles','research','calculator-definitions','assets']);
 const EXCLUDE_DIRS = new Set([
-  '.git','.github','node_modules','qa','scripts',
+  '.git','.github','node_modules','qa','scripts','docs','tests','functions','migrations',
   'country-modules','api','p','privacy','reports','dist'
 ]);
 const EXCLUDE_ROOT = new Set([
@@ -93,8 +93,8 @@ function auditTree(dir, rel='') {
 }
 auditTree(out);
 const forbiddenHits = forbidden.filter(p =>
-  /^(qa|scripts|country-modules|api|p|privacy|reports)(\/|$)/.test(p) ||
-  /\.(md)$/i.test(p) ||
+  /^(qa|scripts|docs|tests|functions|migrations|country-modules|api|p|privacy|reports)(\/|$)/.test(p) ||
+  /\.(md|yml|yaml)$/i.test(p) ||
   p === 'content-sources.json' ||
   p.startsWith('.github/')
 );
