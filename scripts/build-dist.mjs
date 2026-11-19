@@ -19,6 +19,7 @@ const EXCLUDE_DIRS = new Set([
 const EXCLUDE_ROOT = new Set([
   'ARCHITECTURE.md','PHASE10_AUDIT.md','PHASE3_FINAL.md','QA_TESTS.md',
   'README-RELEASE.md','STABILIZATION-PLAN.md','GLOBAL-PLATFORM-SPEC.md',
+  'wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js','widget.js','widget-bootstrap.js','calculator-safety.js','calculator-page-init.js','pdf-export-fix.js',
   'GLOBAL-PRODUCT-ROADMAP.md','content-sources.json','CNAME'
 ]);
 
