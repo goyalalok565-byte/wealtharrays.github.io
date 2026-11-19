@@ -74,6 +74,10 @@ jobs:
         env:
           BASE_URL: http://127.0.0.1:4173
         run: node qa/production-browser-smoke.mjs
+      - name: Browser regression for currency, theme, language and CSV/PDF exports on all calculators
+        env:
+          BASE_URL: http://127.0.0.1:4173
+        run: node qa/calculator-feature-smoke.mjs
       - name: Browser regression for cloud workspace sync
         env:
           BASE_URL: http://127.0.0.1:4173
