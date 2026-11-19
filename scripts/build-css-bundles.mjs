@@ -62,7 +62,7 @@ for(const rel of htmlFiles){
     if(relAttr==='preload'&&/\bas\s*=\s*["']style["']/i.test(tag))return '';
     return tag;
   });
-  const links=`<link rel="preload" as="style" href="/${asset}"><link rel="stylesheet" href="/${asset}">`;
+  const links=`<link rel="stylesheet" href="/${asset}">`;
   if(!/<head\b[^>]*>/i.test(html))throw new Error(`${rel}: missing head element`);
   html=html.replace(/<head\b[^>]*>/i,match=>match+links);
   fs.writeFileSync(full,html);
