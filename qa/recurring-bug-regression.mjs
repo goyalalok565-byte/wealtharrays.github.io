@@ -7,6 +7,7 @@ const scriptNames=html=>[...html.matchAll(/<script\s+src=["']([^"']+)["'][^>]*><
 const sourceFiles=[];
 for(const dir of ['.','articles','p','.github/workflows']){const fullDir=path.join(root,dir);if(!fs.existsSync(fullDir))continue;const walk=current=>{for(const entry of fs.readdirSync(current,{withFileTypes:true})){const full=path.join(current,entry.name);if(entry.isDirectory())walk(full);else if(/\.(html|css|js|yml|yaml)$/i.test(entry.name))sourceFiles.push(full)}};walk(fullDir)}
 const contents=sourceFiles.map(file=>({file:path.relative(root,file),text:fs.readFileSync(file,'utf8')}));
+for(const file of fs.readdirSync(path.join(root,'articles')).filter(name=>name.endsWith('.html'))){const html=fs.readFileSync(path.join(root,'articles',file),'utf8');const names=scriptNames(html);if(names.filter(name=>name==='wa-article-runtime.js').length!==1||names.includes('wa-site-runtime.js'))throw new Error('articles/'+file+': article runtime ownership is not isolated');}
 const clippingPattern=/\.ledger-hero\s*\{[^}]*overflow\s*:\s*hidden\b/i;for(const {file,text} of contents)if(clippingPattern.test(text))throw new Error(`Recurring search clipping rule detected in ${file}`);
 const core=fs.readFileSync(path.join(root,'wa-core.js'),'utf8');if(!/window\.__WA_SEARCH_OWNER__\s*=\s*['"]wa-core['"]/.test(core))throw new Error('wa-core.js is missing the legacy search-owner marker');
 if(!/document\.querySelectorAll\('\.ledger-hero,\.hero-copy,\.search-bar'\)/.test(core))throw new Error('wa-core.js is missing the search-container overflow protection');
