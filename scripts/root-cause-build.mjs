@@ -258,6 +258,62 @@ if(isCalc){
     if(faqHeadingIndex>=0){const insertAt=faqHeadingIndex+faqHeading.length;html=html.slice(0,insertAt)+extraFaqs+html.slice(insertAt);}
     else{const articleEnd=html.indexOf('</article>');if(articleEnd>=0)html=html.slice(0,articleEnd)+faqHeading+extraFaqs+html.slice(articleEnd);}
   }
+  const formulaForValidation=calcDefinition?.obj.match(/\\bformula:\\s*["']([^"']+)["']/)?.[1]||'the formula explained in the methodology section';
+  const validationParagraphs={
+    investment:[
+      'For '+calcTitleForFaq+', first confirm that '+calcInputsText+' match the actual investment schedule and goal date. Check whether contributions are monthly or annual, whether the return is nominal or effective, and whether the timing is at the beginning or end of each period. The method shown for this calculator is '+formulaForValidation+'.',
+      'Run a conservative, central and optimistic return case while keeping the contribution pattern unchanged. Treat the lower case as a stress test, not a guarantee, and do not select an assumed return only because it reaches a desired target. Separate the amount invested from projected growth, then account for fees, taxes and inflation.',
+      'Check whether '+calcTitleForFaq+' assumes a constant return and uninterrupted contributions. Real portfolios move unevenly; market losses, missed contributions, withdrawals and product charges can change the realised outcome. Use current scheme and provider documents for fees, restrictions and tax treatment rather than treating a calculator output as a product quote.',
+      'For a reproducible decision, record the values, date, currency and source used for every major assumption in '+calcTitleForFaq+'. Re-run the calculation when contributions, the target date, charges or the plan changes. The result is a planning scenario, not a promise of investment performance or a recommendation to buy a particular product.'
+    ],
+    loan:[
+      'Before relying on '+calcTitleForFaq+', verify that '+calcInputsText+' match the lender illustration. Confirm the principal outstanding, whether the interest rate is annual or monthly, the repayment frequency and the remaining term. The method shown for this calculator is '+formulaForValidation+'. A mismatch in rate units or payment timing can materially change the estimate.',
+      'Compare at least three rate cases using the same principal and term. Review the monthly instalment and the total interest together; a lower instalment can simply reflect a longer repayment period. If the loan has a floating rate, test a plausible upward reset rather than assuming today’s rate remains unchanged.',
+      'Check what '+calcTitleForFaq+' does not include, such as processing charges, insurance, taxes, late fees, prepayment penalties or lender-specific rounding. The actual repayment schedule and loan agreement take precedence over an online estimate. Ask the lender how rate resets, payment dates and extra repayments are applied.',
+      'Keep the lender quote date, rate type, repayment term and all inputs used in '+calcTitleForFaq+'. Recalculate after a rate reset, partial prepayment, tenure change or fee revision. This makes it possible to compare the new schedule with the original offer without confusing a changed assumption with a calculation error.'
+    ],
+    banking:[
+      'For '+calcTitleForFaq+', check that '+calcInputsText+' reflect the exact deposit product and tenure. Confirm the bank’s compounding frequency, interest-crediting dates and whether the quoted rate is annual. The method shown for this calculator is '+formulaForValidation+'. A bank may use product-specific day-count or rounding conventions that differ from a simple estimate.',
+      'Compare the same deposit under the bank’s stated compounding convention and at least one alternative rate. Check the maturity value and the amount available if the deposit is closed early. A headline rate is not the same as the net amount received after applicable tax withholding or penalties.',
+      'Verify the terms that '+calcTitleForFaq+' cannot infer, including premature-withdrawal rules, automatic renewal, minimum balance, tax deduction and any special eligibility condition. Use the current deposit receipt and official bank schedule. If the product is not a standard fixed or recurring deposit, confirm its calculation method directly with the provider.',
+      'Record the bank, product name, rate, start date, maturity date and input values used in '+calcTitleForFaq+'. Recalculate when the bank changes a renewal rate or the deposit is renewed, extended or closed early. Keep the estimate separate from the bank’s contractual maturity instruction.'
+    ],
+    retirement:[
+      'For '+calcTitleForFaq+', validate '+calcInputsText+' against the actual contribution plan, expected retirement date and scheme rules. Check whether the return is before or after fees, whether contributions rise over time and whether withdrawals begin immediately or later. The method shown for this calculator is '+formulaForValidation+'.',
+      'Compare a lower-return case, a higher-inflation case and a later-life withdrawal case. A retirement target should not depend on one optimistic assumption. Review both the projected balance and the sustainable withdrawal amount; a large account value does not automatically mean the income will last throughout retirement.',
+      'Check whether '+calcTitleForFaq+' includes annuity pricing, scheme eligibility, contribution limits, taxes, management charges or survivor benefits. These depend on the pension scheme, provider and jurisdiction. Verify current NPS, EPF or other pension rules with the relevant official regulator before using an estimate to choose a contribution or withdrawal option.',
+      'Keep the contribution schedule, retirement age, return assumption, inflation rate and withdrawal plan used in '+calcTitleForFaq+'. Revisit the estimate after a material salary or contribution change, a scheme-rule update or a change to the retirement date. A dated set of assumptions makes annual reviews meaningfully comparable.'
+    ],
+    salary:[
+      'For '+calcTitleForFaq+', confirm '+calcInputsText+' against the employment contract and actual work pattern. Check whether the pay figure is gross or net, whether hours are paid hours, and how many weeks are paid in the year. The method shown for this calculator is '+formulaForValidation+'. Keep pay frequency and currency consistent.',
+      'Compare a normal week with a week that includes overtime, unpaid leave or a public holiday. Do not assume every hour is paid at the same rate. If you are comparing annual salary with hourly pay, account for paid leave, bonuses and the number of working weeks rather than multiplying by a standard week without checking.',
+      'Check which items '+calcTitleForFaq+' excludes, such as tax, pension deductions, insurance, employer benefits and statutory overtime eligibility. Those rules differ by country and employment status. Use the official labour authority guidance for your jurisdiction and the employer’s payroll policy before treating the estimate as a legal entitlement or take-home amount.',
+      'Save the pay period, hours, paid weeks, overtime assumption and date used in '+calcTitleForFaq+'. Recalculate after a pay rise, schedule change, new contract or change in overtime. Keeping the original assumptions helps explain why a payslip or annual equivalent differs from an earlier estimate.'
+    ],
+    business:[
+      'For '+calcTitleForFaq+', verify '+calcInputsText+' against the same accounting period and source records. Separate revenue from cash received, direct costs from overhead and recurring costs from one-off purchases. The method shown for this calculator is '+formulaForValidation+'. Mixing monthly sales with annual costs can make a margin or break-even result misleading.',
+      'Build a base case and a downside case by changing sales volume, selling price and variable cost separately. Check the break-even point as well as the headline margin. A business that appears profitable at the current volume may have little room for lower demand, supplier increases or customer discounts.',
+      'Check whether '+calcTitleForFaq+' excludes taxes, financing charges, depreciation, inventory changes, payment delays or owner compensation. These items can change accounting profit and cash flow in different ways. Use consistent definitions for gross margin, contribution margin and net profit, and reconcile the estimate with the business’s own accounts.',
+      'Record the period, data source, cost definitions and assumptions used in '+calcTitleForFaq+'. Recalculate after changes to pricing, staffing, rent, supplier terms or sales volume. Label forecasts separately from actual results so that an optimistic plan is not mistaken for realised business performance.'
+    ],
+    tax:[
+      'Before using '+calcTitleForFaq+', confirm '+calcInputsText+' for the correct jurisdiction, tax year and filing status. Check whether income is taxable, exempt or subject to a separate rate, and distinguish deductions from rebates or credits. The method shown for this calculator is '+formulaForValidation+'. Do not combine thresholds from different tax years.',
+      'Compare scenarios using the same income, tax year and eligibility assumptions. If you compare tax regimes, change the regime while keeping the underlying facts constant, then check the total liability rather than only one deduction. A result that changes because the tax year changed is not a valid like-for-like comparison.',
+      'Check whether '+calcTitleForFaq+' includes surcharge, cess, local taxes, capital-gain rules, employer benefits, loss offsets or documentation requirements. A calculator cannot validate the evidence needed for a tax return. Use current official tax-authority instructions and forms, especially when a new law or assessment year applies.',
+      'Keep the tax year, jurisdiction, filing status, income breakdown and source documents used in '+calcTitleForFaq+'. Recalculate when income, deductions, residence, filing status or legislation changes. Treat the result as a planning estimate and verify it against the current official portal before filing or making a payment.'
+    ],
+    planning:[
+      'For '+calcTitleForFaq+', define the country, location, time period and unit for '+calcInputsText+' before comparing values. Check whether the amounts are nominal or inflation-adjusted and whether the period is monthly, annual or one-off. The method shown for this calculator is '+formulaForValidation+'.',
+      'Use a base case and a downside case rather than relying on one average. Change the main rate or cost assumption separately and compare the impact on the target. An official index can describe a broad population, but it may not match your household, city, spending pattern or personal timing.',
+      'Check which real-world details '+calcTitleForFaq+' does not model, such as local taxes, contract terms, fees, seasonality or irregular expenses. Use current local data and the relevant public authority for your country. Do not assume that an average inflation rate or market benchmark applies equally to every category.',
+      'Record the date, geography, period, data source and assumptions used in '+calcTitleForFaq+'. Recalculate when prices, rates, household costs or the target date change. Keeping a dated baseline helps you distinguish a genuine change in circumstances from a change caused only by different assumptions.'
+    ]
+  };
+  const validationText=validationParagraphs[calcCategoryForFaq]||validationParagraphs.planning;
+  if(!html.includes('WA-CALCULATOR-VALIDATION-NOTES')){
+    const validationBlock='<!-- WA-CALCULATOR-VALIDATION-NOTES --><section class="calculator-validation-notes"><h2>How to validate '+escapeCalcFaq(calcTitleForFaq)+' before acting</h2>'+validationText.map(paragraph=>'<p>'+escapeCalcFaq(paragraph)+'</p>').join('')+'</section>';
+    html=html.replace(/<\\/article>/i,validationBlock+'</article>');
+  }
   const calculatorSources=sourceSetForCalculator(calcDefinition?.obj||'');
   if(!html.includes('WA-CALCULATOR-AUTHORITATIVE-SOURCES')){
     const sourceItems=calculatorSources.map(item=>'<li><a href="'+item.url+'" rel="noopener noreferrer">'+item.name+'</a> — '+item.reason+'</li>').join('');
