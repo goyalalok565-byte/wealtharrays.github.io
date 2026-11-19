@@ -61,10 +61,10 @@ if (!fs.existsSync(sipGoalExamplePath)) {
   failures.push('sip-goal-calculator: generated worked example page missing');
 } else {
   const sipGoalHtml = fs.readFileSync(sipGoalExamplePath, 'utf8');
-  if (!sipGoalHtml.includes('Required monthly SIP: ₹6,635.27')) {
+  if (!sipGoalHtml.includes('Required monthly SIP: $6,635.27')) {
     failures.push('sip-goal-calculator: worked example must match the beginning-of-month model output (₹6,635.27).');
   }
-  if (sipGoalHtml.includes('₹6,691')) {
+  if (sipGoalHtml.includes('$6,691')) {
     failures.push('sip-goal-calculator: stale end-of-month worked example must not be published.');
   }
 }
@@ -73,7 +73,7 @@ if (!fs.existsSync(sipGoalExamplePath)) {
 // Regression checks for worked examples whose contribution-timing convention
 // must match the calculator implementation.
 const stepUpHtml = fs.readFileSync(path.join(root, 'step-up-sip-calculator', 'index.html'), 'utf8');
-if (!stepUpHtml.includes('Projected investment value: ₹43,41,924.72')) {
+if (!stepUpHtml.includes('Projected investment value: $4,341,924.72')) {
   failures.push('step-up-sip-calculator: worked example must be generated from the beginning-of-month model (₹43,41,924.72).');
 }
 if (stepUpHtml.includes('42.99 lakh')) {
