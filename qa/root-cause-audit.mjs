@@ -42,6 +42,10 @@ for(const file of allSiteHtml){
  if(!/name=["']twitter:card["']/i.test(html))throw new Error(`${file}: twitter:card missing`);
 }
 const socialHtml=fs.readFileSync('index.html','utf8');if(!socialHtml.includes('https://wealtharrays.com/og-image.png')||!socialHtml.includes('image/png'))throw new Error('Social preview must use the 1200x630 PNG asset and MIME type');
+const clsFixes=fs.readFileSync('cls-fixes.css','utf8');if(!clsFixes.includes('#calc-widget{min-height:680px}'))throw new Error('Calculator mount height must be reserved before runtime initialization');
+const searchLoader=fs.readFileSync('search-loader.js','utf8');if(!searchLoader.includes("input.addEventListener('focus',load)")||!searchLoader.includes('window.__WA_SEARCH_LAZY__=true'))throw new Error('Search catalogs must lazy-load on first focus');
+if(fs.readFileSync('index.html','utf8').includes('/homepage-search.js')||fs.readFileSync('tools.html','utf8').includes('/calculator-search.js'))throw new Error('Search catalogs must not be included directly in initial HTML');
+const zlib=require('node:zlib');for(const file of ['homepage-search.js','calculator-search.js'])if(zlib.gzipSync(fs.readFileSync(file)).length>15*1024)throw new Error(file+' gzip size exceeds 15 KB search-index budget');
 const privacyHtml=fs.readFileSync('privacy.html','utf8');if(/does not serve Google AdSense advertisements/i.test(privacyHtml))throw new Error('privacy.html contains stale AdSense disclosure');
 const home=fs.readFileSync('index.html','utf8');if(!home.includes('id="tool-search-results"'))throw new Error('Homepage search results container missing');if(!home.includes('href="/favicon.svg"'))throw new Error('Homepage canonical favicon missing');
 const styles=fs.readFileSync('styles.css','utf8');if(!/\.search-bar\{[^}]*position:relative/i.test(styles)&&!styles.includes('.search-bar{position:relative'))throw new Error('Homepage search parent must be positioned');if(!styles.includes('z-index:1000'))throw new Error('Homepage search parent z-index missing');
