@@ -50,6 +50,8 @@ jobs:
         run: node qa/accessibility-static-audit.mjs
       - name: Build production dist
         run: npm run build:dist
+      - name: Verify deployment exclusions and exact dist manifest
+        run: node qa/build-dist-exclusion-audit.mjs
       - name: Canonical embed source regression
         run: node qa/embed-regression.mjs
       - name: Dist integrity
