@@ -13,23 +13,23 @@ concurrency:
   cancel-in-progress: true
 jobs:
   lighthouse:
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && startsWith(github.head_ref, 'phase0/pr-c')) || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
+    if: ${{ (github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/phase0/pr-c')) || (github.event_name == 'pull_request' && startsWith(github.head_ref, 'phase0/pr-c')) || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || 'main' }}
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || (github.event_name == 'workflow_dispatch' && github.ref) || 'main' }}
       - uses: actions/setup-node@v4
         with:
           node-version: 24
       - name: Verify mobile release gate rejects threshold violations
         run: node --test tests/lighthouse-quality-gate.test.js
       - name: Build PR preview
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
         run: npm run build
       - name: Start PR preview server
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
         run: |
           nohup python3 -m http.server 4173 --directory dist >/tmp/wa-preview.log 2>&1 &
           echo $! >/tmp/wa-preview.pid
@@ -40,7 +40,7 @@ jobs:
           cat /tmp/wa-preview.log
           exit 1
       - name: Wait for production routes
-        if: ${{ github.event_name != 'pull_request' }}
+        if: ${{ github.event_name != 'pull_request' && github.event_name != 'workflow_dispatch' }}
         run: |
           set -euo pipefail
           routes=(/ /tools.html /sip-calculator/ /swp-calculator/ /fire-calculator/ /rent-vs-buy-calculator/ /articles/compound-interest-guide.html)
@@ -50,53 +50,53 @@ jobs:
           npm install --no-save lighthouse@13.0.1 playwright
           npx playwright install chromium --with-deps
       - name: Audit all pre-rendered calculator shells
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
         env:
           SITE_ROOT: dist
         run: node qa/static-calculator-shell-audit.mjs
       - name: Verify calculator shells with JavaScript disabled
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
         env:
           BASE_URL: http://127.0.0.1:4173
         run: node qa/static-calculator-shell-browser-smoke.mjs
       - name: PR browser smoke — canonical calculator embed
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
         env:
           BASE_URL: http://127.0.0.1:4173
         run: node qa/embed-browser-smoke.mjs
       - name: PR browser smoke — all registry calculators and scenario features
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
         env:
           BASE_URL: http://127.0.0.1:4173
         run: node qa/production-browser-smoke.mjs
       - name: PR browser smoke — every calculator, responsive layout, currency, theme, language and exports
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
         env:
           BASE_URL: http://127.0.0.1:4173
         run: node qa/all-calculators-browser-smoke.mjs
       - name: PR browser smoke — cloud workspace save and load
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
         env:
           BASE_URL: http://127.0.0.1:4173
         run: node qa/cloud-workspace-sync-browser-smoke.mjs
       - name: PR browser smoke — third-party scripts respect consent and ad slots
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
         env:
           BASE_URL: http://127.0.0.1:4173
         run: node qa/third-party-loading-browser-smoke.mjs
       - name: Run seven-page mobile Lighthouse baseline
         env:
-          BASE_URL: ${{ github.event_name == 'pull_request' && 'http://127.0.0.1:4173' || 'https://wealtharrays.com' }}
+          BASE_URL: ${{ (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch') && 'http://127.0.0.1:4173' || 'https://wealtharrays.com' }}
           LH_OUTPUT_DIR: /tmp/wa-lighthouse
         run: node qa/mobile-lighthouse-baseline.mjs
       - name: Diagnose homepage TBT without Google Funding Choices
         env:
-          BASE_URL: ${{ github.event_name == 'pull_request' && 'http://127.0.0.1:4173' || 'https://wealtharrays.com' }}
+          BASE_URL: ${{ (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch') && 'http://127.0.0.1:4173' || 'https://wealtharrays.com' }}
           LH_OUTPUT_DIR: /tmp/wa-lighthouse
         run: node qa/homepage-performance-diagnostic.mjs
       - name: Capture SWP typing and scroll CPU profile
         env:
-          BASE_URL: ${{ github.event_name == 'pull_request' && 'http://127.0.0.1:4173' || 'https://wealtharrays.com' }}
+          BASE_URL: ${{ (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch') && 'http://127.0.0.1:4173' || 'https://wealtharrays.com' }}
         run: node qa/performance-profile.mjs
       - name: Enforce strict mobile release thresholds
         run: node qa/lighthouse-quality-gate.mjs /tmp/wa-lighthouse/summary.json
@@ -109,7 +109,7 @@ jobs:
           retention-days: 14
 
   main-homepage-baseline:
-    if: ${{ github.event_name == 'pull_request' && startsWith(github.head_ref, 'phase0/pr-c') }}
+    if: ${{ (github.event_name == 'pull_request' && startsWith(github.head_ref, 'phase0/pr-c')) || (github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/phase0/pr-c')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -119,7 +119,7 @@ jobs:
           path: main
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.ref }}
           path: pr-tools
       - uses: actions/setup-node@v4
         with:
