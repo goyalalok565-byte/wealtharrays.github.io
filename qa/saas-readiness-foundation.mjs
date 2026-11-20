@@ -22,6 +22,8 @@ const premiumBuild = fs.readFileSync('scripts/phase4-premium-build.mjs', 'utf8')
 const adLoader = fs.readFileSync('wa-ad-loader.js', 'utf8');
 const migration = fs.readFileSync('migrations/0001_saas.sql', 'utf8');
 const webhookOrderMigration = fs.readFileSync('migrations/0002_billing_webhook_order.sql', 'utf8');
+const trialMigration = fs.readFileSync('migrations/0003_pro_trials.sql', 'utf8');
+const checkoutLockMigration = fs.readFileSync('migrations/0004_billing_checkout_locks.sql', 'utf8');
 for (const [name, source] of [['widget.js', widget], ['wa-calculator-runtime.js', runtime]]) {
   assert.match(source, /toLocaleString\(['"]en-IN['"]/ , name + ' must format numbers using Indian grouping');
   assert.match(source, /waScenarioUrl/, name + ' must build scenario links with input values');
@@ -55,6 +57,10 @@ assert.match(auth, /email_verified: Boolean\(user\.email_confirmed_at \|\| user\
 assert.match(authConfig, /SUPABASE_ANON_KEY/);
 assert.match(scenarios, /DELETE FROM saved_scenarios WHERE id = \? AND user_id = \?/);
 assert.match(checkout, /RAZORPAY_PLAN_MONTHLY/);
+assert.match(checkout, /INSERT OR IGNORE INTO billing_checkout_locks/);
+assert.match(checkout, /CHECKOUT_RECOVERY_REQUIRED/);
+assert.match(checkoutLockMigration, /PRIMARY KEY/);
+assert.match(trialMigration, /UNIQUE/);
 assert.match(trial, /EMAIL_VERIFICATION_REQUIRED/);
 assert.match(trial, /TRIAL_DAYS = 14/);
 assert.match(trial, /INSERT OR IGNORE INTO pro_trials/);
