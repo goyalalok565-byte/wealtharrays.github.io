@@ -56,6 +56,12 @@ const forbiddenProbes = [
   '/package.json',
   '/wrangler.toml',
   '/content-sources.json',
+  '/wa-core.js',
+  '/site-runtime.js',
+  '/final-polish.js',
+  '/theme-fix.js',
+  '/phase3-seo.js',
+  '/phase4-premium.js',
   '/private-backup.zip'
 ];
 const leaked = [];
