@@ -17,10 +17,10 @@ Trust is the moat. AI may parse intent, select/explain approved deterministic mo
 
 ## Repository and architecture
 
-Repository: `goyalalok565-byte/wealtharrays.github.io`, default branch `main`. Static site deploys via Cloudflare Pages; `worker.mjs` is a separate Cloudflare Worker API entry point, configured by `wrangler.toml`.
+Repository: `goyalalok565-byte/wealtharrays.github.io`, default branch `main`. The current deployment source uses a Wrangler-managed Cloudflare Worker with Workers Static Assets; `wrangler.toml` points to `dist/` and routes `/v1/*` through `worker.mjs`. Do not describe this as a separate Pages Functions deployment. Production branch control, active version and traffic allocation still require Cloudflare dashboard verification.
 
 Read first after any context reset:
-- `docs/PROJECT_STATE.md` (single source of truth)
+- `docs/PROJECT_STATE.md` (single source of truth; read its top-level “Current authoritative release status” first)
 - `ARCHITECTURE.md`
 - `GLOBAL-PRODUCT-ROADMAP.md`
 - `GLOBAL-PLATFORM-SPEC.md`
@@ -33,8 +33,8 @@ Current architecture includes 55 calculator definitions in `calculators.js`, gen
 ## Roadmap order — do not skip phases
 
 **Phase 0 — stabilize first (P0):**
-1. Fix calculator CLS: static `#calc-widget` host must receive `.calc-widget` before runtime mount so 520px reservation applies. PR #78 was closed without merging and superseded by the consolidated Phase 0 release candidate PR #88. Do not treat PR #78 as an active release candidate.
-2. Enforce mobile Lighthouse gates on built PR preview: Performance >= 90, CLS <= 0.10, TBT <= 200 ms, LCP <= 2.5 s. Add negative tests proving failures. Never lower thresholds to turn CI green. Do not treat TBT as INP.
+1. PR #97 (`phase0/pr-c-final`) is the active Phase 0 release candidate. Static calculator shells, CLS reservation, hydration guards and route performance work are implemented and have passed the seven-route mobile Lighthouse gate at code head `955aac3fc9515c68847128648c794c9a90207f20`. Do not create another branch or merge PR #97 without the owner's exact `merge approved` phrase.
+2. Keep the mobile release thresholds unchanged: Performance >= 90, CLS <= 0.10, TBT <= 200 ms, LCP <= 2.5 s, Accessibility >= 95, Best Practices >= 80 and SEO >= 90. The latest code-head results are lab measurements, not physical-device or field INP evidence. Never treat TBT as INP.
 3. Fix year-aware Indian tax terminology. FY/Tax Year 2026-27 under Income-tax Act, 2025 uses Section 156; legacy AY 2026-27 under the 1961 Act may still use Section 87A. Verify current Income Tax Department/Gazette sources, add regression tests and ask a CA/lawyer to review eligibility language. Never change tax formulas without reference vectors and approval.
 4. Make `calculators.js` the single source for counts/lists in pages, navigation, sitemap, `llms.txt`, metadata, workflows and tests. Remove stale “47 calculators”.
 5. Add `GET /v1/health`: status, version, safe dependency checks, no secrets, tests and monitoring.
@@ -52,7 +52,7 @@ Do not start later phases while earlier P0s remain open unless the owner explici
 
 - Start with docs and repo state; inspect uploaded ZIP if provided.
 - Give a concise audit with 0–100 scores for accuracy, performance, interaction smoothness, SEO, AEO/GEO, content, accessibility, security, globalization and SaaS readiness; label scores as estimates vs measured data.
-- Work in small PRs; never commit directly to main. Update `docs/PROJECT_STATE.md` in every PR.
+- Work in small PRs; never commit directly to main. Until PR #97 is merged, keep work on `phase0/pr-c-final` and do not create a new branch. Update `docs/PROJECT_STATE.md` in every engineering batch.
 - Require CI, snapshot/golden tests and browser smoke tests. Never merge or say “done” without verification.
 - Clearly separate: verified on production; verified in CI/local; written but not verified.
 - Do not change financial formulas without authoritative reference calculation, test and one-line rationale.
@@ -64,11 +64,13 @@ Do not start later phases while earlier P0s remain open unless the owner explici
 
 ## Current audit baseline (2026-11-20)
 
-Preliminary repo/CI scores: accuracy 72, performance 68, interaction 50, SEO 84, AEO/GEO 65, content 55, accessibility 75, security 70, globalization 32, SaaS readiness 35. These are engineering assessments, not production KPIs.
+Historical ZIP-based estimates (accuracy 72, interaction 50, SEO 84, AEO/GEO 65, content 55, security 70, globalization 32, SaaS readiness 35) are preliminary assessments, not production KPIs. The older performance 68 and accessibility 75 estimates are superseded for the PR #97 preview by measured lab results below; they must not be represented as current field metrics.
 
-Verified in uploaded ZIP/local: 55 definitions; 48/48 tests passed; `npm run build:dist` passed; 117 HTML pages passed site integrity; value-content 55/55 passed; local dist contained 248 public files with no inspected internal paths; static accessibility audit passed. `qa/performance-budget-audit.mjs` failed: calculator runtime 129,214 bytes vs 118,000 budget.
+Latest verified code head `955aac3fc9515c68847128648c794c9a90207f20`: seven-route mobile Lighthouse, three runs per route, minimum Performance 98, minimum Accessibility 96, maximum CLS 0.0757, maximum TBT 87.28ms and maximum LCP 1,905.17ms. Exact-head Canonical CI run 44765905682, Platform Gates run 44765905532 and Mobile Lighthouse run 44765905615 passed. The test used 360x800 CSS px, DPR 2, simulated slow 4G and 4x CPU slowdown; this is not a physical Android or field INP measurement.
 
-GitHub CI: PR #88 head 6221a1b has Canonical CI and Platform Gates passing; Mobile Lighthouse failed strict LCP on three routes (SWP 2,656 ms, rent-vs-buy 2,611 ms, compound-interest article 2,553 ms; limit 2,500 ms). The Cloudflare Workers bot reported a successful production build for this unmerged head (build record: https://dash.cloudflare.com/?to=/f5619318297695cabb3a1540854cb166/workers/services/view/wealtharrays-github-io/production/builds/dafa123a-596b-481b-96ae-53f8e2fbc029). This is a production Worker deployment report, not Pages deployment or live health verification. Homepage TBT baseline comparison with main remains unverified.
+The latest 55-page HTML audit found unique title/meta/H1/canonical and worked examples on 55/55 pages, 2–4 visible FAQs per page, 682–1,126 words per page, 0/55 external authoritative source links and 0/55 FAQPage structured data. Formula snapshots are regression protection, not independent proof of correctness.
+
+PR #97 remains open and unmerged. Production Cloudflare branch control/version, live `/v1/health`, production compression, live authentication/entitlements/billing, backups/alerts, CA/legal review and physical-device/field measurements remain unverified. Never describe a Worker build record as proof that the intended candidate serves production.
 
 ## Secrets checklist (names only)
 
