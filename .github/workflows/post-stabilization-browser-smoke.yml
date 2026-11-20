@@ -140,6 +140,11 @@ jobs:
           echo "Final observed asset URLs: home=$actual_home site=$actual_site calc=$actual_calc"
           exit 1
 
+      - name: Verify production deployment manifest and internal path exclusions
+        env:
+          BASE_URL: https://wealtharrays.com
+        run: node qa/production-deployment-hygiene.mjs
+
       - name: Production embed browser smoke
         env:
           BASE_URL: https://wealtharrays.com
