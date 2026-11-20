@@ -294,7 +294,7 @@ Never treat repository source, local builds or CI deploy messages as proof of li
 
 ### Preference and localization follow-up authored after the verified head
 
-- Home/tools theme toggle now receives an early delegated handler; calculator pages retain their canonical runtime handler.
+- Added Playwright coverage for the existing bundled theme handlers on home and tools pages, including persisted theme state; the synchronous theme bootstrap remains small and does not add a competing click handler.
 - Homepage currency now reads and writes the shared `waCurrency` preference so it survives reloads and is shared with calculator pages.
 - The localization API advertises only languages with complete dictionaries (currently English and Hindi); the UI does not yet provide a full language switcher or full-site translation.
 - Added Playwright coverage for theme/currency persistence and a localization dictionary audit. The all-calculator smoke label now accurately describes its tested scope.

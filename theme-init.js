@@ -1,39 +1,9 @@
-/* Synchronous theme bootstrap; small interaction wiring is installed before first paint. */
+/* Synchronous theme bootstrap only; non-critical site enhancements run after load. */
 (function(){
-  'use strict';
-  function applyTheme(value){
-    var theme=value==='dark'?'dark':'light';
-    document.documentElement.dataset.theme=theme;
-    var meta=document.querySelector('meta[name="theme-color"]');
-    if(meta)meta.setAttribute('content',theme==='dark'?'#080a0f':'#f7f8fb');
-    document.querySelectorAll('#theme-toggle,.theme-toggle').forEach(function(button){
-      button.setAttribute('aria-pressed',String(theme==='dark'));
-      button.setAttribute('aria-label','Switch to '+(theme==='dark'?'light':'dark')+' mode');
-      var label=button.querySelector('[data-theme-label],#theme-toggle-label');
-      if(label)label.textContent=theme==='dark'?'Light mode':'Dark mode';
-    });
-  }
   try{
-    var savedTheme=localStorage.getItem('waTheme');
-    if(savedTheme==='dark'||savedTheme==='light')document.documentElement.dataset.theme=savedTheme;
+    var theme=localStorage.getItem('waTheme');
+    if(theme==='dark'||theme==='light')document.documentElement.dataset.theme=theme;
   }catch(_error){}
-  function syncThemeButton(){applyTheme(document.documentElement.dataset.theme||'light');}
-  // Calculator pages and pages with the canonical site runtime already own theme clicks.
-  // The early delegated handler fills the gap on lightweight pages such as the homepage.
-  document.addEventListener('click',function(event){
-    var target=event.target;
-    var button=target&&typeof target.closest==='function'?target.closest('#theme-toggle,.theme-toggle'):null;
-    if(!button||window.__WEALTH_ARRAYS_CORE_LOADED__||document.querySelector('.calc-page'))return;
-    event.preventDefault();
-    var next=document.documentElement.dataset.theme==='dark'?'light':'dark';
-    try{localStorage.setItem('waTheme',next);}catch(_error){}
-    applyTheme(next);
-  },true);
-  window.addEventListener('storage',function(event){
-    if(event.key==='waTheme')applyTheme(event.newValue==='dark'?'dark':'light');
-  });
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',syncThemeButton,{once:true});
-  else syncThemeButton();
   function loadProductionHotfix(){
     if(document.querySelector('script[data-wa-production-hotfix]'))return;
     var script=document.createElement('script');
