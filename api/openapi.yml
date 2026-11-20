@@ -9,7 +9,7 @@ paths:
       summary: Report API version, liveness and safe dependency readiness
       operationId: getApiHealth
       responses:
-        '200': {description: API is live; optional dependencies may be unconfigured}
+        '200': {description: API is live; optional dependencies may be unconfigured; response includes ready_for_saas}
         '503': {description: A configured database dependency is unavailable}
   /v1/auth-config:
     get:
