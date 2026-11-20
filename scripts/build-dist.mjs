@@ -17,7 +17,7 @@ const EXCLUDE_DIRS = EXCLUDED_DIRECTORY_NAMES;
 const EXCLUDE_ROOT = new Set([
   'ARCHITECTURE.md','PHASE10_AUDIT.md','PHASE3_FINAL.md','QA_TESTS.md',
   'README-RELEASE.md','STABILIZATION-PLAN.md','GLOBAL-PLATFORM-SPEC.md',
-  'GLOBAL-PRODUCT-ROADMAP.md','content-sources.json','CNAME'
+  'GLOBAL-PRODUCT-ROADMAP.md','content-sources.json','CNAME','wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js'
 ]);
 
 fs.rmSync(out, { recursive: true, force: true });
