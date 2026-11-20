@@ -192,3 +192,6 @@ CI scope: strict seven-route Lighthouse runs on PR C (performance branch), manua
 Pro monthly test cells are reserved for after the Pro MVP only: India ₹199 / ₹299 / ₹399; USD $7 / $9 / $12; EUR €7 / €9 / €11; GBP £6 / £8 / £10. Annual cells may compare 10-month equivalent pricing (~16.7% discount) against 20% off. These are approved experiment candidates, not current live prices.
 
 Ultra remains waitlist-only: no public checkout, no paid launch and no Ultra pricing experiment while it is in waitlist/invite-only beta. The previously proposed Ultra price cells are deferred and must not be shown as current offers.
+
+
+PR C CI also builds the current `main` commit in a separate job and runs the same seven-route Lighthouse settings plus the same homepage-with/without-Funding-Choices TBT diagnostic. Artifacts are uploaded separately as `wealth-arrays-main-homepage-baseline` so homepage TBT can be compared against the PR build without changing throttling or thresholds.
