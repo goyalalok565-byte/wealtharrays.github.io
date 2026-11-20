@@ -49,6 +49,16 @@ jobs:
         run: |
           npm install --no-save lighthouse@13.0.1 playwright
           npx playwright install chromium --with-deps
+      - name: Audit all pre-rendered calculator shells
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          SITE_ROOT: dist
+        run: node qa/static-calculator-shell-audit.mjs
+      - name: Verify calculator shells with JavaScript disabled
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          BASE_URL: http://127.0.0.1:4173
+        run: node qa/static-calculator-shell-browser-smoke.mjs
       - name: PR browser smoke — canonical calculator embed
         if: ${{ github.event_name == 'pull_request' }}
         env:
