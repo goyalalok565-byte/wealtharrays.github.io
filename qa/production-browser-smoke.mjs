@@ -297,5 +297,5 @@ try {
 
   if (failedResponses.length) throw new Error(`Failed network responses: ${failedResponses.join(' | ')}`);
   if (errors.length) throw new Error(`Browser errors: ${errors.join(' | ')}`);
-  console.log(`Production browser smoke passed at ${baseUrl}: homepage, all 55 calculators, explicit Calculate/Compare interactions, shareable inputs, local save/load, PDF download, and 375px mobile overflow checks are healthy.`);
+  console.log(`Production browser smoke passed at ${baseUrl}: homepage, all registry calculators, explicit Calculate/Compare interactions, shareable inputs, local save/load, PDF download, and 375px mobile overflow checks are healthy.`);
 } finally { await browser.close(); }
