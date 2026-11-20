@@ -176,3 +176,12 @@ CI scope: strict seven-route Lighthouse runs on PR C (performance branch), manua
 - Lighthouse reported ~67KiB unused CSS and ~66KiB unused calculator runtime JS on affected routes; these remain optimization leads, not proven sole causes. No blanket script deferral or CSS rewrite is claimed.
 - PR #88 preview homepage TBT was 0ms; blocking Funding Choices also measured 0ms. A same-settings main-branch comparison has not been run, so historical 7,510ms-to-current remains unverified.
 - Strict seven-route thresholds remain unchanged: Performance >=90, CLS <=0.10, TBT <=200ms, LCP <=2,500ms, Accessibility >=95, Best Practices >=80, SEO >=90. PR C must pass fresh seven-route CI; no pass is claimed yet.
+
+
+## Cloudflare Workers production-branch control — verified incident
+
+- PR #88 bot deployment comment reports successful production deployment for unmerged head `6221a1b4` at 05:14 UTC: https://dash.cloudflare.com/?to=/f5619318297695cabb3a1540854cb166/workers/services/view/wealtharrays-github-io/production/builds/dafa123a-596b-481b-96ae-53f8e2fbc029 .
+- PR #93 bot deployment comment also reports successful production deployment for unmerged head `20de71f1` at 06:13 UTC: https://dash.cloudflare.com/?to=/f5619318297695cabb3a1540854cb166/workers/services/view/wealtharrays-github-io/production/builds/dfb200ba-8f7c-40cc-994c-2fb21b759d73 .
+- These are production-build/deployment bot records, not Preview URLs. Current active version/traffic percentage and Pages production deployment are not verified from the repository.
+- Cloudflare Worker Settings → Build → Branch control must be checked. The production branch should be `main`; enable Worker Previews for non-production branches and use the Preview command (`npx wrangler preview`). If this Worker is still on legacy branch-build mode, complete the one-time switch to Worker Previews. Official docs: https://developers.cloudflare.com/workers/ci-cd/builds/build-branches/ and https://developers.cloudflare.com/workers/ci-cd/builds/configuration/ .
+- Dashboard rollback: Workers & Pages → Worker → Deployments → three-dot menu on last-known-good version → Rollback. Rollback routes 100% traffic to that version; D1/KV/R2/DO resources are not rolled back and must be checked separately. Official: https://developers.cloudflare.com/workers/versions-and-deployments/rollbacks/ .
