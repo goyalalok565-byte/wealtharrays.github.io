@@ -124,13 +124,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: npm
-          cache-dependency-path: main/package-lock.json
       - name: Install main dependencies and Lighthouse
         working-directory: main
         run: |
-          npm ci
-          npm install --no-save lighthouse@13.0.1 playwright
+          npm install --no-package-lock
+          npm install --no-save --no-package-lock lighthouse@13.0.1 playwright
           npx playwright install chromium --with-deps
       - name: Build main branch baseline
         working-directory: main
