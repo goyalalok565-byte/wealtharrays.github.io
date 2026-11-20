@@ -26,7 +26,10 @@ try {
     await button.click();
     await page.waitForTimeout(100);
     const label = (await button.innerText()).trim();
-    const copied = await page.evaluate(() => navigator.clipboard.readText().catch(() => ''));
+    const copied = await page.evaluate(async () => {
+      const timeout = new Promise(resolve => setTimeout(() => resolve(''), 2000));
+      return await Promise.race([navigator.clipboard.readText().catch(() => ''), timeout]);
+    });
     if (!/Embed copied/.test(label)) throw new Error(`Copy Embed did not report success on ${item.slug}: ${label}`);
     if (!copied.includes(`/widget/?calc=${item.id}`)) throw new Error(`Clipboard embed URL is incorrect on ${item.slug}: ${copied}`);
     const widgetPath = '/widget/';

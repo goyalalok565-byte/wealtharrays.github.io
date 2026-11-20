@@ -396,3 +396,15 @@ html.wa-home-ready #wa-home-tool-grid:not(.is-expanded) .home-tool-card:nth-chil
 
 /* Keep the mobile hero's natural reading order: heading and intro before search. */
 @media(max-width:760px){.ledger-hero .tool-search-shell{order:0!important}}
+
+/* Lighthouse-backed homepage accessibility repairs (2026-11-20). */
+.wa-emi-result{color:var(--text)!important}
+.wa-emi-result>span{color:var(--text)!important;opacity:1!important}
+.wa-emi-result-meta span{color:var(--text)!important;opacity:1!important}
+.wa-text-link,.section-head>a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 12px;position:relative;z-index:2}
+@media(max-width:760px){
+  #wa-home-tool-grid{row-gap:24px!important;column-gap:24px!important}
+  .cat-grid{row-gap:24px!important;column-gap:24px!important}
+  .section-head{row-gap:12px}
+  .section-head>a{margin-block:8px}
+}

@@ -25,6 +25,17 @@ let changed=0;
 for(const file of htmlFiles){
   let s=fs.readFileSync(file,'utf8');
   const before=s;
+  // The calculator host must carry the class used by its layout, styling and CLS reservation
+  // before the deferred calculator runtime mounts. Adding it only after mount creates a large
+  // layout shift and leaves the calculator surface unstyled during initial rendering.
+  s=s.replace(/<div\b[^>]*\bid=["']calc-widget["'][^>]*>/gi, (tag) => {
+    const classAttr = tag.match(/\bclass=(["'])(.*?)\1/i);
+    if (classAttr) {
+      if (/(?:^|\s)calc-widget(?:\s|$)/.test(classAttr[2])) return tag;
+      return tag.replace(classAttr[0], `class=${classAttr[1]}${classAttr[2]} calc-widget${classAttr[1]}`);
+    }
+    return tag.replace(/>$/, ' class="calc-widget">');
+  });
   s=s.replace(/<script>[^<]*(?:document\.documentElement\.dataset\.theme|localStorage\.(?:waTheme|getItem\(['"]waTheme['"]\)))[^<]*<\/script>/gi, '');
   if(!s.includes('/theme-init.js')) s=s.replace('</head>',`${themeJs}</head>`);
   // Replace every inline calculator bootstrap, including legacy formatting variants.
@@ -50,7 +61,11 @@ for(const file of htmlFiles){
   // AdSense is intentionally excluded from 404.html and widget.html.
   // 404 is an error/low-value page; widget.html may be embedded on third-party domains.
   const noindex=/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(s);
-  const adsenseExcluded=['index.html','404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html','research.html','category-investment.html','category-loan.html','category-banking.html','category-retirement.html','category-salary.html','category-business.html','financial-workspace.html','goal-planner.html','scenario-lab.html','home-loan-emi-calculator/index.html','loan-emi-calculator/index.html','loan-interest-calculator/index.html'].includes(routeName) || noindex;
+  // Load AdSense only when this page contains a real publisher ad unit. A
+  // site-wide loader on pages with no <ins class="adsbygoogle" data-ad-slot>
+  // wastes mobile CPU/network and can request ads where no placement exists.
+  const hasAdSlot=/<ins\b(?=[^>]*\bclass=["'][^"']*\badsbygoogle\b)(?=[^>]*\bdata-ad-slot=["'][^"']+["'])[^>]*>/i.test(s);
+  const adsenseExcluded=['index.html','404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html','research.html','category-investment.html','category-loan.html','category-banking.html','category-retirement.html','category-salary.html','category-business.html','financial-workspace.html','goal-planner.html','scenario-lab.html','home-loan-emi-calculator/index.html','loan-emi-calculator/index.html','loan-interest-calculator/index.html'].includes(routeName) || noindex || !hasAdSlot;
   const consentExcluded=['404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html'].includes(routeName) || noindex;
   if(consentExcluded){
     s=s.replace(/<script[^>]+src=["']\/consent-loader\.js[^>]*><\/script>/gi,'');
@@ -63,6 +78,10 @@ for(const file of htmlFiles){
   // plus wa-ad-loader.js caused the same third-party library to be injected twice.
   s=s.replace(staticAdScript,'');
   s=s.replace(adLoaderScript,'');
+  if(!hasAdSlot) {
+    // Do not preconnect to ad networks on pages that have no ad placement.
+    s=s.replace(/<link\b(?=[^>]*\brel=["']preconnect["'])(?=[^>]*\bhref=["']https:\/\/(?:pagead2\.googlesyndication\.com|googleads\.g\.doubleclick\.net)(?:\/|["']))[^>]*>/gi,'');
+  }
   if(!adsenseExcluded) s=s.replace('</head>',adsenseJs+'</head>');
   if(id && s.includes('id="calc-widget"') && base!=='widget.html'){
     if(!s.includes('/wa-calculator-runtime.js')) s=s.replace('</body>','<script src="/wa-calculator-runtime.js" defer></script></body>');
