@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Wealth Arrays Financial Engine API
-  version: 1.2.0
+  version: 1.3.0
   description: Versioned financial calculations, indicative FX rates, a limited Indian tax estimate, authenticated scenario storage and subscription endpoints. Cloudflare bindings, Supabase authentication and Razorpay plans require deployment configuration.
 paths:
   /v1/health:
@@ -179,7 +179,7 @@ components:
       type: object
       required: [model, inputs]
       properties:
-        model: {type: string, enum: [sip, loan-emi, home-loan-emi, compound-interest, fixed-deposit, lumpsum, gst, cagr, inflation, simple-interest, currency-converter, roi, recurring-deposit, net-worth, profit-margin, sip-goal, car-loan, mortgage, personal-loan, debt-payoff, salary-hourly, overtime, freelance-rate, freedom-milestone, emergency-fund, budget-50-30-20, break-even, cost-of-delay, rule-of-72, credit-card-payoff], description: Registered model ID; see GET /v1/models}
+        model: {type: string, enum: [sip, loan-emi, home-loan-emi, compound-interest, fixed-deposit, lumpsum, gst, cagr, inflation, simple-interest, currency-converter, roi, recurring-deposit, net-worth, profit-margin, sip-goal, car-loan, mortgage, personal-loan, debt-payoff, salary-hourly, overtime, freelance-rate, freedom-milestone, emergency-fund, budget-50-30-20, break-even, cost-of-delay, rule-of-72, credit-card-payoff, step-up-sip, swp, fire], description: Registered model ID; see GET /v1/models}
         model_version: {type: string, description: Optional exact model version; server must reject unsupported versions}
         inputs: {type: object, additionalProperties: true}
         assumptions: {type: object, additionalProperties: true}

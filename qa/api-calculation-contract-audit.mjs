@@ -37,10 +37,13 @@ const cases = {
   "break-even": [{ fixedCosts: 150000, price: 150, variableCost: 60, targetProfit: 50000, days: 30 }, [90, 1667, 250050, 1667 / 30, 2223]],
   "cost-of-delay": [{ monthly: 1000, annualRate: 0, years: 2, delay: 1 }, [24000, 12000, 12000, 2000]],
   "rule-of-72": [{ rate: 8, multiple: 3 }, [9, 9.006468342000588, -0.006468342000587768, 14.274914586003177]],
-  "credit-card-payoff": [{ balance: 80000, apr: 36, payment: 8000 }, [13, 16540.373489041325, 96540.37348904133]]
+  "credit-card-payoff": [{ balance: 80000, apr: 36, payment: 8000 }, [13, 16540.373489041325, 96540.37348904133]],
+  "step-up-sip": [{ monthly: 1000, stepUp: 0, rate: 0, years: 1 }, [12000, 12000, 0]],
+  swp: [{ corpus: 12000, withdrawal: 1000, rate: 0, years: 1, stepUp: 0 }, [12000, 0, 0, 1]],
+  fire: [{ annualExpenses: 600000, currentSavings: 15000000, monthlySavings: 0, stepUp: 0, returnRate: 10, inflation: 6, withdrawalRate: 4 }, [0, 15000000, 15000000, 15000000, 600000]]
 };
 
-assert.equal(mod.API_VERSION, "1.2.0");
+assert.equal(mod.API_VERSION, "1.3.0");
 assert.equal(mod.MODEL_LIST.length, Object.keys(cases).length, "Every published API model must have a contract vector");
 assert.deepEqual(mod.MODEL_LIST.map(model => model.id).sort(), Object.keys(cases).sort(), "Published model catalogue and contract vectors must match");
 const openapi = fs.readFileSync("api/openapi.yml", "utf8");
@@ -73,6 +76,8 @@ assert.throws(() => mod.calculate("salary-hourly", { amount: 50000, hoursPerWeek
 assert.throws(() => mod.calculate("loan-emi", { principal: -1, annualRate: 5, months: 12 }), /principal must be between/);
 assert.throws(() => mod.calculate("loan-emi", { principal: 1000, annualRate: 5, months: 0 }), /months must be between/);
 assert.throws(() => mod.calculate("cost-of-delay", { monthly: 1000, annualRate: 5, years: 2, delay: 3 }), /delay must not exceed years/);
+assert.throws(() => mod.calculate("step-up-sip", { monthly: 1000, stepUp: 5, rate: 5, years: 0 }), /years must be between/);
+assert.throws(() => mod.calculate("fire", { annualExpenses: 1000, currentSavings: 0, monthlySavings: 0, stepUp: 0, returnRate: 5, inflation: 2, withdrawalRate: 0 }), /withdrawalRate must be between/);
 assert.equal(mod.calculate("break-even", { fixedCosts: 1000, price: 10, variableCost: 10, targetProfit: 100, days: 30 }).results[1].value, 0, "No positive contribution means no break-even volume.");
 assert.throws(() => mod.calculate("cagr", { startValue: 100, endValue: 120, years: 0 }), /greater than zero/);
 assert.throws(() => mod.calculate("gst", { amount: 100, rate: 18, mode: "unknown" }), /mode must be/);

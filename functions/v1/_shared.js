@@ -1,4 +1,4 @@
-export const API_VERSION = "1.2.0";
+export const API_VERSION = "1.3.0";
 export const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
@@ -41,7 +41,10 @@ export const MODEL_LIST = [
   { id: "break-even", version: API_VERSION, title: "Business break-even", inputs: ["fixedCosts", "price", "variableCost", "targetProfit", "days"], assumptions: "Contribution is selling price less variable cost; unit counts are rounded up; if contribution is not positive, no break-even is possible." },
   { id: "cost-of-delay", version: API_VERSION, title: "SIP cost of delay", inputs: ["monthly", "annualRate", "years", "delay"], assumptions: "Beginning-of-month contributions; constant assumed nominal rate; delayed contributions finish on the same goal date." },
   { id: "rule-of-72", version: API_VERSION, title: "Rule of 72", inputs: ["rate", "multiple"], assumptions: "Rule of 72 is an approximation; exact doubling and target-multiple periods use discrete annual compounding." },
-  { id: "credit-card-payoff", version: API_VERSION, title: "Fixed-payment credit card payoff", inputs: ["balance", "apr", "payment"], assumptions: "Monthly interest is added before a fixed payment; excludes new purchases, fees, rate changes and issuer-specific rules; capped at 1,200 months." }
+  { id: "credit-card-payoff", version: API_VERSION, title: "Fixed-payment credit card payoff", inputs: ["balance", "apr", "payment"], assumptions: "Monthly interest is added before a fixed payment; excludes new purchases, fees, rate changes and issuer-specific rules; capped at 1,200 months." },
+  { id: "step-up-sip", version: API_VERSION, title: "Step-up SIP projection", inputs: ["monthly", "stepUp", "rate", "years"], assumptions: "Monthly contribution increases at the start of each investment year; each contribution is added at the beginning of the month and compounds monthly at a constant assumed rate." },
+  { id: "swp", version: API_VERSION, title: "Systematic withdrawal plan", inputs: ["corpus", "withdrawal", "rate", "years", "stepUp"], assumptions: "Withdrawal is taken at the beginning of each month before monthly growth; annual withdrawal step-up applies from month 13; excludes taxes, fees and return volatility." },
+  { id: "fire", version: API_VERSION, title: "Financial independence timeline", inputs: ["annualExpenses", "currentSavings", "monthlySavings", "stepUp", "returnRate", "inflation", "withdrawalRate"], assumptions: "Annual spending grows with assumed inflation; monthly contributions compound monthly and step up annually; target corpus equals projected annual spending divided by user-supplied withdrawal rate; planning estimate, not a retirement guarantee." }
 ];
 const numeric = (v, name, { min = 0, max = 1e15, optional = false, fallback } = {}) => {
   if (optional && (v === undefined || v === null || v === "")) v = fallback;
@@ -291,6 +294,53 @@ export function calculate(model, input) {
         results = [number("Months to pay off", months), money("Total interest paid", interestPaid), money("Total payments", totalPaid)];
         assumptions = "Fixed monthly payment with monthly interest added first; excludes fees, new purchases, rate changes and issuer-specific rules.";
       }
+      break;
+    }
+    case "step-up-sip": {
+      const monthly = n("monthly"), stepUp = n("stepUp", { max: 100 }), annualRate = n("rate", { max: 100 }), duration = n("years", { min: 1, max: 60 });
+      const monthlyRate = annualRate / 1200;
+      let balance = 0, invested = 0;
+      for (let year = 0; year < duration; year++) {
+        const contribution = monthly * Math.pow(1 + stepUp / 100, year);
+        for (let month = 0; month < 12; month++) { balance = (balance + contribution) * (1 + monthlyRate); invested += contribution; }
+      }
+      results = [money("Projected investment value", balance, "positive"), money("Total contributions", invested), money("Estimated growth", balance - invested)];
+      assumptions = "Monthly contribution increases at the start of each investment year; each contribution is added at the beginning of the month and compounds monthly at a constant assumed rate.";
+      break;
+    }
+    case "swp": {
+      const corpus = n("corpus"), withdrawal = n("withdrawal"), annualRate = n("rate", { max: 50 }), duration = n("years", { min: 1, max: 60 }), stepUp = n("stepUp", { max: 50 });
+      const months = Math.round(duration * 12), monthlyRate = annualRate / 1200;
+      let balance = corpus, planned = withdrawal, withdrawn = 0, fundedMonths = 0, exhausted = false;
+      for (let month = 1; month <= months; month++) {
+        if (month > 1 && (month - 1) % 12 === 0) planned *= 1 + stepUp / 100;
+        const taken = Math.min(planned, balance);
+        balance -= taken; withdrawn += taken;
+        if (taken + 0.005 < planned) { exhausted = true; break; }
+        fundedMonths += 1; balance *= 1 + monthlyRate;
+      }
+      const growth = balance + withdrawn - corpus;
+      results = [money("Total amount withdrawn", withdrawn), money(exhausted ? "Balance left (corpus exhausted)" : "Balance left after the period", balance), money("Investment growth earned", growth), number(exhausted ? "Years the corpus pays the full withdrawal" : "Years of full withdrawals funded", fundedMonths / 12)];
+      assumptions = "Withdrawal is taken at the beginning of each month before monthly growth; annual withdrawal step-up applies from month 13; excludes taxes, fees and return volatility.";
+      break;
+    }
+    case "fire": {
+      const spending = n("annualExpenses"), currentSavings = n("currentSavings"), monthlySavings = n("monthlySavings");
+      const stepUp = n("stepUp", { max: 50 }) / 100, annualRate = n("returnRate", { max: 30 }) / 1200;
+      const inflation = n("inflation", { max: 30 }) / 100, withdrawal = n("withdrawalRate", { min: 0.5, max: 10 }) / 100;
+      let portfolio = currentSavings, saving = monthlySavings, reachedYear = -1, target = 0, spendThen = 0, portfolioThen = 0;
+      for (let year = 0; year <= 60; year++) {
+        spendThen = spending * Math.pow(1 + inflation, year);
+        target = spendThen / withdrawal;
+        portfolioThen = portfolio;
+        if (portfolio >= target) { reachedYear = year; break; }
+        if (year === 60) break;
+        for (let month = 0; month < 12; month++) portfolio = (portfolio + saving) * (1 + annualRate);
+        saving *= 1 + stepUp;
+      }
+      const reached = reachedYear >= 0, yearsNeeded = reached ? reachedYear : 60;
+      results = [number(reached ? "Years to financial independence" : "Not reached within 60 years", yearsNeeded), money("Corpus needed at that point", target), money("Same corpus in today's money", target / Math.pow(1 + inflation, yearsNeeded)), money("Projected portfolio at that point", portfolioThen), money("Annual spending at that point", spendThen)];
+      assumptions = "Annual spending grows with assumed inflation; monthly contributions compound monthly and step up annually; target corpus equals projected annual spending divided by user-supplied withdrawal rate; planning estimate, not a retirement guarantee.";
       break;
     }
     default: throw Object.assign(new Error("Unsupported model. Use GET /v1/models to list supported models."), { unsupported: true });
