@@ -91,19 +91,22 @@ jobs:
         run: |
           set -euo pipefail
           export SOURCE_DATE_DATE="$(git log -1 --format=%cs)"
-          rm -rf dist
-          # Warm up generators once: the first build normalizes tracked HTML from the pre-build source state.
-          npm run build
-          rm -rf dist
-          npm run build
-          find dist -type f -printf '%P\n' | LC_ALL=C sort > /tmp/dist-first-files.txt
-          (cd dist && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum) > /tmp/dist-first-hashes.txt
-          rm -rf dist
-          npm run build
-          find dist -type f -printf '%P\n' | LC_ALL=C sort > /tmp/dist-second-files.txt
-          (cd dist && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum) > /tmp/dist-second-hashes.txt
+          rm -rf /tmp/wa-build-a /tmp/wa-build-b dist
+          git worktree add --detach /tmp/wa-build-a HEAD
+          git worktree add --detach /tmp/wa-build-b HEAD
+          ln -s "$GITHUB_WORKSPACE/node_modules" /tmp/wa-build-a/node_modules
+          ln -s "$GITHUB_WORKSPACE/node_modules" /tmp/wa-build-b/node_modules
+          (cd /tmp/wa-build-a && npm run build)
+          (cd /tmp/wa-build-b && npm run build)
+          find /tmp/wa-build-a/dist -type f -printf '%P\n' | LC_ALL=C sort > /tmp/dist-first-files.txt
+          find /tmp/wa-build-b/dist -type f -printf '%P\n' | LC_ALL=C sort > /tmp/dist-second-files.txt
+          (cd /tmp/wa-build-a/dist && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum) > /tmp/dist-first-hashes.txt
+          (cd /tmp/wa-build-b/dist && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum) > /tmp/dist-second-hashes.txt
           diff -u /tmp/dist-first-files.txt /tmp/dist-second-files.txt
           diff -u /tmp/dist-first-hashes.txt /tmp/dist-second-hashes.txt
+          cp -a /tmp/wa-build-a/dist ./dist
+          git worktree remove --force /tmp/wa-build-a
+          git worktree remove --force /tmp/wa-build-b
       - name: Generate 55-calculator built HTML audit
         env:
           SITE_ROOT: dist
