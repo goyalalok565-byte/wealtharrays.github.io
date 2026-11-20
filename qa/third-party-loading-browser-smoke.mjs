@@ -13,6 +13,14 @@ const paintProbe=()=>{
 };
 const noSlot=await browser.newPage({viewport:{width:360,height:800}});
 await noSlot.addInitScript(paintProbe);
+await noSlot.addInitScript(()=>{
+  const original=Document.prototype.querySelector;
+  window.__waAdSlotDocumentScans=0;
+  Document.prototype.querySelector=function(selector){
+    if(selector==='ins.adsbygoogle,[data-ad-slot],.wa-ad-slot')window.__waAdSlotDocumentScans++;
+    return original.call(this,selector);
+  };
+});
 await noSlot.route('https://www.googletagmanager.com/**',async route=>{
   analyticsRequests++;
   await route.fulfill({status:200,contentType:'application/javascript',body:'window.dataLayer=window.dataLayer||[];'});
@@ -29,6 +37,16 @@ await noSlot.goto(base+'/tools.html',{waitUntil:'load'});
 await noSlot.waitForSelector('#wa-consent');
 await noSlot.waitForFunction(()=>window.__waFirstPaintAt!==null);
 await noSlot.waitForTimeout(500);
+const initialAdSlotScans=await noSlot.evaluate(()=>window.__waAdSlotDocumentScans);
+await noSlot.evaluate(()=>{
+  for(var i=0;i<80;i++){
+    var node=document.createElement('div');
+    node.className='qa-unrelated-mutation';
+    document.body.appendChild(node);
+  }
+});
+await noSlot.waitForTimeout(100);
+assert.equal(await noSlot.evaluate(()=>window.__waAdSlotDocumentScans),initialAdSlotScans,'unrelated DOM mutations must not trigger whole-document ad-slot scans');
 assert.equal(analyticsRequests,0,'GA4 must not load before analytics consent');
 assert.equal(adRequests,0,'AdSense must not load on a page without ad slots');
 assert.equal(fundingChoicesRequests,0,'Funding Choices must not load on a page without ad slots');

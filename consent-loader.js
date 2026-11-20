@@ -62,11 +62,27 @@
     if(document.readyState==='complete')afterPaint();
     else window.addEventListener('load',afterPaint,{once:true});
   }
-  if(hasAdSlot())scheduleLoad();
-  if('MutationObserver' in window&&document.documentElement){
-    observer=new MutationObserver(function(){
-      if(hasAdSlot())scheduleLoad();
-      if(started)observer.disconnect();
+  function nodeContainsAdSlot(node){
+    if(!node||(node.nodeType!==1&&node.nodeType!==11))return false;
+    if(node.nodeType===1&&typeof node.matches==='function'&&node.matches(AD_SLOT_SELECTOR))return true;
+    return !!(typeof node.querySelector==='function'&&node.querySelector(AD_SLOT_SELECTOR));
+  }
+  var initialAdSlot=hasAdSlot();
+  if(initialAdSlot)scheduleLoad();
+  // Do not rescan the entire document for every unrelated DOM mutation.
+  // Inspect only newly-added subtrees; dynamic ad placements still trigger the CMP.
+  if(!initialAdSlot&&'MutationObserver' in window&&document.documentElement){
+    observer=new MutationObserver(function(records){
+      if(started){observer.disconnect();return;}
+      for(var i=0;i<records.length;i++){
+        var added=records[i].addedNodes;
+        for(var j=0;j<added.length;j++){
+          if(nodeContainsAdSlot(added[j])){
+            scheduleLoad();
+            return;
+          }
+        }
+      }
     });
     observer.observe(document.documentElement,{childList:true,subtree:true});
   }

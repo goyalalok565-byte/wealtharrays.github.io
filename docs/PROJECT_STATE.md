@@ -316,3 +316,14 @@ Never treat repository source, local builds or CI deploy messages as proof of li
 - The 55-calculator smoke now batches each route's numeric min/max checks in the page context while still dispatching real input and Calculate events and validating finite output rows. This reduces Playwright round trips without dropping any declared numeric bound.
 - The mobile Lighthouse job timeout is 45 minutes to accommodate all 55 calculators plus the full 21-run, seven-route performance matrix on slower GitHub-hosted runners.
 - Fresh CI on the new head is required; no verification is implied by the earlier successful run.
+
+
+## Homepage TBT variance and consent observer follow-up — 2026-11-20
+
+- Verified head before this follow-up: `f756d7c12837547e25a6b4d4c8a713834b403808`.
+- Canonical CI #1642 PASS, Platform Gates #1044 PASS, Mobile Lighthouse #1917 PASS.
+- Seven-route median gate passed. Homepage median TBT was 0 ms, but one of three runs had TBT 326.6 ms (worst case); its minimum Performance score was 93. Other route medians remained within all thresholds.
+- Normal homepage trace made zero Funding Choices requests. The diagnostic therefore correctly marked a blocked-Funding-Choices experiment not applicable; no causal claim about Funding Choices is made.
+- The normal-run long-task audit attributed 379 ms to the main document at about 895 ms and 348 ms to `consent-loader.js` at about 1,622 ms. The trace showed substantial style/layout and microtask work; it did not conclusively identify one JavaScript function as the cause of the main-document outlier.
+- A concrete avoidable cost was found in `consent-loader.js`: its document-wide MutationObserver called `document.querySelector(AD_SLOT_SELECTOR)` on every child-list mutation even on pages with no ad slot. It now inspects only newly-added subtrees and starts observing only when the initial page has no slot. The browser smoke counts document-wide ad-slot queries and asserts unrelated DOM mutations do not trigger additional scans; the existing dynamic-slot/CMP/consent tests remain.
+- Fresh Canonical CI, Platform Gates and Mobile Lighthouse on the post-fix head are required. The 326.6 ms outlier is not claimed fixed until a new trace confirms it.
