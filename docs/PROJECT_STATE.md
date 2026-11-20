@@ -4,7 +4,7 @@ Last updated: 2026-11-20
 Repository: `goyalalok565-byte/wealtharrays.github.io`
 Default branch: `main`
 Current phase: Phase 0 — Stabilization
-Status: Phase 0 work is in review; no production release is certified complete.
+Status: Phase 0 engineering changes are in review; strict performance targets and production evidence remain outstanding.
 
 ## Mission
 
@@ -85,7 +85,7 @@ Scores are preliminary engineering assessments from repository inspection, uploa
 3. **P0-3 Tax terminology:** PR #82 updates the Tax Year 2026-27 widget wording to Section 156 and adds source/runtime regression coverage. No formula or eligibility logic changed. CA/legal review is still a release prerequisite.
 4. **P0-4 Registry source of truth:** Remove stale 47-calculator workflow labels and derive route/count assertions from `calculators.js` across pages, navigation, sitemap, `llms.txt`, metadata, workflows and tests.
 5. **P0-5 Health and monitoring:** Add safe `GET /v1/health` with status, version and dependency checks; expose no secrets; add tests and monitoring.
-6. **P0-6 Deployment hygiene:** Explicitly exclude QA, scripts, docs, tests, workflows, Markdown, backups and archives from Pages output. Prove local dist inventory and obtain production deployed-file evidence.
+6. **P0-6 Deployment hygiene:** PR #83 adds a shared exclusion policy for QA, scripts, docs, tests, workflows, backups and archives; a deterministic public-file manifest; local dist inventory audit; and a production check that probes internal paths and HEAD-checks manifest files. CI and post-deploy verification remain pending.
 
 ## Phase 1 — blocked pending Phase 0
 
