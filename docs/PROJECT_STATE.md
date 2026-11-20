@@ -78,12 +78,13 @@ Scores are preliminary engineering assessments from repository inspection, uploa
 - PR #81 (`docs/project-state-baseline-2026-11-20`) is open; its latest observed Platform Gates run was still in progress. Cloudflare bot posted a successful Worker build for its commit; that is not proof of a Pages production release.
 - PR #82 (`fix/tax-year-aware-rebate-label`) is open and stacked on PR #81. Its local 50/50 tests and build passed on the ZIP-based worktree; GitHub CI had not started at last check. It changes only tax-year UI terminology, not calculations. CA/legal review remains required.
 - PR #83 (`fix/strict-mobile-release-gates`) is open against main and includes the CLS host fix, strict mobile release gates, homepage accessibility repairs, registry parity checks, a safe /v1/health endpoint and deployment inventory controls. Canonical CI, Platform Gates and Mobile Lighthouse were running at the latest check; no pass is claimed yet.
+- PR #83 first verification run (commit `2886442`) passed Canonical CI. Platform Gates confirmed registry parity and the 249-file dist inventory (247 public assets + 2 Cloudflare config files), then stopped on a literal newline typo in the new Worker health test. Mobile Lighthouse stopped at the negative-test suite because `null` TBT was treated as zero; the gate now fails closed on missing CLS/TBT/LCP metrics, and the routing-test newline is corrected. These corrections still require a fresh CI run.
 
 ## Phase 0 — status and open items
 
 1. **P0-1 Calculator CLS:** PR #78 adds the missing `.calc-widget` host class and static reservation. Do not merge until strict release gates and browser regressions pass.
 2. **P0-2 Performance gates:** This PR adds strict numeric checks for Performance >=90, CLS <=0.10, TBT <=200ms and LCP <=2500ms, retaining accessibility >=95, best practices >=80 and SEO >=90. Tests must prove a threshold violation fails. The current preview is expected to fail until performance is improved; never relax thresholds.
-3. **P0-3 Tax terminology:** PR #82 updates the Tax Year 2026-27 widget wording to Section 156 and adds source/runtime regression coverage. No formula or eligibility logic changed. CA/legal review is still a release prerequisite.
+3. **P0-3 Tax terminology:** PR #83 now includes the Tax Year 2026-27 widget wording update to Section 156 plus source/runtime regression coverage and build audit. No formula or eligibility logic changed. CA/legal review is still a release prerequisite.
 4. **P0-4 Registry source of truth:** PR #83 removes stale 47/55 workflow labels and adds a registry audit across calculator pages, split definitions, homepage, tools, search, sitemap, `llms.txt`, methodology and metadata. Build/CI verification is pending.
 5. **P0-5 Health and monitoring:** PR #83 adds `GET /v1/health` with API version, liveness, D1 probe, Supabase/Razorpay/rate-limiter readiness flags, no secret values, OpenAPI docs and Worker routing regression tests. Monitoring integration and CI verification remain pending.
 6. **P0-6 Deployment hygiene:** PR #83 adds a shared exclusion policy for QA, scripts, docs, tests, workflows, backups and archives; a deterministic public-file manifest; local dist inventory audit; and a production check that probes internal paths and HEAD-checks manifest files. CI and post-deploy verification remain pending.
@@ -117,6 +118,6 @@ Owner configures these directly in GitHub Settings > Secrets. Never request secr
 
 ## Next three actions
 
-1. Profile and optimize the routes currently failing strict mobile thresholds; rerun the same seven-route Lighthouse matrix and interaction profile.
-2. Finish registry-driven catalogue parity and deployment-output hygiene.
-3. Add `/v1/health`, tests and monitoring; then re-evaluate Phase 0 closure and request CA review for the tax UI language.
+1. Rerun CI after the corrected health routing test and fail-closed Lighthouse metric checks; inspect fresh seven-route Lighthouse and SWP CPU profile artifacts.
+2. Optimize any remaining strict performance/accessibility failures without lowering thresholds; verify production deployment manifest after a successful release.
+3. Obtain CA/legal review for the tax eligibility wording, then complete production Core Web Vitals and live backend monitoring verification.
