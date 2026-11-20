@@ -203,3 +203,11 @@ PR C CI also builds the current `main` commit in a separate job and runs the sam
 - Controlled diagnostic blocking only Google Funding Choices (all other homepage code and Lighthouse settings unchanged): TBT 5ms, a 1,014ms reduction. Diagnostic interpretation: Funding Choices is a likely major contributor.
 - PR C does not disable the CMP globally or bypass consent. It loads Funding Choices only on pages with an explicit ad slot, and observes for dynamically inserted ad slots. The current site has no ad slots; analytics remains governed by the first-party consent UI. Browser QA verifies no CMP request without a slot and one load after a dynamic slot is added.
 - Expected TBT benefit must be confirmed by fresh PR Lighthouse; no performance pass is claimed until the strict gate passes.
+
+
+## Additional Cloudflare production build evidence — PR C
+
+- Cloudflare Workers bot reported `Deployment successful!` against `production/builds/200eb0cc-d241-47ba-8c4f-bd7136d5191d` for unmerged PR #95 commit `88da2679`, Nov 20 2026 06:29 UTC: https://dash.cloudflare.com/?to=/f5619318297695cabb3a1540854cb166/workers/services/view/wealtharrays-github-io/production/builds/200eb0cc-d241-47ba-8c4c-f4b... (Cloudflare dashboard link is account-authenticated).
+- This is another production deployment report for an unmerged PR head. The active version, percentage of traffic served by that version, and whether it was later superseded are not verified. Do not merge PR C until Cloudflare production branch control is confirmed to target `main` only and the currently serving version is known.
+- Immediate mitigation is an owner/admin action in Cloudflare Workers & Pages → `wealtharrays-github-io` → Settings → Builds → Branch control: confirm Production branch is `main`; disable production builds for other branches and configure Preview deployments for non-production branches. If branch control cannot be safely corrected immediately, pause/disable Git integration deploys until corrected.
+- If an unmerged version is serving traffic: Deployments → select last-known-good version → Rollback (or create a new deployment from the known-good `main` commit). Verify version ID and 100% traffic after rollback, then smoke-test `/v1/health`, auth, entitlements and key calculator routes. Rollback does not revert D1/KV/R2/DO data/schema mutations.
