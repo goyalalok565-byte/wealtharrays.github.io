@@ -4,7 +4,7 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const { CALCULATORS } = require('../calculators.js');
 const calculatorsByRoute = new Map(CALCULATORS.map(calc => [calc.slug + '/index.html', calc]));
-const escapeHtml = value => String(value ?? '').replace(/[&<>\"']/g, ch => ({ '&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;' }[ch]));
+const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, ch => { switch (ch) { case '&': return '&amp;'; case '<': return '&lt;'; case '>': return '&gt;'; case '"': return '&quot;'; default: return '&#39;'; } });
 function renderStaticShell(calc) {
   const fields = calc.fields.map(field => {
     const id = `wa-static-${calc.id}-${field.id}`;
