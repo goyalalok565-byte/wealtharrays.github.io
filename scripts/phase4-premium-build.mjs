@@ -25,17 +25,6 @@ let changed=0;
 for(const file of htmlFiles){
   let s=fs.readFileSync(file,'utf8');
   const before=s;
-  // The calculator host must carry the class used by its layout, styling and CLS reservation
-  // before the deferred calculator runtime mounts. Adding it only after mount creates a large
-  // layout shift and leaves the calculator surface unstyled during initial rendering.
-  s=s.replace(/<div\b[^>]*\bid=["']calc-widget["'][^>]*>/gi, (tag) => {
-    const classAttr = tag.match(/\bclass=(["'])(.*?)\1/i);
-    if (classAttr) {
-      if (/(?:^|\s)calc-widget(?:\s|$)/.test(classAttr[2])) return tag;
-      return tag.replace(classAttr[0], `class=${classAttr[1]}${classAttr[2]} calc-widget${classAttr[1]}`);
-    }
-    return tag.replace(/>$/, ' class="calc-widget">');
-  });
   s=s.replace(/<script>[^<]*(?:document\.documentElement\.dataset\.theme|localStorage\.(?:waTheme|getItem\(['"]waTheme['"]\)))[^<]*<\/script>/gi, '');
   if(!s.includes('/theme-init.js')) s=s.replace('</head>',`${themeJs}</head>`);
   // Replace every inline calculator bootstrap, including legacy formatting variants.
