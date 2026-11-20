@@ -8,7 +8,8 @@ const mod = await import("data:text/javascript;base64," + Buffer.from(moduleSour
 assert.equal(mod.FREE_SCENARIO_LIMIT, 3);
 assert.equal(mod.MAX_SCENARIO_LIMIT, 500);
 assert.deepEqual(mod.resolveEntitlement(null), {
-  tier: "free", active: false, plan_id: null, cloud_scenario_limit: 3,
+  tier: "free", active: false, source: null, plan_id: null, cloud_scenario_limit: 3,
+  trial: { status: "available", ends_at: null },
   features: { cloud_scenario_sync: true, cross_device_scenarios: true, expanded_scenario_library: false }
 });
 assert.equal(mod.resolveEntitlement({ status: "active", plan_id: "monthly" }).tier, "pro");
@@ -17,6 +18,10 @@ assert.equal(mod.resolveEntitlement({ status: "active", plan_id: "yearly", curre
 assert.equal(mod.resolveEntitlement({ status: "cancelled", plan_id: "monthly" }).tier, "free");
 assert.equal(mod.resolveEntitlement({ status: "halted", plan_id: "monthly" }).tier, "free");
 assert.equal(mod.resolveEntitlement({ status: "active", plan_id: "monthly", current_period_end: "not-a-date" }).tier, "free");
+assert.equal(mod.resolveEntitlement(null, Date.parse("2026-11-20T00:00:00.000Z"), { ends_at: "2026-12-04T00:00:00.000Z" }).tier, "pro");
+assert.equal(mod.resolveEntitlement(null, Date.parse("2026-11-20T00:00:00.000Z"), { ends_at: "2026-12-04T00:00:00.000Z" }).source, "trial");
+assert.equal(mod.resolveEntitlement(null, Date.parse("2026-12-05T00:00:00.000Z"), { ends_at: "2026-12-04T00:00:00.000Z" }).tier, "free");
+assert.equal(mod.resolveEntitlement(null, Date.parse("2026-12-05T00:00:00.000Z"), { ends_at: "2026-12-04T00:00:00.000Z" }).trial.status, "expired");
 
 const scenarios = fs.readFileSync("functions/v1/scenarios.js", "utf8");
 assert.match(scenarios, /getEntitlement\(env, auth\.user\.id\)/);
@@ -27,6 +32,8 @@ assert.match(scenarios, /INSERT INTO saved_scenarios[\s\S]*SELECT[\s\S]*WHERE \(
 const worker = fs.readFileSync("worker.mjs", "utf8");
 assert.match(worker, /billing\/config/);
 const account = fs.readFileSync("account.js", "utf8");
+const auth = fs.readFileSync("functions/v1/_auth.js", "utf8");
+assert.match(auth, /email_verified: Boolean\(user\.email_confirmed_at \|\| user\.confirmed_at\)/);
 assert.match(account, /v1\/billing\/config/);
 assert.match(account, /cloud_scenario_limit/);
 console.log("SaaS entitlement audit PASS — free quota, active/expired/cancelled states, server enforcement and UI readiness.");
