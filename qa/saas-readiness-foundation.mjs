@@ -51,9 +51,20 @@ assert.match(fx, /open\.er-api\.com/);
 assert.match(tax, /2026-27-new-regime-v1/);
 assert.match(widget, /Estimate India new-regime tax/);
 assert.match(auth, /auth\/v1\/user/);
+assert.match(auth, /email_verified: Boolean\(user\.email_confirmed_at \|\| user\.confirmed_at\)/);
 assert.match(authConfig, /SUPABASE_ANON_KEY/);
 assert.match(scenarios, /DELETE FROM saved_scenarios WHERE id = \? AND user_id = \?/);
-assert.match(checkout, /RAZORPAY_PLAN_MONTHLY/);\nassert.match(trial, /EMAIL_VERIFICATION_REQUIRED/);\nassert.match(trial, /TRIAL_DAYS = 14/);\nassert.match(trial, /INSERT OR IGNORE INTO pro_trials/);\nassert.match(trial, /emailHash/);\nassert.match(worker, /billing\\/trial/);
+assert.match(checkout, /RAZORPAY_PLAN_MONTHLY/);
+assert.match(trial, /EMAIL_VERIFICATION_REQUIRED/);
+assert.match(trial, /TRIAL_DAYS = 14/);
+assert.match(trial, /INSERT OR IGNORE INTO pro_trials/);
+assert.match(trial, /emailHash/);
+assert.ok(worker.includes('"/v1/billing/trial"'), 'Worker must route the Pro trial endpoint');
+assert.match(trial, /EMAIL_VERIFICATION_REQUIRED/);
+assert.match(trial, /TRIAL_DAYS = 14/);
+assert.match(trial, /INSERT OR IGNORE INTO pro_trials/);
+assert.match(trial, /emailHash/);
+assert.match(worker, /billing\\/trial/);
 assert.match(checkout, /SUBSCRIPTION_ALREADY_ACTIVE/);
 assert.match(checkout, /CHECKOUT_ALREADY_PENDING/);
 assert.ok(checkout.includes("https://api.razorpay.com/v1/subscriptions/"), "Existing checkout must be reused instead of creating a duplicate.");
@@ -89,9 +100,12 @@ assert.equal(zeroInterest.results[0].value, 10000, 'Zero-rate loan EMI must avoi
 assert.throws(() => sharedModule.calculate('cagr', { startValue: 100, endValue: 110, years: 0 }), /years must be greater than zero/);
 
 const taxHarness = tax
-  .replace(/^import \{ CORS_HEADERS, error, json \} from "\.\/\_shared\.js";\n/, 'const CORS_HEADERS = {}; const error = (code, message, status = 400, details) => new Response(JSON.stringify({error:{code,message,...(details?{details}:{})}}), {status, headers:{"Content-Type":"application/json"}}); const json = (data, status = 200) => new Response(JSON.stringify(data), {status, headers:{"Content-Type":"application/json"}});\n')
+  .replace(/^import \{ CORS_HEADERS, error, json \} from "\.\/\_shared\.js";
+/, 'const CORS_HEADERS = {}; const error = (code, message, status = 400, details) => new Response(JSON.stringify({error:{code,message,...(details?{details}:{})}}), {status, headers:{"Content-Type":"application/json"}}); const json = (data, status = 200) => new Response(JSON.stringify(data), {status, headers:{"Content-Type":"application/json"}});
+')
   .replaceAll('export async function onRequestOptions', 'async function onRequestOptions')
-  .replaceAll('export async function onRequestPost', 'async function onRequestPost') + '\nexport { onRequestPost };';
+  .replaceAll('export async function onRequestPost', 'async function onRequestPost') + '
+export { onRequestPost };';
 const taxModule = await import('data:text/javascript;base64,' + Buffer.from(taxHarness).toString('base64'));
 const taxAt12L = await taxModule.onRequestPost({ request: new Request('https://example.test/v1/india-tax', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tax_year:'2026-27',regime:'new',taxable_income:1200000,rebate_eligible:true}) }) });
 const tax12L = await taxAt12L.json();
