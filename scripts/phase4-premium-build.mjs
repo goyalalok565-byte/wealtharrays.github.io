@@ -64,7 +64,7 @@ for(const file of htmlFiles){
   // Load AdSense only when this page contains a real publisher ad unit. A
   // site-wide loader on pages with no <ins class="adsbygoogle" data-ad-slot>
   // wastes mobile CPU/network and can request ads where no placement exists.
-  const hasAdSlot=/<ins\\b(?=[^>]*\\bclass=["'][^"']*\\badsbygoogle\\b)(?=[^>]*\\bdata-ad-slot=["'][^"']+["'])[^>]*>/i.test(s);
+  const hasAdSlot=/<ins\b(?=[^>]*\bclass=["'][^"']*\badsbygoogle\b)(?=[^>]*\bdata-ad-slot=["'][^"']+["'])[^>]*>/i.test(s);
   const adsenseExcluded=['index.html','404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html','research.html','category-investment.html','category-loan.html','category-banking.html','category-retirement.html','category-salary.html','category-business.html','financial-workspace.html','goal-planner.html','scenario-lab.html','home-loan-emi-calculator/index.html','loan-emi-calculator/index.html','loan-interest-calculator/index.html'].includes(routeName) || noindex || !hasAdSlot;
   const consentExcluded=['404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html'].includes(routeName) || noindex;
   if(consentExcluded){
@@ -80,7 +80,7 @@ for(const file of htmlFiles){
   s=s.replace(adLoaderScript,'');
   if(!hasAdSlot) {
     // Do not preconnect to ad networks on pages that have no ad placement.
-    s=s.replace(/<link\\b(?=[^>]*\\brel=["']preconnect["'])(?=[^>]*\\bhref=["']https:\\/\\/(?:pagead2\\.googlesyndication\\.com|googleads\\.g\\.doubleclick\\.net)(?:\\/|["']))[^>]*>/gi,'');
+    s=s.replace(/<link\b(?=[^>]*\brel=["']preconnect["'])(?=[^>]*\bhref=["']https:\/\/(?:pagead2\.googlesyndication\.com|googleads\.g\.doubleclick\.net)(?:\/|["']))[^>]*>/gi,'');
   }
   if(!adsenseExcluded) s=s.replace('</head>',adsenseJs+'</head>');
   if(id && s.includes('id="calc-widget"') && base!=='widget.html'){
