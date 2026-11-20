@@ -1,36 +1,35 @@
 import fs from 'node:fs';
 
-const file = process.argv[2] || '/tmp/wa-lighthouse/summary.json';
-const summary = JSON.parse(fs.readFileSync(file, 'utf8'));
-const rows = summary.rows || [];
-if (rows.length !== 7) throw new Error(`Expected seven Lighthouse routes, found ${rows.length}`);
+export const THRESHOLDS = Object.freeze({ performance: 90, cls: 0.10, tbtMs: 200, lcpMs: 2500, accessibility: 95, bestPractices: 80, seo: 90 });
 
-const floors = { performance: 70, accessibility: 95, bestPractices: 80, seo: 90 };
-const maxCLS = 0.25;
-const failures = [];
-
-for (const row of rows) {
-  for (const [metric, floor] of Object.entries(floors)) {
-    const value = Number(row[metric]);
-    if (!Number.isFinite(value) || value < floor) {
-      failures.push(`${row.route}: ${metric} ${row[metric]} is below the minimum ${floor}`);
+export function evaluateSummary(summary) {
+  const rows = summary?.rows || [];
+  const failures = [];
+  if (rows.length !== 7) failures.push(`Expected seven Lighthouse routes, found ${rows.length}`);
+  for (const row of rows) {
+    const route = row.route || '(unknown route)';
+    for (const metric of ['performance', 'accessibility', 'bestPractices', 'seo']) {
+      const value = Number(row[metric]);
+      if (!Number.isFinite(value) || value < THRESHOLDS[metric]) failures.push(`${route}: ${metric} ${row[metric]} is below minimum ${THRESHOLDS[metric]}`);
     }
+    const cls = Number(row.clsValue);
+    if (!Number.isFinite(cls) || cls > THRESHOLDS.cls) failures.push(`${route}: CLS ${row.clsValue} exceeds maximum ${THRESHOLDS.cls}`);
+    const tbt = Number(row.tbtMs);
+    if (!Number.isFinite(tbt) || tbt > THRESHOLDS.tbtMs) failures.push(`${route}: TBT ${row.tbtMs}ms exceeds maximum ${THRESHOLDS.tbtMs}ms`);
+    const lcp = Number(row.lcpMs);
+    if (!Number.isFinite(lcp) || lcp > THRESHOLDS.lcpMs) failures.push(`${route}: LCP ${row.lcpMs}ms exceeds maximum ${THRESHOLDS.lcpMs}ms`);
   }
-  const cls = Number.parseFloat(row.cls);
-  if (!Number.isFinite(cls) || cls > maxCLS) {
-    const sources = (row.layoutShiftElements || [])
-      .map(item => item.selector || item.snippet || item.path)
-      .filter(Boolean)
-      .join(' | ');
-    failures.push(`${row.route}: CLS ${row.cls} exceeds the maximum ${maxCLS}; top shifted elements: ${sources || 'not exposed by Lighthouse'}`);
+  return failures;
+}
+if (process.argv[1] && process.argv[1].endsWith('lighthouse-quality-gate.mjs')) {
+  const file = process.argv[2] || '/tmp/wa-lighthouse/summary.json';
+  const summary = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const failures = evaluateSummary(summary);
+  console.log('Mobile release thresholds: Performance ≥90, CLS ≤0.10, TBT ≤200ms, LCP ≤2500ms; accessibility ≥95, best practices ≥80, SEO ≥90.');
+  if (failures.length) {
+    console.error('MOBILE RELEASE GATE FAILED (' + failures.length + ' issues)');
+    console.error(failures.join('\\n'));
+    process.exit(1);
   }
+  console.log('MOBILE RELEASE GATE PASS — all seven routes meet every release threshold.');
 }
-
-console.log('Mobile Lighthouse release floors: performance ≥70, accessibility ≥95, best practices ≥80, SEO ≥90, CLS ≤0.25.');
-console.log('Longer-term product target: performance ≥90 and CLS ≤0.10 on every core route.');
-if (failures.length) {
-  console.error('MOBILE QUALITY GATE FAILED (' + failures.length + ' issues)');
-  console.error(failures.join('\n'));
-  process.exit(1);
-}
-console.log('MOBILE QUALITY GATE PASS — all seven routes meet the minimum release floors.');
