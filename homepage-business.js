@@ -22,7 +22,9 @@ function initCurrency(){
   var homeCurrency=document.getElementById('currency-select');
   if(!homeCurrency)return;
   var homeCurrencies=[["USD","US Dollar","$"],["EUR","Euro","€"],["GBP","British Pound","£"],["INR","Indian Rupee","₹"],["JPY","Japanese Yen","¥"],["CNY","Chinese Yuan","CN¥"],["CAD","Canadian Dollar","C$"],["AUD","Australian Dollar","A$"],["CHF","Swiss Franc","CHF"],["SGD","Singapore Dollar","S$"],["HKD","Hong Kong Dollar","HK$"],["KRW","South Korean Won","₩"],["AED","UAE Dirham","د.إ"],["SAR","Saudi Riyal","﷼"],["NZD","New Zealand Dollar","NZ$"],["MXN","Mexican Peso","MX$"],["BRL","Brazilian Real","R$"],["ZAR","South African Rand","R"],["TRY","Turkish Lira","₺"],["THB","Thai Baht","฿"],["MYR","Malaysian Ringgit","RM"],["IDR","Indonesian Rupiah","Rp"],["PHP","Philippine Peso","₱"],["PLN","Polish Zloty","zł"],["SEK","Swedish Krona","kr"]];
-  var savedCurrency=document.documentElement.getAttribute('data-currency')||'INR';
+  var savedCurrency='';
+  try{savedCurrency=localStorage.getItem('waCurrency')||'';}catch(_error){}
+  savedCurrency=savedCurrency||document.documentElement.getAttribute('data-currency')||'INR';
   if(!homeCurrencies.some(function(c){return c[0]===savedCurrency;}))savedCurrency='INR';
   if(!homeCurrency.options.length||!Array.from(homeCurrency.options).some(function(o){return o.value==='INR';})){
     var fragment=document.createDocumentFragment();
@@ -37,8 +39,10 @@ function initCurrency(){
   homeCurrency.value=savedCurrency;
   document.documentElement.setAttribute('data-currency',savedCurrency);
   homeCurrency.addEventListener('change',function(){
-    document.documentElement.setAttribute('data-currency',homeCurrency.value||'INR');
-    window.dispatchEvent(new CustomEvent('wa-currency',{detail:{currency:homeCurrency.value||'INR'}}));
+    var currency=homeCurrency.value||'INR';
+    document.documentElement.setAttribute('data-currency',currency);
+    try{localStorage.setItem('waCurrency',currency);}catch(_error){}
+    window.dispatchEvent(new CustomEvent('wa-currency',{detail:{currency:currency}}));
   });
 }
 function initQuickEmi(){

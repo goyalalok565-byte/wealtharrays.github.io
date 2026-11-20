@@ -34,6 +34,8 @@ jobs:
         run: node qa/service-worker-privacy-audit.mjs
       - name: Privacy policy consistency audit
         run: node qa/privacy-policy-audit.mjs
+      - name: Localization dictionary audit
+        run: node qa/i18n-audit.mjs
       - name: Calculator regression before build
         run: node qa/calculator-regression.mjs
       - name: Independent calculator formula audit from canonical registry

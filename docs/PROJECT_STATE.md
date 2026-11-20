@@ -260,3 +260,52 @@ Audit base: `phase0/pr-c-final` at `ffd1ba752b5cf1896b4175c75aa8f47384fc972a`. T
 - The 55-page CSV is an audit report, not proof that all content meets editorial/legal quality requirements.
 
 Never treat repository source, local builds or CI deploy messages as proof of live production traffic.
+
+## Verification snapshot — PR #97, 2026-11-20
+
+### Last fully verified head before the preference/localization follow-up
+
+- Head: `58898e632fb0b9d9b64fc2bed63f789755882c12`.
+- Canonical CI #1637: PASS — https://github.com/goyalalok565-byte/wealtharrays.github.io/actions/runs/44758536996 .
+- Platform Gates #1039: PASS — https://github.com/goyalalok565-byte/wealtharrays.github.io/actions/runs/44758536992 .
+- Mobile Lighthouse #1907: PASS — https://github.com/goyalalok565-byte/wealtharrays.github.io/actions/runs/44758537088 .
+- All 55-calculator browser checks, static shells, JavaScript-disabled shells, authenticated workspace save/load, consent/ad-slot checks and 3-run-per-route Lighthouse measurements passed.
+- Median route results (Performance / Accessibility / Best Practices / SEO; CLS / TBT / LCP):
+  - Home: 100 / 100 / 100 / 100; 0 / 0 ms / 1,477 ms.
+  - Tools: 99 / 96 / 100 / 100; 0.0003 / 69 ms / 1,625 ms.
+  - SIP: 98 / 96 / 100 / 100; 0.0757 / 16 ms / 1,878 ms.
+  - SWP: 98 / 96 / 100 / 100; 0.0757 / 12 ms / 1,717 ms.
+  - FIRE: 98 / 96 / 100 / 100; 0.0757 / 11 ms / 1,716 ms.
+  - Rent vs Buy: 98 / 96 / 100 / 100; 0.0700 / 15 ms / 1,720 ms.
+  - Compound-interest guide: 100 / 100 / 100 / 100; 0 / 0 ms / 1,522 ms.
+- Normal homepage trace made zero Funding Choices requests; homepage median TBT was 0 ms and the worst observed run was about 16 ms. The diagnostic correctly marked a blocked-Funding-Choices experiment not applicable; it does not claim a causal improvement.
+- SWP interaction profiling recorded no long tasks during the probe; MutationObserver callbacks totalled about 2.3 ms across the four sampled input changes. The CPU profile was predominantly idle.
+- Main-branch same-settings single-run baseline on that workflow: homepage Performance 88 / TBT 460 ms; tools Performance 85 / TBT 590 ms; calculator CLS ranged 0.61–0.66. This is a comparison baseline, not a PR release result.
+
+### 55-page built HTML audit
+
+- Unique title, meta description, H1 and canonical URL: 55/55.
+- Visible FAQ items: 55/55 pages, with 2–4 each. Structured FAQPage JSON-LD: 0/55; visible FAQs and structured FAQ schema are reported separately.
+- Worked examples: 55/55.
+- Article content range: 682–1,126 words; mean about 814 words.
+- External source links detected in calculator article content: 0/55. This is an editorial/source-citation gap, not a formula failure.
+- The shared-paragraph metric reports boilerplate repeated across different calculator pages; it is not an intra-page duplicate-paragraph count.
+- The 55-page audit CSV is an inventory, not proof of legal/editorial sufficiency. Content expansion and authoritative source citations remain planned for the five 11-page content batches after PR C is merged.
+
+### Preference and localization follow-up authored after the verified head
+
+- Home/tools theme toggle now receives an early delegated handler; calculator pages retain their canonical runtime handler.
+- Homepage currency now reads and writes the shared `waCurrency` preference so it survives reloads and is shared with calculator pages.
+- The localization API advertises only languages with complete dictionaries (currently English and Hindi); the UI does not yet provide a full language switcher or full-site translation.
+- Added Playwright coverage for theme/currency persistence and a localization dictionary audit. The all-calculator smoke label now accurately describes its tested scope.
+- Lighthouse runner now bounds each CLI attempt to 120 seconds and retries known transient trace failures.
+- This follow-up commit requires fresh Canonical CI, Platform Gates and Mobile Lighthouse verification. The prior green run above must not be represented as verification of the follow-up head.
+
+### Production and owner-side blockers — unchanged
+
+- Production `Content-Encoding: br` remains unverified; DNS resolution for `wealtharrays.com` failed in this environment and the web fetch returned 403. Brotli is verified only in the local CI preview. Do not change production settings based on preview evidence.
+- Cloudflare production branch control, active Worker version/traffic allocation, Pages deployment and rollback target require owner/admin dashboard verification. No Cloudflare settings were changed.
+- Live `/v1/health`, D1/Supabase/Razorpay/Paddle operations, production secrets, backups, alerts and production browser checks remain unverified. No secrets or payment settings were accessed.
+- Field INP/CrUX and real-device performance remain unverified; Lighthouse lab TBT is not field INP.
+- CA/legal review and page-specific authoritative source citations remain required. No formulas or tax eligibility logic were changed.
+- PR #97 remains open and unmerged. Do not merge without the exact owner approval phrase `merge approved`.

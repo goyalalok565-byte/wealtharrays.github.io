@@ -41,7 +41,7 @@ for(const page of pages){
   for(const script of jsonScripts){try{visit(JSON.parse(script[1]));}catch(_error){}}
   const schemaFaqCount=faqCount;
   const htmlFaqCount=(contentHtml.match(/<(?:details|div|section)\b(?=[^>]*\bclass=["'][^"']*\bfaq-item\b)[^>]*>/gi)||[]).length;
-  const visibleFaqCount=Math.max(schemaFaqCount,questionCount,htmlFaqCount);
+  const visibleFaqCount=htmlFaqCount;
   const sourceLinks=new Set();
   for(const match of contentHtml.matchAll(/<a\b[^>]*>/gi)){
     const href=attr(match[0],'href');
@@ -52,7 +52,7 @@ for(const page of pages){
   collected.push({
     id:page.id,slug:page.slug,title,metaDescription:attr(descriptionTag||'','content'),
     h1,canonical:attr(canonicalTag||'','href'),jsonLdCount:jsonScripts.length,
-    faqCount:visibleFaqCount,schemaFaqCount,htmlFaqCount,
+    faqCount:visibleFaqCount,schemaFaqCount,schemaQuestionCount:questionCount,
     words:countWords(contentHtml),
     workedExample:/worked example|worked calculation|example calculation|example inputs|example scenario/i.test(contentText)?'yes':'no',
     sourceLinks:sourceLinks.size,paragraphs
@@ -60,12 +60,12 @@ for(const page of pages){
 }
 const frequency=new Map();
 for(const page of collected)for(const paragraph of new Set(page.paragraphs))frequency.set(paragraph,(frequency.get(paragraph)||0)+1);
-const headers=['calculator_id','slug','title','meta_description','h1','canonical','json_ld_count','faq_count','schema_faq_count','html_faq_count','words','worked_example','source_links','repeated_paragraph_count','repeated_paragraph_examples'];
+const headers=['calculator_id','slug','title','meta_description','h1','canonical','json_ld_count','faq_count','schema_faq_count','schema_question_count','words','worked_example','source_links','cross_page_shared_paragraph_count','cross_page_shared_paragraph_examples'];
 const rows=[headers];
 for(const page of collected){
-  const repeated=[...new Set(page.paragraphs)].filter(paragraph=>(frequency.get(paragraph)||0)>1);
-  rows.push([page.id,page.slug,page.title,page.metaDescription,page.h1,page.canonical,page.jsonLdCount,page.faqCount,page.schemaFaqCount,page.htmlFaqCount,page.words,page.workedExample,page.sourceLinks,repeated.length,repeated.slice(0,3).join(' | ')]);
+  const shared=[...new Set(page.paragraphs)].filter(paragraph=>(frequency.get(paragraph)||0)>1);
+  rows.push([page.id,page.slug,page.title,page.metaDescription,page.h1,page.canonical,page.jsonLdCount,page.faqCount,page.schemaFaqCount,page.schemaQuestionCount,page.words,page.workedExample,page.sourceLinks,shared.length,shared.slice(0,3).join(' | ')]);
 }
 fs.mkdirSync(path.dirname(output),{recursive:true});
 fs.writeFileSync(output,rows.map(row=>row.map(csv).join(',')).join('\n')+'\n','utf8');
-console.log('Built HTML audit CSV written: '+output+' ('+collected.length+'/55 canonical calculator pages).');
+console.log('Built HTML audit CSV written: '+output+' ('+collected.length+'/55 canonical calculator pages; visible FAQ items and cross-page shared paragraphs reported separately).');
