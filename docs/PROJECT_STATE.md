@@ -185,3 +185,10 @@ CI scope: strict seven-route Lighthouse runs on PR C (performance branch), manua
 - These are production-build/deployment bot records, not Preview URLs. Current active version/traffic percentage and Pages production deployment are not verified from the repository.
 - Cloudflare Worker Settings → Build → Branch control must be checked. The production branch should be `main`; enable Worker Previews for non-production branches and use the Preview command (`npx wrangler preview`). If this Worker is still on legacy branch-build mode, complete the one-time switch to Worker Previews. Official docs: https://developers.cloudflare.com/workers/ci-cd/builds/build-branches/ and https://developers.cloudflare.com/workers/ci-cd/builds/configuration/ .
 - Dashboard rollback: Workers & Pages → Worker → Deployments → three-dot menu on last-known-good version → Rollback. Rollback routes 100% traffic to that version; D1/KV/R2/DO resources are not rolled back and must be checked separately. Official: https://developers.cloudflare.com/workers/versions-and-deployments/rollbacks/ .
+
+
+## Approved pricing experiment cells — not live yet
+
+Pro monthly test cells are reserved for after the Pro MVP only: India ₹199 / ₹299 / ₹399; USD $7 / $9 / $12; EUR €7 / €9 / €11; GBP £6 / £8 / £10. Annual cells may compare 10-month equivalent pricing (~16.7% discount) against 20% off. These are approved experiment candidates, not current live prices.
+
+Ultra remains waitlist-only: no public checkout, no paid launch and no Ultra pricing experiment while it is in waitlist/invite-only beta. The previously proposed Ultra price cells are deferred and must not be shown as current offers.
