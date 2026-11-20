@@ -147,3 +147,14 @@ PR #88 Cloudflare bot reported a successful Worker deployment from unmerged head
 - Assessment Year 2026–27 (FY 2025–26): Income-tax Act, 1961, Section 87A. This mapping is documented separately in `docs/INDIA-TAX-YEAR-SOURCES.md` with official Income Tax Department sources.
 - `widget.js` and `wa-calculator-runtime.js` are changed together. The generated runtime must be rebuilt in CI; do not update formulas or eligibility rules in this PR.
 - CA/legal eligibility review remains outstanding and is required before Phase 1.
+
+
+## PR C — static calculator shell and trace-led performance work
+
+- Build-time shell generation targets every route in the canonical calculator registry. It includes labeled inputs, a result region and a fixed 220px chart placeholder inside a 520px minimum-height host. Runtime is updated to hydrate/replace the shell when enabled.
+- QA includes a source audit for all registry routes and a Playwright browser smoke with JavaScript disabled.
+- LCP evidence from PR #88 Mobile Lighthouse artifact (run 44679593076): SWP LCP 2,656ms (FCP 2,338ms, TBT 35ms), rent-vs-buy 2,611ms (FCP 2,459ms, TBT 3.5ms), compound-interest article 2,553ms (FCP 2,403ms, TBT 3ms). LCP candidates were text: SWP description paragraph, rent-vs-buy H1, and article H1. Trace LCP element-render delays were about 134ms, 87ms and 132ms respectively. This does not establish a single long JavaScript task as the common cause.
+- The compound-interest article trace/report showed both a versioned preloaded root stylesheet and a second unversioned relative stylesheet request; the report counted 196,315 CSS transfer bytes versus about 101,653 bytes on calculator routes. PR C normalizes the stylesheet link to reuse the preloaded URL, avoiding the duplicate transfer.
+- Lighthouse also reported about 67KiB unused CSS on calculator pages and 66KiB unused calculator runtime JS; these are optimization leads, not proof that either alone caused the three LCP failures. No blanket script deferral or CSS rewrite is made without further measurements.
+- Homepage TBT on the PR #88 preview was 0ms; the diagnostic with Funding Choices blocked also measured 0ms and reported no material TBT improvement. A same-settings build/measurement on main has not been run, so the historical 7,510ms-to-current comparison remains unverified.
+- Strict seven-route thresholds remain unchanged: Performance >=90, CLS <=0.10, TBT <=200ms, LCP <=2,500ms, Accessibility >=95, Best Practices >=80, SEO >=90. PR C must re-run all seven routes; passing is not claimed until fresh CI results exist.
