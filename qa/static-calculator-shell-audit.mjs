@@ -9,7 +9,7 @@ for (const calc of CALCULATORS) {
   const file = path.join(root, calc.slug, 'index.html');
   if (!fs.existsSync(file)) throw new Error(`Missing calculator route: ${calc.slug}/index.html`);
   const html = fs.readFileSync(file, 'utf8');
-  if (!/<div\\b[^>]*id=["']calc-widget["'][^>]*class=["'][^"']*\\bcalc-widget\\b/i.test(html)) throw new Error(`${calc.slug}: static host class missing`);
+  if (!/<div\b[^>]*id=["']calc-widget["'][^>]*class=["'][^"']*\bcalc-widget\b/i.test(html)) throw new Error(`${calc.slug}: static host class missing`);
   if (!html.includes('data-wa-static-shell="true"')) throw new Error(`${calc.slug}: static no-JS shell missing`);
   if (!html.includes('data-wa-chart-placeholder="true"') || !/min-height:220px/.test(html)) throw new Error(`${calc.slug}: fixed chart placeholder missing`);
   const fieldCount = (html.match(/id="wa-static-[^"]+"/g) || []).length;
