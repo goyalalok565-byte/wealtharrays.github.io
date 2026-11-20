@@ -139,3 +139,6 @@ Active verification PR: #88 (`fix/phase0-clean-mainline-2026-11-20`), based on c
 PR #89 (merged) adds 275 snapshots (55 calculators × default/zero/blank/large/invalid) and independent top-10 reference tests. Canonical CI passed; Platform Gates status pending recheck. These snapshots lock current behaviour, not correctness by themselves.
 
 PR #88 Cloudflare bot reported a successful Worker deployment from unmerged head 6221a1b with a `/production/builds/` dashboard record. Treat as production Worker deployment report. Pages and live `/v1/health` remain unverified.
+
+
+CI scope: strict seven-route Lighthouse runs on PR C (performance branch), manual dispatch and main-branch release validation. PR A/B run Canonical CI and Platform Gates plus the Lighthouse threshold unit tests; they do not run the performance measurement because they do not own performance changes. No thresholds are relaxed; PR C must pass the same strict limits.
