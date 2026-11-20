@@ -67,7 +67,7 @@ assert.throws(() => mod.calculate("salary-hourly", { amount: 50000, hoursPerWeek
 assert.throws(() => mod.calculate("loan-emi", { principal: -1, annualRate: 5, months: 12 }), /principal must be between/);
 assert.throws(() => mod.calculate("loan-emi", { principal: 1000, annualRate: 5, months: 0 }), /months must be between/);
 assert.throws(() => mod.calculate("cost-of-delay", { monthly: 1000, annualRate: 5, years: 2, delay: 3 }), /delay must not exceed years/);
-assert.throws(() => mod.calculate("break-even", { fixedCosts: 1000, price: 10, variableCost: 10, targetProfit: 100, days: 30 }), error => error === undefined);
+assert.equal(mod.calculate("break-even", { fixedCosts: 1000, price: 10, variableCost: 10, targetProfit: 100, days: 30 }).results[1].value, 0, "No positive contribution means no break-even volume.");
 assert.throws(() => mod.calculate("cagr", { startValue: 100, endValue: 120, years: 0 }), /greater than zero/);
 assert.throws(() => mod.calculate("gst", { amount: 100, rate: 18, mode: "unknown" }), /mode must be/);
 assert.throws(() => mod.calculate("currency-converter", { amount: 100, rate: 1, from: "US", to: "EUR" }), /three-letter currency codes/);
