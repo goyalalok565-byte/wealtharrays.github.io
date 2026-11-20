@@ -1,4 +1,4 @@
-export const API_VERSION = "1.3.0";
+export const API_VERSION = "1.4.0";
 export const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
@@ -44,7 +44,13 @@ export const MODEL_LIST = [
   { id: "credit-card-payoff", version: API_VERSION, title: "Fixed-payment credit card payoff", inputs: ["balance", "apr", "payment"], assumptions: "Monthly interest is added before a fixed payment; excludes new purchases, fees, rate changes and issuer-specific rules; capped at 1,200 months." },
   { id: "step-up-sip", version: API_VERSION, title: "Step-up SIP projection", inputs: ["monthly", "stepUp", "rate", "years"], assumptions: "Monthly contribution increases at the start of each investment year; each contribution is added at the beginning of the month and compounds monthly at a constant assumed rate." },
   { id: "swp", version: API_VERSION, title: "Systematic withdrawal plan", inputs: ["corpus", "withdrawal", "rate", "years", "stepUp"], assumptions: "Withdrawal is taken at the beginning of each month before monthly growth; annual withdrawal step-up applies from month 13; excludes taxes, fees and return volatility." },
-  { id: "fire", version: API_VERSION, title: "Financial independence timeline", inputs: ["annualExpenses", "currentSavings", "monthlySavings", "stepUp", "returnRate", "inflation", "withdrawalRate"], assumptions: "Annual spending grows with assumed inflation; monthly contributions compound monthly and step up annually; target corpus equals projected annual spending divided by user-supplied withdrawal rate; planning estimate, not a retirement guarantee." }
+  { id: "fire", version: API_VERSION, title: "Financial independence timeline", inputs: ["annualExpenses", "currentSavings", "monthlySavings", "stepUp", "returnRate", "inflation", "withdrawalRate"], assumptions: "Annual spending grows with assumed inflation; monthly contributions compound monthly and step up annually; target corpus equals projected annual spending divided by user-supplied withdrawal rate; planning estimate, not a retirement guarantee." },
+  { id: "ltv", version: API_VERSION, title: "Loan-to-value ratio", inputs: ["property", "loan"], assumptions: "Loan amount divided by the user-entered property value; lender valuation and eligibility rules are not inferred." },
+  { id: "flat-cost", version: API_VERSION, title: "All-in flat purchase cost", inputs: ["price", "stamp", "registration", "furnishing", "other"], assumptions: "Stamp duty and registration are user-entered percentages; no jurisdiction-specific statutory rates are applied." },
+  { id: "consumer-durable-loan", version: API_VERSION, title: "Consumer durable loan", inputs: ["price", "down", "rate", "years", "fee"], assumptions: "Financed amount is purchase price less down payment; fixed monthly amortization; processing fee is a user-entered percentage of financed amount." },
+  { id: "property-calculator", version: API_VERSION, title: "Property purchase cost and EMI", inputs: ["price", "down", "stamp", "registration", "rate", "years", "other"], assumptions: "Down payment is capped at property price; stamp duty and registration are user-entered percentages; excludes maintenance, insurance and jurisdiction-specific charges not entered." },
+  { id: "loan-against-property", version: API_VERSION, title: "Loan against property estimate", inputs: ["property", "ltv", "rate", "years"], assumptions: "Indicative loan equals property value times user-entered LTV; fixed monthly amortization; actual lender eligibility is not inferred." },
+  { id: "loan-prepayment-vs-sip", version: API_VERSION, title: "Loan prepayment versus investing", inputs: ["balance", "rate", "years", "prepay", "investmentReturn"], assumptions: "Compares modeled interest avoided after a lump-sum principal prepayment with the compounded value of investing the same cash; excludes taxes, fees and lender prepayment rules." }
 ];
 const numeric = (v, name, { min = 0, max = 1e15, optional = false, fallback } = {}) => {
   if (optional && (v === undefined || v === null || v === "")) v = fallback;
@@ -341,6 +347,60 @@ export function calculate(model, input) {
       const reached = reachedYear >= 0, yearsNeeded = reached ? reachedYear : 60;
       results = [number(reached ? "Years to financial independence" : "Not reached within 60 years", yearsNeeded), money("Corpus needed at that point", target), money("Same corpus in today's money", target / Math.pow(1 + inflation, yearsNeeded)), money("Projected portfolio at that point", portfolioThen), money("Annual spending at that point", spendThen)];
       assumptions = "Annual spending grows with assumed inflation; monthly contributions compound monthly and step up annually; target corpus equals projected annual spending divided by user-supplied withdrawal rate; planning estimate, not a retirement guarantee.";
+      break;
+    }
+    case "ltv": {
+      const property = n("property", { min: Number.MIN_VALUE }), loan = n("loan"), ratio = loan / property * 100;
+      results = [percent("Loan-to-value ratio", ratio), money("Equity / value not financed", Math.max(property - loan, 0)), money("Loan amount", loan)];
+      assumptions = "Loan amount divided by the user-entered property value; lender valuation and eligibility rules are not inferred.";
+      break;
+    }
+    case "flat-cost": {
+      const price = n("price"), stamp = n("stamp", { max: 100 }), registration = n("registration", { max: 100 }), furnishing = n("furnishing"), other = n("other");
+      const stampCost = price * stamp / 100, registrationCost = price * registration / 100, otherCosts = furnishing + other;
+      results = [money("Stamp duty", stampCost), money("Registration / transfer", registrationCost), money("Other purchase costs", otherCosts), money("Estimated all-in purchase cost", price + stampCost + registrationCost + otherCosts)];
+      assumptions = "Stamp duty and registration are user-entered percentages; no jurisdiction-specific statutory rates are applied.";
+      break;
+    }
+    case "consumer-durable-loan": {
+      const price = n("price"), down = Math.min(n("down"), price), annualRate = n("rate", { max: 100 }), duration = n("years", { min: 1 / 12, max: 100 }), feeRate = n("fee", { max: 100 });
+      const principal = price - down, months = Math.max(1, Math.round(duration * 12)), monthlyRate = annualRate / 1200;
+      const emi = principal === 0 ? 0 : monthlyRate === 0 ? principal / months : principal * monthlyRate * Math.pow(1 + monthlyRate, months) / (Math.pow(1 + monthlyRate, months) - 1);
+      const fee = principal * feeRate / 100, total = emi * months;
+      results = [money("Financed amount", principal), money("Monthly EMI", emi), money("Total interest", total - principal), money("Estimated all-in cost", total + down + fee)];
+      assumptions = "Financed amount is purchase price less down payment; fixed monthly amortization; processing fee is a user-entered percentage of financed amount.";
+      break;
+    }
+    case "property-calculator": {
+      const price = n("price"), down = Math.min(n("down"), price), stamp = n("stamp", { max: 100 }), registration = n("registration", { max: 100 });
+      const annualRate = n("rate", { max: 100 }), duration = n("years", { min: 1, max: 100 }), other = n("other");
+      const principal = price - down, months = Math.max(1, Math.round(duration * 12)), monthlyRate = annualRate / 1200;
+      const emi = principal === 0 ? 0 : monthlyRate === 0 ? principal / months : principal * monthlyRate * Math.pow(1 + monthlyRate, months) / (Math.pow(1 + monthlyRate, months) - 1);
+      const repayment = emi * months, stampCost = price * stamp / 100, registrationCost = price * registration / 100;
+      const upfront = down + stampCost + registrationCost + other;
+      results = [money("Loan amount", principal), money("Monthly EMI", emi), money("Cash needed upfront", upfront), money("Total loan interest", repayment - principal), money("Estimated total cash cost", upfront + repayment)];
+      assumptions = "Down payment is capped at property price; stamp duty and registration are user-entered percentages; excludes maintenance, insurance and jurisdiction-specific charges not entered.";
+      break;
+    }
+    case "loan-against-property": {
+      const property = n("property", { min: Number.MIN_VALUE }), ltv = n("ltv", { min: 1, max: 100 }), annualRate = n("rate", { max: 100 }), duration = n("years", { min: 1, max: 100 });
+      const principal = property * ltv / 100, months = Math.max(1, Math.round(duration * 12)), monthlyRate = annualRate / 1200;
+      const emi = monthlyRate === 0 ? principal / months : principal * monthlyRate * Math.pow(1 + monthlyRate, months) / (Math.pow(1 + monthlyRate, months) - 1);
+      const total = emi * months;
+      results = [money("Indicative loan amount", principal), money("Monthly EMI", emi), money("Total interest", total - principal)];
+      assumptions = "Indicative loan equals property value times user-entered LTV; fixed monthly amortization; actual lender eligibility is not inferred.";
+      break;
+    }
+    case "loan-prepayment-vs-sip": {
+      const balance = n("balance"), annualRate = n("rate", { max: 100 }), duration = n("years", { min: 1, max: 100 }), prepay = Math.min(n("prepay"), balance), investmentReturn = n("investmentReturn", { max: 100 });
+      const months = Math.max(1, Math.round(duration * 12)), loanRate = annualRate / 1200;
+      const emi = loanRate === 0 ? balance / months : balance * loanRate * Math.pow(1 + loanRate, months) / (Math.pow(1 + loanRate, months) - 1);
+      const baseInterest = emi * months - balance, newPrincipal = balance - prepay;
+      const newEmi = loanRate === 0 ? newPrincipal / months : newPrincipal === 0 ? 0 : newPrincipal * loanRate * Math.pow(1 + loanRate, months) / (Math.pow(1 + loanRate, months) - 1);
+      const saved = Math.max(baseInterest - (newEmi * months - newPrincipal), 0), investmentRate = investmentReturn / 1200;
+      const invested = investmentRate === 0 ? prepay : prepay * Math.pow(1 + investmentRate, months), difference = invested - saved;
+      results = [money("Estimated loan interest saved", saved, "positive"), money("Investment value of the same cash", invested), money("Loan EMI after prepayment", newEmi), money("Difference (investment value − interest saved)", difference, difference >= 0 ? "positive" : "negative")];
+      assumptions = "Compares modeled interest avoided after a lump-sum principal prepayment with the compounded value of investing the same cash; excludes taxes, fees and lender prepayment rules.";
       break;
     }
     default: throw Object.assign(new Error("Unsupported model. Use GET /v1/models to list supported models."), { unsupported: true });
