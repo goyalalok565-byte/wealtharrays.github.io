@@ -139,3 +139,11 @@ Active verification PR: #88 (`fix/phase0-clean-mainline-2026-11-20`), based on c
 PR #89 adds 275 snapshots (55 calculators × default/zero/blank/large/invalid) and independent top-10 reference tests. Canonical CI passed; Platform Gates status pending recheck. These snapshots lock current behaviour, not correctness by themselves.
 
 PR #88 Cloudflare bot reported a successful Worker deployment from unmerged head 6221a1b with a `/production/builds/` dashboard record. Treat as production Worker deployment report. Pages and live `/v1/health` remain unverified.
+
+
+## PR B — India tax-year terminology
+
+- Tax Year 2026–27 (from 1 April 2026): Income-tax Act, 2025, Section 156. The widget and generated runtime use this label only.
+- Assessment Year 2026–27 (FY 2025–26): Income-tax Act, 1961, Section 87A. This mapping is documented separately in `docs/INDIA-TAX-YEAR-SOURCES.md` with official Income Tax Department sources.
+- `widget.js` and `wa-calculator-runtime.js` are changed together. The generated runtime must be rebuilt in CI; do not update formulas or eligibility rules in this PR.
+- CA/legal eligibility review remains outstanding and is required before Phase 1.
