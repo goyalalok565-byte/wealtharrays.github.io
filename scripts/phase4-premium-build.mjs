@@ -107,6 +107,7 @@ for(const file of htmlFiles){
     if (s.includes('<!-- WA-STATIC-CALC-SHELL-START -->')) {
       s = s.replace(/<!-- WA-STATIC-CALC-SHELL-START -->[\s\S]*?<!-- WA-STATIC-CALC-SHELL-END -->/g, shell);
     } else {
+      s = s.replace(/(<div\\b(?=[^>]*\\bid=["']calc-widget["'])[^>]*>)(\\s*)<\\/div>/i, `$1${shell}</div>`);
     }
   }
   // Reuse the preloaded root stylesheet URL on nested article routes; otherwise the
