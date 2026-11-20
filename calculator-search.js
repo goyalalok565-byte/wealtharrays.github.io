@@ -23,6 +23,6 @@
       else{const results=CATALOG.map(c=>({c,score:score(c,q)})).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,8);box.innerHTML=results.length?results.map(({c})=>`<a class="wa-search-suggestion" href="${esc(c[1])}"><span><strong>${esc(c[0])}</strong><small>${esc(c[2])}</small></span><b aria-hidden="true">→</b></a>`).join(''):'<div class="tool-search-empty">No calculator found. Try SIP, EMI, FD, RD, loan, tax, salary or ROI.</div>'}show()};
     input.addEventListener('input',render);input.addEventListener('search',render);input.addEventListener('keyup',render);input.addEventListener('focus',render);input.addEventListener('keydown',e=>{if(e.key==='Escape'){hide();input.blur()}});document.addEventListener('click',e=>{if(!input.contains(e.target)&&!box.contains(e.target))hide()});window.WA_CALCULATOR_SEARCH_CATALOG=CATALOG;window.__WA_SEARCH_READY__=true;render();return true;
   }
-  function boot(){if(install())return;const observer=new MutationObserver(()=>{if(install())observer.disconnect()});observer.observe(document.documentElement,{childList:true,subtree:true});[50,150,300,600,1200,2500].forEach(ms=>setTimeout(install,ms))}
+  function boot(){install()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();

@@ -67,8 +67,11 @@ async function assertCalculator(path, label, phase2 = false) {
 try {
   await page.goto(`${baseUrl}/index.html`, { waitUntil: 'networkidle' });
   await dismissPrivacyChoices();
-  const stylesheet = await page.locator('link[rel="stylesheet"][href*="styles.css"]').count();
-  if (!stylesheet) throw new Error('Homepage stylesheet link is missing');
+  const stylesheet = page.locator('link[rel="stylesheet"][href*="wa-home."][href$=".css"]');
+  if (!(await stylesheet.count())) throw new Error('Homepage content-hashed stylesheet link is missing');
+  const stylesheetUrl = await stylesheet.first().getAttribute('href');
+  const stylesheetResponse = await page.request.get(new URL(stylesheetUrl, baseUrl).toString());
+  if (!stylesheetResponse.ok()) throw new Error(`Homepage stylesheet failed to load: ${stylesheetResponse.status()} ${stylesheetUrl}`);
   const bodyDisplay = await page.locator('body').evaluate(el => getComputedStyle(el).display);
   if (bodyDisplay === 'inline') throw new Error('Homepage body is rendering with inline/default styling; CSS may be missing');
   if ((await page.locator('h1').count()) !== 1) throw new Error('Homepage must have exactly one H1');
@@ -197,7 +200,7 @@ try {
   await page.locator('#calc-widget .calc-result-row').first().waitFor({ state: 'visible', timeout: 5000 });
   const cagrResult = await page.locator('#calc-widget .calc-result-value').allTextContents();
   if (!cagrResult.some(value => value.includes('10.00%'))) throw new Error('CAGR Calculate click did not produce the expected 10.00% result');
-  const cagrExample = await page.locator('.tool-article').innerText();
+  const cagrExample = await page.locator('.tool-article').evaluate(element => element.textContent || '');
   if (!cagrExample.includes('₹1,00,000') || !cagrExample.includes('₹1,61,051') || !cagrExample.includes('10.00%')) throw new Error('CAGR worked example is missing key verified values');
 
   await assertCalculator('income-tax-scenario-calculator/', 'Income tax scenario calculator');
@@ -207,7 +210,7 @@ try {
   if (await page.locator('#calc-widget .calc-result-row').count()) throw new Error('Income tax scenario must not calculate automatically while filling inputs');
   await page.locator('#calc-widget button[id$="-calculate"]').click();
   await page.locator('#calc-widget .calc-result-row').first().waitFor({ state: 'visible', timeout: 5000 });
-  const taxExample = await page.locator('.tool-article').innerText();
+  const taxExample = await page.locator('.tool-article').evaluate(element => element.textContent || '');
   for (const value of ['₹12,00,000','₹1,50,000','₹10,50,000','₹1,57,500','₹10,42,500']) {
     if (!taxExample.includes(value)) throw new Error('Income tax worked example is missing ' + value);
   }

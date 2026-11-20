@@ -14,7 +14,7 @@ function walk(dir) {
       let after = before.replaceAll('aria-label="Wealth Arrays home"', 'aria-label="Wealth Arrays"').replaceAll('<select id="currency-select">','<select id="currency-select" aria-label="Currency">');
       if(entry.name==='widget.html'){
         after=after.replace(/\s*<script[^>]+src=["']\/calculators\.js[^>]*><\/script>/gi,'').replace(/\s*<script[^>]+src=["']\/wa-calculator-runtime\.js[^>]*><\/script>/gi,'').replace(/\s*<script[^>]+src=["']\/widget-bootstrap\.js[^>]*><\/script>/gi,'');
-        after=after.replace('</body>','<script src="/calculators.js"></script><script src="/wa-calculator-runtime.js"></script><script src="/widget-bootstrap.js"></script></body>');
+        after=after.replace('</body>','<script src="/calculators.js"></script><script src="/wa-calculator-runtime.js" defer></script></body>');
       }
       if (after !== before) {
         fs.writeFileSync(full, after);

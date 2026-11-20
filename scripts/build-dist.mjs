@@ -13,12 +13,13 @@ const PUBLIC_ROOT_EXACT = new Set([
 ]);
 const PUBLIC_DIRS = new Set(['articles','research','calculator-definitions','assets']);
 const EXCLUDE_DIRS = new Set([
-  '.git','.github','node_modules','qa','scripts',
+  '.git','.github','node_modules','qa','scripts','docs','tests','functions','migrations',
   'country-modules','api','p','privacy','reports','dist'
 ]);
 const EXCLUDE_ROOT = new Set([
   'ARCHITECTURE.md','PHASE10_AUDIT.md','PHASE3_FINAL.md','QA_TESTS.md',
   'README-RELEASE.md','STABILIZATION-PLAN.md','GLOBAL-PLATFORM-SPEC.md',
+  'wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js','widget.js','widget-bootstrap.js','calculator-safety.js','calculator-page-init.js',
   'GLOBAL-PRODUCT-ROADMAP.md','content-sources.json','CNAME'
 ]);
 
@@ -46,7 +47,7 @@ for (const e of fs.readdirSync(root, { withFileTypes: true })) {
   if (e.isDirectory()) continue;
   if (PUBLIC_ROOT_EXACT.has(e.name) || PUBLIC_ROOT_EXTS.has(path.extname(e.name).toLowerCase())) {
     // JSON is intentionally limited to known browser-facing files.
-    if (path.extname(e.name).toLowerCase() === '.json' && !['ai-contract.json','global-seo-config.json','calculator-value-content.json','model-registry.json'].includes(e.name)) continue;
+    if (path.extname(e.name).toLowerCase() === '.json' && !['ai-contract.json','global-seo-config.json','model-registry.json'].includes(e.name)) continue;
     copyFile(path.join(root, e.name), e.name);
   }
 }
@@ -93,15 +94,15 @@ function auditTree(dir, rel='') {
 }
 auditTree(out);
 const forbiddenHits = forbidden.filter(p =>
-  /^(qa|scripts|country-modules|api|p|privacy|reports)(\/|$)/.test(p) ||
+  /^(qa|scripts|docs|tests|functions|migrations|country-modules|api|p|privacy|reports)(\/|$)/.test(p) ||
   /\.(md)$/i.test(p) ||
   p === 'content-sources.json' ||
-  p.startsWith('.github/')
+  p.startsWith('.github/') || /\.(zip|bak|old|orig)$/i.test(p) || p === 'package.json' || p === 'calculator-value-content.json'
 );
 if (forbiddenHits.length) {
   throw new Error('Forbidden internal files leaked into dist:\n' + forbiddenHits.join('\n'));
 }
-for (const required of ['index.html','robots.txt','sitemap.xml','ads.txt','_headers','_redirects','sw.js','manifest.webmanifest','widget.html','widget/index.html','widget.js','widget-bootstrap.js','wa-site-runtime.js','wa-home-runtime.js','wa-calculator-runtime.js']) {
+for (const required of ['index.html','robots.txt','sitemap.xml','ads.txt','_headers','_redirects','sw.js','manifest.webmanifest','widget.html','widget/index.html','wa-site-runtime.js','wa-home-runtime.js','wa-calculator-runtime.js','wa-article-runtime.js','pdf-export-fix.js']) {
   if (!fs.existsSync(path.join(out, required))) throw new Error('Missing required public output: ' + required);
 }
 const definitionsSrc = path.join(root, 'calculator-definitions');
@@ -116,5 +117,7 @@ for (const name of definitionFiles) {
   }
 }
 if (!definitionFiles.length) throw new Error('No calculator definition JavaScript files found.');
+if (fs.existsSync(path.join(out, 'calculator-value-content.json'))) throw new Error('Build-only calculator-value-content.json must not be deployed.');
+if (fs.existsSync(path.join(out, 'calculator-value-content.json'))) throw new Error('Build-only calculator-value-content.json must not be deployed.');
 console.log('Cloudflare public build PASS:', forbidden.length, 'public files emitted to dist/.');
 console.log('Calculator definitions PASS:', definitionFiles.length, 'definition scripts copied to dist/.');

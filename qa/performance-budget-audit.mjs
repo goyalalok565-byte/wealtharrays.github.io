@@ -66,12 +66,12 @@ auditHtml(process.cwd());
 const headersPath = path.join(process.cwd(), '_headers');
 if (fs.existsSync(headersPath)) {
   const headerText = fs.readFileSync(headersPath, 'utf8');
-  for (const asset of ['wa-site-runtime.js', 'wa-home-runtime.js', 'wa-calculator-runtime.js']) {
-    const start = headerText.indexOf('/' + asset + '\n');
-    const end = start >= 0 ? headerText.indexOf('\n/', start + 1) : -1;
-    const block = start >= 0 ? headerText.slice(start, end >= 0 ? end : undefined) : '';
+  for (const [pattern, label] of [['/*.js', 'JavaScript'], ['/*.css', 'CSS']]) {
+    const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const match = headerText.match(new RegExp('(?:^|\\n)' + escaped + '\\n([\\s\\S]*?)(?=\\n/|$)'));
+    const block = match?.[1] || '';
     if (!block.includes('max-age=31536000') || !block.includes('immutable')) {
-      failures.push('_headers: ' + asset + ' must use one-year immutable caching because its URL is content-hashed.');
+      failures.push('_headers: ' + pattern + ' must use one-year immutable caching for content-hashed ' + label + ' assets.');
     }
   }
 }

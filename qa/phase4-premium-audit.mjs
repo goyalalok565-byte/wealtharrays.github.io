@@ -19,6 +19,10 @@ if(!fs.existsSync(path.join(root,'wa-calculator-runtime.js'))) failures.push('wa
 if(!fs.existsSync(path.join(root,'phase4-premium.css'))) failures.push('phase4-premium.css missing');
 if(!fs.existsSync(path.join(root,'theme-init.js'))) failures.push('theme-init.js missing');
 if(!fs.existsSync(path.join(root,'404-runtime.js'))) failures.push('404-runtime.js missing');
+const phase4Runtime=read('phase4-premium.js');if(phase4Runtime.includes('MutationObserver')||phase4Runtime.includes('dedupeSharedControls')) failures.push('phase4-premium.js: DOM mutation dedupe observer must remain removed.');
+if(fs.existsSync(path.join(root,'production-hotfix.js'))) failures.push('production-hotfix.js: retired duplicate loader must remain deleted.');
+const adRuntime=read('wa-ad-loader.js');if(!adRuntime.includes('requestIdleCallback')||!adRuntime.includes('fallbackTimer=setTimeout(function')||!adRuntime.includes('},4000);')||!adRuntime.includes("addEventListener('load'")) failures.push('wa-ad-loader.js: AdSense must wait for first interaction or a 4 s post-load idle fallback.');
+const consentRuntime=read('consent-loader.js');if(!consentRuntime.includes('requestIdleCallback')||!consentRuntime.includes('timer=setTimeout(function')||!consentRuntime.includes('},4000);')||!consentRuntime.includes("addEventListener('load'")) failures.push('consent-loader.js: Funding Choices must wait for first interaction or a 4 s post-load idle fallback.');
 for(const f of calc){if(!fs.existsSync(path.join(root,f))) failures.push(`Missing calculator: ${f}`);}
 for(const full of publicFiles){
  const r=path.relative(root,full).replaceAll(path.sep,'/'), s=fs.readFileSync(full,'utf8');
@@ -38,12 +42,12 @@ for(const full of publicFiles){
 for(const file of publicFiles){
   const base=path.basename(file);
   const rel=path.relative(root,file).replaceAll(path.sep,'/');
-  const routeName=rel==='widget/index.html'?'widget/index.html':base;
+  const routeName=rel;
   const html=fs.readFileSync(file,'utf8');
   const noindex=/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html);
-  const consentExcluded=['404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html'].includes(routeName) || noindex;
+  const consentExcluded=['index.html','404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html'].includes(routeName) || noindex;
   if(consentExcluded){
-    if(html.includes('/consent-loader.js')) failures.push(base+': Funding Choices loader must not run on disclosure/legal document');
+    if(html.includes('/consent-loader.js')) failures.push(base+': Funding Choices loader must not run on an ad-exempt, disclosure, or legal route');
   }else if(!html.includes('/consent-loader.js')){
     failures.push(base+': Funding Choices consent loader missing');
   }

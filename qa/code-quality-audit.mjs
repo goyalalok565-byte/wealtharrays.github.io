@@ -4,7 +4,7 @@ import crypto from 'node:crypto';
 
 const root = process.cwd();
 const canonicalSources = ['widget.js','wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','calculator-page-init.js','phase4-premium.js'];
-const siteSources = ['wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js','calculator-search.js'];
+const siteSources = ['wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js' ];
 const homeSources = ['final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js'];
 const supportSources = ['theme-init.js','404-runtime.js'];
 const sourceFiles = [...canonicalSources,...supportSources];
@@ -18,8 +18,11 @@ const calculatorBundle=fs.readFileSync('wa-calculator-runtime.js','utf8');
 for(const {file,text} of js.slice(0,canonicalSources.length)){const hash=crypto.createHash('sha256').update(text.replace(/\r\n/g,'\n').trimEnd()).digest('hex').slice(0,12);if(!calculatorBundle.includes(`WA CANONICAL MODULE | calculator | ${file} | sha256:${hash}`)) throw new Error(`Calculator bundle provenance missing/stale for ${file}`);}
 const siteBundle=fs.readFileSync('wa-site-runtime.js','utf8');
 const homeBundle=fs.readFileSync('wa-home-runtime.js','utf8');
+const articleBundle=fs.readFileSync('wa-article-runtime.js','utf8');
+const articleSources=['wa-core.js','phase4-premium.js'];
 for(const file of siteSources){const text=fs.readFileSync(path.join(root,file),'utf8');const hash=crypto.createHash('sha256').update(text.replace(/\r\n/g,'\n').trimEnd()).digest('hex').slice(0,12);if(!siteBundle.includes(`WA CANONICAL MODULE | site | ${file} | sha256:${hash}`)) throw new Error(`Site bundle provenance missing/stale for ${file}`);}
 for(const file of homeSources){const text=fs.readFileSync(path.join(root,file),'utf8');const hash=crypto.createHash('sha256').update(text.replace(/\r\n/g,'\n').trimEnd()).digest('hex').slice(0,12);if(!homeBundle.includes(`WA CANONICAL MODULE | home | ${file} | sha256:${hash}`)) throw new Error(`Home bundle provenance missing/stale for ${file}`);}
+for(const file of articleSources){const text=fs.readFileSync(path.join(root,file),'utf8');const hash=crypto.createHash('sha256').update(text.replace(/\r\n/g,'\n').trimEnd()).digest('hex').slice(0,12);if(!articleBundle.includes('WA CANONICAL MODULE | article | '+file+' | sha256:'+hash)) throw new Error('Article bundle provenance missing/stale for '+file);}
 const pages=[];
 function walkCalculatorPages(dir){
   for(const entry of fs.readdirSync(dir,{withFileTypes:true})){
@@ -46,5 +49,6 @@ if(fs.existsSync('calculator-runtime.js')) throw new Error('Retired calculator-r
 if(fs.statSync('wa-calculator-runtime.js').size>750_000) throw new Error(`Canonical calculator runtime exceeds 750 KB`);
 if(fs.statSync('wa-site-runtime.js').size>750_000) throw new Error(`Canonical site runtime exceeds 750 KB`);
 if(fs.statSync('wa-home-runtime.js').size>750_000) throw new Error(`Canonical home runtime exceeds 750 KB`);
+if(fs.statSync('wa-article-runtime.js').size>750_000) throw new Error(`Canonical article runtime exceeds 750 KB`);
 if(fs.existsSync('node_modules')) throw new Error('node_modules must not exist in deployable tree');
 console.log(`Code-quality audit PASS — ${canonicalSources.length} canonical calculator source modules plus ${supportSources.length} support modules are unique; calculator/site provenance is fresh; calculator-only Phase 2 code is isolated; calculator pages are isolated from direct source dependencies; deploy-tree hygiene is clean.`);

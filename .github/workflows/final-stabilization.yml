@@ -82,6 +82,8 @@ jobs:
           node scripts/launch-readiness.mjs
           node scripts/phase10-qa.mjs
           node scripts/build-dist.mjs
+          node scripts/build-css-bundles.mjs
+          node scripts/hash-js-assets.mjs
           npm run qa:dist
           git diff --check
       - name: Commit deterministic build

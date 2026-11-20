@@ -1,7 +1,7 @@
 /* Wealth Arrays global theme controller — calculator fallback only. Hub pages are owned by wa-core. */
 (function(){
   'use strict';
-  if(window.__WEALTH_ARRAYS_CORE_LOADED__&&!document.querySelector('.calc-page'))return;
+  if(window.__WEALTH_ARRAYS_CORE_LOADED__)return;
   var KEY='waTheme';
   var REMOVED=['step-up-sip-calculator.html','emergency-fund-calculator.html','real-return-calculator.html'];
   function read(){try{return localStorage.getItem(KEY)==='dark'?'dark':'light'}catch(e){return document.documentElement.dataset.theme==='dark'?'dark':'light'}}
