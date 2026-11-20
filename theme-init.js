@@ -18,12 +18,12 @@
     if(savedTheme==='dark'||savedTheme==='light')document.documentElement.dataset.theme=savedTheme;
   }catch(_error){}
   function syncThemeButton(){applyTheme(document.documentElement.dataset.theme||'light');}
-  // Calculator pages already receive this handler from the canonical calculator runtime.
-  // Other pages use this early delegated handler so their header toggle is never inert.
+  // Calculator pages and pages with the canonical site runtime already own theme clicks.
+  // The early delegated handler fills the gap on lightweight pages such as the homepage.
   document.addEventListener('click',function(event){
     var target=event.target;
     var button=target&&typeof target.closest==='function'?target.closest('#theme-toggle,.theme-toggle'):null;
-    if(!button||document.querySelector('.calc-page'))return;
+    if(!button||window.__WEALTH_ARRAYS_CORE_LOADED__||document.querySelector('.calc-page'))return;
     event.preventDefault();
     var next=document.documentElement.dataset.theme==='dark'?'light':'dark';
     try{localStorage.setItem('waTheme',next);}catch(_error){}
