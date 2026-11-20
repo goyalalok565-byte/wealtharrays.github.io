@@ -69,6 +69,11 @@ jobs:
         env:
           BASE_URL: http://127.0.0.1:4173
         run: node qa/cloud-workspace-sync-browser-smoke.mjs
+      - name: PR browser smoke — third-party scripts respect consent and ad slots
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          BASE_URL: http://127.0.0.1:4173
+        run: node qa/third-party-loading-browser-smoke.mjs
       - name: Run seven-page mobile Lighthouse baseline
         env:
           BASE_URL: ${{ github.event_name == 'pull_request' && 'http://127.0.0.1:4173' || 'https://wealtharrays.com' }}
