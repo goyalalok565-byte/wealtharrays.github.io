@@ -77,14 +77,15 @@ Scores are preliminary engineering assessments from repository inspection, uploa
 - Homepage Lighthouse findings are specific: low contrast on Quick EMI result label/output/meta text; target-size/overlap warnings around Scenario Lab CTA, calculator cards and category cards.
 - PR #81 (`docs/project-state-baseline-2026-11-20`) is open; its latest observed Platform Gates run was still in progress. Cloudflare bot posted a successful Worker build for its commit; that is not proof of a Pages production release.
 - PR #82 (`fix/tax-year-aware-rebate-label`) is open and stacked on PR #81. Its local 50/50 tests and build passed on the ZIP-based worktree; GitHub CI had not started at last check. It changes only tax-year UI terminology, not calculations. CA/legal review remains required.
+- PR #83 (`fix/strict-mobile-release-gates`) is open against main and includes the CLS host fix, strict mobile release gates, homepage accessibility repairs, registry parity checks, a safe /v1/health endpoint and deployment inventory controls. Canonical CI, Platform Gates and Mobile Lighthouse were running at the latest check; no pass is claimed yet.
 
 ## Phase 0 — status and open items
 
 1. **P0-1 Calculator CLS:** PR #78 adds the missing `.calc-widget` host class and static reservation. Do not merge until strict release gates and browser regressions pass.
 2. **P0-2 Performance gates:** This PR adds strict numeric checks for Performance >=90, CLS <=0.10, TBT <=200ms and LCP <=2500ms, retaining accessibility >=95, best practices >=80 and SEO >=90. Tests must prove a threshold violation fails. The current preview is expected to fail until performance is improved; never relax thresholds.
 3. **P0-3 Tax terminology:** PR #82 updates the Tax Year 2026-27 widget wording to Section 156 and adds source/runtime regression coverage. No formula or eligibility logic changed. CA/legal review is still a release prerequisite.
-4. **P0-4 Registry source of truth:** Remove stale 47-calculator workflow labels and derive route/count assertions from `calculators.js` across pages, navigation, sitemap, `llms.txt`, metadata, workflows and tests.
-5. **P0-5 Health and monitoring:** Add safe `GET /v1/health` with status, version and dependency checks; expose no secrets; add tests and monitoring.
+4. **P0-4 Registry source of truth:** PR #83 removes stale 47/55 workflow labels and adds a registry audit across calculator pages, split definitions, homepage, tools, search, sitemap, `llms.txt`, methodology and metadata. Build/CI verification is pending.
+5. **P0-5 Health and monitoring:** PR #83 adds `GET /v1/health` with API version, liveness, D1 probe, Supabase/Razorpay/rate-limiter readiness flags, no secret values, OpenAPI docs and Worker routing regression tests. Monitoring integration and CI verification remain pending.
 6. **P0-6 Deployment hygiene:** PR #83 adds a shared exclusion policy for QA, scripts, docs, tests, workflows, backups and archives; a deterministic public-file manifest; local dist inventory audit; and a production check that probes internal paths and HEAD-checks manifest files. CI and post-deploy verification remain pending.
 
 ## Phase 1 — blocked pending Phase 0
