@@ -30,6 +30,11 @@
     if (started || !hasAdSlot()) return;
     started = true;
     window.__waFundingChoicesLoaded = true;
+    var preconnect = document.createElement('link');
+    preconnect.rel = 'preconnect';
+    preconnect.href = 'https://fundingchoicesmessages.google.com';
+    preconnect.crossOrigin = 'anonymous';
+    document.head.appendChild(preconnect);
     var script = document.createElement('script');
     script.async = true;
     script.src = 'https://fundingchoicesmessages.google.com/i/pub-6507600103785450?ers=1';
