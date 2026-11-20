@@ -72,8 +72,8 @@ jobs:
       - name: Embed browser smoke
         run: node qa/embed-browser-smoke.mjs
 
-      - name: Deep audit all 47 calculator pages in browser
-        run: node qa/all-47-calculators-browser-smoke.mjs
+      - name: Deep audit all canonical calculator pages in browser
+        run: node qa/all-calculators-browser-smoke.mjs
 
       - name: Visual and calculator browser smoke
         run: node qa/production-browser-smoke.mjs
@@ -139,6 +139,11 @@ jobs:
           echo "Production did not expose canonical runtime bundles built from the checked-out source within ten minutes."
           echo "Final observed asset URLs: home=$actual_home site=$actual_site calc=$actual_calc"
           exit 1
+
+      - name: Verify production deployment manifest and internal path exclusions
+        env:
+          BASE_URL: https://wealtharrays.com
+        run: node qa/production-deployment-hygiene.mjs
 
       - name: Production embed browser smoke
         env:
