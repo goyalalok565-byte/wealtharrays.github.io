@@ -130,25 +130,46 @@ try {
         assert(lossValues[2].trim() === expectedLoss.loss, 'capital-gain: after-tax result must preserve the loss');
       }
 
-      // Check the minimum bound for each numeric field and every declared maximum, one field at a time.
-      for (const boundField of calc.fields.filter(f => f.type !== 'select')) {
-        const bounds = [];
-        if (boundField.min !== undefined) bounds.push(['min', Number(boundField.min)]);
-        if (boundField.max !== undefined) bounds.push(['max', Number(boundField.max)]);
-        for (const [kind, bound] of bounds) {
-          const input = page.locator('#f-' + boundField.id);
-          const old = await input.inputValue();
-          if (Number(old) === bound) continue;
-          await input.fill(String(bound));
-          await page.locator('#calc-widget button[id$="-calculate"]').click();
-          const boundRows = page.locator('#calc-widget .calc-result-row');
-          assert(await boundRows.count() > 0, calc.id + ': ' + boundField.id + ' ' + kind + ' bound returned no result');
-          const vals = await boundRows.locator('.calc-result-value').allTextContents();
-          assert(vals.every(v => v.trim() && !/NaN|Infinity|undefined|null|^—$/.test(v.trim())), calc.id + ': non-finite output at ' + boundField.id + ' ' + kind + ' bound');
-          // Restore the field so the next boundary check starts from the current normal state.
-          await input.fill(old);
-          await page.locator('#calc-widget button[id$="-calculate"]').click();
+      // Exercise every declared numeric min/max through the real Calculate event.
+      // Batch browser-side interactions per route to avoid thousands of Playwright round trips.
+      const boundaryChecks = calc.fields.filter(f => f.type !== 'select').flatMap(f => [
+        ...(f.min === undefined ? [] : [{ fieldId: f.id, kind: 'min', value: Number(f.min) }]),
+        ...(f.max === undefined ? [] : [{ fieldId: f.id, kind: 'max', value: Number(f.max) }])
+      ]);
+      const boundaryResults = await page.evaluate(async checks => {
+        const button = document.querySelector('#calc-widget button[id$="-calculate"]');
+        const nextFrame = () => new Promise(resolve => requestAnimationFrame(() => resolve()));
+        const results = [];
+        for (const check of checks) {
+          const input = document.getElementById('f-' + check.fieldId);
+          if (!input) {
+            results.push({ ...check, error: 'field missing' });
+            continue;
+          }
+          const previous = input.value;
+          if (Number(previous) === check.value) continue;
+          input.value = String(check.value);
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+          button.click();
+          await nextFrame();
+          const rows = [...document.querySelectorAll('#calc-widget .calc-result-row')];
+          const values = rows.map(row => row.querySelector('.calc-result-value')?.textContent?.trim() || '');
+          results.push({
+            ...check,
+            rowCount: rows.length,
+            invalidValues: values.filter(value => !value || /NaN|Infinity|undefined|null|^—$/.test(value))
+          });
+          input.value = previous;
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+          button.click();
+          await nextFrame();
         }
+        return results;
+      }, boundaryChecks);
+      for (const result of boundaryResults) {
+        assert(!result.error, calc.id + ': ' + result.fieldId + ' field missing at ' + result.kind + ' bound');
+        assert(result.rowCount > 0, calc.id + ': ' + result.fieldId + ' ' + result.kind + ' bound returned no result');
+        assert(result.invalidValues.length === 0, calc.id + ': invalid output at ' + result.fieldId + ' ' + result.kind + ' bound');
       }
 
       // Confirm tablet and desktop layouts do not overflow, independently for each calculator route.

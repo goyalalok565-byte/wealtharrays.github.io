@@ -309,3 +309,10 @@ Never treat repository source, local builds or CI deploy messages as proof of li
 - Field INP/CrUX and real-device performance remain unverified; Lighthouse lab TBT is not field INP.
 - CA/legal review and page-specific authoritative source citations remain required. No formulas or tax eligibility logic were changed.
 - PR #97 remains open and unmerged. Do not merge without the exact owner approval phrase `merge approved`.
+
+
+### Exhaustive browser-smoke runtime follow-up
+
+- The 55-calculator smoke now batches each route's numeric min/max checks in the page context while still dispatching real input and Calculate events and validating finite output rows. This reduces Playwright round trips without dropping any declared numeric bound.
+- The mobile Lighthouse job timeout is 45 minutes to accommodate all 55 calculators plus the full 21-run, seven-route performance matrix on slower GitHub-hosted runners.
+- Fresh CI on the new head is required; no verification is implied by the earlier successful run.
