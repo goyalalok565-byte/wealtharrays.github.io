@@ -3,7 +3,7 @@
 function boot(){
   var host=document.getElementById('calc-widget');
   if(window.parent!==window) document.documentElement.dataset.waEmbed='1';
-  if(!host||host.dataset.waBooted==='1'||host.children.length)return false;
+  if(!host||host.dataset.waBooted==='1'||(host.children.length&&!host.querySelector('[data-wa-static-shell]')))return false;
   if(typeof mountCalculator!=='function'||typeof CALCULATORS==='undefined')return false;
   var id=new URLSearchParams(location.search).get('calc')||'sip';
   var calc=CALCULATORS.find(function(x){return x.id===id||x.slug===id;})||CALCULATORS.find(function(x){return x.id==='sip';})||CALCULATORS[0];
