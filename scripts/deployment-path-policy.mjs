@@ -8,7 +8,7 @@ const FORBIDDEN_EXTENSIONS = new Set([
   ".md", ".zip", ".7z", ".rar", ".tar", ".gz", ".bak", ".backup",
   ".old", ".orig", ".tmp", ".log", ".map"
 ]);
-const FORBIDDEN_FILES = new Set(["content-sources.json", "package.json", "package-lock.json", "wrangler.toml"]);
+const FORBIDDEN_FILES = new Set(["content-sources.json", "package.json", "package-lock.json", "wrangler.toml", "wa-core.js", "site-runtime.js", "final-polish.js", "theme-fix.js", "phase3-seo.js", "phase4-premium.js"]);
 
 export function isForbiddenDeploymentPath(relativePath) {
   const normalized = String(relativePath).replaceAll("\\", "/").replace(/^\.\//, "");
