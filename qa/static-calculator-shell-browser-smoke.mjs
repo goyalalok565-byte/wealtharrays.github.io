@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const { CALCULATORS } = require('../calculators.js');
-const base = (process.env.BASE_URL || 'http://127.0.0.1:4173').replace(/\\/$/, '');
+const base = (process.env.BASE_URL || 'http://127.0.0.1:4173').replace(/\/$/, '');
 const browser = await chromium.launch({ headless: true });
 try {
   const page = await browser.newPage({ javaScriptEnabled: false, viewport: { width: 360, height: 800 } });
