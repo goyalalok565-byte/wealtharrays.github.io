@@ -195,3 +195,11 @@ Ultra remains waitlist-only: no public checkout, no paid launch and no Ultra pri
 
 
 PR C CI also builds the current `main` commit in a separate job and runs the same seven-route Lighthouse settings plus the same homepage-with/without-Funding-Choices TBT diagnostic. Artifacts are uploaded separately as `wealth-arrays-main-homepage-baseline` so homepage TBT can be compared against the PR build without changing throttling or thresholds.
+
+
+## Main-vs-PR homepage TBT diagnostic — 2026-11-20
+
+- Main branch baseline (post PR A+B, pre PR C), same seven-route Lighthouse configuration: homepage Performance 66, FCP 2.0s, LCP 3.7s, TBT 1,020ms, CLS 0; six long tasks. Artifact: https://github.com/goyalalok565-byte/wealtharrays.github.io/actions/runs/44688002384/artifacts/14607342567 .
+- Controlled diagnostic blocking only Google Funding Choices (all other homepage code and Lighthouse settings unchanged): TBT 5ms, a 1,014ms reduction. Diagnostic interpretation: Funding Choices is a likely major contributor.
+- PR C does not disable the CMP globally or bypass consent. It loads Funding Choices only on pages with an explicit ad slot, and observes for dynamically inserted ad slots. The current site has no ad slots; analytics remains governed by the first-party consent UI. Browser QA verifies no CMP request without a slot and one load after a dynamic slot is added.
+- Expected TBT benefit must be confirmed by fresh PR Lighthouse; no performance pass is claimed until the strict gate passes.
