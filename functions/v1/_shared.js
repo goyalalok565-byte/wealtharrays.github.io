@@ -1,4 +1,4 @@
-export const API_VERSION = "1.0.0";
+export const API_VERSION = "1.1.0";
 export const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
@@ -22,7 +22,12 @@ export const MODEL_LIST = [
   { id: "cagr", version: API_VERSION, title: "CAGR", inputs: ["startValue", "endValue", "years"], assumptions: "Positive starting and ending values over a positive duration." },
   { id: "inflation", version: API_VERSION, title: "Inflation projection", inputs: ["currentCost", "annualInflationRate", "years"], assumptions: "Constant annual inflation compounded yearly." },
   { id: "simple-interest", version: API_VERSION, title: "Simple interest", inputs: ["principal", "annualRate", "years"], assumptions: "Simple, non-compounding interest." },
-  { id: "currency-converter", version: API_VERSION, title: "Currency conversion", inputs: ["amount", "rate", "from", "to"], assumptions: "Uses the exchange rate supplied in the request; live rates are available separately at /v1/fx." }
+  { id: "currency-converter", version: API_VERSION, title: "Currency conversion", inputs: ["amount", "rate", "from", "to"], assumptions: "Uses the exchange rate supplied in the request; live rates are available separately at /v1/fx." },
+  { id: "roi", version: API_VERSION, title: "Return on investment", inputs: ["cost", "finalValue", "years"], assumptions: "Simple endpoint return; excludes interim cash flows, taxes, fees and timing effects." },
+  { id: "recurring-deposit", version: API_VERSION, title: "Recurring deposit maturity", inputs: ["monthly", "annualRate", "years"], assumptions: "Equal deposits at the end of each month; monthly compounding; constant assumed rate." },
+  { id: "net-worth", version: API_VERSION, title: "Net worth", inputs: ["cash", "investments", "property", "debt"], assumptions: "User-entered asset values less user-entered debt; excludes unlisted assets and liabilities." },
+  { id: "profit-margin", version: API_VERSION, title: "Profit margin", inputs: ["revenue", "cost"], assumptions: "Single-period revenue less cost; excludes tax and non-operating items." },
+  { id: "sip-goal", version: API_VERSION, title: "SIP goal planner", inputs: ["target", "current", "annualRate", "years"], assumptions: "Current corpus grows monthly; required contributions occur at the beginning of each month at a constant assumed rate." }
 ];
 const numeric = (v, name, { min = 0, max = 1e15, optional = false, fallback } = {}) => {
   if (optional && (v === undefined || v === null || v === "")) v = fallback;
@@ -100,6 +105,46 @@ export function calculate(model, input) {
       if (!/^[A-Z]{3}$/.test(from) || !/^[A-Z]{3}$/.test(to)) throw Object.assign(new Error("from and to must be three-letter currency codes."), { field: "from/to" });
       results = [number(from + " amount", amount), number("Converted amount (" + to + ")", amount * fxRate)];
       assumptions = "User-supplied exchange rate; provider spreads and fees excluded.";
+      break;
+    }
+    case "roi": {
+      const cost = n("cost", { min: Number.MIN_VALUE }), finalValue = n("finalValue"), duration = years();
+      const profit = finalValue - cost;
+      results = [money("Initial cost", cost), money("Net gain / loss", profit), percent("Return on investment", profit / cost * 100)];
+      assumptions = "Simple endpoint return; excludes interim cash flows, taxes, fees and timing effects; years is contextual only.";
+      break;
+    }
+    case "recurring-deposit": {
+      const monthly = n("monthly"), annualRate = rate(), duration = years(), months = Math.round(duration * 12), monthlyRate = annualRate / 1200;
+      const invested = monthly * months;
+      const maturity = monthlyRate === 0 ? invested : monthly * (Math.pow(1 + monthlyRate, months) - 1) / monthlyRate;
+      results = [money("Total deposits", invested), money("Estimated interest", maturity - invested), money("Estimated maturity value", maturity, "positive")];
+      assumptions = "Equal deposits at the end of each month; monthly compounding; constant assumed annual rate.";
+      break;
+    }
+    case "net-worth": {
+      const cash = n("cash"), investments = n("investments"), property = n("property"), debt = n("debt");
+      const assets = cash + investments + property, netWorth = assets - debt;
+      results = [money("Total listed assets", assets), money("Total listed liabilities", debt), money("Estimated net worth", netWorth, netWorth >= 0 ? "positive" : "negative")];
+      assumptions = "User-entered asset values less user-entered debt; excludes unlisted assets and liabilities.";
+      break;
+    }
+    case "profit-margin": {
+      const revenue = n("revenue", { min: Number.MIN_VALUE }), cost = n("cost");
+      const profit = revenue - cost;
+      results = [money("Revenue", revenue), money("Profit / loss", profit), percent("Profit margin", profit / revenue * 100)];
+      assumptions = "Single-period revenue less cost; excludes tax and non-operating items.";
+      break;
+    }
+    case "sip-goal": {
+      const target = n("target"), current = n("current"), annualRate = rate(), duration = n("years", { min: Number.MIN_VALUE, max: 80 });
+      const months = Math.round(duration * 12), monthlyRate = annualRate / 1200;
+      const futureCurrent = current * Math.pow(1 + monthlyRate, months);
+      const gap = Math.max(0, target - futureCurrent);
+      const factor = monthlyRate === 0 ? months : ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * (1 + monthlyRate);
+      const required = gap === 0 ? 0 : gap / factor;
+      results = [money("Required monthly SIP", required, "positive"), money("Future value of current corpus", futureCurrent), money("Remaining target gap", gap)];
+      assumptions = "Current corpus compounds monthly; contributions are at the beginning of each month; constant assumed return.";
       break;
     }
     default: throw Object.assign(new Error("Unsupported model. Use GET /v1/models to list supported models."), { unsupported: true });

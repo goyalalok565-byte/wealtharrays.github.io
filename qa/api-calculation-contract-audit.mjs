@@ -18,10 +18,15 @@ const cases = {
   cagr: [{ startValue: 100, endValue: 121, years: 2 }, [100, 121, 10]],
   inflation: [{ currentCost: 100, annualInflationRate: 10, years: 2 }, [100, 121, 21]],
   "simple-interest": [{ principal: 1000, annualRate: 10, years: 2 }, [1000, 200, 1200]],
-  "currency-converter": [{ amount: 100, rate: 0.85, from: "USD", to: "EUR" }, [100, 85]]
+  "currency-converter": [{ amount: 100, rate: 0.85, from: "USD", to: "EUR" }, [100, 85]],
+  roi: [{ cost: 1000, finalValue: 1500, years: 2 }, [1000, 500, 50]],
+  "recurring-deposit": [{ monthly: 1000, annualRate: 0, years: 1 }, [12000, 0, 12000]],
+  "net-worth": [{ cash: 1000, investments: 2000, property: 5000, debt: 3000 }, [8000, 3000, 5000]],
+  "profit-margin": [{ revenue: 1000, cost: 700 }, [1000, 300, 30]],
+  "sip-goal": [{ target: 120000, current: 0, annualRate: 0, years: 10 }, [1000, 0, 120000]]
 };
 
-assert.equal(mod.API_VERSION, "1.0.0");
+assert.equal(mod.API_VERSION, "1.1.0");
 assert.equal(mod.MODEL_LIST.length, Object.keys(cases).length, "Every published API model must have a contract vector");
 assert.deepEqual(mod.MODEL_LIST.map(model => model.id).sort(), Object.keys(cases).sort(), "Published model catalogue and contract vectors must match");
 
@@ -39,6 +44,9 @@ for (const model of mod.MODEL_LIST) {
 }
 
 assert.throws(() => mod.calculate("not-a-model", {}), error => error.unsupported === true);
+assert.throws(() => mod.calculate("roi", { cost: 0, finalValue: 10, years: 1 }), /cost must be between/);
+assert.throws(() => mod.calculate("profit-margin", { revenue: 0, cost: 10 }), /revenue must be between/);
+assert.throws(() => mod.calculate("sip-goal", { target: 100000, current: 0, annualRate: 5, years: 0 }), /years must be between/);
 assert.throws(() => mod.calculate("loan-emi", { principal: -1, annualRate: 5, months: 12 }), /principal must be between/);
 assert.throws(() => mod.calculate("loan-emi", { principal: 1000, annualRate: 5, months: 0 }), /months must be between/);
 assert.throws(() => mod.calculate("cagr", { startValue: 100, endValue: 120, years: 0 }), /greater than zero/);
