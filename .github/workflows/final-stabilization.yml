@@ -36,12 +36,14 @@ jobs:
         run: node qa/privacy-policy-audit.mjs
       - name: Calculator regression before build
         run: node qa/calculator-regression.mjs
-      - name: Independent 47-calculator formula audit
+      - name: Independent calculator formula audit from canonical registry
         run: node qa/phase1-calculator-audit.mjs
       - name: Generate new calculator routes
         run: node scripts/generate-calculator-pages.mjs
       - name: Build canonical runtime, split definitions and sitemap
         run: node scripts/root-cause-build.mjs
+      - name: India tax-year terminology audit
+        run: node qa/tax-terminology-audit.mjs
       - name: Canonical embed source regression
         run: node qa/embed-regression.mjs
       - name: Run Phase 4 premium normalization
@@ -82,6 +84,7 @@ jobs:
           node scripts/launch-readiness.mjs
           node scripts/phase10-qa.mjs
           node scripts/build-dist.mjs
+          node qa/build-dist-exclusion-audit.mjs
           npm run qa:dist
           git diff --check
       - name: Commit deterministic build
