@@ -142,3 +142,12 @@ PR #88 Cloudflare bot reported a successful Worker deployment from unmerged head
 
 
 CI scope: strict seven-route Lighthouse runs on PR C (performance branch), manual dispatch and main-branch release validation. PR A/B run Canonical CI and Platform Gates plus the Lighthouse threshold unit tests; they do not run the performance measurement because they do not own performance changes. No thresholds are relaxed; PR C must pass the same strict limits.
+
+
+## Paddle seller onboarding — India preflight
+
+- Paddle's official seller-country policy says it works with software businesses globally except its published unsupported-country list; India is not listed among those exclusions. This means country-level eligibility appears possible, not guaranteed seller approval.
+- All checkout domains require domain review: live HTTPS site, clear product description, pricing (a screenshot can be supplied if pricing is not live yet), features/deliverables, Terms, Refund Policy and Privacy Policy. Paddle may request a test account for login-gated products.
+- Business verification may request government business-registration documents and ownership breakdown for every owner at or above 25%; this business-document step is not required for individuals/sole traders. Identity verification applies to at least one business owner, or to the individual/sole trader; government ID, proof of address and sometimes liveness may be requested.
+- Payouts are monthly: balance above the minimum $100 threshold enters the queue on the 1st, Paddle sends by the 15th, and arrival can take up to 3 working days. Published payout methods are wire transfer or Payoneer. India-specific bank/Payoneer availability, currency conversion, fees and required tax documentation still need written confirmation from Paddle.
+- Official references: https://www.paddle.com/help/start/account-verification/which-countries-are-supported-by-paddle ; https://www.paddle.com/help/start/account-verification/what-is-domain-verification ; https://www.paddle.com/help/start/account-verification/what-is-business-verification ; https://www.paddle.com/help/start/account-verification/what-is-identity-verification ; https://www.paddle.com/help/manage/get-paid/when-and-how-do-i-get-paid
