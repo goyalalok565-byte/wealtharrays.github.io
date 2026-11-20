@@ -43,10 +43,11 @@ function changedNumber(field, current) {
   if (next < min || next > max || next === current) return null;
   return String(next);
 }
-async function checkViewport(route, title, width) {
+async function checkViewport(title, width) {
+  // Reuse the already hydrated calculator page; resizing is sufficient to test responsive overflow.
+  // Re-navigation at every width multiplies 55 routes into 165 full browser loads.
   await page.setViewportSize({ width, height: width < 600 ? 844 : 900 });
-  await page.goto(baseUrl + '/' + route.replace(/^\//, '').replace(/\/$/, '') + '/', { waitUntil: 'domcontentloaded' });
-  await page.waitForSelector('#calc-widget [data-field]');
+  await page.waitForTimeout(60);
   const dims = await page.evaluate(() => ({ inner: window.innerWidth, doc: document.documentElement.scrollWidth }));
   assert(dims.doc <= dims.inner + 2, title + ' horizontal overflow at ' + width + 'px (' + dims.doc + ' > ' + dims.inner + ')');
 }
@@ -60,7 +61,10 @@ try {
 
   for (const calc of calculators) {
     try {
-      await checkViewport(calc.slug, calc.title, 375);
+      await page.setViewportSize({ width: 375, height: 844 });
+      await page.goto(baseUrl + '/' + calc.slug.replace(/^\//, '').replace(/\/$/, '') + '/', { waitUntil: 'domcontentloaded' });
+      await page.waitForSelector('#calc-widget [data-field]');
+      await checkViewport(calc.title, 375);
       const browserFields = page.locator('#calc-widget [data-field]');
       assert(await browserFields.count() === calc.fields.length, calc.id + ': rendered field count does not match definition');
 
@@ -149,7 +153,7 @@ try {
 
       // Confirm tablet and desktop layouts do not overflow, independently for each calculator route.
       for (const width of [768, 1280]) {
-        await checkViewport(calc.slug, calc.title, width);
+        await checkViewport(calc.title, width);
       }
       passes.push({ id: calc.id, title: calc.title, fields: calc.fields.length, outputs: expected.length, status: 'PASS' });
       console.log('PASS ' + calc.id + ' — valid outputs, click-only calculation, changed-input recalculation, min/max bounds, 375/768/1280px');
