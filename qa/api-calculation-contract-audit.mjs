@@ -23,7 +23,15 @@ const cases = {
   "recurring-deposit": [{ monthly: 1000, annualRate: 0, years: 1 }, [12000, 0, 12000]],
   "net-worth": [{ cash: 1000, investments: 2000, property: 5000, debt: 3000 }, [8000, 3000, 5000]],
   "profit-margin": [{ revenue: 1000, cost: 700 }, [1000, 300, 30]],
-  "sip-goal": [{ target: 120000, current: 0, annualRate: 0, years: 10 }, [1000, 0, 120000]]
+  "sip-goal": [{ target: 120000, current: 0, annualRate: 0, years: 10 }, [1000, 0, 120000]],
+  "car-loan": [{ price: 120000, down: 20000, annualRate: 0, years: 1 }, [8333.333333333334, 100000, 0]],
+  mortgage: [{ principal: 120000, annualRate: 0, years: 1 }, [10000, 120000, 0]],
+  "personal-loan": [{ principal: 120000, annualRate: 0, years: 1 }, [10000, 120000, 0]],
+  "debt-payoff": [{ balance: 12000, payment: 1000, annualRate: 0 }, [12, 0, 12000]],
+  "salary-hourly": [{ amount: 52000, hoursPerWeek: 40, weeksPerYear: 52 }, [25, 2080, 52000]],
+  overtime: [{ hourly: 20, regular: 40, overtime: 10, multiplier: 1.5 }, [800, 300, 1100]],
+  "freelance-rate": [{ income: 100000, expenses: 20000, hours: 20, weeks: 50 }, [120, 1000, 120000]],
+  "freedom-milestone": [{ expenses: 600000, withdrawal: 4, current: 10000000 }, [15000000, 10000000, 5000000]]
 };
 
 assert.equal(mod.API_VERSION, "1.1.0");
@@ -47,6 +55,9 @@ assert.throws(() => mod.calculate("not-a-model", {}), error => error.unsupported
 assert.throws(() => mod.calculate("roi", { cost: 0, finalValue: 10, years: 1 }), /cost must be between/);
 assert.throws(() => mod.calculate("profit-margin", { revenue: 0, cost: 10 }), /revenue must be between/);
 assert.throws(() => mod.calculate("sip-goal", { target: 100000, current: 0, annualRate: 5, years: 0 }), /years must be between/);
+assert.throws(() => mod.calculate("car-loan", { price: 1000, down: 1200, annualRate: 5, years: 1 }), /down payment cannot exceed/);
+assert.throws(() => mod.calculate("debt-payoff", { balance: 10000, payment: 10, annualRate: 12 }), /payment must exceed/);
+assert.throws(() => mod.calculate("salary-hourly", { amount: 50000, hoursPerWeek: 0, weeksPerYear: 52 }), /hoursPerWeek must be between/);
 assert.throws(() => mod.calculate("loan-emi", { principal: -1, annualRate: 5, months: 12 }), /principal must be between/);
 assert.throws(() => mod.calculate("loan-emi", { principal: 1000, annualRate: 5, months: 0 }), /months must be between/);
 assert.throws(() => mod.calculate("cagr", { startValue: 100, endValue: 120, years: 0 }), /greater than zero/);
