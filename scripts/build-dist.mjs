@@ -103,7 +103,7 @@ const manifestData = {
   public_files: publicFiles.sort(),
   deployment_files: [...deploymentFiles, '.well-known/wa-public-manifest.json'].sort()
 };
-fs.writeFileSync(manifestPath, JSON.stringify(manifestData, null, 2) + '\\n', 'utf8');
+fs.writeFileSync(manifestPath, JSON.stringify(manifestData, null, 2) + '\n', 'utf8');
 
 const forbidden = [];
 function auditTree(dir, rel='') {
