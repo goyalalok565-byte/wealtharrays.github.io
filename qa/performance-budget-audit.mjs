@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 
 const files = [];
 function walk(dir) {
@@ -70,11 +71,55 @@ if (fs.existsSync(headersPath)) {
     const start = headerText.indexOf('/' + asset + '\n');
     const end = start >= 0 ? headerText.indexOf('\n/', start + 1) : -1;
     const block = start >= 0 ? headerText.slice(start, end >= 0 ? end : undefined) : '';
-    if (!block.includes('max-age=31536000') || !block.includes('immutable')) {
+    if (!block.includes('! Cache-Control') || !block.includes('max-age=31536000') || !block.includes('immutable')) {
       failures.push('_headers: ' + asset + ' must use one-year immutable caching because its URL is content-hashed.');
     }
   }
 }
+
+// Static assets are content-hashed in their query strings and can safely use
+// one-year immutable caching. Verify both the references and response policy.
+const staticHeaderText = fs.readFileSync(path.join(process.cwd(), '_headers'), 'utf8');
+const staticCacheableAssets = [
+  'styles.css','phase3-seo.css','phase4-premium.css','cls-fixes.css',
+  'homepage-refresh.css','theme-init.js','homepage-business.js',
+  'homepage-search.js','consent-loader.js','wa-ad-loader.js'
+];
+const htmlFiles = [];
+function collectHtml(dir) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name.startsWith('.') || ['node_modules','dist','qa','scripts'].includes(entry.name)) continue;
+    const file = path.join(dir, entry.name);
+    if (entry.isDirectory()) collectHtml(file);
+    else if (entry.name.endsWith('.html')) htmlFiles.push(file);
+  }
+}
+collectHtml(process.cwd());
+for (const asset of staticCacheableAssets) {
+  const assetPath = path.join(process.cwd(), asset);
+  if (!fs.existsSync(assetPath)) {
+    failures.push('Missing static asset required for immutable cache contract: ' + asset);
+    continue;
+  }
+  const expectedHash = crypto.createHash('sha256').update(fs.readFileSync(assetPath)).digest('hex').slice(0,12);
+  const assetPattern = new RegExp("/" + asset.replace(".", "\\.") + "\\?v=([^\"']+)", "g");
+  let references = 0;
+  for (const htmlFile of htmlFiles) {
+    const html = fs.readFileSync(htmlFile, 'utf8');
+    for (const match of html.matchAll(assetPattern)) {
+      references++;
+      if (match[1] !== expectedHash) failures.push(htmlFile + ': ' + asset + ' cache version does not match its content hash.');
+    }
+  }
+  if (!references) failures.push('No versioned HTML references found for cacheable asset: ' + asset);
+  const start = staticHeaderText.indexOf('/' + asset + '\n');
+  const end = start >= 0 ? staticHeaderText.indexOf('\n/', start + 1) : -1;
+  const block = start >= 0 ? staticHeaderText.slice(start, end >= 0 ? end : undefined) : '';
+  if (!block.includes('! Cache-Control') || !block.includes('max-age=31536000') || !block.includes('immutable')) {
+    failures.push('_headers: ' + asset + ' must use one-year immutable caching with a content-hashed URL.');
+  }
+}
+
 if (failures.length) {
   console.error('Performance budget audit FAIL:\n' + failures.join('\n'));
   process.exit(1);
