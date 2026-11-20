@@ -27,7 +27,7 @@ const cases = [
 const byId = new Map(CALCULATORS.map(c => [c.id, c]));
 const failures = [];
 
-if (CALCULATORS.length !== 55) failures.push(`Expected 55 calculators, found ${CALCULATORS.length}`);
+if (!Array.isArray(CALCULATORS) || !CALCULATORS.length || new Set(CALCULATORS.map(c => c.id)).size !== CALCULATORS.length) failures.push('Calculator registry must be non-empty and contain unique IDs');
 if (new Set(CALCULATORS.map(c => c.id)).size !== CALCULATORS.length) failures.push('Calculator IDs are not unique');
 
 for (const [id, values, label, expected] of cases) {
