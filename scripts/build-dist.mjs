@@ -10,7 +10,7 @@ const PUBLIC_ROOT_EXTS = new Set([
   '.ico','.woff','.woff2','.ttf','.eot','.xml','.txt','.webmanifest','.json'
 ]);
 const PUBLIC_ROOT_EXACT = new Set([
-  '_headers','_redirects','ads.txt','robots.txt','sitemap.xml','sw.js','manifest.webmanifest'
+  '_headers','_redirects','ads.txt','robots.txt','sitemap.xml','llms.txt','sw.js','manifest.webmanifest'
 ]);
 const PUBLIC_DIRS = new Set(['articles','research','calculator-definitions','assets']);
 const EXCLUDE_DIRS = EXCLUDED_DIRECTORY_NAMES;
@@ -45,6 +45,7 @@ for (const e of fs.readdirSync(root, { withFileTypes: true })) {
   if (PUBLIC_ROOT_EXACT.has(e.name) || PUBLIC_ROOT_EXTS.has(path.extname(e.name).toLowerCase())) {
     // JSON is intentionally limited to known browser-facing files.
     if (path.extname(e.name).toLowerCase() === '.json' && !['ai-contract.json','global-seo-config.json','calculator-value-content.json','model-registry.json'].includes(e.name)) continue;
+    if (path.extname(e.name).toLowerCase() === '.txt' && !PUBLIC_ROOT_EXACT.has(e.name)) continue;
     copyFile(path.join(root, e.name), e.name);
   }
 }
@@ -68,7 +69,7 @@ function copyRouteDirs(base, relBase='') {
       for (const child of fs.readdirSync(src, { withFileTypes: true })) {
         if (child.name === 'index.html' || child.name.startsWith('.') || isForbiddenDeploymentPath(path.join(rel, child.name))) continue;
         const childSrc = path.join(src, child.name);
-        if (child.isFile() && PUBLIC_ROOT_EXTS.has(path.extname(child.name).toLowerCase())) {
+        if (child.isFile() && !['.json','.txt','.xml'].includes(path.extname(child.name).toLowerCase()) && PUBLIC_ROOT_EXTS.has(path.extname(child.name).toLowerCase())) {
           copyFile(childSrc, path.join(rel, child.name));
         }
       }
