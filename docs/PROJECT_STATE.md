@@ -70,25 +70,25 @@ Scores are preliminary engineering assessments from repository inspection, uploa
 
 ## Verified in GitHub CI / PR previews
 
-- PR #78 (`fix/calculator-widget-cls-reservation`) is open, not merged. Its canonical CI and Platform Gates passed at observed head `f501374fa678e251fd37364fac65601d3954b46e`; Mobile Lighthouse failed homepage accessibility (92 vs 95).
-- PR #78 preview metrics under 4x CPU and simulated slow 4G: home Performance 97 / TBT 110ms / LCP 2.1s / CLS 0; tools 83 / 550ms / 2.5s / 0; SIP 90 / 260ms / 2.5s / .076; SWP 85 / 330ms / 3.0s / .076; FIRE 90 / 200ms / 2.5s / .076; Rent vs Buy 89 / 190ms / 2.6s / .070; compound guide 89 / 180ms / 3.0s / 0.
-- Strict owner release targets are Performance >=90, CLS <=0.10, TBT <=200ms and LCP <=2.5s on all seven routes. Preview currently fails: tools, SIP and SWP TBT; SWP, rent-vs-buy and compound guide LCP; tools, rent-vs-buy and compound guide Performance.
-- The earlier 7,510ms homepage TBT observation remains tracked until reproduced or current production remeasurement proves it resolved.
-- Homepage Lighthouse findings are specific: low contrast on Quick EMI result label/output/meta text; target-size/overlap warnings around Scenario Lab CTA, calculator cards and category cards.
-- Tools-page trace diagnosis from the 550ms TBT run: two `wa-site-runtime.js` long tasks at about 233ms each, plus Google Tag Manager (169ms), AdSense loader (162ms) and AdSense show-ads script (105ms). The current Tools page has no ad-slot markup. PR #84 now defers GA4 until explicit analytics consent, loads AdSense only when an actual slot exists, and scopes the visual runtime to calculator/embed routes; browser smoke coverage is added. Performance improvement is not yet measured.
-- PR #81 (`docs/project-state-baseline-2026-11-20`) is open; its latest observed Platform Gates run was still in progress. Cloudflare bot posted a successful Worker build for its commit; that is not proof of a Pages production release.
-- PR #82 (`fix/tax-year-aware-rebate-label`) is open and stacked on PR #81. Its local 50/50 tests and build passed on the ZIP-based worktree; GitHub CI had not started at last check. It changes only tax-year UI terminology, not calculations. CA/legal review remains required.
-- PR #84 (`fix/phase0-release-gates-final`) is open against main and includes the CLS host fix, strict mobile release gates, homepage accessibility repairs, registry parity checks, a safe /v1/health endpoint and deployment inventory controls. Canonical CI, Platform Gates and Mobile Lighthouse passed the earlier code state but have not yet rerun against the latest consent/performance changes; no current-head pass is claimed.
-- Earlier consolidated branch first verification run (commit `2886442`) passed Canonical CI. Platform Gates confirmed registry parity and the 249-file dist inventory (247 public assets + 2 Cloudflare config files), then stopped on a literal newline typo in the new Worker health test. Mobile Lighthouse stopped at the negative-test suite because `null` TBT was treated as zero; the gate now fails closed on missing CLS/TBT/LCP metrics, and the routing-test newline is corrected. These corrections still require a fresh CI run.
+- PR #78 remains open and unmerged. Its earlier seven-route mobile preview is the known baseline: multiple routes missed strict performance, TBT or LCP targets; homepage accessibility scored 92 vs the 95 floor. Do not merge it independently of the consolidated release candidate.
+- PRs #81–#87 are historical/superseded engineering or verification branches. PR #87 was closed without merging because it was based on a stale mainline.
+- **Active release candidate:** PR #88, branch `fix/phase0-clean-mainline-2026-11-20`, based on the current `main` branch. GitHub reports the branch mergeable; this is not equivalent to release approval.
+- Latest observed PR #88 head at this update: `e124ec691a0e7237fc7d8333498a4e303f2cb8d4`. Re-check the head SHA before relying on any check result.
+- On that PR run, **Canonical CI passed**: source/Pages/Worker syntax, privacy and auth CSP regression, privacy policy, calculator regression and independent formula audit, generated routes/runtime, Section 156 terminology, canonical embed regression and regression gates.
+- **Platform Gates passed**: registry parity, 55-calculator catalogue audit, Phase 1–20 audits, research data audit, static accessibility audit, production `dist` build, deployment exclusion and exact manifest audit, dist integrity, literal `npm run build`, minification and production asset budget.
+- **Mobile/browser verification is still running** at the last check. Negative tests for strict mobile thresholds passed; PR preview built; canonical calculator embed smoke and all-registry calculator/scenario smoke passed. The extended all-calculator responsive/currency/theme/language/export smoke was still in progress. Cloud workspace, consent/ad-slot smoke, seven-page Lighthouse, homepage TBT diagnosis, SWP CPU profile, strict threshold enforcement and artifact upload had not completed. No seven-route Lighthouse pass is claimed.
+- Strict owner release targets remain unchanged on all seven routes: Performance >=90, CLS <=0.10, TBT <=200ms and LCP <=2.5s; accessibility >=95, best practices >=80 and SEO >=90. The earlier baseline failed multiple targets. Do not relax gates.
+- Prior trace evidence found expensive `wa-site-runtime.js`, GTM and AdSense work on Tools; the release candidate defers GA4 until explicit analytics consent, gates AdSense on actual ad slots and scopes visual runtime to calculator/embed routes. These changes still need the active browser and performance measurements to prove benefit.
+- Production deployment, live Cloudflare file manifest, live `/v1/health`, production Core Web Vitals, AdSense approval, and CA/legal review are **not verified**.
 
 ## Phase 0 — status and open items
 
 1. **P0-1 Calculator CLS:** PR #78 adds the missing `.calc-widget` host class and static reservation. Do not merge until strict release gates and browser regressions pass.
 2. **P0-2 Performance gates:** This PR adds strict numeric checks for Performance >=90, CLS <=0.10, TBT <=200ms and LCP <=2500ms, retaining accessibility >=95, best practices >=80 and SEO >=90. Tests must prove a threshold violation fails. The current preview is expected to fail until performance is improved; never relax thresholds.
-3. **P0-3 Tax terminology:** PR #83 now includes the Tax Year 2026-27 widget wording update to Section 156 plus source/runtime regression coverage and build audit. No formula or eligibility logic changed. CA/legal review is still a release prerequisite.
-4. **P0-4 Registry source of truth:** PR #83 removes stale 47/55 workflow labels and adds a registry audit across calculator pages, split definitions, homepage, tools, search, sitemap, `llms.txt`, methodology and metadata. Build/CI verification is pending.
-5. **P0-5 Health and monitoring:** PR #83 adds `GET /v1/health` with API version, liveness, D1 probe, Supabase/Razorpay/rate-limiter readiness flags, `ready_for_saas`, no secret values, OpenAPI docs and Worker routing regression tests. A 15-minute GitHub Actions health monitor and post-deploy health check are included; live monitoring starts only after deployment.
-6. **P0-6 Deployment hygiene:** PR #83 adds a shared exclusion policy for QA, scripts, docs, tests, workflows, bundled source-only runtime modules, backups and archives; a deterministic public-file manifest; local dist inventory audit; and a production check that probes internal paths and HEAD-checks manifest files. CI and post-deploy verification remain pending.
+3. **P0-3 Tax terminology:** PR #88 includes the Tax Year 2026-27 widget wording update to Section 156 plus source/runtime regression coverage and build audit. No formula or eligibility logic changed. CA/legal review is still a release prerequisite.
+4. **P0-4 Registry source of truth:** PR #88 removes stale 47/55 workflow labels and adds a registry audit across calculator pages, split definitions, homepage, tools, search, sitemap, `llms.txt`, methodology and metadata. Build/CI verification is pending.
+5. **P0-5 Health and monitoring:** PR #88 adds `GET /v1/health` with API version, liveness, D1 probe, Supabase/Razorpay/rate-limiter readiness flags, `ready_for_saas`, no secret values, OpenAPI docs and Worker routing regression tests. A 15-minute GitHub Actions health monitor and post-deploy health check are included; live monitoring starts only after deployment.
+6. **P0-6 Deployment hygiene:** PR #88 adds a shared exclusion policy for QA, scripts, docs, tests, workflows, bundled source-only runtime modules, backups and archives; a deterministic public-file manifest; local dist inventory audit; and a production check that probes internal paths and HEAD-checks manifest files. CI and post-deploy verification remain pending.
 
 ## Phase 1 — blocked pending Phase 0
 
@@ -117,10 +117,10 @@ Owner configures these directly in GitHub Settings > Secrets. Never request secr
 - Local `dist/` is not a substitute for production Cloudflare evidence.
 - Never claim AdSense approval, traffic, revenue, rankings or SaaS activation without measurements.
 
-Active verification PR: #87 (`fix/phase0-verification-2026-11-20`). This branch consolidates the CLS, tax terminology, strict performance gates, registry parity, health monitor and deployment hygiene work. Do not merge until the seven-route release matrix passes.
+Active verification PR: #88 (`fix/phase0-clean-mainline-2026-11-20`), based on current `main`. This branch consolidates the CLS, tax terminology, strict performance gates, registry parity, health monitor and deployment hygiene work. Do not merge until the seven-route release matrix passes.
 
 ## Next three actions
 
-1. Trigger fresh CI on the latest consolidated branch; verify the tax, health, registry, dist and consent-aware browser tests, then inspect the new seven-route Lighthouse and SWP CPU artifacts.
-2. Optimize remaining route-level performance failures based on the new traces, while keeping all release thresholds unchanged.
-3. Verify the deployed public-file manifest and `/v1/health` after a production release, measure Core Web Vitals, and obtain CA/legal review of tax eligibility wording.
+1. Finish the active PR #88 extended browser smoke, workspace and consent/ad-slot checks; inspect seven-route Lighthouse results and SWP CPU profile.
+2. Fix any measured route-level performance or interaction failures without changing release thresholds; rerun all required checks on the final head.
+3. After a verified merge and Cloudflare release, check the deployed public-file manifest and `/v1/health`, measure production Core Web Vitals, and obtain CA/legal review of tax eligibility wording.
