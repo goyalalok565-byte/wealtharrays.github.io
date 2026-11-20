@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Wealth Arrays Financial Engine API
-  version: 1.0.0
+  version: 1.1.0
   description: Versioned financial calculations, indicative FX rates, a limited Indian tax estimate, authenticated scenario storage and subscription endpoints. Cloudflare bindings, Supabase authentication and Razorpay plans require deployment configuration.
 paths:
   /v1/health:
@@ -179,7 +179,7 @@ components:
       type: object
       required: [model, inputs]
       properties:
-        model: {type: string, description: Registered model ID}
+        model: {type: string, enum: [sip, loan-emi, home-loan-emi, compound-interest, fixed-deposit, lumpsum, gst, cagr, inflation, simple-interest, currency-converter, roi, recurring-deposit, net-worth, profit-margin, sip-goal], description: Registered model ID; see GET /v1/models}
         model_version: {type: string, description: Optional exact model version; server must reject unsupported versions}
         inputs: {type: object, additionalProperties: true}
         assumptions: {type: object, additionalProperties: true}

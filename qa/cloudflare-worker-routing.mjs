@@ -22,7 +22,7 @@ const env = {
 const modelsResponse = await worker.fetch(new Request("https://example.test/v1/models"), env, {});
 assert.equal(modelsResponse.status, 200);
 const modelData = await modelsResponse.json();
-assert.ok(modelData.models.some(model => model.id === "sip" && model.version === "1.0.0"));
+assert.ok(modelData.models.some(model => model.id === "sip" && model.version === "1.1.0"));
 const healthResponse = await worker.fetch(new Request("https://example.test/v1/health"), {
   ...env,
   DB: { prepare(sql) { assert.equal(sql, "SELECT 1 AS ok"); return { async first() { return { ok: 1 }; } }; } },
