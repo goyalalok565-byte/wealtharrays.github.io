@@ -12,7 +12,7 @@ assert.match(visual,/if\(!document\.querySelector\('ins\.adsbygoogle,\[data-ad-s
 assert.match(visual,/if\(!document\.querySelector\('\.calc-page'\)/,'visual runtime must be scoped away from hub pages');
 const consentLoader=fs.readFileSync("consent-loader.js","utf8");
 const homeHtml=fs.readFileSync("index.html","utf8");
-assert.doesNotMatch(homeHtml,/preconnect[^>]+fundingchoicesmessages\\.google\\.com/,"Homepage must not preconnect to an unused ad-consent provider");
+assert.doesNotMatch(homeHtml,/preconnect[^>]+fundingchoicesmessages\.google\.com/,"Homepage must not preconnect to an unused ad-consent provider");
 assert.match(consentLoader,/preconnect/,"Funding Choices should preconnect only when an ad slot triggers loading");
 assert.match(consentLoader,/AD_SLOT_SELECTOR\s*=\s*'ins\.adsbygoogle,\[data-ad-slot\],\.wa-ad-slot'/,"Funding Choices must be scoped to pages with explicit ad slots");
 assert.match(consentLoader,/new MutationObserver/,"Funding Choices must support dynamically inserted ad slots");
