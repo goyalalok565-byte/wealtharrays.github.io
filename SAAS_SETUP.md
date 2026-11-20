@@ -4,13 +4,13 @@ The repository now contains the application code for browser-first scenarios, an
 
 ## 1. Cloudflare Worker API + D1
 
-The deployment has two distinct pieces: Cloudflare Pages serves the static website from the GitHub repository, while a Wrangler-managed Cloudflare Worker handles /v1/* API requests on the same domain. Do not configure these API routes as Pages Functions; worker.mjs is the API entry point and wrangler.toml is its source of truth.
+The current repository deployment uses a Wrangler-managed Cloudflare Worker with Workers Static Assets. `npm run build` generates `dist/`; `wrangler.toml` points `[assets].directory` to `./dist`, and `run_worker_first=["/v1/*"]` routes API requests through `worker.mjs`. This is not a separate Cloudflare Pages static deployment. Do not configure these API routes as Pages Functions; `worker.mjs` is the API entry point and `wrangler.toml` is its source of truth.
 
 1. Create a Cloudflare D1 database for Wealth Arrays.
 2. Add these GitHub Actions repository secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, and CLOUDFLARE_D1_DATABASE_ID.
 3. The cloudflare-worker-deploy.yml workflow appends the D1 binding named DB, applies every migration in migrations/ in order, and deploys the Worker when Cloudflare credentials are present.
 4. wrangler.toml declares PUBLIC_API_LIMITER. It limits each client IP to 120 requests per minute per API route for /v1/calculate, /v1/india-tax, and /v1/fx. Cloudflare's Rate Limiting API is approximate and distributed per Cloudflare location; it is an abuse-control layer, not a strict global quota.
-5. The static Cloudflare Pages deployment remains separate. Confirm its production branch and build/output settings match the repository's static-site build; the Worker workflow does not deploy the Pages site.
+5. The Worker deploy workflow handles the API and Worker Static Assets from `dist/`. It does not by itself prove which version receives live traffic; confirm the active production version, branch control, traffic allocation and rollback target in Cloudflare.
 
 ## 2. Supabase authentication
 
@@ -48,3 +48,8 @@ Configure the Razorpay webhook URL as https://wealtharrays.com/v1/billing/webhoo
 - Public calculation, tax and FX endpoints fail closed if the Cloudflare rate-limiter binding is missing.
 - Before production billing, test account confirmation, expired sessions, cross-user scenario isolation, webhook retries, out-of-order events, cancellations, refunds and subscription state reconciliation against Razorpay test mode.
 - Backups/retention policy, alerting/abuse monitoring and a full DPDP Act review still need to be completed for production.
+
+
+## Current deployment and consent implementation note
+
+AdSense must remain blocked until the Funding Choices CMP reports consent-mode data. The implementation loads the AdSense tag only when ad storage, ad user data and ad personalization are granted or not applicable; denied, unknown, missing or unconfigured states fail closed. Confirm the matching Google Privacy & Messaging consent-mode configuration and obtain legal review before enabling live ads.

@@ -72,7 +72,7 @@ Scores are preliminary engineering assessments from repository inspection, uploa
 
 - PR #78 was closed without merging as superseded by the consolidated PR #88. Its earlier seven-route mobile preview remains the known baseline: multiple routes missed strict performance, TBT or LCP targets; homepage accessibility scored 92 vs the 95 floor.
 - PRs #81–#87 are historical/superseded engineering or verification branches. PR #87 was closed without merging because it was based on a stale mainline.
-- **Active release candidate:** PR #88, branch `fix/phase0-clean-mainline-2026-11-20`, based on the current `main` branch. GitHub reports the branch mergeable; this is not equivalent to release approval.
+- **Active release candidate:** PR #97, branch `phase0/pr-c-final`, based on the current `main` branch. The PR remains unmerged; the Lighthouse release gate was failing at the audited base head.
 - The previous documentation-only verification head was `41583eda808d2fb6c42caa3cdd09261a35264670`. Subsequent ad-slot-aware loading fixes are being committed; re-check the latest head and its fresh CI before relying on results.
 - On that PR run, **Canonical CI passed**: source/Pages/Worker syntax, privacy and auth CSP regression, privacy policy, calculator regression and independent formula audit, generated routes/runtime, Section 156 terminology, canonical embed regression and regression gates.
 - **Platform Gates passed**: registry parity, 55-calculator catalogue audit, Phase 1–20 audits, research data audit, static accessibility audit, production `dist` build, deployment exclusion and exact manifest audit, dist integrity, literal `npm run build`, minification and production asset budget.
@@ -112,12 +112,12 @@ Owner configures these directly in GitHub Settings > Secrets. Never request secr
 
 - India-first, global architecture; metadata-only country codes are not country engines.
 - Preserve financial formulas unless authoritative reference vectors and tests justify a change.
-- Do not merge PR #88 until strict mobile thresholds, accessibility and browser checks pass.
+- Do not merge PR #97 until strict mobile thresholds, accessibility and browser checks pass.
 - Do not alter ads/CMP based on one Lighthouse observation; profile first.
 - Local `dist/` is not a substitute for production Cloudflare evidence.
 - Never claim AdSense approval, traffic, revenue, rankings or SaaS activation without measurements.
 
-Active verification PR: #88 (`fix/phase0-clean-mainline-2026-11-20`), based on current `main`. This branch consolidates the CLS, tax terminology, strict performance gates, registry parity, health monitor, deployment hygiene and ad-slot-aware third-party loading work. Do not merge until the seven-route release matrix passes.
+Active verification PR: #97 (`phase0/pr-c-final`), based on current `main`. This branch is the current Phase 0 release candidate. Do not merge until canonical, platform and lighthouse checks pass and the seven-route release matrix is verified.
 
 ## Next three actions
 
@@ -223,3 +223,40 @@ PR C CI also builds the current `main` commit in a separate job and runs the sam
 - The source change is included in the same atomic commit as this project-state update on `phase0/pr-c-final`. Fresh Canonical CI, Platform Gates and strict seven-route Lighthouse are required on that exact commit; none is claimed by this documentation entry.
 
 PR C final verification commit: CI must re-run after the Funding Choices ad-slot gating and main-branch TBT baseline workflow were added; strict seven-route Lighthouse remains a release gate.
+
+
+## A–Z audit update — 2026-11-20 (PR #97)
+
+Audit base: `phase0/pr-c-final` at `ffd1ba752b5cf1896b4175c75aa8f47384fc972a`. This section records repository findings and engineering changes authored in this audit commit; CI verification is pending until the new commit completes all required checks.
+
+### Verified from the PR Lighthouse artifact
+
+- The normal homepage `home.json` network request list contains no Funding Choices or AdSense request. The `854 ms → 6 ms` blocked-Funding-Choices comparison is therefore not valid evidence that Funding Choices caused the normal run's TBT; it is an uncontrolled run-to-run difference for this artifact.
+- The normal report lists long tasks attributed to the main document (594 ms), `homepage-business.js` (485 ms), `theme-init.js` (136 ms) and `wa-home-runtime.js` (131 ms). The normal homepage trace was not present in that artifact, so exact function-level attribution remains unverified.
+- Homepage accessibility defects include Quick EMI text contrast, target spacing for the Scenario Lab link/category cards/ledger row, and a footer-logo accessible-name mismatch.
+- The existing `fix-accessible-names.mjs` normalized the footer link to `aria-label="Wealth Arrays"`, which excluded its visible tagline from the accessible name.
+- The AdSense loader previously injected the Google ad tag without waiting for Funding Choices consent data. The theme bootstrap resumed paused ad requests on any interaction or after six seconds; neither is a consent decision.
+- The runtime build stamp used wall-clock time, so identical source inputs could produce different generated output. The Phase 4 and Phase 4/5 audits also had hardcoded calculator lists (20 and 47) rather than deriving all routes from the canonical registry.
+
+### Changes authored in this audit commit — verification pending
+
+- Homepage business initialization is split into small tasks, scheduled after first paint/idle, with `scheduler.yield()` or `setTimeout(0)` between tasks.
+- Home runtime modules run in separate yielded tasks; theme behavior remains initialized immediately.
+- Theme bootstrap is reduced to synchronous theme selection; the production hotfix is scheduled after load/idle.
+- Funding Choices is delayed until after first paint and idle. AdSense waits for Google's `CONSENT_MODE_DATA_READY` callback and fails closed unless the ad-storage, ad-user-data and ad-personalization purposes are granted or not applicable.
+- Accessibility contrast, target spacing and footer accessible-name generation are corrected in source.
+- Lighthouse now captures three independent runs per route, saves normal homepage traces, gates on each route's median, reports worst-case metrics, and fails on missing/invalid runs.
+- The Funding Choices diagnostic now skips causal comparison when the normal report has no Funding Choices request.
+- Stabilization CI is read-only, no longer commits/pushes generated output to `main`, compares two deterministic `dist/` builds, and uploads `dist/` plus a 55-page HTML audit CSV.
+- Phase 4 and Phase 4/5 audits now derive calculator routes from `calculators.js`; the build stamp is content-derived and reproducible.
+
+### Still not production-verified / release blockers
+
+- Fresh GitHub CI on the new PR head, including canonical, platform, three-run Lighthouse medians and browser consent smoke.
+- Production Brotli response header and Cloudflare's active production Worker version/traffic allocation.
+- Full independent formula validation against authoritative references and jurisdictional/tax legal review; no formulas were changed.
+- Live Supabase, D1, Razorpay/Paddle lifecycle, backups, alerts and production secret configuration; no secrets or payment settings were accessed.
+- Accessibility testing beyond the homepage, field INP and real-device performance remain to be measured.
+- The 55-page CSV is an audit report, not proof that all content meets editorial/legal quality requirements.
+
+Never treat repository source, local builds or CI deploy messages as proof of live production traffic.

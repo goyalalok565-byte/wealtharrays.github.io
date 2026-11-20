@@ -1,13 +1,17 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { createRequire } from 'node:module';
+const require=createRequire(import.meta.url);
+const { CALCULATORS }=require('../calculators.js');
 
-const calculatorPages = ['sip-calculator','compound-interest-calculator','mortgage-emi-calculator','roi-calculator','simple-interest-calculator','retirement-calculator','salary-to-hourly-calculator','profit-margin-calculator','fixed-deposit-calculator','recurring-deposit-calculator','lumpsum-calculator','cagr-calculator','car-loan-calculator','personal-loan-calculator','debt-payoff-calculator','inflation-calculator','net-worth-calculator','overtime-pay-calculator','freelance-rate-calculator','income-tax-planner','home-loan-emi-calculator','currency-converter','flat-cost-calculator','loan-emi-calculator','capital-gain-calculator','lumpsum-sip-calculator','loan-against-property-calculator','home-loan-eligibility-calculator','silver-jewelry-calculator','advanced-home-loan-eligibility-calculator','consumer-durable-loan-calculator','gold-jewelry-calculator','loan-prepayment-vs-sip-calculator','loan-to-value-ltv-calculator','stamp-duty-calculator','property-calculator','loan-interest-calculator','ppf-calculator','epf-calculator','gst-calculator','emergency-fund-calculator','credit-card-payoff-calculator','step-up-sip-calculator','sip-goal-calculator','gratuity-calculator','hra-exemption-calculator'].map(x => `${x}/index.html`);
+const calculatorPages = CALCULATORS.map(calculator => `${calculator.slug}/index.html`);
 const fail = msg => { throw new Error(msg); };
 const read = file => fs.readFileSync(file, 'utf8');
 const allHtml = [
-  ...fs.readdirSync('.').filter(f => f.endsWith('.html')),
-  ...(fs.existsSync('articles') ? fs.readdirSync('articles').filter(f => f.endsWith('.html')).map(f => `articles/${f}`) : []),
-  ...(fs.existsSync('p') ? fs.readdirSync('p').filter(f => f.endsWith('.html')).map(f => `p/${f}`) : []),
+  ...fs.readdirSync('.').filter(file => file.endsWith('.html')),
+  ...(fs.existsSync('articles') ? fs.readdirSync('articles').filter(file => file.endsWith('.html')).map(file => `articles/${file}`) : []),
+  ...(fs.existsSync('p') ? fs.readdirSync('p').filter(file => file.endsWith('.html')).map(file => `p/${file}`) : []),
+  ...calculatorPages
 ];
 
 for (const page of calculatorPages) {
