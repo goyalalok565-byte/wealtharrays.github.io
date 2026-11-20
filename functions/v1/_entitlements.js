@@ -3,11 +3,12 @@ export const MAX_SCENARIO_LIMIT = 500;
 
 /**
  * Resolve server-authoritative access from a paid subscription or a one-time trial.
+ * Paid access fails closed unless the provider-backed billing period has a valid future end.
  * A cancellation scheduled for period end remains active only until that end.
  */
 export function resolveEntitlement(subscription, now = Date.now(), trial = null) {
-  const end = subscription?.current_period_end ? Date.parse(subscription.current_period_end) : null;
-  const periodValid = end === null || (Number.isFinite(end) && end > now);
+  const end = subscription?.current_period_end ? Date.parse(subscription.current_period_end) : NaN;
+  const periodValid = Number.isFinite(end) && end > now;
   const paidActive = subscription?.status === "active" && periodValid;
   const trialEnd = trial?.ends_at ? Date.parse(trial.ends_at) : null;
   const trialActive = Boolean(trial && Number.isFinite(trialEnd) && trialEnd > now);
