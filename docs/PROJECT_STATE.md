@@ -216,4 +216,10 @@ PR C CI also builds the current `main` commit in a separate job and runs the sam
 - PR #95 Cloudflare Workers bot reported successful `production/builds/` deployment for unmerged head `88da2679` on 20 Nov 2026 06:29 UTC: https://dash.cloudflare.com/?to=/f5619318297695cabb3a1540854cb166/workers/services/view/wealtharrays-github-io/production/builds/200eb0cc-d241-47ba-8c4f-bd7136d5191d . This strengthens the evidence that non-main branch builds can deploy to the production Worker. Verify branch control before any further merge/release.
 
 
+## PR C hydration guard follow-up — 2026-11-20
+
+- The calculator bootstrap now hydrates an existing `#calc-widget` host when its children contain `[data-wa-static-shell]`; it still avoids double-booting an already booted host and does not overwrite unrelated pre-existing child content.
+- This preserves the build-time static calculator shell while allowing the canonical runtime to hydrate it. No calculation formula or entitlement logic changes.
+- The source change is included in the same atomic commit as this project-state update on `phase0/pr-c-final`. Fresh Canonical CI, Platform Gates and strict seven-route Lighthouse are required on that exact commit; none is claimed by this documentation entry.
+
 PR C final verification commit: CI must re-run after the Funding Choices ad-slot gating and main-branch TBT baseline workflow were added; strict seven-route Lighthouse remains a release gate.
