@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { EXCLUDED_DIRECTORY_NAMES, isForbiddenDeploymentPath } from './deployment-path-policy.mjs';
 
 const root = process.cwd();
 const out = path.join(root, 'dist');
@@ -12,10 +13,7 @@ const PUBLIC_ROOT_EXACT = new Set([
   '_headers','_redirects','ads.txt','robots.txt','sitemap.xml','sw.js','manifest.webmanifest'
 ]);
 const PUBLIC_DIRS = new Set(['articles','research','calculator-definitions','assets']);
-const EXCLUDE_DIRS = new Set([
-  '.git','.github','node_modules','qa','scripts',
-  'country-modules','api','p','privacy','reports','dist'
-]);
+const EXCLUDE_DIRS = EXCLUDED_DIRECTORY_NAMES;
 const EXCLUDE_ROOT = new Set([
   'ARCHITECTURE.md','PHASE10_AUDIT.md','PHASE3_FINAL.md','QA_TESTS.md',
   'README-RELEASE.md','STABILIZATION-PLAN.md','GLOBAL-PLATFORM-SPEC.md',
@@ -32,7 +30,7 @@ function copyFile(src, rel) {
 }
 function walkPublicDir(srcDir, relDir) {
   for (const e of fs.readdirSync(srcDir, { withFileTypes: true })) {
-    if (e.name.startsWith('.') || EXCLUDE_DIRS.has(e.name) || e.name.toLowerCase().endsWith('.md')) continue;
+    if (e.name.startsWith('.') || EXCLUDE_DIRS.has(e.name) || isForbiddenDeploymentPath(path.join(relDir, e.name))) continue;
     const src = path.join(srcDir, e.name);
     const rel = path.join(relDir, e.name);
     if (e.isDirectory()) walkPublicDir(src, rel);
@@ -42,7 +40,7 @@ function walkPublicDir(srcDir, relDir) {
 
 // Root public files.
 for (const e of fs.readdirSync(root, { withFileTypes: true })) {
-  if (e.name.startsWith('.') || EXCLUDE_DIRS.has(e.name) || EXCLUDE_ROOT.has(e.name)) continue;
+  if (e.name.startsWith('.') || EXCLUDE_DIRS.has(e.name) || EXCLUDE_ROOT.has(e.name) || isForbiddenDeploymentPath(e.name)) continue;
   if (e.isDirectory()) continue;
   if (PUBLIC_ROOT_EXACT.has(e.name) || PUBLIC_ROOT_EXTS.has(path.extname(e.name).toLowerCase())) {
     // JSON is intentionally limited to known browser-facing files.
@@ -68,7 +66,7 @@ function copyRouteDirs(base, relBase='') {
       copyFile(index, path.join(rel, 'index.html'));
       // Preserve route-local public assets if present.
       for (const child of fs.readdirSync(src, { withFileTypes: true })) {
-        if (child.name === 'index.html' || child.name.startsWith('.')) continue;
+        if (child.name === 'index.html' || child.name.startsWith('.') || isForbiddenDeploymentPath(path.join(rel, child.name))) continue;
         const childSrc = path.join(src, child.name);
         if (child.isFile() && PUBLIC_ROOT_EXTS.has(path.extname(child.name).toLowerCase())) {
           copyFile(childSrc, path.join(rel, child.name));
@@ -83,6 +81,30 @@ fs.mkdirSync(path.join(out, '.well-known'), { recursive: true });
 const security = path.join(root, '.well-known', 'security.txt');
 if (fs.existsSync(security)) copyFile(security, '.well-known/security.txt');
 
+// Deterministic public-file inventory for post-deployment verification.
+const manifestPath = path.join(out, '.well-known', 'wa-public-manifest.json');
+function listFiles(dir, rel = '') {
+  const files = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const current = path.join(rel, entry.name).replaceAll(path.sep, '/');
+    if (entry.isDirectory()) files.push(...listFiles(path.join(dir, entry.name), current));
+    else files.push(current);
+  }
+  return files;
+}
+const deploymentFiles = listFiles(out).filter(file => file !== '.well-known/wa-public-manifest.json');
+const deploymentConfigFiles = deploymentFiles.filter(file => file === '_headers' || file === '_redirects').sort();
+const publicFiles = deploymentFiles.filter(file => !deploymentConfigFiles.includes(file));
+publicFiles.push('.well-known/wa-public-manifest.json');
+const manifestData = {
+  schema_version: 1,
+  source: 'Cloudflare Pages dist build',
+  deployment_config_files: deploymentConfigFiles,
+  public_files: publicFiles.sort(),
+  deployment_files: [...deploymentFiles, '.well-known/wa-public-manifest.json'].sort()
+};
+fs.writeFileSync(manifestPath, JSON.stringify(manifestData, null, 2) + '\\n', 'utf8');
+
 const forbidden = [];
 function auditTree(dir, rel='') {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -92,16 +114,11 @@ function auditTree(dir, rel='') {
   }
 }
 auditTree(out);
-const forbiddenHits = forbidden.filter(p =>
-  /^(qa|scripts|country-modules|api|p|privacy|reports)(\/|$)/.test(p) ||
-  /\.(md)$/i.test(p) ||
-  p === 'content-sources.json' ||
-  p.startsWith('.github/')
-);
+const forbiddenHits = forbidden.filter(isForbiddenDeploymentPath);
 if (forbiddenHits.length) {
   throw new Error('Forbidden internal files leaked into dist:\n' + forbiddenHits.join('\n'));
 }
-for (const required of ['index.html','robots.txt','sitemap.xml','ads.txt','_headers','_redirects','sw.js','manifest.webmanifest','widget.html','widget/index.html','widget.js','widget-bootstrap.js','wa-site-runtime.js','wa-home-runtime.js','wa-calculator-runtime.js']) {
+for (const required of ['index.html','robots.txt','sitemap.xml','ads.txt','_headers','_redirects','sw.js','manifest.webmanifest','widget.html','widget/index.html','widget.js','widget-bootstrap.js','wa-site-runtime.js','wa-home-runtime.js','wa-calculator-runtime.js','.well-known/wa-public-manifest.json']) {
   if (!fs.existsSync(path.join(out, required))) throw new Error('Missing required public output: ' + required);
 }
 const definitionsSrc = path.join(root, 'calculator-definitions');
