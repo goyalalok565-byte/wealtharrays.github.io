@@ -44,8 +44,8 @@ assert.equal(mod.API_VERSION, "1.2.0");
 assert.equal(mod.MODEL_LIST.length, Object.keys(cases).length, "Every published API model must have a contract vector");
 assert.deepEqual(mod.MODEL_LIST.map(model => model.id).sort(), Object.keys(cases).sort(), "Published model catalogue and contract vectors must match");
 const openapi = fs.readFileSync("api/openapi.yml", "utf8");
-assert.equal(openapi.match(/^  version: ([^\\s]+)$/m)?.[1], mod.API_VERSION, "OpenAPI and runtime API versions must match");
-const modelEnum = openapi.match(/^\\s*model: \\{type: string, enum: \\[([^\\]]+)\\]/m)?.[1];
+assert.equal(openapi.match(/^  version: ([^\s]+)$/m)?.[1], mod.API_VERSION, "OpenAPI and runtime API versions must match");
+const modelEnum = openapi.match(/^\s*model: \{type: string, enum: \[([^\]]+)\]/m)?.[1];
 assert.ok(modelEnum, "OpenAPI must publish the calculation model enum");
 assert.deepEqual(modelEnum.split(",").map(value => value.trim()).sort(), mod.MODEL_LIST.map(model => model.id).sort(),
   "OpenAPI model enum and runtime registry must match exactly");
