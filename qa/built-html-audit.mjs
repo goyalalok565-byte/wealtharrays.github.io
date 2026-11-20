@@ -39,7 +39,9 @@ for(const page of pages){
     Object.entries(value).forEach(([key,item])=>{if(key!=='mainEntity'||!types.includes('FAQPage'))visit(item);});
   };
   for(const script of jsonScripts){try{visit(JSON.parse(script[1]));}catch(_error){}}
-  if(!faqCount)faqCount=questionCount||((contentHtml.match(/<details\b/gi)||[]).length);
+  const schemaFaqCount=faqCount;
+  const htmlFaqCount=(contentHtml.match(/<(?:details|div|section)\b(?=[^>]*\bclass=["'][^"']*\bfaq-item\b)[^>]*>/gi)||[]).length;
+  const visibleFaqCount=Math.max(schemaFaqCount,questionCount,htmlFaqCount);
   const sourceLinks=new Set();
   for(const match of contentHtml.matchAll(/<a\b[^>]*>/gi)){
     const href=attr(match[0],'href');
@@ -49,7 +51,8 @@ for(const page of pages){
   const paragraphs=[...contentHtml.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)].map(match=>textContent(match[1]).toLowerCase()).filter(value=>value.length>=40);
   collected.push({
     id:page.id,slug:page.slug,title,metaDescription:attr(descriptionTag||'','content'),
-    h1,canonical:attr(canonicalTag||'','href'),jsonLdCount:jsonScripts.length,faqCount,
+    h1,canonical:attr(canonicalTag||'','href'),jsonLdCount:jsonScripts.length,
+    faqCount:visibleFaqCount,schemaFaqCount,htmlFaqCount,
     words:countWords(contentHtml),
     workedExample:/worked example|worked calculation|example calculation|example inputs|example scenario/i.test(contentText)?'yes':'no',
     sourceLinks:sourceLinks.size,paragraphs
@@ -57,11 +60,11 @@ for(const page of pages){
 }
 const frequency=new Map();
 for(const page of collected)for(const paragraph of new Set(page.paragraphs))frequency.set(paragraph,(frequency.get(paragraph)||0)+1);
-const headers=['calculator_id','slug','title','meta_description','h1','canonical','json_ld_count','faq_count','words','worked_example','source_links','repeated_paragraph_count','repeated_paragraph_examples'];
+const headers=['calculator_id','slug','title','meta_description','h1','canonical','json_ld_count','faq_count','schema_faq_count','html_faq_count','words','worked_example','source_links','repeated_paragraph_count','repeated_paragraph_examples'];
 const rows=[headers];
 for(const page of collected){
   const repeated=[...new Set(page.paragraphs)].filter(paragraph=>(frequency.get(paragraph)||0)>1);
-  rows.push([page.id,page.slug,page.title,page.metaDescription,page.h1,page.canonical,page.jsonLdCount,page.faqCount,page.words,page.workedExample,page.sourceLinks,repeated.length,repeated.slice(0,3).join(' | ')]);
+  rows.push([page.id,page.slug,page.title,page.metaDescription,page.h1,page.canonical,page.jsonLdCount,page.faqCount,page.schemaFaqCount,page.htmlFaqCount,page.words,page.workedExample,page.sourceLinks,repeated.length,repeated.slice(0,3).join(' | ')]);
 }
 fs.mkdirSync(path.dirname(output),{recursive:true});
 fs.writeFileSync(output,rows.map(row=>row.map(csv).join(',')).join('\n')+'\n','utf8');
