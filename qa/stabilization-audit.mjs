@@ -22,14 +22,17 @@ for (const file of calculators) {
   // The publisher ID belongs in the subscription-aware loader, not a static page tag.
   // These routes are intentionally excluded from AdSense by Phase 4 policy.
   const adExemptPages = new Set(['income-tax-scenario-calculator/index.html','loan-emi-calculator/index.html','loan-interest-calculator/index.html']);
+  const hasAdSlot = /<ins\b(?=[^>]*\bclass=["'][^"']*\badsbygoogle\b)(?=[^>]*\bdata-ad-slot=["'][^"']+["'])[^>]*>/i.test(html);
+  const noindex = /<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html);
   const adLoaderTags = html.match(/<script\b(?=[^>]*src=["']\/wa-ad-loader\.js(?:\?[^"']*)?["'])[^>]*>\s*<\/script>/gi) || [];
   const directAdTags = html.match(/<script\b(?=[^>]*src=["']https:\/\/pagead2?\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js)[^>]*>/gi) || [];
   const adLoaderSource = fs.existsSync('wa-ad-loader.js') ? fs.readFileSync('wa-ad-loader.js','utf8') : '';
-  if (!adExemptPages.has(file) && adLoaderTags.length !== 1) throw new Error(`${file}: expected exactly one subscription-aware AdSense loader, found ${adLoaderTags.length}`);
-  if (!adExemptPages.has(file) && !adLoaderSource.includes('ca-pub-6507600103785450')) throw new Error(`${file}: AdSense publisher id missing from wa-ad-loader.js`);
-  if (directAdTags.length) throw new Error(`${file}: direct AdSense bootstrap bypasses the subscription-aware loader`);
+  const shouldLoadAdLoader = hasAdSlot && !noindex && !adExemptPages.has(file);
+  if (shouldLoadAdLoader ? adLoaderTags.length !== 1 : adLoaderTags.length !== 0) throw new Error(file + ': AdSense loader must exist only for eligible pages with an actual ad slot; found ' + adLoaderTags.length);
+  if (adLoaderTags.length && !adLoaderSource.includes('ca-pub-6507600103785450')) throw new Error(file + ': AdSense publisher id missing from wa-ad-loader.js');
+  if (directAdTags.length) throw new Error(file + ': direct AdSense bootstrap bypasses the subscription-aware loader');
   if (!html.includes('rel="canonical"')) throw new Error(`${file}: canonical tag missing`);
 }
 if (!fs.existsSync('ads.txt') || !fs.readFileSync('ads.txt','utf8').includes('google.com, pub-6507600103785450, DIRECT')) throw new Error('ads.txt authorization missing');
 if (fs.existsSync('node_modules')) throw new Error('node_modules must not be present in deploy tree');
-console.log(`Stabilization audit PASS — ${calculators.length} calculators use exactly one shared runtime plus one page-specific definition; retired runtime is absent; source modules are not page-loaded directly; AdSense and ads.txt contracts preserved.`);
+console.log(`Stabilization audit PASS — ${calculators.length} calculators use exactly one shared runtime plus one page-specific definition; retired runtime is absent; source modules are not page-loaded directly; AdSense loads only on eligible pages with real ad slots; ads.txt authorization preserved.`);

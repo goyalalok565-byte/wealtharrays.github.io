@@ -35,6 +35,19 @@ for(const full of publicFiles){
     failures.push(r+': noindex pages must not carry AdSense');
   }
 }
+for(const full of publicFiles){
+  const r=path.relative(root,full).replaceAll(path.sep,'/'), html=fs.readFileSync(full,'utf8');
+  const hasAdSlot=/<ins\b(?=[^>]*\bclass=["'][^"']*\badsbygoogle\b)(?=[^>]*\bdata-ad-slot=["'][^"']+["'])[^>]*>/i.test(html);
+  const noindex=/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html);
+  const routeName=r==='widget/index.html'?'widget/index.html':r;
+  const intentionallyExcluded=['index.html','404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html','research.html','category-investment.html','category-loan.html','category-banking.html','category-retirement.html','category-salary.html','category-business.html','financial-workspace.html','goal-planner.html','scenario-lab.html','home-loan-emi-calculator/index.html','loan-emi-calculator/index.html','loan-interest-calculator/index.html'].includes(routeName) || noindex;
+  const shouldLoadAds=hasAdSlot && !intentionallyExcluded;
+  const hasAdLoader=html.includes('/wa-ad-loader.js') || /adsbygoogle\.js/i.test(html);
+  if(shouldLoadAds!==hasAdLoader) failures.push(r+': AdSense loader must be present only when an eligible ad slot exists');
+  if(!hasAdSlot && /<link\b(?=[^>]*\brel=["']preconnect["'])(?=[^>]*\bhref=["']https:\/\/(?:pagead2\.googlesyndication\.com|googleads\.g\.doubleclick\.net))/i.test(html)){
+    failures.push(r+': ad-network preconnect must not be present without an ad slot');
+  }
+}
 for(const file of publicFiles){
   const base=path.basename(file);
   const rel=path.relative(root,file).replaceAll(path.sep,'/');
