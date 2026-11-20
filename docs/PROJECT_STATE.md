@@ -79,7 +79,10 @@ Scores are preliminary engineering assessments from repository inspection, uploa
 - Canonical CI: passed.
 - Platform Gates: passed.
 - Mobile Lighthouse Quality Gate: failed because homepage accessibility scored 92 against the current minimum of 95.
-- PR preview baseline reported homepage TBT about 112 ms and LCP about 2.1 s in a separate experiment. This does not erase the earlier 7,510 ms observation; the cause must be profiled and remeasured.
+- Actual seven-route PR preview artifact (4x CPU, simulated slow 4G): homepage Performance 97 / TBT 110 ms / LCP 2.1 s / CLS 0; tools 83 / 550 ms / 2.5 s / 0; SIP 90 / 260 ms / 2.5 s / 0.076; SWP 85 / 330 ms / 3.0 s / 0.076; FIRE 90 / 200 ms / 2.5 s / 0.076; Rent vs Buy 89 / 190 ms / 2.6 s / 0.070; compound guide 89 / 180 ms / 3.0 s / 0.
+- Latest Lighthouse quality gate failed: homepage accessibility 92 vs minimum 95. The current PR's gate only enforces Performance >=70, CLS <=0.25, Accessibility >=95, Best Practices >=80 and SEO >=90; it does not enforce the owner's stricter Performance >=90, CLS <=0.10, TBT <=200 ms and LCP <=2.5 s.
+- Under the stricter targets, tools, SIP and SWP fail TBT; SWP, rent-vs-buy and the compound-interest guide fail LCP; tools/rent-vs-buy/compound guide fail Performance. The CLS reservation itself is improved in the PR preview.
+- This does not erase the earlier 7,510 ms production observation; the current preview homepage is below 200 ms, but the earlier production outlier must remain tracked until reproduced or production remeasurement confirms it is resolved.
 - PR #78 is not merged and must not be merged until all requested stricter gates and browser regressions pass.
 
 ### Not verified on production
