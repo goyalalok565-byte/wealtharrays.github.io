@@ -23,7 +23,34 @@ const modelsResponse = await worker.fetch(new Request("https://example.test/v1/m
 assert.equal(modelsResponse.status, 200);
 const modelData = await modelsResponse.json();
 assert.ok(modelData.models.some(model => model.id === "sip" && model.version === "1.0.0"));
-const calculate = await worker.fetch(new Request("https://example.test/v1/calculate", {
+const healthResponse = await worker.fetch(new Request("https://example.test/v1/health"), {
+  ...env,
+  DB: { prepare(sql) { assert.equal(sql, "SELECT 1 AS ok"); return { async first() { return { ok: 1 }; } }; } },
+  SUPABASE_URL: "https://supabase.example.test",
+  SUPABASE_ANON_KEY: "public-anon-test-value",
+  RAZORPAY_KEY_ID: "rzp_test_key",
+  RAZORPAY_KEY_SECRET: "test-secret-must-not-leak",
+  RAZORPAY_PLAN_MONTHLY: "plan_monthly",
+  RAZORPAY_PLAN_YEARLY: "plan_yearly",
+  RAZORPAY_WEBHOOK_SECRET: "webhook-secret-must-not-leak"
+}, {});
+assert.equal(healthResponse.status, 200);
+const healthData = await healthResponse.json();
+assert.equal(healthData.status, "ok");
+assert.equal(healthData.service, "wealth-arrays-api");
+assert.equal(healthData.version, "1.0.0");
+assert.equal(healthData.dependencies.d1_database, "ok");
+assert.equal(healthData.dependencies.supabase_auth, "configured");
+assert.equal(healthData.dependencies.razorpay_billing, "configured");
+assert.equal(JSON.stringify(healthData).includes("test-secret-must-not-leak"), false);
+assert.equal(JSON.stringify(healthData).includes("public-anon-test-value"), false);
+const unhealthy = await worker.fetch(new Request("https://example.test/v1/health"), {
+  ...env,
+  DB: { prepare() { return { async first() { throw new Error("database offline"); } }; } }
+}, {});
+assert.equal(unhealthy.status, 503);
+assert.equal((await unhealthy.json()).status, "degraded");
+\nconst calculate = await worker.fetch(new Request("https://example.test/v1/calculate", {
   method: "POST", headers: { "Content-Type": "application/json", "cf-connecting-ip": "203.0.113.10" },
   body: JSON.stringify({ model: "sip", inputs: { monthly: 5000, annualRate: 10, years: 10 } })
 }), env, {});
