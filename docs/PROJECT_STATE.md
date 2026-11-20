@@ -157,3 +157,11 @@ CI scope: strict seven-route Lighthouse runs on PR C (performance branch), manua
 - Stripe India new-account onboarding is invite-only; Stripe requires an invite request and may ask for business IDs, site/app URL, business description, bank details, and IEC/RBI Transaction Purpose Code for international transactions. Official: https://support.stripe.com/questions/stripe-accounts-are-invite-only-in-india and https://support.stripe.com/questions/how-can-i-open-a-stripe-account-in-india
 - Lemon Squeezy stopped accepting new users/store sign-ups on 16 Nov 2026 and will stop processing transactions and subscription renewals on 31 Mar 2027. Official: https://docs.lemonsqueezy.com/migration
 - Paddle acts as Merchant of Record for supported sales and handles customer sales-tax calculation/collection/remittance. This does not replace the Indian seller's own income-tax/GST/accounting obligations; CA review remains required.
+
+
+## PR B — India tax-year terminology and sources
+
+- Tax Year 2026–27 (income from 1 April 2026): Income-tax Act, 2025, Section 156. Current new-regime calculator widget/runtime uses this label.
+- Assessment Year 2026–27 (income in FY 2025–26): Income-tax Act, 1961, Section 87A. This remains the applicable old-Act reference despite return filing after 1 April 2026.
+- Official Income Tax Department sources: AY/FY transition FAQ https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/income-tax-returns ; AY 2026–27 Section 87A rates/rebate https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/file-itr-2-online ; TY 2026–27 estimator manual https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/income-and-tax-estimator-um ; Section 156 Act PDF https://wmstatic-prd.incometaxindia.gov.in/documents/20117/42998/Section-156_2026-04-01_05-11-58_344893_en.pdf/415b0f0e-8826-feaa-b374-481e54d4b98e?t=1775046534568&version=9.0 .
+- `widget.js` and `wa-calculator-runtime.js` are changed together; canonical CI's root-cause build regenerates the runtime from canonical source modules. No tax formula or rebate eligibility model is changed in this PR. CA/legal review remains required before Phase 1.
