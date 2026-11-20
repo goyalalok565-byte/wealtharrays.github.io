@@ -1,5 +1,44 @@
 # Wealth Arrays Project State
 
+## Current authoritative release status — 2026-11-20 (PR #97)
+
+This section supersedes older Phase 0 status notes below where they refer to PR #88 or earlier verification runs. Historical audit findings remain useful as history, not as the current release state.
+
+- Active candidate: PR #97, branch `phase0/pr-c-final`, based on `main`; keep this branch as the only engineering branch until PR C is merged.
+- Latest verified head: `955aac3fc9515c68847128648c794c9a90207f20`.
+- Exact-head Canonical CI run `44765905682`: PASS.
+- Exact-head Platform Gates run `44765905532`: PASS.
+- Exact-head Mobile Lighthouse run `44765905615`: PASS. Seven routes, three independent runs per route; minimum Performance 98, minimum Accessibility 96, maximum CLS 0.0757, maximum TBT 87.28ms, maximum LCP 1,905.17ms. All unchanged thresholds pass.
+- Browser suite passed: all 55 calculators/output bounds, JavaScript-disabled shells, theme/currency persistence, cloud workspace save/load, consent/ad-slot behavior, and seven-route mobile Lighthouse.
+- 55-page HTML audit: unique title/meta/H1/canonical and worked example 55/55; 2–4 visible FAQs/page; content 682–1,126 words; external authoritative source links 0/55; FAQPage structured data 0/55. Content/source citations and legal review remain incomplete.
+- No formula changes were made. Snapshot tests preserve existing behavior but do not independently prove financial correctness.
+- PR #97 is OPEN and UNMERGED. Do not merge unless the repository owner sends the exact phrase `merge approved`.
+
+### Release blockers not verifiable from repository CI
+
+1. Cloudflare Workers production branch control must be confirmed as `main` only, with Preview separate; verify active production version, traffic allocation and rollback target. Prior bot messages reported production builds for unmerged heads, so a green build is not proof of the version serving users.
+2. Verify production HTTP response header `Content-Encoding: br`; preview compression is not production proof.
+3. Verify live `/v1/health`, authentication, server-side entitlements, D1/Supabase connectivity, Razorpay/Paddle subscription and webhook lifecycle/idempotency, backups, alerts, production config/secrets, and production browser smoke. Never request or expose secret values.
+4. Complete physical Android-device accessibility/performance and field INP/CrUX measurements; lab Lighthouse TBT is not field INP.
+5. Obtain independent authoritative formula validation and jurisdiction-specific CA/legal review before making accuracy/tax claims.
+6. Add page-specific authoritative sources and complete editorial review for all 55 calculator pages. This is a planned post-PR-C content batch; do not create a new branch before PR #97 is merged.
+7. Decide separately whether FAQ structured data is appropriate and compliant; visible FAQs do not imply FAQ schema.
+
+### Commercial/product readiness
+
+- Pro trial remains 14 days, no card, one per verified account. Ultra remains invite-only 7-day beta; public Ultra checkout stays disabled.
+- Approved pricing cells are experiments only, not live prices. Do not change production payment settings or enable checkout without explicit owner approval.
+- Payments/providers remain unverified in production. Do not claim revenue, paid conversion, payment readiness or SaaS activation without end-to-end evidence.
+- Priority after Phase 0: complete live backend/payment verification, improve calculation trust and source coverage, then ship the paid Pro MVP with transparent entitlements, account/workspace value, billing lifecycle, refund/cancellation handling, support and privacy/legal review.
+
+### Non-negotiable release controls
+
+- Do not lower Performance >=90, CLS <=0.10, TBT <=200ms, LCP <=2500ms, Accessibility >=95, Best Practices >=80, SEO >=90.
+- Do not merge PR #97 without exact `merge approved`.
+- Do not change Cloudflare production settings, payment settings, secrets, branch protections or delete branches/tags without explicit written approval.
+- Do not commit generated HTML. Do not change formulas without authoritative reference vectors, tests and a one-line rationale.
+- Do not represent CI/preview results as production verification.
+
 Last updated: 2026-11-20
 Repository: `goyalalok565-byte/wealtharrays.github.io`
 Default branch: `main`
