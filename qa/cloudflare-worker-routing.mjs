@@ -50,7 +50,8 @@ const unhealthy = await worker.fetch(new Request("https://example.test/v1/health
 }, {});
 assert.equal(unhealthy.status, 503);
 assert.equal((await unhealthy.json()).status, "degraded");
-\nconst calculate = await worker.fetch(new Request("https://example.test/v1/calculate", {
+
+const calculate = await worker.fetch(new Request("https://example.test/v1/calculate", {
   method: "POST", headers: { "Content-Type": "application/json", "cf-connecting-ip": "203.0.113.10" },
   body: JSON.stringify({ model: "sip", inputs: { monthly: 5000, annualRate: 10, years: 10 } })
 }), env, {});
