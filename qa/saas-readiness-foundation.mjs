@@ -101,7 +101,7 @@ assert.equal(zeroInterest.results[0].value, 10000, 'Zero-rate loan EMI must avoi
 assert.throws(() => sharedModule.calculate('cagr', { startValue: 100, endValue: 110, years: 0 }), /years must be greater than zero/);
 
 const taxHarness = tax
-  .replace('import { CORS_HEADERS, error, json } from "../_shared.js";\n', 'const CORS_HEADERS = {}; const error = (code, message, status = 400, details) => new Response(JSON.stringify({error:{code,message,...(details?{details}:{})}}), {status, headers:{"Content-Type":"application/json"}}); const json = (data, status = 200) => new Response(JSON.stringify(data), {status, headers:{"Content-Type":"application/json"}});\n')
+  .replace('import { CORS_HEADERS, error, json } from "./_shared.js";\n', 'const CORS_HEADERS = {}; const error = (code, message, status = 400, details) => new Response(JSON.stringify({error:{code,message,...(details?{details}:{})}}), {status, headers:{"Content-Type":"application/json"}}); const json = (data, status = 200) => new Response(JSON.stringify(data), {status, headers:{"Content-Type":"application/json"}});\n')
   .replaceAll('export async function onRequestOptions', 'async function onRequestOptions')
   .replaceAll('export async function onRequestPost', 'async function onRequestPost') + '\nexport { onRequestPost };\n';
 const taxModule = await import('data:text/javascript;base64,' + Buffer.from(taxHarness).toString('base64'));
