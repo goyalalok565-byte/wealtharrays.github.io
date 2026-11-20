@@ -21,11 +21,13 @@ export async function onRequestGet({ env }) {
   );
   const rateLimiter = Boolean(env.PUBLIC_API_LIMITER && typeof env.PUBLIC_API_LIMITER.limit === "function");
   const degraded = database === "unavailable";
+  const readyForSaas = database === "ok" && auth && billing && rateLimiter;
 
   return json({
     status: degraded ? "degraded" : "ok",
     service: "wealth-arrays-api",
     version: API_VERSION,
+    ready_for_saas: readyForSaas,
     checked_at: new Date().toISOString(),
     dependencies: {
       calculation_engine: "ok",
