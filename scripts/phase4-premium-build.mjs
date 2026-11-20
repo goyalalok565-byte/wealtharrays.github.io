@@ -11,7 +11,7 @@ function renderStaticShell(calc) {
     const label = escapeHtml(field.label);
     if (field.type === 'select') {
       const options = (field.options || []).map(option => `<option value=\"${escapeHtml(option.value)}\">${escapeHtml(option.label)}</option>`).join('');
-      return `<div class=\"field\"><label for=\"${id}\">${label}</label><select id=\"${id}\" disabled><option value=\"\">Choose ${label}</option>${options}</select></div>`;
+      return `<div class=\"field\"><label for=\"${id}\">${label}</label><select id=\"${id}\"><option value=\"\">Choose ${label}</option>${options}</select></div>`;
     }
     const attrs = [typeof field.min === 'number' ? `min=\"${field.min}\"` : '', typeof field.max === 'number' ? `max=\"${field.max}\"` : '', typeof field.step === 'number' ? `step=\"${field.step}\"` : ''].filter(Boolean).join(' ');
     return `<div class=\"field\"><label for=\"${id}\">${label}${field.suffix ? ` <span class=\"hint\">(${escapeHtml(field.suffix)})</span>` : ''}</label><input id=\"${id}\" type=\"number\" inputmode=\"decimal\" placeholder=\"Enter ${label.toLowerCase()}\" ${attrs}></div>`;
