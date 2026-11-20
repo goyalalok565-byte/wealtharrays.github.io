@@ -100,4 +100,4 @@ const cardPayoff = calculators.find(c => c.id === 'credit-card-payoff');
 const longCard = cardPayoff.compute({ balance: 1e12, apr: 0, payment: 0.01 });
 assert(longCard.some(r => /not reached within 1,200 months/i.test(r.label)), 'Credit-card payoff must disclose a balance that cannot be cleared within the simulation horizon');
 assert(longCard.some(r => /remaining balance/i.test(r.label) && r.value > 0), 'Credit-card payoff must report the remaining balance after its simulation cap');
-console.log('Calculator regression PASS — ${calculators.length}/${calculators.length} definitions, blank-input UX, responsive runtime hooks, field bounds, finite outputs, homepage/tools/search/llms/sitemap parity passed.');
+console.log('Calculator regression PASS — ' + calculators.length + '/' + calculators.length + ' definitions, blank-input UX, responsive runtime hooks, field bounds, finite outputs, homepage/tools/search/llms/sitemap parity passed.');
