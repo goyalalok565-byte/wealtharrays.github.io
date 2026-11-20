@@ -31,7 +31,7 @@ assert.match(scenarios, /COUNT\(\*\) AS total/);
 assert.match(scenarios, /INSERT INTO saved_scenarios[\s\S]*SELECT[\s\S]*WHERE \(SELECT COUNT\(\*\) FROM saved_scenarios/);
 const cancel = fs.readFileSync("functions/v1/billing/cancel.js", "utf8");
 assert.match(cancel, /SELECT provider_subscription_id, plan_id, status, current_period_end, cancel_at_period_end FROM subscriptions/);
-assert.match(cancel, /current_period_end = COALESCE\\(\\?, current_period_end\\)/,
+assert.match(cancel, /current_period_end = COALESCE\(\?, current_period_end\)/,
   "A provider response without current_end must preserve the known billing-period end during scheduled cancellation.");
 
 const worker = fs.readFileSync("worker.mjs", "utf8");
