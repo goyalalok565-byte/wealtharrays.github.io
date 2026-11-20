@@ -18,6 +18,6 @@ export async function onRequestPost({ request, env }) {
     if (!response.ok) return error("PAYMENT_PROVIDER_ERROR", "Razorpay could not schedule cancellation.", 502, { provider_status: response.status });
     await env.DB.prepare("UPDATE subscriptions SET cancel_at_period_end = 1, status = ?, current_period_end = COALESCE(?, current_period_end), updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE provider_subscription_id = ? AND user_id = ?")
       .bind(result.status || current.status, result.current_end ? new Date(result.current_end * 1000).toISOString() : null, current.provider_subscription_id, auth.user.id).run();
-    return json({ cancellation_scheduled: true, status: result.status || current.status, current_period_end: result.current_end ? new Date(result.current_end * 1000).toISOString() : null }, 200, { "Cache-Control": "no-store" });
+    return json({ cancellation_scheduled: true, status: result.status || current.status, current_period_end: result.current_end ? new Date(result.current_end * 1000).toISOString() : current.current_period_end || null }, 200, { "Cache-Control": "no-store" });
   } catch { return error("BILLING_ERROR", "Could not schedule subscription cancellation.", 500); }
 }
