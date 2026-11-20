@@ -107,3 +107,61 @@ jobs:
           name: wealth-arrays-seven-page-mobile-performance
           path: /tmp/wa-lighthouse/
           retention-days: 14
+
+  main-homepage-baseline:
+    if: ${{ github.event_name == 'pull_request' && startsWith(github.head_ref, 'phase0/pr-c') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: pr-tools
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: main/package-lock.json
+      - name: Install main dependencies and Lighthouse
+        working-directory: main
+        run: |
+          npm ci
+          npm install --no-save lighthouse@13.0.1 playwright
+          npx playwright install chromium --with-deps
+      - name: Build main branch baseline
+        working-directory: main
+        run: npm run build
+      - name: Start main preview server
+        working-directory: main
+        run: |
+          nohup python3 -m http.server 4174 --directory dist >/tmp/wa-main-preview.log 2>&1 &
+          echo $! >/tmp/wa-main-preview.pid
+          for attempt in {1..30}; do
+            if curl -fsS http://127.0.0.1:4174/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/wa-main-preview.log
+          exit 1
+      - name: Run same seven-route Lighthouse settings on main
+        working-directory: main
+        env:
+          BASE_URL: http://127.0.0.1:4174
+          LH_OUTPUT_DIR: /tmp/wa-main-lighthouse
+        run: node qa/mobile-lighthouse-baseline.mjs
+      - name: Run same homepage TBT diagnostic on main
+        working-directory: main
+        env:
+          BASE_URL: http://127.0.0.1:4174
+          LH_OUTPUT_DIR: /tmp/wa-main-lighthouse
+        run: node ../pr-tools/qa/homepage-performance-diagnostic.mjs
+      - name: Upload main-branch baseline artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wealth-arrays-main-homepage-baseline
+          path: /tmp/wa-main-lighthouse/
+          retention-days: 14
