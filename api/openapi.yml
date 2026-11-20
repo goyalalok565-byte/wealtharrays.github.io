@@ -46,6 +46,45 @@ paths:
       responses:
         '200': {description: Scenario deleted}
         '404': {description: Scenario not found}
+  /v1/reports:
+    get:
+      summary: List or retrieve the authenticated user's reproducible financial reports
+      operationId: listOrGetSavedReports
+      security: [{bearerAuth: []}]
+      parameters:
+        - in: query
+          name: id
+          required: false
+          schema: {type: string}
+      responses:
+        '200': {description: User-owned report metadata or a complete reproducible report}
+        '401': {description: Authentication required}
+        '404': {description: Report not found for this account}
+    post:
+      summary: Save a reproducible financial report to the authenticated user's archive
+      operationId: saveFinancialReport
+      security: [{bearerAuth: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, required: [name, fingerprint, report], additionalProperties: true}
+      responses:
+        '201': {description: Report saved}
+        '400': {description: Invalid report contract}
+        '403': {description: Account report quota reached}
+    delete:
+      summary: Delete an authenticated user's saved report
+      operationId: deleteSavedReport
+      security: [{bearerAuth: []}]
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema: {type: string}
+      responses:
+        '200': {description: Report deleted}
+        '404': {description: Report not found for this account}
   /v1/billing/checkout:
     post:
       summary: Create a Razorpay subscription checkout

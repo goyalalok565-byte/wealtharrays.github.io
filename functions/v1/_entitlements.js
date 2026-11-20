@@ -1,5 +1,7 @@
 export const FREE_SCENARIO_LIMIT = 3;
 export const MAX_SCENARIO_LIMIT = 500;
+export const FREE_REPORT_LIMIT = 1;
+export const MAX_REPORT_LIMIT = 100;
 
 /**
  * Resolve server-authoritative access from a paid subscription or a one-time trial.
@@ -20,11 +22,13 @@ export function resolveEntitlement(subscription, now = Date.now(), trial = null)
     source: paidActive ? "subscription" : trialActive ? "trial" : null,
     plan_id: paidActive ? (subscription.plan_id || null) : trialActive ? "pro-trial" : null,
     cloud_scenario_limit: active ? MAX_SCENARIO_LIMIT : FREE_SCENARIO_LIMIT,
+    cloud_report_limit: active ? MAX_REPORT_LIMIT : FREE_REPORT_LIMIT,
     trial: { status: trialStatus, ends_at: trial?.ends_at || null },
     features: {
       cloud_scenario_sync: true,
       cross_device_scenarios: true,
-      expanded_scenario_library: active
+      expanded_scenario_library: active,
+      saved_report_archive: active
     }
   };
 }

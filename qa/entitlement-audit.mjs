@@ -7,14 +7,17 @@ const mod = await import("data:text/javascript;base64," + Buffer.from(moduleSour
 
 assert.equal(mod.FREE_SCENARIO_LIMIT, 3);
 assert.equal(mod.MAX_SCENARIO_LIMIT, 500);
+assert.equal(mod.FREE_REPORT_LIMIT, 1);
+assert.equal(mod.MAX_REPORT_LIMIT, 100);
 assert.deepEqual(mod.resolveEntitlement(null), {
-  tier: "free", active: false, source: null, plan_id: null, cloud_scenario_limit: 3,
+  tier: "free", active: false, source: null, plan_id: null, cloud_scenario_limit: 3, cloud_report_limit: 1,
   trial: { status: "available", ends_at: null },
-  features: { cloud_scenario_sync: true, cross_device_scenarios: true, expanded_scenario_library: false }
+  features: { cloud_scenario_sync: true, cross_device_scenarios: true, expanded_scenario_library: false, saved_report_archive: false }
 });
 assert.equal(mod.resolveEntitlement({ status: "active", plan_id: "monthly" }).tier, "free", "An active subscription without a billing-period end must fail closed.");
 assert.equal(mod.resolveEntitlement({ status: "active", plan_id: "monthly", current_period_end: null }).tier, "free", "A null provider period end must not grant indefinite Pro access.");
 assert.equal(mod.resolveEntitlement({ status: "active", plan_id: "yearly", current_period_end: "2027-01-01T00:00:00.000Z" }, Date.parse("2026-11-18T00:00:00.000Z")).tier, "pro");
+assert.equal(mod.resolveEntitlement({ status: "active", plan_id: "yearly", current_period_end: "2027-01-01T00:00:00.000Z" }, Date.parse("2026-11-18T00:00:00.000Z")).cloud_report_limit, 100);
 assert.equal(mod.resolveEntitlement({ status: "active", plan_id: "yearly", current_period_end: "2026-11-17T00:00:00.000Z" }, Date.parse("2026-11-18T00:00:00.000Z")).tier, "free");
 assert.equal(mod.resolveEntitlement({ status: "cancelled", plan_id: "monthly" }).tier, "free");
 assert.equal(mod.resolveEntitlement({ status: "halted", plan_id: "monthly" }).tier, "free");
@@ -45,4 +48,5 @@ const auth = fs.readFileSync("functions/v1/_auth.js", "utf8");
 assert.match(auth, /email_verified: Boolean\(user\.email_confirmed_at \|\| user\.confirmed_at\)/);
 assert.match(account, /v1\/billing\/config/);
 assert.match(account, /cloud_scenario_limit/);
+assert.match(account, /cloud_report_limit/);
 console.log("SaaS entitlement audit PASS — paid access expiry, trial fallback, free quota, server enforcement and UI readiness.");

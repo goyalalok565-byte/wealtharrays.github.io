@@ -80,6 +80,8 @@ const wrongMethod = await worker.fetch(new Request("https://example.test/v1/calc
 assert.equal(wrongMethod.status, 405);
 const unauthenticated = await worker.fetch(new Request("https://example.test/v1/scenarios"), env, {});
 assert.equal(unauthenticated.status, 401);
+const unauthenticatedReports = await worker.fetch(new Request("https://example.test/v1/reports"), env, {});
+assert.equal(unauthenticatedReports.status, 401, "Report archive must require an authenticated account");
 const staticResponse = await worker.fetch(new Request("https://example.test/index.html"), env, {});
 assert.equal(await staticResponse.text(), "static asset");
 assert.deepEqual(assetCalls, ["/index.html"]);
