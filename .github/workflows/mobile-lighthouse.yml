@@ -54,7 +54,7 @@ jobs:
         env:
           BASE_URL: http://127.0.0.1:4173
         run: node qa/embed-browser-smoke.mjs
-      - name: PR browser smoke — all 55 calculators and scenario features
+      - name: PR browser smoke — all registry calculators and scenario features
         if: ${{ github.event_name == 'pull_request' }}
         env:
           BASE_URL: http://127.0.0.1:4173
