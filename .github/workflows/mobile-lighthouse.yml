@@ -31,10 +31,10 @@ jobs:
       - name: Start PR preview server
         if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
         run: |
-          nohup python3 -m http.server 4173 --directory dist >/tmp/wa-preview.log 2>&1 &
+          nohup node qa/performance-preview-server.mjs --root dist --port 4173 >/tmp/wa-preview.log 2>&1 &
           echo $! >/tmp/wa-preview.pid
           for attempt in {1..30}; do
-            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            if curl -fsSI -H 'Accept-Encoding: br' http://127.0.0.1:4173/ | grep -qi '^content-encoding: br'; then exit 0; fi
             sleep 1
           done
           cat /tmp/wa-preview.log
@@ -136,10 +136,10 @@ jobs:
       - name: Start main preview server
         working-directory: main
         run: |
-          nohup python3 -m http.server 4174 --directory dist >/tmp/wa-main-preview.log 2>&1 &
+          nohup node ../pr-tools/qa/performance-preview-server.mjs --root dist --port 4174 >/tmp/wa-main-preview.log 2>&1 &
           echo $! >/tmp/wa-main-preview.pid
           for attempt in {1..30}; do
-            if curl -fsS http://127.0.0.1:4174/ >/dev/null; then exit 0; fi
+            if curl -fsSI -H 'Accept-Encoding: br' http://127.0.0.1:4174/ | grep -qi '^content-encoding: br'; then exit 0; fi
             sleep 1
           done
           cat /tmp/wa-main-preview.log
