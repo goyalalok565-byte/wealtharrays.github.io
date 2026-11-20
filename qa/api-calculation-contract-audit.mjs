@@ -31,10 +31,16 @@ const cases = {
   "salary-hourly": [{ amount: 52000, hoursPerWeek: 40, weeksPerYear: 52 }, [25, 2080, 52000]],
   overtime: [{ hourly: 20, regular: 40, overtime: 10, multiplier: 1.5 }, [800, 300, 1100]],
   "freelance-rate": [{ income: 100000, expenses: 20000, hours: 20, weeks: 50 }, [120, 1000, 120000]],
-  "freedom-milestone": [{ expenses: 600000, withdrawal: 4, current: 10000000 }, [15000000, 10000000, 5000000]]
+  "freedom-milestone": [{ expenses: 600000, withdrawal: 4, current: 10000000 }, [15000000, 10000000, 5000000]],
+  "emergency-fund": [{ expenses: 40000, targetMonths: 6, currentSavings: 100000, monthlySaving: 10000 }, [240000, 140000, 14]],
+  "budget-50-30-20": [{ income: 80000, needsPct: 50, wantsPct: 30, actualNeeds: 45000, actualWants: 25000 }, [40000, 24000, 16000, 10000, 6000]],
+  "break-even": [{ fixedCosts: 150000, price: 150, variableCost: 60, targetProfit: 50000, days: 30 }, [90, 1667, 250050, 1667 / 30, 2223]],
+  "cost-of-delay": [{ monthly: 1000, annualRate: 0, years: 2, delay: 1 }, [24000, 12000, 12000, 2000]],
+  "rule-of-72": [{ rate: 8, multiple: 3 }, [9, 9.006468342000588, -0.006468342000587768, 14.274914586003177]],
+  "credit-card-payoff": [{ balance: 80000, apr: 36, payment: 8000 }, [13, 16540.373489041325, 96540.37348904133]]
 };
 
-assert.equal(mod.API_VERSION, "1.1.0");
+assert.equal(mod.API_VERSION, "1.2.0");
 assert.equal(mod.MODEL_LIST.length, Object.keys(cases).length, "Every published API model must have a contract vector");
 assert.deepEqual(mod.MODEL_LIST.map(model => model.id).sort(), Object.keys(cases).sort(), "Published model catalogue and contract vectors must match");
 
@@ -60,6 +66,8 @@ assert.throws(() => mod.calculate("debt-payoff", { balance: 10000, payment: 10, 
 assert.throws(() => mod.calculate("salary-hourly", { amount: 50000, hoursPerWeek: 0, weeksPerYear: 52 }), /hoursPerWeek must be between/);
 assert.throws(() => mod.calculate("loan-emi", { principal: -1, annualRate: 5, months: 12 }), /principal must be between/);
 assert.throws(() => mod.calculate("loan-emi", { principal: 1000, annualRate: 5, months: 0 }), /months must be between/);
+assert.throws(() => mod.calculate("cost-of-delay", { monthly: 1000, annualRate: 5, years: 2, delay: 3 }), /delay must not exceed years/);
+assert.throws(() => mod.calculate("break-even", { fixedCosts: 1000, price: 10, variableCost: 10, targetProfit: 100, days: 30 }), error => error === undefined);
 assert.throws(() => mod.calculate("cagr", { startValue: 100, endValue: 120, years: 0 }), /greater than zero/);
 assert.throws(() => mod.calculate("gst", { amount: 100, rate: 18, mode: "unknown" }), /mode must be/);
 assert.throws(() => mod.calculate("currency-converter", { amount: 100, rate: 1, from: "US", to: "EUR" }), /three-letter currency codes/);

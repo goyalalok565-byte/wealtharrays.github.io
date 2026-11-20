@@ -1,4 +1,4 @@
-export const API_VERSION = "1.1.0";
+export const API_VERSION = "1.2.0";
 export const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
@@ -35,7 +35,13 @@ export const MODEL_LIST = [
   { id: "salary-hourly", version: API_VERSION, title: "Salary to hourly pay", inputs: ["amount", "hoursPerWeek", "weeksPerYear"], assumptions: "Annual salary divided by scheduled hours per year; excludes unpaid leave, overtime and benefits." },
   { id: "overtime", version: API_VERSION, title: "Overtime pay", inputs: ["hourly", "regular", "overtime", "multiplier"], assumptions: "User-supplied overtime multiplier; excludes jurisdiction-specific labor rules, taxes and deductions." },
   { id: "freelance-rate", version: API_VERSION, title: "Freelance hourly rate", inputs: ["income", "expenses", "hours", "weeks"], assumptions: "Annual income target plus annual business expenses divided by annual billable hours; excludes tax and non-billable time beyond the inputs." },
-  { id: "freedom-milestone", version: API_VERSION, title: "Financial independence target", inputs: ["expenses", "withdrawal", "current"], assumptions: "Annual expenses divided by user-supplied withdrawal rate; a planning heuristic, not a safe-withdrawal guarantee." }
+  { id: "freedom-milestone", version: API_VERSION, title: "Financial independence target", inputs: ["expenses", "withdrawal", "current"], assumptions: "Annual expenses divided by user-supplied withdrawal rate; a planning heuristic, not a safe-withdrawal guarantee." },
+  { id: "emergency-fund", version: API_VERSION, title: "Emergency fund target", inputs: ["expenses", "targetMonths", "currentSavings", "monthlySaving"], assumptions: "Target equals essential monthly expenses times target months; excludes interest, inflation and withdrawals." },
+  { id: "budget-50-30-20", version: API_VERSION, title: "50/30/20 budget", inputs: ["income", "needsPct", "wantsPct", "actualNeeds", "actualWants"], assumptions: "Uses take-home income; wants percentage is capped so needs plus wants never exceed 100%; no tax or expense classification is inferred." },
+  { id: "break-even", version: API_VERSION, title: "Business break-even", inputs: ["fixedCosts", "price", "variableCost", "targetProfit", "days"], assumptions: "Contribution is selling price less variable cost; unit counts are rounded up; if contribution is not positive, no break-even is possible." },
+  { id: "cost-of-delay", version: API_VERSION, title: "SIP cost of delay", inputs: ["monthly", "annualRate", "years", "delay"], assumptions: "Beginning-of-month contributions; constant assumed nominal rate; delayed contributions finish on the same goal date." },
+  { id: "rule-of-72", version: API_VERSION, title: "Rule of 72", inputs: ["rate", "multiple"], assumptions: "Rule of 72 is an approximation; exact doubling and target-multiple periods use discrete annual compounding." },
+  { id: "credit-card-payoff", version: API_VERSION, title: "Fixed-payment credit card payoff", inputs: ["balance", "apr", "payment"], assumptions: "Monthly interest is added before a fixed payment; excludes new purchases, fees, rate changes and issuer-specific rules; capped at 1,200 months." }
 ];
 const numeric = (v, name, { min = 0, max = 1e15, optional = false, fallback } = {}) => {
   if (optional && (v === undefined || v === null || v === "")) v = fallback;
@@ -216,6 +222,75 @@ export function calculate(model, input) {
       const target = expenses / (withdrawal / 100), gap = Math.max(0, target - current);
       results = [money("Indicative independence target", target, "positive"), money("Current investments", current), money("Remaining target gap", gap)];
       assumptions = "Annual expenses divided by user-supplied withdrawal rate; a planning heuristic, not a safe-withdrawal guarantee.";
+      break;
+    }
+    case "emergency-fund": {
+      const expenses = n("expenses"), targetMonths = n("targetMonths", { min: 1, max: 36 }), currentSavings = n("currentSavings"), monthlySaving = n("monthlySaving");
+      const target = expenses * targetMonths, gap = Math.max(0, target - currentSavings);
+      const months = gap === 0 ? 0 : monthlySaving > 0 ? Math.ceil(gap / monthlySaving) : 0;
+      results = [money("Emergency fund target", target), money("Additional savings needed", gap), number("Months to target (0 = already funded or no monthly saving)", months)];
+      assumptions = "Target equals essential monthly expenses times target months; excludes interest, inflation and withdrawals.";
+      break;
+    }
+    case "budget-50-30-20": {
+      const income = n("income"), needsPct = n("needsPct", { max: 100 }), wantsPct = Math.min(100 - needsPct, n("wantsPct", { max: 100 }));
+      const actualNeeds = n("actualNeeds"), actualWants = n("actualWants");
+      const needs = income * needsPct / 100, wants = income * wantsPct / 100, savings = income - needs - wants;
+      const actualSavings = income - actualNeeds - actualWants, gap = actualSavings - savings;
+      results = [money("Target for needs", needs), money("Target for wants", wants), money("Target for savings and debt repayment", savings), money("Your actual monthly savings", actualSavings), money(gap >= 0 ? "Ahead of the savings target by" : "Short of the savings target by", Math.abs(gap))];
+      assumptions = "Uses take-home income; wants percentage is capped so needs plus wants never exceed 100%; no tax or expense classification is inferred.";
+      break;
+    }
+    case "break-even": {
+      const fixedCosts = n("fixedCosts"), price = n("price"), variableCost = n("variableCost"), targetProfit = n("targetProfit"), days = n("days", { min: 1, max: 31 });
+      const contribution = price - variableCost, viable = contribution > 0;
+      const units = viable ? Math.ceil(fixedCosts / contribution) : 0, targetUnits = viable ? Math.ceil((fixedCosts + targetProfit) / contribution) : 0;
+      results = [money("Contribution per unit", contribution), number(viable ? "Break-even units per month" : "No break-even: price does not cover variable cost", units), money("Break-even sales per month", units * price), number("Break-even units per day", units / days), number("Units per month for the profit target", targetUnits)];
+      assumptions = "Contribution is selling price less variable cost; unit counts are rounded up; if contribution is not positive, no break-even is possible.";
+      break;
+    }
+    case "cost-of-delay": {
+      const monthly = n("monthly"), annualRate = rate(), duration = n("years", { min: 1, max: 60 }), delay = n("delay", { max: 59 });
+      if (delay > duration) throw Object.assign(new Error("delay must not exceed years."), { field: "delay" });
+      const months = Math.round(duration * 12), delayMonths = Math.min(months, Math.round(delay * 12)), monthlyRate = annualRate / 1200;
+      const factor = count => monthlyRate === 0 ? count : ((Math.pow(1 + monthlyRate, count) - 1) / monthlyRate) * (1 + monthlyRate);
+      const startNow = monthly * factor(months), delayedFactor = factor(months - delayMonths), startLater = monthly * delayedFactor;
+      const catchUp = delayedFactor > 0 ? startNow / delayedFactor : 0;
+      results = [money("Value if you start now", startNow), money("Value if you start later", startLater), money("Cost of the delay", startNow - startLater), money("Monthly SIP needed to catch up after the delay", catchUp)];
+      assumptions = "Beginning-of-month contributions; constant assumed nominal rate; delayed contributions finish on the same goal date.";
+      break;
+    }
+    case "rule-of-72": {
+      const annualRate = n("rate", { max: 100 }), multiple = n("multiple", { min: 1, max: 1000 }), growth = 1 + annualRate / 100;
+      const rule = annualRate > 0 ? 72 / annualRate : 0, exact = annualRate > 0 ? Math.log(2) / Math.log(growth) : 0;
+      const target = annualRate > 0 ? Math.log(multiple) / Math.log(growth) : 0;
+      results = [number("Years to double (Rule of 72)", rule), number("Years to double (exact compounding)", exact), number("Rule of 72 minus exact", rule - exact), number("Years to reach the target multiple", target)];
+      assumptions = "Rule of 72 is an approximation; exact doubling and target-multiple periods use discrete annual compounding.";
+      break;
+    }
+    case "credit-card-payoff": {
+      let balance = n("balance"), interestPaid = 0, totalPaid = 0, months = 0;
+      const apr = n("apr", { max: 300 }), payment = n("payment"), monthlyRate = apr / 1200, maxMonths = 1200;
+      if (payment <= balance * monthlyRate && balance > 0) {
+        results = [number("Months to clear (0 = payment too low)", 0), money("Monthly interest at current balance", balance * monthlyRate), money("Payment needed to start reducing balance", balance * monthlyRate + 1)];
+        assumptions = "Payment does not exceed first-month interest; balance will not decline. Excludes fees, new purchases and issuer-specific rules.";
+        break;
+      }
+      while (balance > 0.005 && months < maxMonths) {
+        const interest = balance * monthlyRate;
+        interestPaid += interest;
+        const paid = Math.min(balance + interest, payment);
+        totalPaid += paid;
+        balance = Math.max(0, balance + interest - paid);
+        months++;
+      }
+      if (balance > 0.005) {
+        results = [number("Payoff not reached within 1,200 months", maxMonths), money("Remaining balance after 1,200 months", balance), money("Interest paid within 1,200 months", interestPaid)];
+        assumptions = "Fixed monthly payment with monthly interest added first; payoff capped at 1,200 months; excludes fees, new purchases and issuer-specific rules.";
+      } else {
+        results = [number("Months to pay off", months), money("Total interest paid", interestPaid), money("Total payments", totalPaid)];
+        assumptions = "Fixed monthly payment with monthly interest added first; excludes fees, new purchases, rate changes and issuer-specific rules.";
+      }
       break;
     }
     default: throw Object.assign(new Error("Unsupported model. Use GET /v1/models to list supported models."), { unsupported: true });
