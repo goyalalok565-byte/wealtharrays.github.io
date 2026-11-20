@@ -14,7 +14,7 @@ function renderStaticShell(calc) {
       return `<div class=\"field\"><label for=\"${id}\">${label}</label><select id=\"${id}\" disabled><option value=\"\">Choose ${label}</option>${options}</select></div>`;
     }
     const attrs = [typeof field.min === 'number' ? `min=\"${field.min}\"` : '', typeof field.max === 'number' ? `max=\"${field.max}\"` : '', typeof field.step === 'number' ? `step=\"${field.step}\"` : ''].filter(Boolean).join(' ');
-    return `<div class=\"field\"><label for=\"${id}\">${label}${field.suffix ? ` <span class=\"hint\">(${escapeHtml(field.suffix)})</span>` : ''}</label><input id=\"${id}\" type=\"number\" inputmode=\"decimal\" placeholder=\"Enter ${label.toLowerCase()}\" ${attrs} disabled></div>`;
+    return `<div class=\"field\"><label for=\"${id}\">${label}${field.suffix ? ` <span class=\"hint\">(${escapeHtml(field.suffix)})</span>` : ''}</label><input id=\"${id}\" type=\"number\" inputmode=\"decimal\" placeholder=\"Enter ${label.toLowerCase()}\" ${attrs}></div>`;
   }).join('');
   return `<!-- WA-STATIC-CALC-SHELL-START --><div class=\"calc-widget-shell\" data-wa-static-shell=\"true\" aria-label=\"${escapeHtml(calc.title)} calculator static form\" style=\"min-height:520px\"><p class=\"wa-static-shell-note\">Calculator fields are shown below. Enable JavaScript to calculate results.</p><div class=\"calc-grid\">${fields}</div><button type=\"button\" disabled aria-disabled=\"true\">Calculate result</button><div class=\"calc-result\" aria-live=\"polite\">Results appear here when the calculator is available.</div><div class=\"wa-portfolio-card\" data-wa-chart-placeholder=\"true\" aria-label=\"Chart placeholder\" style=\"min-height:220px;display:grid;place-items:center\">Chart preview</div></div><!-- WA-STATIC-CALC-SHELL-END -->`;
 }
@@ -107,9 +107,7 @@ for(const file of htmlFiles){
     if (s.includes('<!-- WA-STATIC-CALC-SHELL-START -->')) {
       s = s.replace(/<!-- WA-STATIC-CALC-SHELL-START -->[\s\S]*?<!-- WA-STATIC-CALC-SHELL-END -->/g, shell);
     } else {
-      s = s.replace(/(<div\b(?=[^>]*\bid=["']calc-widget["'])[^>]*>)(\s*)<\/div>/i, `$1${shell}</div>`);
     }
-    s = s.replace(/(<div\b(?=[^>]*\bid=["']calc-widget["'])[^>]*)(>)/i, (tag, open, close) => /\bstyle=/.test(open) ? `${open} style="min-height:520px"${close}` : `${open} style="min-height:520px"${close}`);
   }
   // Reuse the preloaded root stylesheet URL on nested article routes; otherwise the
   // same 94 KB stylesheet is downloaded twice under versioned and unversioned URLs.
