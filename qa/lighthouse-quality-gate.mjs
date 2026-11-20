@@ -13,11 +13,11 @@ export function evaluateSummary(summary) {
       if (!Number.isFinite(value) || value < THRESHOLDS[metric]) failures.push(`${route}: ${metric} ${row[metric]} is below minimum ${THRESHOLDS[metric]}`);
     }
     const cls = Number(row.clsValue);
-    if (!Number.isFinite(cls) || cls > THRESHOLDS.cls) failures.push(`${route}: CLS ${row.clsValue} exceeds maximum ${THRESHOLDS.cls}`);
+    if (row.clsValue == null || !Number.isFinite(cls) || cls > THRESHOLDS.cls) failures.push(`${route}: CLS ${row.clsValue} exceeds maximum ${THRESHOLDS.cls}`);
     const tbt = Number(row.tbtMs);
-    if (!Number.isFinite(tbt) || tbt > THRESHOLDS.tbtMs) failures.push(`${route}: TBT ${row.tbtMs}ms exceeds maximum ${THRESHOLDS.tbtMs}ms`);
+    if (row.tbtMs == null || !Number.isFinite(tbt) || tbt > THRESHOLDS.tbtMs) failures.push(`${route}: TBT ${row.tbtMs}ms exceeds maximum ${THRESHOLDS.tbtMs}ms`);
     const lcp = Number(row.lcpMs);
-    if (!Number.isFinite(lcp) || lcp > THRESHOLDS.lcpMs) failures.push(`${route}: LCP ${row.lcpMs}ms exceeds maximum ${THRESHOLDS.lcpMs}ms`);
+    if (row.lcpMs == null || !Number.isFinite(lcp) || lcp > THRESHOLDS.lcpMs) failures.push(`${route}: LCP ${row.lcpMs}ms exceeds maximum ${THRESHOLDS.lcpMs}ms`);
   }
   return failures;
 }
