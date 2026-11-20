@@ -1,5 +1,4 @@
 name: Mobile Lighthouse Quality Gate
-
 on:
   workflow_run:
     workflows: ["Wealth Arrays Canonical CI"]
@@ -7,14 +6,11 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
-
 permissions:
   contents: read
-
 concurrency:
   group: mobile-lighthouse-${{ github.event.pull_request.number || github.event.workflow_run.head_branch || github.ref }}
   cancel-in-progress: true
-
 jobs:
   lighthouse:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
@@ -27,6 +23,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+      - name: Verify mobile release gate rejects threshold violations
+        run: node --test tests/lighthouse-quality-gate.test.js
       - name: Build PR preview
         if: ${{ github.event_name == 'pull_request' }}
         run: npm run build
@@ -46,9 +44,7 @@ jobs:
         run: |
           set -euo pipefail
           routes=(/ /tools.html /sip-calculator/ /swp-calculator/ /fire-calculator/ /rent-vs-buy-calculator/ /articles/compound-interest-guide.html)
-          for route in "${routes[@]}"; do
-            curl -fsSL --max-time 30 "https://wealtharrays.com$route" >/dev/null
-          done
+          for route in "${routes[@]}"; do curl -fsSL --max-time 30 "https://wealtharrays.com$route" >/dev/null; done
       - name: Install browser measurement tools
         run: |
           npm install --no-save lighthouse@13.0.1 playwright
@@ -83,7 +79,7 @@ jobs:
           BASE_URL: ${{ github.event_name == 'pull_request' && 'http://127.0.0.1:4173' || 'https://wealtharrays.com' }}
           LH_OUTPUT_DIR: /tmp/wa-lighthouse
         run: node qa/homepage-performance-diagnostic.mjs
-      - name: Enforce mobile quality thresholds
+      - name: Enforce strict mobile release thresholds
         run: node qa/lighthouse-quality-gate.mjs /tmp/wa-lighthouse/summary.json
       - name: Capture SWP typing and scroll CPU profile
         env:
