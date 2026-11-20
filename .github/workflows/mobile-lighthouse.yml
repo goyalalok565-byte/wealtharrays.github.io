@@ -59,11 +59,11 @@ jobs:
         env:
           BASE_URL: http://127.0.0.1:4173
         run: node qa/production-browser-smoke.mjs
-      - name: PR browser smoke — responsive, currency, theme, language and exports
+      - name: PR browser smoke — every calculator, responsive layout, currency, theme, language and exports
         if: ${{ github.event_name == 'pull_request' }}
         env:
           BASE_URL: http://127.0.0.1:4173
-        run: node qa/all-47-calculators-browser-smoke.mjs
+        run: node qa/all-calculators-browser-smoke.mjs
       - name: PR browser smoke — cloud workspace save and load
         if: ${{ github.event_name == 'pull_request' }}
         env:
