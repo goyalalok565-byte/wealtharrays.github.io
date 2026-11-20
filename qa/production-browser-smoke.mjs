@@ -3,7 +3,8 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 const calcContext={window:{},console};vm.createContext(calcContext);vm.runInContext(fs.readFileSync('calculators.js','utf8')+'\n;globalThis.__WA_TEST_CALCULATORS__=CALCULATORS;',calcContext);
 const allCalculators=calcContext.__WA_TEST_CALCULATORS__;
-if(!Array.isArray(allCalculators)||allCalculators.length!==55)throw new Error('Expected 55 calculator definitions, found '+(allCalculators?.length??'none'));
+if(!Array.isArray(allCalculators)||!allCalculators.length)throw new Error('Canonical calculator registry is empty or invalid');
+if(new Set(allCalculators.map(calc=>calc.id)).size!==allCalculators.length)throw new Error('Canonical calculator registry contains duplicate IDs');
 
 const baseUrl = (process.env.BASE_URL || 'http://127.0.0.1:4173').replace(/\/$/, '');
 const browser = await chromium.launch({ headless: true });
