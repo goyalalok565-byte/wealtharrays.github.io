@@ -3,6 +3,14 @@ import { error, json, CORS_HEADERS } from "./_shared.js";
 import { getEntitlement } from "./_entitlements.js";
 
 const reportCors = { ...CORS_HEADERS, "Access-Control-Allow-Methods": "GET,POST,DELETE,OPTIONS" };
+function reportFingerprint(report) {
+  const stable = { ...report };
+  delete stable.generatedAt;
+  const serialized = JSON.stringify(stable);
+  let hash = 2166136261;
+  for (let i = 0; i < serialized.length; i++) { hash ^= serialized.charCodeAt(i); hash = Math.imul(hash, 16777619); }
+  return (hash >>> 0).toString(16).padStart(8, "0");
+}
 export async function onRequestOptions() { return new Response(null, { status: 204, headers: reportCors }); }
 
 export async function onRequestGet({ request, env }) {
@@ -14,11 +22,11 @@ export async function onRequestGet({ request, env }) {
     const id = new URL(request.url).searchParams.get("id");
     if (id) {
       if (id.length > 80) return error("INVALID_ID", "Provide a valid report id.", 400);
-      const row = await env.DB.prepare("SELECT report_json FROM saved_reports WHERE id = ? AND user_id = ?").bind(id, auth.user.id).first();
+      const row = await env.DB.prepare("SELECT report_json, fingerprint, content_sha256 FROM saved_reports WHERE id = ? AND user_id = ?").bind(id, auth.user.id).first();
       if (!row) return error("NOT_FOUND", "Report not found.", 404);
       let report;
       try { report = JSON.parse(row.report_json); } catch { return error("REPORT_CORRUPT", "This saved report could not be read.", 500); }
-      return json({ report }, 200, { "Cache-Control": "no-store" });
+      return json({ report, fingerprint: row.fingerprint, content_sha256: row.content_sha256 }, 200, { "Cache-Control": "no-store" });
     }
     const [rows, count, entitlement] = await Promise.all([
       env.DB.prepare("SELECT id, name, model, model_version, currency, fingerprint, created_at FROM saved_reports WHERE user_id = ? ORDER BY created_at DESC LIMIT 100").bind(auth.user.id).all(),
@@ -45,10 +53,10 @@ export async function onRequestPost({ request, env }) {
   if (!object(report) || typeof report.model !== "string" || !report.model.trim() || report.model.length > 120 ||
       typeof report.modelVersion !== "string" || !report.modelVersion.trim() || report.modelVersion.length > 80 ||
       typeof report.currency !== "string" || !/^[A-Z]{3}$/.test(report.currency) ||
-      !object(report.inputs) || !object(report.assumptions) ||
+      typeof report.generatedAt !== "string" || !object(report.inputs) || !object(report.assumptions) ||
       !Array.isArray(report.scenarios) || !Array.isArray(report.stressTests) ||
       !Array.isArray(report.sources) || !Array.isArray(report.limitations) ||
-      typeof body.fingerprint !== "string" || !/^[a-f0-9]{8}$/i.test(body.fingerprint)) {
+      typeof body.fingerprint !== "string" || !/^[a-f0-9]{8}$/i.test(body.fingerprint) || body.fingerprint.toLowerCase() !== reportFingerprint(report)) {
     return error("INVALID_REPORT", "Provide a reproducible report with model/version, ISO currency, inputs, assumptions, scenarios, stress tests, sources, limitations and an 8-character fingerprint.", 400);
   }
   const name = String(body.name || report.model).trim().slice(0, 120);

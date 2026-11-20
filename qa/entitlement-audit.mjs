@@ -3,7 +3,7 @@ import fs from "node:fs";
 
 const source = fs.readFileSync("functions/v1/_entitlements.js", "utf8");
 const moduleSource = source.replace(/^export /gm, "");
-const mod = await import("data:text/javascript;base64," + Buffer.from(moduleSource + "\nexport { FREE_SCENARIO_LIMIT, MAX_SCENARIO_LIMIT, resolveEntitlement };").toString("base64"));
+const mod = await import("data:text/javascript;base64," + Buffer.from(moduleSource + "\nexport { FREE_SCENARIO_LIMIT, MAX_SCENARIO_LIMIT, FREE_REPORT_LIMIT, MAX_REPORT_LIMIT, resolveEntitlement };").toString("base64"));
 
 assert.equal(mod.FREE_SCENARIO_LIMIT, 3);
 assert.equal(mod.MAX_SCENARIO_LIMIT, 500);
