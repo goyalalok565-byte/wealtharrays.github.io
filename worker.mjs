@@ -1,4 +1,5 @@
 import * as models from "./functions/v1/models.js";
+import * as health from "./functions/v1/health.js";
 import * as calculate from "./functions/v1/calculate.js";
 import * as fx from "./functions/v1/fx.js";
 import * as indiaTax from "./functions/v1/india-tax.js";
@@ -11,6 +12,7 @@ import * as cancelSubscription from "./functions/v1/billing/cancel.js";
 import * as billingWebhook from "./functions/v1/billing/webhook.js";
 
 const ROUTES = new Map([
+  ["/v1/health", health],
   ["/v1/models", models],
   ["/v1/calculate", calculate],
   ["/v1/fx", fx],
