@@ -214,3 +214,6 @@ PR C CI also builds the current `main` commit in a separate job and runs the sam
 
 
 - PR #95 Cloudflare Workers bot reported successful `production/builds/` deployment for unmerged head `88da2679` on 20 Nov 2026 06:29 UTC: https://dash.cloudflare.com/?to=/f5619318297695cabb3a1540854cb166/workers/services/view/wealtharrays-github-io/production/builds/200eb0cc-d241-47ba-8c4f-bd7136d5191d . This strengthens the evidence that non-main branch builds can deploy to the production Worker. Verify branch control before any further merge/release.
+
+
+PR C final verification commit: CI must re-run after the Funding Choices ad-slot gating and main-branch TBT baseline workflow were added; strict seven-route Lighthouse remains a release gate.
