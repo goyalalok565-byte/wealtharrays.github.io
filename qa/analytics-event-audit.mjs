@@ -10,6 +10,11 @@ assert.match(core,/if\(saved==='granted'\)[\s\S]*?window\.waLoadAnalytics\(\)/,"
 assert.match(core,/if\(granted\)[\s\S]*?window\.waLoadAnalytics\(\)/,"GA4 must load after explicit acceptance");
 assert.match(visual,/if\(!document\.querySelector\('ins\.adsbygoogle,\[data-ad-slot\],\.wa-ad-slot'\)\) return;/,"AdSense must load only when a page has an explicit ad slot");
 assert.match(visual,/if\(!document\.querySelector\('\.calc-page'\)/,'visual runtime must be scoped away from hub pages');
+const consentLoader=fs.readFileSync("consent-loader.js","utf8");
+assert.match(consentLoader,/AD_SLOT_SELECTOR\s*=\s*'ins\.adsbygoogle,\[data-ad-slot\],\.wa-ad-slot'/,"Funding Choices must be scoped to pages with explicit ad slots");
+assert.match(consentLoader,/new MutationObserver/,"Funding Choices must support dynamically inserted ad slots");
+assert.match(consentLoader,/if \(hasAdSlot\(\)\)/,"Funding Choices must check for an ad slot before loading");
+
 const accountHtml=fs.readFileSync("account.html","utf8");
 assert.match(accountHtml,/Free includes 3/);
 assert.match(accountHtml,/Cancellation takes effect at the end of the current billing period/);
