@@ -24,6 +24,12 @@ This section supersedes older Phase 0 status notes below where they refer to PR 
 6. Add page-specific authoritative sources and complete editorial review for all 55 calculator pages. This is a planned post-PR-C content batch; do not create a new branch before PR #97 is merged.
 7. Decide separately whether FAQ structured data is appropriate and compliant; visible FAQs do not imply FAQ schema.
 
+### Latest engineering audit follow-up — billing cancellation safety
+
+- Deep code inspection identified a cancellation persistence edge case: if Razorpay's cancel response omitted `current_end`, the handler wrote SQL NULL over the previously known subscription period end. This could make an active subscription appear to have no expiry.
+- The fix now reads the existing period end and uses SQL `COALESCE` so a missing provider field cannot erase it. The entitlement audit asserts this invariant.
+- This is a source-level fix pending exact-head CI. It is not live Razorpay or production verification.
+
 ### Commercial/product readiness
 
 - Pro trial remains 14 days, no card, one per verified account. Ultra remains invite-only 7-day beta; public Ultra checkout stays disabled.
