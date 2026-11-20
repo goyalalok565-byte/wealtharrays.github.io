@@ -75,10 +75,11 @@ Scores are preliminary engineering assessments from repository inspection, uploa
 - Strict owner release targets are Performance >=90, CLS <=0.10, TBT <=200ms and LCP <=2.5s on all seven routes. Preview currently fails: tools, SIP and SWP TBT; SWP, rent-vs-buy and compound guide LCP; tools, rent-vs-buy and compound guide Performance.
 - The earlier 7,510ms homepage TBT observation remains tracked until reproduced or current production remeasurement proves it resolved.
 - Homepage Lighthouse findings are specific: low contrast on Quick EMI result label/output/meta text; target-size/overlap warnings around Scenario Lab CTA, calculator cards and category cards.
+- Tools-page trace diagnosis from the 550ms TBT run: two `wa-site-runtime.js` long tasks at about 233ms each, plus Google Tag Manager (169ms), AdSense loader (162ms) and AdSense show-ads script (105ms). The current Tools page has no ad-slot markup. PR #84 now defers GA4 until explicit analytics consent and loads AdSense only when an actual slot exists; browser smoke coverage is added. Performance improvement is not yet measured.
 - PR #81 (`docs/project-state-baseline-2026-11-20`) is open; its latest observed Platform Gates run was still in progress. Cloudflare bot posted a successful Worker build for its commit; that is not proof of a Pages production release.
 - PR #82 (`fix/tax-year-aware-rebate-label`) is open and stacked on PR #81. Its local 50/50 tests and build passed on the ZIP-based worktree; GitHub CI had not started at last check. It changes only tax-year UI terminology, not calculations. CA/legal review remains required.
-- PR #83 (`fix/strict-mobile-release-gates`) is open against main and includes the CLS host fix, strict mobile release gates, homepage accessibility repairs, registry parity checks, a safe /v1/health endpoint and deployment inventory controls. Canonical CI, Platform Gates and Mobile Lighthouse were running at the latest check; no pass is claimed yet.
-- PR #83 first verification run (commit `2886442`) passed Canonical CI. Platform Gates confirmed registry parity and the 249-file dist inventory (247 public assets + 2 Cloudflare config files), then stopped on a literal newline typo in the new Worker health test. Mobile Lighthouse stopped at the negative-test suite because `null` TBT was treated as zero; the gate now fails closed on missing CLS/TBT/LCP metrics, and the routing-test newline is corrected. These corrections still require a fresh CI run.
+- PR #84 (`fix/phase0-release-gates-final`) is open against main and includes the CLS host fix, strict mobile release gates, homepage accessibility repairs, registry parity checks, a safe /v1/health endpoint and deployment inventory controls. Canonical CI, Platform Gates and Mobile Lighthouse passed the earlier code state but have not yet rerun against the latest consent/performance changes; no current-head pass is claimed.
+- Earlier consolidated branch first verification run (commit `2886442`) passed Canonical CI. Platform Gates confirmed registry parity and the 249-file dist inventory (247 public assets + 2 Cloudflare config files), then stopped on a literal newline typo in the new Worker health test. Mobile Lighthouse stopped at the negative-test suite because `null` TBT was treated as zero; the gate now fails closed on missing CLS/TBT/LCP metrics, and the routing-test newline is corrected. These corrections still require a fresh CI run.
 
 ## Phase 0 — status and open items
 
@@ -118,6 +119,6 @@ Owner configures these directly in GitHub Settings > Secrets. Never request secr
 
 ## Next three actions
 
-1. Rerun CI after the corrected health routing test and fail-closed Lighthouse metric checks; inspect fresh seven-route Lighthouse and SWP CPU profile artifacts.
-2. Optimize any remaining strict performance/accessibility failures without lowering thresholds; verify production deployment manifest after a successful release.
-3. Obtain CA/legal review for the tax eligibility wording, then complete production Core Web Vitals and live backend monitoring verification.
+1. Trigger fresh CI on the latest consolidated branch; verify the tax, health, registry, dist and consent-aware browser tests, then inspect the new seven-route Lighthouse and SWP CPU artifacts.
+2. Optimize remaining route-level performance failures based on the new traces, while keeping all release thresholds unchanged.
+3. Verify the deployed public-file manifest and `/v1/health` after a production release, measure Core Web Vitals, and obtain CA/legal review of tax eligibility wording.
