@@ -4,7 +4,7 @@ Last updated: 2026-11-20
 Repository: `goyalalok565-byte/wealtharrays.github.io`
 Default branch: `main`
 Current phase: Phase 0 — Stabilization
-Status: Phase 0 engineering changes are in review; strict performance targets and production evidence remain outstanding.
+Status: Phase 0 engineering changes are in final verification review; strict performance targets and production evidence remain outstanding.
 
 ## Mission
 
@@ -116,6 +116,8 @@ Owner configures these directly in GitHub Settings > Secrets. Never request secr
 - Do not alter ads/CMP based on one Lighthouse observation; profile first.
 - Local `dist/` is not a substitute for production Cloudflare evidence.
 - Never claim AdSense approval, traffic, revenue, rankings or SaaS activation without measurements.
+
+Active verification PR: #87 (`fix/phase0-verification-2026-11-20`). This branch consolidates the CLS, tax terminology, strict performance gates, registry parity, health monitor and deployment hygiene work. Do not merge until the seven-route release matrix passes.
 
 ## Next three actions
 
