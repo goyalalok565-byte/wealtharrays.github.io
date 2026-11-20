@@ -4,6 +4,13 @@ info:
   version: 1.0.0
   description: Versioned financial calculations, indicative FX rates, a limited Indian tax estimate, authenticated scenario storage and subscription endpoints. Cloudflare bindings, Supabase authentication and Razorpay plans require deployment configuration.
 paths:
+  /v1/health:
+    get:
+      summary: Report API version, liveness and safe dependency readiness
+      operationId: getApiHealth
+      responses:
+        '200': {description: API is live; optional dependencies may be unconfigured}
+        '503': {description: A configured database dependency is unavailable}
   /v1/auth-config:
     get:
       summary: Return public authentication configuration
@@ -109,7 +116,7 @@ paths:
                 tax_year: {type: string, enum: ["2026-27"]}
                 regime: {type: string, enum: [new]}
                 taxable_income: {type: number, minimum: 0, maximum: 1000000000}
-                rebate_eligible: {type: boolean, description: Whether Section 87A rebate eligibility has been confirmed for this taxpayer}
+                rebate_eligible: {type: boolean, description: Whether Section 156 rebate eligibility under the Income-tax Act, 2025 has been confirmed for this taxpayer}
       responses:
         '200':
           description: Tax estimate with model version and assumptions
