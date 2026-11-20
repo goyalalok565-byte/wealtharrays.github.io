@@ -105,16 +105,16 @@ for(const file of htmlFiles){
   if(calc && s.includes('id="calc-widget"')) {
     const shell = renderStaticShell(calc);
     if (s.includes('<!-- WA-STATIC-CALC-SHELL-START -->')) {
-      s = s.replace(/<!-- WA-STATIC-CALC-SHELL-START -->[\\s\\S]*?<!-- WA-STATIC-CALC-SHELL-END -->/g, shell);
+      s = s.replace(/<!-- WA-STATIC-CALC-SHELL-START -->[\s\S]*?<!-- WA-STATIC-CALC-SHELL-END -->/g, shell);
     } else {
-      s = s.replace(/(<div\\b(?=[^>]*\\bid=["']calc-widget["'])[^>]*>)(\\s*)<\\/div>/i, `$1${shell}</div>`);
+      s = s.replace(/(<div\b(?=[^>]*\bid=["']calc-widget["'])[^>]*>)(\s*)<\/div>/i, `$1${shell}</div>`);
     }
-    s = s.replace(/(<div\\b(?=[^>]*\\bid=["']calc-widget["'])[^>]*)(>)/i, (tag, open, close) => /\\bstyle=/.test(open) ? `${open} style="min-height:520px"${close}` : `${open} style="min-height:520px"${close}`);
+    s = s.replace(/(<div\b(?=[^>]*\bid=["']calc-widget["'])[^>]*)(>)/i, (tag, open, close) => /\bstyle=/.test(open) ? `${open} style="min-height:520px"${close}` : `${open} style="min-height:520px"${close}`);
   }
   // Reuse the preloaded root stylesheet URL on nested article routes; otherwise the
   // same 94 KB stylesheet is downloaded twice under versioned and unversioned URLs.
-  const stylesPreload = s.match(/<link\\b(?=[^>]*\\brel=["']preload["'])(?=[^>]*\\bas=["']style["'])[^>]*\\bhref=["']([^"']*styles\\.css[^"']*)["'][^>]*>/i);
-  if (stylesPreload) s = s.replace(/href=["'](?:\\.\\.\\/)+styles\\.css["']/gi, `href="${stylesPreload[1]}"`);
+  const stylesPreload = s.match(/<link\b(?=[^>]*\brel=["']preload["'])(?=[^>]*\bas=["']style["'])[^>]*\bhref=["']([^"']*styles\.css[^"']*)["'][^>]*>/i);
+  if (stylesPreload) s = s.replace(/href=["'](?:\.\.\/)+styles\.css["']/gi, `href="${stylesPreload[1]}"`);
   if(id && s.includes('id="calc-widget"') && base!=='widget.html'){
     if(!s.includes('/wa-calculator-runtime.js')) s=s.replace('</body>','<script src="/wa-calculator-runtime.js" defer></script></body>');
   }
