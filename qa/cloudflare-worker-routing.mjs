@@ -42,6 +42,7 @@ assert.equal(healthData.version, "1.0.0");
 assert.equal(healthData.dependencies.d1_database, "ok");
 assert.equal(healthData.dependencies.supabase_auth, "configured");
 assert.equal(healthData.dependencies.razorpay_billing, "configured");
+assert.equal(healthData.ready_for_saas, true);
 assert.equal(JSON.stringify(healthData).includes("test-secret-must-not-leak"), false);
 assert.equal(JSON.stringify(healthData).includes("public-anon-test-value"), false);
 const unhealthy = await worker.fetch(new Request("https://example.test/v1/health"), {
