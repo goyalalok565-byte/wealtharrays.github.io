@@ -2,9 +2,9 @@
 (function () {
   'use strict';
   /* Hub pages already have one shared runtime owner; keep this visual/calculator layer off them. */
-  if(!document.querySelector('.calc-page')&&!/(?:^|\\/)widget(?:\\/|\\.html$)/.test(location.pathname))return;
+  if(!document.querySelector('.calc-page')&&!/(?:^|\/)widget(?:\/|\.html$)/.test(location.pathname))return;
   function installAdSense(){
-    if(/(?:^|\\/)404\\.html$|(?:^|\\/)widget(?:\\/|\\.html$)/.test(location.pathname)) return;
+    if(/(?:^|\/)404\.html$|(?:^|\/)widget(?:\/|\.html$)/.test(location.pathname)) return;
     // No current page has an ad slot. Load AdSense only on pages that explicitly add one.
     if(!document.querySelector('ins.adsbygoogle,[data-ad-slot],.wa-ad-slot')) return;
     if(document.querySelector('script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]')) return;
