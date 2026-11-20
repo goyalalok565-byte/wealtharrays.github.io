@@ -79,12 +79,12 @@ jobs:
           BASE_URL: ${{ github.event_name == 'pull_request' && 'http://127.0.0.1:4173' || 'https://wealtharrays.com' }}
           LH_OUTPUT_DIR: /tmp/wa-lighthouse
         run: node qa/homepage-performance-diagnostic.mjs
-      - name: Enforce strict mobile release thresholds
-        run: node qa/lighthouse-quality-gate.mjs /tmp/wa-lighthouse/summary.json
       - name: Capture SWP typing and scroll CPU profile
         env:
           BASE_URL: ${{ github.event_name == 'pull_request' && 'http://127.0.0.1:4173' || 'https://wealtharrays.com' }}
         run: node qa/performance-profile.mjs
+      - name: Enforce strict mobile release thresholds
+        run: node qa/lighthouse-quality-gate.mjs /tmp/wa-lighthouse/summary.json
       - name: Upload Lighthouse and CPU profile reports
         if: always()
         uses: actions/upload-artifact@v4
