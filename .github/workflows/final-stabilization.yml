@@ -95,6 +95,8 @@ jobs:
           npm run build
           find dist -type f -printf '%P\n' | LC_ALL=C sort > /tmp/dist-first-files.txt
           (cd dist && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum) > /tmp/dist-first-hashes.txt
+          # Build scripts normalize tracked source HTML; reset it so both builds start from the same clean commit.
+          git restore --source=HEAD --worktree -- .
           rm -rf dist
           npm run build
           find dist -type f -printf '%P\n' | LC_ALL=C sort > /tmp/dist-second-files.txt
