@@ -92,11 +92,12 @@ jobs:
           set -euo pipefail
           export SOURCE_DATE_DATE="$(git log -1 --format=%cs)"
           rm -rf dist
+          # Warm up generators once: the first build normalizes tracked HTML from the pre-build source state.
+          npm run build
+          rm -rf dist
           npm run build
           find dist -type f -printf '%P\n' | LC_ALL=C sort > /tmp/dist-first-files.txt
           (cd dist && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum) > /tmp/dist-first-hashes.txt
-          # Build scripts normalize tracked source HTML; reset it so both builds start from the same clean commit.
-          git restore --source=HEAD --worktree -- .
           rm -rf dist
           npm run build
           find dist -type f -printf '%P\n' | LC_ALL=C sort > /tmp/dist-second-files.txt
