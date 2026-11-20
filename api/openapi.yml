@@ -116,7 +116,7 @@ paths:
                 tax_year: {type: string, enum: ["2026-27"]}
                 regime: {type: string, enum: [new]}
                 taxable_income: {type: number, minimum: 0, maximum: 1000000000}
-                rebate_eligible: {type: boolean, description: Whether eligibility under Section 156 of the Income-tax Act, 2025 has been confirmed for this taxpayer}
+                rebate_eligible: {type: boolean, description: Whether Section 156 rebate eligibility under the Income-tax Act, 2025 has been confirmed for this taxpayer}
       responses:
         '200':
           description: Tax estimate with model version and assumptions
