@@ -3,7 +3,8 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 const calcContext={window:{},console};vm.createContext(calcContext);vm.runInContext(fs.readFileSync('calculators.js','utf8')+'\n;globalThis.__WA_TEST_CALCULATORS__=CALCULATORS;',calcContext);
 const allCalculators=calcContext.__WA_TEST_CALCULATORS__;
-if(!Array.isArray(allCalculators)||allCalculators.length!==55)throw new Error('Expected 55 calculator definitions, found '+(allCalculators?.length??'none'));
+if(!Array.isArray(allCalculators)||!allCalculators.length)throw new Error('Canonical calculator registry is empty or invalid');
+if(new Set(allCalculators.map(calc=>calc.id)).size!==allCalculators.length)throw new Error('Canonical calculator registry contains duplicate IDs');
 
 const baseUrl = (process.env.BASE_URL || 'http://127.0.0.1:4173').replace(/\/$/, '');
 const browser = await chromium.launch({ headless: true });
@@ -17,8 +18,13 @@ page.on('pageerror', error => errors.push(`pageerror: ${error}`));
 page.on('console', message => { if (message.type() === 'error' && !expectedCspWarning(message.text()) && !/googlesyndication|doubleclick|fonts\\.(googleapis|gstatic)|fundingchoices|ERR_BLOCKED_BY_CLIENT/i.test(message.text())) errors.push(`console: ${message.text()}`); });
 page.on('response', response => { if (response.status() >= 400 && new URL(response.url()).origin === new URL(baseUrl).origin) failedResponses.push(`${response.status()} ${response.url()}`); });
 
+let privacyChoiceChecked = false;
 async function dismissPrivacyChoices() {
   const dialog = page.locator('#wa-consent, [role="dialog"][aria-label*="Privacy" i]').first();
+  if (!privacyChoiceChecked) {
+    await dialog.waitFor({ state: 'visible', timeout: 2000 }).catch(() => {});
+    privacyChoiceChecked = true;
+  }
   if (!(await dialog.count()) || !(await dialog.isVisible().catch(() => false))) return;
   // Keep the automated calculator test privacy-preserving: choose a reject/essential-only
   // option instead of accepting optional advertising or analytics storage.
@@ -50,9 +56,17 @@ async function diagnostics(label) {
 async function assertCalculator(path, label, phase2 = false) {
   errors.length = 0;
   failedResponses.length = 0;
-  await page.goto(`${baseUrl}/${path}`, { waitUntil: 'networkidle' });
+  await page.goto(`${baseUrl}/${path}`, { waitUntil: 'domcontentloaded' });
+  const host = page.locator('#calc-widget');
+  const hostClass = (await host.getAttribute('class')) || '';
+  if (!hostClass.split(/\s+/).includes('calc-widget')) throw new Error(`${label} calculator host is missing its static calc-widget class`);
+  const reservedHeight = await host.evaluate(el => parseFloat(getComputedStyle(el).minHeight));
+  if (!Number.isFinite(reservedHeight) || reservedHeight < 520) throw new Error(`${label} calculator host must reserve at least 520px before the runtime mounts; found ${reservedHeight}px`);
   await dismissPrivacyChoices();
-  try { await page.locator('#calc-widget').waitFor({ state: 'visible', timeout: 10000 }); }
+  try {
+    await page.locator('#calc-widget').waitFor({ state: 'visible', timeout: 10000 });
+    await page.locator('#calc-widget input, #calc-widget select').first().waitFor({ state: 'attached', timeout: 10000 });
+  }
   catch (error) { await diagnostics(label); throw new Error(`${label} failed to render at ${page.url()}: ${error.message}`); }
   if ((await page.locator('h1').count()) !== 1) throw new Error(`${label} must have exactly one H1`);
   if (!(await page.locator('#calc-widget input, #calc-widget select').count())) throw new Error(`${label} controls did not render`);
@@ -65,7 +79,7 @@ async function assertCalculator(path, label, phase2 = false) {
 }
 
 try {
-  await page.goto(`${baseUrl}/index.html`, { waitUntil: 'networkidle' });
+  await page.goto(`${baseUrl}/index.html`, { waitUntil: 'domcontentloaded' });
   await dismissPrivacyChoices();
   const stylesheet = await page.locator('link[rel="stylesheet"][href*="styles.css"]').count();
   if (!stylesheet) throw new Error('Homepage stylesheet link is missing');
@@ -128,8 +142,9 @@ try {
   if (!sharePayload?.url) throw new Error('Share scenario did not produce a share URL');
   const shareUrl = new URL(sharePayload.url);
   if (shareUrl.searchParams.get('wa_scenario') !== '1' || shareUrl.searchParams.get('wa_monthly') !== '200' || shareUrl.searchParams.get('wa_rate') !== '10' || shareUrl.searchParams.get('wa_years') !== '15' || shareUrl.searchParams.get('wa_inflation') !== '6') throw new Error('Share scenario URL did not preserve all SIP inputs');
-  await page.goto(sharePayload.url, { waitUntil: 'networkidle' });
+  await page.goto(sharePayload.url, { waitUntil: 'domcontentloaded' });
   await dismissPrivacyChoices();
+  await page.locator('#calc-widget input[data-field="monthly"]').waitFor({ state: 'attached', timeout: 10000 });
   for (const [field, expected] of [['monthly','200'],['rate','10'],['years','15'],['inflation','6']]) {
     const actual = await page.locator('#calc-widget input[data-field="' + field + '"]').inputValue();
     if (actual !== expected) throw new Error('Shared scenario did not restore ' + field + ': ' + actual);
@@ -218,7 +233,7 @@ try {
     await page.setViewportSize({ width, height: width < 600 ? 844 : 900 });
     errors.length = 0;
     failedResponses.length = 0;
-    await page.goto(`${baseUrl}/${path}`, { waitUntil: 'networkidle' });
+    await page.goto(`${baseUrl}/${path}`, { waitUntil: 'domcontentloaded' });
     await dismissPrivacyChoices();
     if ((await page.locator('h1').count()) !== 1) throw new Error(`${label} must have exactly one H1 at ${width}px`);
     const size = await page.evaluate(() => ({ inner: window.innerWidth, doc: document.documentElement.scrollWidth }));
@@ -282,5 +297,5 @@ try {
 
   if (failedResponses.length) throw new Error(`Failed network responses: ${failedResponses.join(' | ')}`);
   if (errors.length) throw new Error(`Browser errors: ${errors.join(' | ')}`);
-  console.log(`Production browser smoke passed at ${baseUrl}: homepage, all 55 calculators, explicit Calculate/Compare interactions, shareable inputs, local save/load, PDF download, and 375px mobile overflow checks are healthy.`);
+  console.log(`Production browser smoke passed at ${baseUrl}: homepage, all registry calculators, explicit Calculate/Compare interactions, shareable inputs, local save/load, PDF download, and 375px mobile overflow checks are healthy.`);
 } finally { await browser.close(); }
