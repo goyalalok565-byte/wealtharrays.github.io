@@ -16,7 +16,7 @@ assert.doesNotMatch(homeHtml,/preconnect[^>]+fundingchoicesmessages\.google\.com
 assert.match(consentLoader,/preconnect/,"Funding Choices should preconnect only when an ad slot triggers loading");
 assert.match(consentLoader,/AD_SLOT_SELECTOR\s*=\s*'ins\.adsbygoogle,\[data-ad-slot\],\.wa-ad-slot'/,"Funding Choices must be scoped to pages with explicit ad slots");
 assert.match(consentLoader,/new MutationObserver/,"Funding Choices must support dynamically inserted ad slots");
-assert.match(consentLoader,/if \(hasAdSlot\(\)\)/,"Funding Choices must check for an ad slot before loading");
+assert.match(consentLoader,/if\s*\(hasAdSlot\(\)\)/,"Funding Choices must check for an ad slot before loading");
 
 const accountHtml=fs.readFileSync("account.html","utf8");
 assert.match(accountHtml,/Free includes 3/);
