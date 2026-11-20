@@ -28,7 +28,7 @@ if (process.argv[1] && process.argv[1].endsWith('lighthouse-quality-gate.mjs')) 
   console.log('Mobile release thresholds: Performance ≥90, CLS ≤0.10, TBT ≤200ms, LCP ≤2500ms; accessibility ≥95, best practices ≥80, SEO ≥90.');
   if (failures.length) {
     console.error('MOBILE RELEASE GATE FAILED (' + failures.length + ' issues)');
-    console.error(failures.join('\\n'));
+    console.error(failures.join('\n'));
     process.exit(1);
   }
   console.log('MOBILE RELEASE GATE PASS — all seven routes meet every release threshold.');
