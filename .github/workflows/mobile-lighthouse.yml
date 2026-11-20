@@ -69,7 +69,7 @@ jobs:
         env:
           BASE_URL: http://127.0.0.1:4173
         run: node qa/production-browser-smoke.mjs
-      - name: PR browser smoke — every calculator: outputs, bounds and responsive layouts
+      - name: PR browser smoke — all calculators, outputs, bounds and responsive layouts
         if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
         env:
           BASE_URL: http://127.0.0.1:4173
