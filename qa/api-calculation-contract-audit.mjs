@@ -8,7 +8,7 @@ const mod = await import("data:text/javascript;base64," + Buffer.from(
 ).toString("base64"));
 
 const cases = {
-  sip: [{ monthly: 1000, annualRate: 12, years: 1 }, [12000, 809.3, 12809.3]],
+  sip: [{ monthly: 1000, annualRate: 12, years: 1 }, [12000, 809.328, 12809.328]],
   "loan-emi": [{ principal: 120000, annualRate: 0, months: 12 }, [10000, 120000, 0]],
   "home-loan-emi": [{ principal: 120000, annualRate: 0, months: 12 }, [10000, 120000, 0]],
   "compound-interest": [{ principal: 10000, annualRate: 12, years: 1, compoundingPerYear: 12 }, [10000, 1268.25, 11268.25]],
