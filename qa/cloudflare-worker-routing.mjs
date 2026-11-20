@@ -38,7 +38,7 @@ assert.equal(healthResponse.status, 200);
 const healthData = await healthResponse.json();
 assert.equal(healthData.status, "ok");
 assert.equal(healthData.service, "wealth-arrays-api");
-assert.equal(healthData.version, "1.0.0");
+assert.equal(healthData.version, "1.1.0");
 assert.equal(healthData.dependencies.d1_database, "ok");
 assert.equal(healthData.dependencies.supabase_auth, "configured");
 assert.equal(healthData.dependencies.razorpay_billing, "configured");
