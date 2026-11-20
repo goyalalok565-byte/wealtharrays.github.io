@@ -1,17 +1,18 @@
 /*
- * Wealth Arrays — Google Funding Choices loader
- * The publisher-specific tag is kept in one external file so CSP does not
- * require inline script execution. Message configuration itself is managed
- * in Google AdSense / Privacy & messaging.
+ * Wealth Arrays — Google Funding Choices loader.
+ * Funding Choices is an ad-consent platform, so load it only on pages that
+ * actually contain an ad slot. Analytics consent is handled separately by
+ * the first-party consent UI in wa-core.js.
  */
 (function () {
+  'use strict';
   if (window.__waFundingChoicesLoaded) return;
-  window.__waFundingChoicesLoaded = true;
+  var AD_SLOT_SELECTOR = 'ins.adsbygoogle,[data-ad-slot],.wa-ad-slot';
+  var started = false;
 
-  var script = document.createElement('script');
-  script.async = true;
-  script.src = 'https://fundingchoicesmessages.google.com/i/pub-6507600103785450?ers=1';
-  document.head.appendChild(script);
+  function hasAdSlot() {
+    return !!document.querySelector(AD_SLOT_SELECTOR);
+  }
 
   function signalGooglefcPresent() {
     if (window.frames.googlefcPresent) return;
@@ -24,5 +25,34 @@
     iframe.name = 'googlefcPresent';
     document.body.appendChild(iframe);
   }
-  signalGooglefcPresent();
+
+  function loadFundingChoices() {
+    if (started || !hasAdSlot()) return;
+    started = true;
+    window.__waFundingChoicesLoaded = true;
+    var script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://fundingchoicesmessages.google.com/i/pub-6507600103785450?ers=1';
+    script.addEventListener('load', function () {
+      window.dispatchEvent(new Event('wa:fundingchoices-ready'));
+    }, { once: true });
+    document.head.appendChild(script);
+    signalGooglefcPresent();
+  }
+
+  // The loader is deferred in the document head, so static slots are already parsed.
+  if (hasAdSlot()) {
+    loadFundingChoices();
+    return;
+  }
+
+  // Support future ad slots inserted dynamically, without loading the CMP site-wide.
+  if ('MutationObserver' in window && document.documentElement) {
+    var observer = new MutationObserver(function () {
+      if (!hasAdSlot()) return;
+      observer.disconnect();
+      loadFundingChoices();
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+  }
 }());
