@@ -2,6 +2,10 @@ import fs from 'node:fs';
 
 const base = (process.env.BASE_URL || 'https://wealtharrays.com').replace(/\/$/, '');
 const manifestUrl = base + '/.well-known/wa-public-manifest.json';
+const healthResponse = await fetch(base + '/v1/health', { cache: 'no-store', signal: AbortSignal.timeout(15000) });
+if (!healthResponse.ok) throw new Error('Production /v1/health returned HTTP ' + healthResponse.status);
+const healthPayload = await healthResponse.json();
+if (healthPayload.status !== 'ok' || healthPayload.service !== 'wealth-arrays-api' || !healthPayload.version) throw new Error('Production /v1/health liveness response is invalid.');
 const response = await fetch(manifestUrl, { cache: 'no-store', signal: AbortSignal.timeout(20000) });
 if (!response.ok) throw new Error('Production public-file manifest is unavailable: HTTP ' + response.status);
 const manifest = await response.json();
