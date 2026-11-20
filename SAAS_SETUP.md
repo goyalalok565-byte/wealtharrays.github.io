@@ -50,6 +50,21 @@ Configure the Razorpay webhook URL as https://wealtharrays.com/v1/billing/webhoo
 - Backups/retention policy, alerting/abuse monitoring and a full DPDP Act review still need to be completed for production.
 
 
+## 6. Pro trial and checkout concurrency
+
+The application code on the current PR branch includes an explicit 14-day Pro trial with no payment method:
+- The user must sign in with an email confirmed by Supabase; the server checks Supabase's trusted `email_confirmed_at` / `confirmed_at` fields.
+- The user must explicitly choose **Start 14-day Pro trial** on the account page. Creating an account or signing in does not start the trial.
+- D1 migration `0003_pro_trials.sql` stores the claim, start/end timestamps and a SHA-256 digest of the normalized verified email. A unique user ID and unique email digest enforce one claim per account/email. The raw email is not copied into the trial table.
+- Server entitlements grant the Pro scenario limit while the trial is active and automatically return to Free after the 14-day end timestamp. Paid subscription entitlement takes precedence.
+- Apply all D1 migrations before routing traffic to code that queries the trial table. The feature is not live until Supabase email confirmation, D1 migration and the deployed Worker are verified together.
+
+Checkout creation is serialized with `0004_billing_checkout_locks.sql`:
+- One active checkout-creation lock per account prevents concurrent requests from creating multiple Razorpay subscriptions.
+- A successful provider create is persisted before the lock is released.
+- If the network or provider returns an ambiguous result, the lock remains to fail closed. Do not ask the user to retry repeatedly. Support/operator must inspect Razorpay for the subscription using the account's `user_id` note, reconcile the provider subscription into D1, and only then clear the lock through an approved operational procedure.
+- Razorpay subscription creation documentation does not establish a generic create-subscription idempotency header. Do not invent one or assume webhook event-id deduplication protects the create request.
+
 ## Current deployment and consent implementation note
 
 AdSense must remain blocked until the Funding Choices CMP reports consent-mode data. The implementation loads the AdSense tag only when ad storage, ad user data and ad personalization are granted or not applicable; denied, unknown, missing or unconfigured states fail closed. Confirm the matching Google Privacy & Messaging consent-mode configuration and obtain legal review before enabling live ads.
