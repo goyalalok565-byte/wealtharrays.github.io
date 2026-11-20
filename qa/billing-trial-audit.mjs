@@ -3,11 +3,11 @@ import fs from "node:fs";
 
 const byUser = new Map();
 const byEmail = new Map();
-  .replace("import { authenticate, ensureProfile } from \"../_auth.js\";\n", "const authenticate = async () => ({ user: globalThis.__trialTestUser }); const ensureProfile = async () => {};\n")
-  .replace("import { error, json, CORS_HEADERS } from \"../_shared.js\";\n", "const CORS_HEADERS = {}; const json = (data, status = 200, extra = {}) => new Response(JSON.stringify(data), { status, headers: { \"Content-Type\": \"application/json\", ...extra } }); const error = (code, message, status = 400) => json({ error: { code, message } }, status, { \"Cache-Control\": \"no-store\" });\n")
-  .replace("import { getEntitlement } from \"../_entitlements.js\";\n", "const getEntitlement = async (env, userId) => { const row = globalThis.__trialRows.get(userId); const active = Boolean(row && Date.parse(row.ends_at) > Date.now()); return { tier: active ? \"pro\" : \"free\", source: active ? \"trial\" : null, trial: { status: !row ? \"available\" : active ? \"active\" : \"expired\", ends_at: row?.ends_at || null } }; };\n");
-  .replace(/^import \\{ error, json, CORS_HEADERS \\} from "\\.\\.\\/_shared\\.js";\\n/, "const CORS_HEADERS = {}; const json = (data, status = 200, extra = {}) => new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json', ...extra } }); const error = (code, message, status = 400) => json({ error: { code, message } }, status, { 'Cache-Control': 'no-store' });\\n")
-  .replace(/^import \\{ getEntitlement \\} from "\\.\\.\\/_entitlements\\.js";\\n/, "const getEntitlement = async (env, userId) => { const row = globalThis.__trialRows.get(userId); const active = Boolean(row && Date.parse(row.ends_at) > Date.now()); return { tier: active ? 'pro' : 'free', source: active ? 'trial' : null, trial: { status: !row ? 'available' : active ? 'active' : 'expired', ends_at: row?.ends_at || null } }; };\\n");
+globalThis.__trialRows = byUser;
+const source = fs.readFileSync("functions/v1/billing/trial.js", "utf8")
+  .replace('import { authenticate, ensureProfile } from "../_auth.js";\n', 'const authenticate = async () => ({ user: globalThis.__trialTestUser }); const ensureProfile = async () => {};\n')
+  .replace('import { error, json, CORS_HEADERS } from "../_shared.js";\n', 'const CORS_HEADERS = {}; const json = (data, status = 200, extra = {}) => new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json", ...extra } }); const error = (code, message, status = 400) => json({ error: { code, message } }, status, { "Cache-Control": "no-store" });\n')
+  .replace('import { getEntitlement } from "../_entitlements.js";\n', 'const getEntitlement = async (env, userId) => { const row = globalThis.__trialRows.get(userId); const active = Boolean(row && Date.parse(row.ends_at) > Date.now()); return { tier: active ? "pro" : "free", source: active ? "trial" : null, trial: { status: !row ? "available" : active ? "active" : "expired", ends_at: row?.ends_at || null } }; };\n');
 const trialModule = await import("data:text/javascript;base64," + Buffer.from(source).toString("base64"));
 
 const db = {
@@ -42,6 +42,7 @@ async function start(user) {
     env
   });
 }
+
 let response = await start({ id: "unverified", email: "person@example.com", email_verified: false });
 assert.equal(response.status, 403);
 assert.equal((await response.json()).error.code, "EMAIL_VERIFICATION_REQUIRED");
@@ -63,6 +64,7 @@ assert.equal((await response.json()).error.code, "TRIAL_ALREADY_CLAIMED");
 response = await start({ id: "user_2", email: "PERSON@example.com", email_verified: true });
 assert.equal(response.status, 409, "A second account using the same normalized verified email must not receive another trial");
 assert.equal(byUser.size, 1);
+
 delete globalThis.__trialTestUser;
 delete globalThis.__trialRows;
 console.log("Pro trial audit PASS: verified-email gate, 14-day duration, one-time account/email claim and server-side Pro entitlement.");
