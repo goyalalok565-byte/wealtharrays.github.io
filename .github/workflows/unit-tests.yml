@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   unit-tests:
-    name: Node.js unit tests
+    name: unit-tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
