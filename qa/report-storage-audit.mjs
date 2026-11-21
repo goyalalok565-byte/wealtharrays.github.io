@@ -15,7 +15,7 @@ const db = {
   prepare(sql) { return { bind(...values) { return {
     async first() {
       if (sql.includes("COUNT(*) AS total FROM saved_reports")) return { total: [...rows.values()].filter(x => x.user_id === values[0]).length };
-      if (sql.includes("SELECT report_json FROM saved_reports")) { const x = rows.get(values[0]); return x?.user_id === values[1] ? { report_json: x.report_json } : null; }
+      if (sql.includes("SELECT report_json, fingerprint, content_sha256 FROM saved_reports")) { const x = rows.get(values[0]); return x?.user_id === values[1] ? { report_json: x.report_json, fingerprint: x.fingerprint, content_sha256: x.content_sha256 } : null; }
       throw new Error("Unexpected first query: " + sql);
     },
     async all() { return { results: [...rows.values()].filter(x => x.user_id === values[0]).map(({id,name,model,model_version,currency,fingerprint,created_at})=>({id,name,model,model_version,currency,fingerprint,created_at})) }; },
@@ -30,7 +30,10 @@ const db = {
       if (sql.startsWith("DELETE FROM saved_reports")) { const x=rows.get(values[0]); if(x?.user_id===values[1]){rows.delete(values[0]);return {meta:{changes:1}}} return {meta:{changes:0}}; }
       throw new Error("Unexpected run query: " + sql);
     }
-  }}; }
+        };
+      }
+    };
+  }
 };
 const env={DB:db};
 const report={schemaVersion:"1.0",generatedAt:"2026-11-20T00:00:00.000Z",model:"Financial Workspace",modelVersion:"1.0",currency:"INR",inputs:{startingAmount:1000},assumptions:{deterministic:true},scenarios:[],stressTests:[],sources:[],limitations:["Educational estimate only."]};
