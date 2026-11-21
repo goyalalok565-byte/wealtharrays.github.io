@@ -167,7 +167,7 @@ Rates, lender fees, tax deductions, prepayment rules, FX rates, variable-rate pa
 Use separate PMT/IPMT/PPMT schedules for fixed-rate offers and a dated cash-flow/XIRR model for fee-adjusted comparisons. Record assumptions per offer.
 
 ### Worked examples
-1. Offer A: 100,000 at 6% nominal annual, monthly, 24 months; payment approximately **4,432.06**. Offer B: same principal at 7%, monthly, 24 months; payment approximately **4,477.27**. Base payments exclude fees.
+1. Offer A: 100,000 at 6% nominal annual, monthly, 24 months; payment approximately **4,432.06**. Offer B: same principal at 7%, monthly, 24 months; payment approximately **4,477.26**. Base payments exclude fees.
 2. Offer A: 100,000 at 6% over 24 months with 500 paid upfront; Offer B: 100,000 at 6% over 24 months with 500 added to financed principal. Show base rate/payment separately from net proceeds/total cost; calculate fee-adjusted APR from exact cash flows rather than declaring them equivalent.
 
 ### Global-first
@@ -204,7 +204,7 @@ Bank rates, deposit insurance, tax on interest, early-withdrawal penalties, mini
 Use FV for regular equal-period deposits and a dated row-by-row compounding model for irregular contributions/withdrawals. Verify APY with the effective-rate formula.
 
 ### Worked examples
-1. Deposit 10,000 at 5% nominal annual compounded monthly for 2 years: FV = 10,000 × (1+0.05/12)^24 = **11,048.95** (approximately).
+1. Deposit 10,000 at 5% nominal annual compounded monthly for 2 years: FV = 10,000 × (1+0.05/12)^24 = **11,049.41** (approximately).
 2. Deposit 10,000 at 5% nominal annual compounded quarterly for 2 years: FV = 10,000 × (1+0.05/4)^8 = **11,044.86** (approximately).
 
 ### Global-first
