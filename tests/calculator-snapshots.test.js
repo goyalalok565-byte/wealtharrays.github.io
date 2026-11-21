@@ -76,6 +76,10 @@ test('snapshot numeric tolerance accepts runtime rounding but rejects material d
   assertSnapshotEquivalent(-0, 0, 'signed zero is equivalent');
   assertSnapshotEquivalent(5e-10, 0, 'absolute tolerance near zero');
   assert.throws(
+    () => assertSnapshotEquivalent(2e-9, 0, 'absolute tolerance rejects real drift'),
+    /numeric difference exceeds relative 1e-12 \\/ absolute 1e-9 tolerance/
+  );
+  assert.throws(
     () => assertSnapshotEquivalent(1 + 1e-6, 1, 'material drift'),
     /numeric difference exceeds relative 1e-12 \/ absolute 1e-9 tolerance/
   );
