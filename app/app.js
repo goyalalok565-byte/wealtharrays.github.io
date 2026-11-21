@@ -256,6 +256,43 @@
     setStatus(saveStatus, "Plan exported as a reusable JSON report.", "success");
   }
 
+  async function saveReport() {
+    const result = calculate();
+    if (!result) return;
+    if (!window.WA_REPORT_ENGINE) {
+      setStatus(saveStatus, "The report engine is unavailable. Reload the page and try again.", "error");
+      return;
+    }
+    const plan = result.plan;
+    const cases = [-3, 0, 3].map(delta => {
+      const annualReturn = Math.max(-99, Math.min(100, plan.annualReturn + delta));
+      const projectedValue = futureValue(plan.current, plan.monthly, result.months, annualReturn);
+      return { name: delta < 0 ? "Cautious case" : delta > 0 ? "Higher-return case" : "Base case", annualReturn, projectedValue, targetGap: projectedValue - plan.target };
+    });
+    const report = window.WA_REPORT_ENGINE.build({
+      model: "Wealth Goal Planner",
+      modelVersion: "1.0",
+      currency: plan.currency,
+      inputs: plan,
+      assumptions: { compounding: "monthly", contributionTiming: "end of month", constantMonthlyContribution: true, annualReturnPercent: plan.annualReturn, annualInflationPercent: plan.inflation },
+      scenarios: cases,
+      stressTests: [{ name: "Return falls by 3 percentage points", annualReturn: cases[0].annualReturn, projectedValue: cases[0].projectedValue }],
+      sources: [{ label: "Wealth Arrays calculation methodology", url: "/methodology" }],
+      limitations: ["Educational estimate only; not financial, investment, tax or legal advice.", "Assumes constant monthly contributions, return and inflation; actual outcomes can differ materially.", "Taxes, fees, volatility, contribution timing changes and cash-flow interruptions are not modelled."]
+    });
+    setStatus(saveStatus, "Saving your report to your private account archive…");
+    try {
+      const data = await api("/v1/reports", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: plan.name, report, fingerprint: window.WA_REPORT_ENGINE.fingerprint(report) })
+      });
+      setStatus(saveStatus, "Report saved to your account archive (" + data.entitlement.used + " of " + data.entitlement.cloud_report_limit + ").", "success");
+    } catch (error) {
+      setStatus(saveStatus, error.message, "error");
+    }
+  }
+
   function sessionToken() {
     try {
       const session = JSON.parse(localStorage.getItem("waSupabaseSession") || "null");
@@ -381,6 +418,7 @@
   byId("save-local").addEventListener("click", saveLocal);
   byId("export-plan").addEventListener("click", exportPlan);
   byId("sync-plan").addEventListener("click", syncPlan);
+  byId("save-report").addEventListener("click", saveReport);
   byId("load-cloud").addEventListener("click", loadCloudPlans);
   inputs.currency.addEventListener("change", calculate);
 
