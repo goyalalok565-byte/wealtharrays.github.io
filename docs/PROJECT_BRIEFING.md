@@ -28,7 +28,7 @@ Read first after any context reset:
 - `QA_TESTS.md`
 - `ai-contract.json`
 
-Current architecture includes 55 calculator definitions in `calculators.js`, generated route pages and split definitions, `financial-engine.js`, `formula-registry.js`, `decision-adapters.js`, scenario/goal/workspace foundations, and Worker routes for models, calculation, FX, India tax, auth config, scenarios and billing. API currently exposes only a subset (briefing baseline: 11 models); do not claim 55/55 API coverage. Country parameter is not by itself a country engine. Current tax module is India Tax Year 2026-27.
+Current architecture includes 55 calculator definitions in `calculators.js`, generated route pages and split definitions, `financial-engine.js`, `formula-registry.js`, `decision-adapters.js`, scenario/goal/workspace foundations, and Worker routes for models, calculation, FX, India tax, auth config, scenarios and billing. API currently exposes 39 deterministic models in v1.4.0 while the browser catalogue has 55 calculators; do not claim 55/55 API coverage. Each additional API model requires parity vectors, documented assumptions and jurisdiction-aware provenance. Country parameter is not by itself a country engine. Current tax module is India Tax Year 2026-27.
 
 ## Roadmap order — do not skip phases
 

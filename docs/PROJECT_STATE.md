@@ -1,5 +1,13 @@
 # Wealth Arrays Project State
 
+## Latest engineering update — 2026-11-21 (report archive UX)
+
+- Added a signed-in account archive for saved financial reports: list and quota display, per-report view of inputs/assumptions/scenarios/stress tests/sources/limitations, JSON export and owner-scoped deletion. Report data is fetched by authenticated report ID; rendering uses text nodes rather than inserting report content as HTML.
+- The My Plan workspace can create a reproducible report with model/version, input snapshot, assumptions, three return scenarios, stress test, sources and limitations. D1 report archive enforces Free 1 / Pro 100 limits server-side and validates report fingerprints and content size.
+- Exact-head Canonical CI 44877351794 and Platform Gates 44877351785 pass on commit 05839df8873c03e44b2732d982f08eb42fc1baa7; report archive audit passes. Mobile Lighthouse 44877351826 and Cloudflare Workers build were still running at the time of this note; do not claim full green until both finish.
+- API contract remains v1.4.0 with 39 published models and 39 golden vectors. Browser calculator definitions remain 55. Remaining API coverage must be expanded only with model-by-model equivalence vectors and provenance; jurisdiction-dependent tax/retirement calculations must not be generalized as global rules.
+- PR #97 remains OPEN and UNMERGED. Do not merge without the owner's exact merge approved phrase. No production secrets, provider settings or Cloudflare settings were changed.
+
 ## Current authoritative release status — 2026-11-20 (PR #97)
 
 This section supersedes older Phase 0 status notes below where they refer to PR #88 or earlier verification runs. Historical audit findings remain useful as history, not as the current release state.
