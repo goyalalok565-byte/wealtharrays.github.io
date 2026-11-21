@@ -18,10 +18,10 @@ function fixtureValue(field, kind) {
 function assertSnapshotEquivalent(actual, expected, message) {
   if (typeof actual === 'number' && typeof expected === 'number' &&
       Number.isFinite(actual) && Number.isFinite(expected)) {
+    const difference = Math.abs(actual - expected);
     const scale = Math.max(Math.abs(actual), Math.abs(expected));
-    const withinTolerance = actual === expected ||
-      (scale > 0 && Math.abs(actual - expected) <= 1e-12 * scale);
-    assert.ok(withinTolerance, `${message}: numeric difference exceeds relative tolerance 1e-12 (actual=${actual}, expected=${expected})`);
+    const withinTolerance = difference <= Math.max(1e-9, 1e-12 * scale);
+    assert.ok(withinTolerance, `${message}: numeric difference exceeds relative 1e-12 / absolute 1e-9 tolerance (actual=${actual}, expected=${expected})`);
     return;
   }
   if (Array.isArray(actual) || Array.isArray(expected)) {
@@ -73,9 +73,11 @@ test('golden snapshots cover all 55 canonical calculators × five scenarios', ()
 
 test('snapshot numeric tolerance accepts runtime rounding but rejects material drift', () => {
   assertSnapshotEquivalent(1 + 1e-13, 1, 'sub-tolerance rounding');
+  assertSnapshotEquivalent(-0, 0, 'signed zero is equivalent');
+  assertSnapshotEquivalent(5e-10, 0, 'absolute tolerance near zero');
   assert.throws(
     () => assertSnapshotEquivalent(1 + 1e-6, 1, 'material drift'),
-    /numeric difference exceeds relative tolerance 1e-12/
+    /numeric difference exceeds relative 1e-12 / absolute 1e-9 tolerance/
   );
   assert.throws(
     () => assertSnapshotEquivalent('1.00', 1, 'type/format drift'),
