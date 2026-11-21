@@ -8,7 +8,7 @@ const source = fs.readFileSync("functions/v1/reports.js", "utf8")
   .replace('import { authenticate, ensureProfile } from "./_auth.js";', 'const authenticate = async () => ({ user: globalThis.__reportUser }); const ensureProfile = async () => {};')
   .replace('import { error, json, CORS_HEADERS } from "./_shared.js";', 'const CORS_HEADERS = {}; const json = (data, status = 200, extra = {}) => new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json", ...extra } }); const error = (code, message, status = 400, details) => json({ error: { code, message, ...(details ? { details } : {}) } }, status, { "Cache-Control": "no-store" });')
   .replace('import { getEntitlement } from "./_entitlements.js";', 'const getEntitlement = async () => ({ tier: globalThis.__reportTier, cloud_report_limit: globalThis.__reportTier === "pro" ? 100 : 1 });')
-  .replace("export async function onRequest", "async function onRequest")
+  .replaceAll("export async function onRequest", "async function onRequest")
   + "\nexport { onRequestGet, onRequestPost, onRequestDelete };";
 const module = await import("data:text/javascript;base64," + Buffer.from(source).toString("base64"));
 const db = {
