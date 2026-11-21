@@ -177,7 +177,7 @@ function initSearch(inputId,listSelector,headingId,totalLabel){const input=docum
 (function(){
   function boot(){
     var target=document.getElementById('calc-widget');
-    if(!target || target.dataset.waBooted==='1' || target.children.length) return;
+    if(!target || target.dataset.waBooted==='1' || (target.children.length && !target.querySelector('[data-wa-static-shell]'))) return;
     if(typeof mountCalculator!=='function' || typeof CALCULATORS==='undefined') return;
     var file=(location.pathname.split('/').pop()||'').replace(/\.html$/,'');
     var calc=CALCULATORS.find(function(c){return c.slug===file;});

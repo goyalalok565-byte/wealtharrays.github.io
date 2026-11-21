@@ -5,9 +5,11 @@ import * as fx from "./functions/v1/fx.js";
 import * as indiaTax from "./functions/v1/india-tax.js";
 import * as authConfig from "./functions/v1/auth-config.js";
 import * as scenarios from "./functions/v1/scenarios.js";
+import * as reports from "./functions/v1/reports.js";
 import * as checkout from "./functions/v1/billing/checkout.js";
 import * as billingStatus from "./functions/v1/billing/status.js";
 import * as billingConfig from "./functions/v1/billing/config.js";
+import * as startTrial from "./functions/v1/billing/trial.js";
 import * as cancelSubscription from "./functions/v1/billing/cancel.js";
 import * as billingWebhook from "./functions/v1/billing/webhook.js";
 
@@ -19,9 +21,11 @@ const ROUTES = new Map([
   ["/v1/india-tax", indiaTax],
   ["/v1/auth-config", authConfig],
   ["/v1/scenarios", scenarios],
+  ["/v1/reports", reports],
   ["/v1/billing/checkout", checkout],
   ["/v1/billing/status", billingStatus],
   ["/v1/billing/config", billingConfig],
+  ["/v1/billing/trial", startTrial],
   ["/v1/billing/cancel", cancelSubscription],
   ["/v1/billing/webhook", billingWebhook]
 ]);

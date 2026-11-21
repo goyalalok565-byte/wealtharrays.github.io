@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: wealtharrays-canonical-${{ github.ref }}
@@ -34,6 +34,8 @@ jobs:
         run: node qa/service-worker-privacy-audit.mjs
       - name: Privacy policy consistency audit
         run: node qa/privacy-policy-audit.mjs
+      - name: Localization dictionary audit
+        run: node qa/i18n-audit.mjs
       - name: Calculator regression before build
         run: node qa/calculator-regression.mjs
       - name: Independent calculator formula audit from canonical registry
@@ -87,17 +89,42 @@ jobs:
           node qa/build-dist-exclusion-audit.mjs
           npm run qa:dist
           git diff --check
-      - name: Commit deterministic build
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Verify deterministic dist build
         run: |
-          git config user.name "wealtharrays-stabilization-bot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          if git diff --cached --quiet; then echo "No generated changes needed"; exit 0; fi
-          git commit -m "chore: apply canonical production build [canonical-build]"
-          git fetch origin main
-          if [ "$(git rev-parse HEAD^)" != "$(git rev-parse origin/main)" ]; then
-            echo "Remote main advanced during this build; leaving generated commit to the newer canonical run."
-            exit 0
-          fi
-          git push origin HEAD:main
+          set -euo pipefail
+          export SOURCE_DATE_DATE="$(git log -1 --format=%cs)"
+          rm -rf /tmp/wa-build-a /tmp/wa-build-b dist
+          git worktree add --detach /tmp/wa-build-a HEAD
+          git worktree add --detach /tmp/wa-build-b HEAD
+          ln -s "$GITHUB_WORKSPACE/node_modules" /tmp/wa-build-a/node_modules
+          ln -s "$GITHUB_WORKSPACE/node_modules" /tmp/wa-build-b/node_modules
+          (cd /tmp/wa-build-a && npm run build)
+          (cd /tmp/wa-build-b && npm run build)
+          find /tmp/wa-build-a/dist -type f -printf '%P\n' | LC_ALL=C sort > /tmp/dist-first-files.txt
+          find /tmp/wa-build-b/dist -type f -printf '%P\n' | LC_ALL=C sort > /tmp/dist-second-files.txt
+          (cd /tmp/wa-build-a/dist && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum) > /tmp/dist-first-hashes.txt
+          (cd /tmp/wa-build-b/dist && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum) > /tmp/dist-second-hashes.txt
+          diff -u /tmp/dist-first-files.txt /tmp/dist-second-files.txt
+          diff -u /tmp/dist-first-hashes.txt /tmp/dist-second-hashes.txt
+          cp -a /tmp/wa-build-a/dist ./dist
+          git worktree remove --force /tmp/wa-build-a
+          git worktree remove --force /tmp/wa-build-b
+      - name: Generate 55-calculator built HTML audit
+        env:
+          SITE_ROOT: dist
+          OUTPUT_CSV: /tmp/wa-built-html-audit.csv
+        run: node qa/built-html-audit.mjs
+      - name: Upload public dist artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wealth-arrays-dist-${{ github.sha }}
+          path: dist/
+          retention-days: 14
+      - name: Upload 55-calculator HTML audit CSV
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wealth-arrays-built-html-audit-${{ github.sha }}
+          path: /tmp/wa-built-html-audit.csv
+          retention-days: 14

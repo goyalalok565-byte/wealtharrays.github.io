@@ -22,7 +22,7 @@ const env = {
 const modelsResponse = await worker.fetch(new Request("https://example.test/v1/models"), env, {});
 assert.equal(modelsResponse.status, 200);
 const modelData = await modelsResponse.json();
-assert.ok(modelData.models.some(model => model.id === "sip" && model.version === "1.0.0"));
+assert.ok(modelData.models.some(model => model.id === "sip" && model.version === "1.4.0"));
 const healthResponse = await worker.fetch(new Request("https://example.test/v1/health"), {
   ...env,
   DB: { prepare(sql) { assert.equal(sql, "SELECT 1 AS ok"); return { async first() { return { ok: 1 }; } }; } },
@@ -38,7 +38,7 @@ assert.equal(healthResponse.status, 200);
 const healthData = await healthResponse.json();
 assert.equal(healthData.status, "ok");
 assert.equal(healthData.service, "wealth-arrays-api");
-assert.equal(healthData.version, "1.0.0");
+assert.equal(healthData.version, "1.4.0");
 assert.equal(healthData.dependencies.d1_database, "ok");
 assert.equal(healthData.dependencies.supabase_auth, "configured");
 assert.equal(healthData.dependencies.razorpay_billing, "configured");
@@ -80,6 +80,8 @@ const wrongMethod = await worker.fetch(new Request("https://example.test/v1/calc
 assert.equal(wrongMethod.status, 405);
 const unauthenticated = await worker.fetch(new Request("https://example.test/v1/scenarios"), env, {});
 assert.equal(unauthenticated.status, 401);
+const unauthenticatedReports = await worker.fetch(new Request("https://example.test/v1/reports"), env, {});
+assert.equal(unauthenticatedReports.status, 401, "Report archive must require an authenticated account");
 const staticResponse = await worker.fetch(new Request("https://example.test/index.html"), env, {});
 assert.equal(await staticResponse.text(), "static asset");
 assert.deepEqual(assetCalls, ["/index.html"]);

@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Wealth Arrays Financial Engine API
-  version: 1.0.0
+  version: 1.4.0
   description: Versioned financial calculations, indicative FX rates, a limited Indian tax estimate, authenticated scenario storage and subscription endpoints. Cloudflare bindings, Supabase authentication and Razorpay plans require deployment configuration.
 paths:
   /v1/health:
@@ -46,6 +46,45 @@ paths:
       responses:
         '200': {description: Scenario deleted}
         '404': {description: Scenario not found}
+  /v1/reports:
+    get:
+      summary: List or retrieve the authenticated user's reproducible financial reports
+      operationId: listOrGetSavedReports
+      security: [{bearerAuth: []}]
+      parameters:
+        - in: query
+          name: id
+          required: false
+          schema: {type: string}
+      responses:
+        '200': {description: User-owned report metadata or a complete reproducible report}
+        '401': {description: Authentication required}
+        '404': {description: Report not found for this account}
+    post:
+      summary: Save a reproducible financial report to the authenticated user's archive
+      operationId: saveFinancialReport
+      security: [{bearerAuth: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, required: [name, fingerprint, report], additionalProperties: true}
+      responses:
+        '201': {description: Report saved}
+        '400': {description: Invalid report contract}
+        '403': {description: Account report quota reached}
+    delete:
+      summary: Delete an authenticated user's saved report
+      operationId: deleteSavedReport
+      security: [{bearerAuth: []}]
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema: {type: string}
+      responses:
+        '200': {description: Report deleted}
+        '404': {description: Report not found for this account}
   /v1/billing/checkout:
     post:
       summary: Create a Razorpay subscription checkout
@@ -179,7 +218,7 @@ components:
       type: object
       required: [model, inputs]
       properties:
-        model: {type: string, description: Registered model ID}
+        model: {type: string, enum: [sip, loan-emi, home-loan-emi, compound-interest, fixed-deposit, lumpsum, gst, cagr, inflation, simple-interest, currency-converter, roi, recurring-deposit, net-worth, profit-margin, sip-goal, car-loan, mortgage, personal-loan, debt-payoff, salary-hourly, overtime, freelance-rate, freedom-milestone, emergency-fund, budget-50-30-20, break-even, cost-of-delay, rule-of-72, credit-card-payoff, step-up-sip, swp, fire, ltv, flat-cost, consumer-durable-loan, property-calculator, loan-against-property, loan-prepayment-vs-sip], description: Registered model ID; see GET /v1/models}
         model_version: {type: string, description: Optional exact model version; server must reject unsupported versions}
         inputs: {type: object, additionalProperties: true}
         assumptions: {type: object, additionalProperties: true}

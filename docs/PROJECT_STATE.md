@@ -1,5 +1,61 @@
 # Wealth Arrays Project State
 
+## Latest engineering update — 2026-11-21 (report archive UX)
+
+- Added a signed-in account archive for saved financial reports: list and quota display, per-report view of inputs/assumptions/scenarios/stress tests/sources/limitations, JSON export and owner-scoped deletion. Report data is fetched by authenticated report ID; rendering uses text nodes rather than inserting report content as HTML.
+- The My Plan workspace can create a reproducible report with model/version, input snapshot, assumptions, three return scenarios, stress test, sources and limitations. D1 report archive enforces Free 1 / Pro 100 limits server-side and validates report fingerprints and content size.
+- Exact-head Canonical CI 44877351794 and Platform Gates 44877351785 pass on commit 05839df8873c03e44b2732d982f08eb42fc1baa7; report archive audit passes. Mobile Lighthouse 44877351826 and Cloudflare Workers build were still running at the time of this note; do not claim full green until both finish.
+- API contract remains v1.4.0 with 39 published models and 39 golden vectors. Browser calculator definitions remain 55. Remaining API coverage must be expanded only with model-by-model equivalence vectors and provenance; jurisdiction-dependent tax/retirement calculations must not be generalized as global rules.
+- PR #97 remains OPEN and UNMERGED. Do not merge without the owner's exact merge approved phrase. No production secrets, provider settings or Cloudflare settings were changed.
+
+## Current authoritative release status — 2026-11-20 (PR #97)
+
+This section supersedes older Phase 0 status notes below where they refer to PR #88 or earlier verification runs. Historical audit findings remain useful as history, not as the current release state.
+
+- Active candidate: PR #97, branch `phase0/pr-c-final`, based on `main`; keep this branch as the only engineering branch until PR C is merged.
+- Last fully green all-gates head before the current API expansion: `14522f0d04a17e995df1b9c97973fe4518459413` (Canonical CI `44783417340`, Platform Gates `44783417649`, Mobile Lighthouse `44783418374`: PASS).
+- Current engineering head at this state update: `67657a21fb67cc55d555af5ad96252095fdf8847`. Exact-head Canonical CI `44792191056`: PASS; Platform Gates `44792190959`: PASS; Cloudflare Workers build: PASS. Mobile Lighthouse `44792190980` is still running and must pass before this head is considered fully green.
+- API contract is now version `1.4.0` with 39 deterministic model IDs and 39 golden vectors, plus automated OpenAPI/runtime catalogue parity. The browser catalogue remains 55 calculators; country-specific tax/savings rules are deliberately not exposed through generic models without jurisdictional source validation.
+- Browser suite passed: all 55 calculators/output bounds, JavaScript-disabled shells, theme/currency persistence, cloud workspace save/load, consent/ad-slot behavior, and seven-route mobile Lighthouse.
+- 55-page HTML audit: unique title/meta/H1/canonical and worked example 55/55; 2–4 visible FAQs/page; content 682–1,126 words; external authoritative source links 0/55; FAQPage structured data 0/55. Content/source citations and legal review remain incomplete.
+- No formula changes were made. Snapshot tests preserve existing behavior but do not independently prove financial correctness.
+- PR #97 is OPEN and UNMERGED. Do not merge unless the repository owner sends the exact phrase `merge approved`.
+
+### Release blockers not verifiable from repository CI
+
+1. Cloudflare Workers production branch control must be confirmed as `main` only, with Preview separate; verify active production version, traffic allocation and rollback target. Prior bot messages reported production builds for unmerged heads, so a green build is not proof of the version serving users.
+2. Verify production HTTP response header `Content-Encoding: br`; preview compression is not production proof.
+3. Verify live `/v1/health`, authentication, server-side entitlements, D1/Supabase connectivity, Razorpay/Paddle subscription and webhook lifecycle/idempotency, backups, alerts, production config/secrets, and production browser smoke. Never request or expose secret values.
+4. Complete physical Android-device accessibility/performance and field INP/CrUX measurements; lab Lighthouse TBT is not field INP.
+5. Obtain independent authoritative formula validation and jurisdiction-specific CA/legal review before making accuracy/tax claims.
+6. Add page-specific authoritative sources and complete editorial review for all 55 calculator pages. This is a planned post-PR-C content batch; do not create a new branch before PR #97 is merged.
+7. Decide separately whether FAQ structured data is appropriate and compliant; visible FAQs do not imply FAQ schema.
+
+### Latest engineering audit follow-up — billing cancellation safety
+
+- Deep code inspection identified a cancellation persistence edge case: if Razorpay's cancel response omitted `current_end`, the handler wrote SQL NULL over the previously known subscription period end. This could make an active subscription appear to have no expiry.
+- The fix now reads the existing period end and uses SQL `COALESCE` so a missing provider field cannot erase it. The entitlement audit asserts this invariant.
+- This is a source-level fix pending exact-head CI. It is not live Razorpay or production verification.
+
+### Commercial/product readiness
+
+- Pro trial remains 14 days, no card, one per verified account. Ultra remains invite-only 7-day beta; public Ultra checkout stays disabled.
+- Approved pricing cells are experiments only, not live prices. Do not change production payment settings or enable checkout without explicit owner approval.
+- Payments/providers remain unverified in production. Do not claim revenue, paid conversion, payment readiness or SaaS activation without end-to-end evidence.
+- **Pro trial implementation is on PR #97 only; NOT production-verified:** added a 14-day no-card start action, Supabase-confirmed-email gate, one-time claim per user and normalized verified-email digest, D1 persistence (`migrations/0003_pro_trials.sql`), automatic expiry and server-side entitlement (`functions/v1/billing/trial.js`). CI and deployed D1 migration must pass before advertising the trial; live email-confirmation, claim-race and expiry tests remain required.
+- **Paid product value is limited:** current server-side Pro entitlement primarily expands cloud-saved scenarios from 3 to 500. A complete paid workspace, reports, premium decision tools, support, invoices and billing self-service still need product acceptance and verification.
+- **API coverage is 39 models, not 55:** the browser has 55 calculator definitions, while `functions/v1/_shared.js` exposes 39 deterministic API models in v1.4.0. The API contract audit now requires a golden vector for every published model and exact parity with `api/openapi.yml`. Generic API country metadata explicitly applies no jurisdictional rules. The remaining models include jurisdiction-specific tax/retirement rules and complex calculations; expand only with equivalence tests and authoritative provenance.
+- **Billing hardening:** Razorpay webhook signature/event-id/order tests exist. PR #97 now serializes checkout creation per account with a D1 lock (`migrations/0004_billing_checkout_locks.sql`); ambiguous provider/network outcomes retain the lock and fail closed to prevent duplicate subscription creation. A persistent lock requires owner/support reconciliation against Razorpay before retry. This is CI code, not proof of live provider lifecycle. Paddle is not integrated in current checkout routes.
+- Priority after Phase 0: complete live backend/payment verification, improve calculation trust and source coverage, then ship the paid Pro MVP with transparent entitlements, account/workspace value, billing lifecycle, refund/cancellation handling, support and privacy/legal review.
+
+### Non-negotiable release controls
+
+- Do not lower Performance >=90, CLS <=0.10, TBT <=200ms, LCP <=2500ms, Accessibility >=95, Best Practices >=80, SEO >=90.
+- Do not merge PR #97 without exact `merge approved`.
+- Do not change Cloudflare production settings, payment settings, secrets, branch protections or delete branches/tags without explicit written approval.
+- Do not commit generated HTML. Do not change formulas without authoritative reference vectors, tests and a one-line rationale.
+- Do not represent CI/preview results as production verification.
+
 Last updated: 2026-11-20
 Repository: `goyalalok565-byte/wealtharrays.github.io`
 Default branch: `main`
@@ -72,7 +128,7 @@ Scores are preliminary engineering assessments from repository inspection, uploa
 
 - PR #78 was closed without merging as superseded by the consolidated PR #88. Its earlier seven-route mobile preview remains the known baseline: multiple routes missed strict performance, TBT or LCP targets; homepage accessibility scored 92 vs the 95 floor.
 - PRs #81–#87 are historical/superseded engineering or verification branches. PR #87 was closed without merging because it was based on a stale mainline.
-- **Active release candidate:** PR #88, branch `fix/phase0-clean-mainline-2026-11-20`, based on the current `main` branch. GitHub reports the branch mergeable; this is not equivalent to release approval.
+- **Active release candidate:** PR #97, branch `phase0/pr-c-final`, based on the current `main` branch. The PR remains unmerged; the Lighthouse release gate was failing at the audited base head.
 - The previous documentation-only verification head was `41583eda808d2fb6c42caa3cdd09261a35264670`. Subsequent ad-slot-aware loading fixes are being committed; re-check the latest head and its fresh CI before relying on results.
 - On that PR run, **Canonical CI passed**: source/Pages/Worker syntax, privacy and auth CSP regression, privacy policy, calculator regression and independent formula audit, generated routes/runtime, Section 156 terminology, canonical embed regression and regression gates.
 - **Platform Gates passed**: registry parity, 55-calculator catalogue audit, Phase 1–20 audits, research data audit, static accessibility audit, production `dist` build, deployment exclusion and exact manifest audit, dist integrity, literal `npm run build`, minification and production asset budget.
@@ -112,12 +168,12 @@ Owner configures these directly in GitHub Settings > Secrets. Never request secr
 
 - India-first, global architecture; metadata-only country codes are not country engines.
 - Preserve financial formulas unless authoritative reference vectors and tests justify a change.
-- Do not merge PR #88 until strict mobile thresholds, accessibility and browser checks pass.
+- Do not merge PR #97 until strict mobile thresholds, accessibility and browser checks pass.
 - Do not alter ads/CMP based on one Lighthouse observation; profile first.
 - Local `dist/` is not a substitute for production Cloudflare evidence.
 - Never claim AdSense approval, traffic, revenue, rankings or SaaS activation without measurements.
 
-Active verification PR: #88 (`fix/phase0-clean-mainline-2026-11-20`), based on current `main`. This branch consolidates the CLS, tax terminology, strict performance gates, registry parity, health monitor, deployment hygiene and ad-slot-aware third-party loading work. Do not merge until the seven-route release matrix passes.
+Active verification PR: #97 (`phase0/pr-c-final`), based on current `main`. This branch is the current Phase 0 release candidate. Do not merge until canonical, platform and lighthouse checks pass and the seven-route release matrix is verified.
 
 ## Next three actions
 
@@ -165,3 +221,165 @@ CI scope: strict seven-route Lighthouse runs on PR C (performance branch), manua
 - Assessment Year 2026–27 (income in FY 2025–26): Income-tax Act, 1961, Section 87A. This remains the applicable old-Act reference despite return filing after 1 April 2026.
 - Official Income Tax Department sources: AY/FY transition FAQ https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/income-tax-returns ; AY 2026–27 Section 87A rates/rebate https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/file-itr-2-online ; TY 2026–27 estimator manual https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/income-and-tax-estimator-um ; Section 156 Act PDF https://wmstatic-prd.incometaxindia.gov.in/documents/20117/42998/Section-156_2026-04-01_05-11-58_344893_en.pdf/415b0f0e-8826-feaa-b374-481e54d4b98e?t=1775046534568&version=9.0 .
 - `widget.js` and `wa-calculator-runtime.js` are changed together; canonical CI's root-cause build regenerates the runtime from canonical source modules. No tax formula or rebate eligibility model is changed in this PR. CA/legal review remains required before Phase 1.
+
+
+## PR C — static shell and trace-led performance
+
+- Build-time shell generation targets every calculator in the canonical registry (currently 55). It includes labels, editable inputs, a result region, a 220px fixed chart placeholder and a 520px minimum-height shell. The canonical runtime hydrates/replaces the shell when JavaScript is enabled.
+- QA: source audit across all registry routes plus Playwright browser smoke with JavaScript disabled.
+- PR #88 Lighthouse trace artifact: https://github.com/goyalalok565-byte/wealtharrays.github.io/actions/runs/44679593076/artifacts/14604350761 . Failed LCP: SWP 2,656ms, rent-vs-buy 2,611ms, compound-interest article 2,553ms (strict limit 2,500ms). LCP candidates were text elements (SWP description paragraph, rent-vs-buy H1, article H1); element-render delays were about 134ms, 87ms and 132ms. A shared long JS task is not established as the common cause.
+- Compound-interest article had a versioned preloaded root stylesheet and a second unversioned relative stylesheet request; the report counted 196,315 CSS transfer bytes versus about 101,653 bytes on calculator routes. PR C reuses the exact preloaded URL and adds an audit to prevent duplicate transfer.
+- Lighthouse reported ~67KiB unused CSS and ~66KiB unused calculator runtime JS on affected routes; these remain optimization leads, not proven sole causes. No blanket script deferral or CSS rewrite is claimed.
+- PR #88 preview homepage TBT was 0ms; blocking Funding Choices also measured 0ms. A same-settings main-branch comparison has not been run, so historical 7,510ms-to-current remains unverified.
+- Strict seven-route thresholds remain unchanged: Performance >=90, CLS <=0.10, TBT <=200ms, LCP <=2,500ms, Accessibility >=95, Best Practices >=80, SEO >=90. PR C must pass fresh seven-route CI; no pass is claimed yet.
+
+
+## Cloudflare Workers production-branch control — verified incident
+
+- PR #88 bot deployment comment reports successful production deployment for unmerged head `6221a1b4` at 05:14 UTC: https://dash.cloudflare.com/?to=/f5619318297695cabb3a1540854cb166/workers/services/view/wealtharrays-github-io/production/builds/dafa123a-596b-481b-96ae-53f8e2fbc029 .
+- PR #93 bot deployment comment also reports successful production deployment for unmerged head `20de71f1` at 06:13 UTC: https://dash.cloudflare.com/?to=/f5619318297695cabb3a1540854cb166/workers/services/view/wealtharrays-github-io/production/builds/dfb200ba-8f7c-40cc-994c-2fb21b759d73 .
+- These are production-build/deployment bot records, not Preview URLs. Current active version/traffic percentage and Pages production deployment are not verified from the repository.
+- Cloudflare Worker Settings → Build → Branch control must be checked. The production branch should be `main`; enable Worker Previews for non-production branches and use the Preview command (`npx wrangler preview`). If this Worker is still on legacy branch-build mode, complete the one-time switch to Worker Previews. Official docs: https://developers.cloudflare.com/workers/ci-cd/builds/build-branches/ and https://developers.cloudflare.com/workers/ci-cd/builds/configuration/ .
+- Dashboard rollback: Workers & Pages → Worker → Deployments → three-dot menu on last-known-good version → Rollback. Rollback routes 100% traffic to that version; D1/KV/R2/DO resources are not rolled back and must be checked separately. Official: https://developers.cloudflare.com/workers/versions-and-deployments/rollbacks/ .
+
+
+## Approved pricing experiment cells — not live yet
+
+Pro monthly test cells are reserved for after the Pro MVP only: India ₹199 / ₹299 / ₹399; USD $7 / $9 / $12; EUR €7 / €9 / €11; GBP £6 / £8 / £10. Annual cells may compare 10-month equivalent pricing (~16.7% discount) against 20% off. These are approved experiment candidates, not current live prices.
+
+Ultra remains waitlist-only: no public checkout, no paid launch and no Ultra pricing experiment while it is in waitlist/invite-only beta. The previously proposed Ultra price cells are deferred and must not be shown as current offers.
+
+
+PR C CI also builds the current `main` commit in a separate job and runs the same seven-route Lighthouse settings plus the same homepage-with/without-Funding-Choices TBT diagnostic. Artifacts are uploaded separately as `wealth-arrays-main-homepage-baseline` so homepage TBT can be compared against the PR build without changing throttling or thresholds.
+
+
+## Main-vs-PR homepage TBT diagnostic — 2026-11-20
+
+- Main branch baseline (post PR A+B, pre PR C), same seven-route Lighthouse configuration: homepage Performance 66, FCP 2.0s, LCP 3.7s, TBT 1,020ms, CLS 0; six long tasks. Artifact: https://github.com/goyalalok565-byte/wealtharrays.github.io/actions/runs/44688002384/artifacts/14607342567 .
+- Controlled diagnostic blocking only Google Funding Choices (all other homepage code and Lighthouse settings unchanged): TBT 5ms, a 1,014ms reduction. Diagnostic interpretation: Funding Choices is a likely major contributor.
+- PR C does not disable the CMP globally or bypass consent. It loads Funding Choices only on pages with an explicit ad slot, and observes for dynamically inserted ad slots. The current site has no ad slots; analytics remains governed by the first-party consent UI. Browser QA verifies no CMP request without a slot and one load after a dynamic slot is added.
+- Expected TBT benefit must be confirmed by fresh PR Lighthouse; no performance pass is claimed until the strict gate passes.
+
+
+## Additional Cloudflare production build evidence — PR C
+
+- Cloudflare Workers bot reported `Deployment successful!` against `production/builds/200eb0cc-d241-47ba-8c4f-bd7136d5191d` for unmerged PR #95 commit `88da2679`, Nov 20 2026 06:29 UTC: https://dash.cloudflare.com/?to=/f5619318297695cabb3a1540854cb166/workers/services/view/wealtharrays-github-io/production/builds/200eb0cc-d241-47ba-8c4c-f4b... (Cloudflare dashboard link is account-authenticated).
+- This is another production deployment report for an unmerged PR head. The active version, percentage of traffic served by that version, and whether it was later superseded are not verified. Do not merge PR C until Cloudflare production branch control is confirmed to target `main` only and the currently serving version is known.
+- Immediate mitigation is an owner/admin action in Cloudflare Workers & Pages → `wealtharrays-github-io` → Settings → Builds → Branch control: confirm Production branch is `main`; disable production builds for other branches and configure Preview deployments for non-production branches. If branch control cannot be safely corrected immediately, pause/disable Git integration deploys until corrected.
+- If an unmerged version is serving traffic: Deployments → select last-known-good version → Rollback (or create a new deployment from the known-good `main` commit). Verify version ID and 100% traffic after rollback, then smoke-test `/v1/health`, auth, entitlements and key calculator routes. Rollback does not revert D1/KV/R2/DO data/schema mutations.
+
+
+- PR #95 Cloudflare Workers bot reported successful `production/builds/` deployment for unmerged head `88da2679` on 20 Nov 2026 06:29 UTC: https://dash.cloudflare.com/?to=/f5619318297695cabb3a1540854cb166/workers/services/view/wealtharrays-github-io/production/builds/200eb0cc-d241-47ba-8c4f-bd7136d5191d . This strengthens the evidence that non-main branch builds can deploy to the production Worker. Verify branch control before any further merge/release.
+
+
+## PR C hydration guard follow-up — 2026-11-20
+
+- The calculator bootstrap now hydrates an existing `#calc-widget` host when its children contain `[data-wa-static-shell]`; it still avoids double-booting an already booted host and does not overwrite unrelated pre-existing child content.
+- This preserves the build-time static calculator shell while allowing the canonical runtime to hydrate it. No calculation formula or entitlement logic changes.
+- The source change is included in the same atomic commit as this project-state update on `phase0/pr-c-final`. Fresh Canonical CI, Platform Gates and strict seven-route Lighthouse are required on that exact commit; none is claimed by this documentation entry.
+
+PR C final verification commit: CI must re-run after the Funding Choices ad-slot gating and main-branch TBT baseline workflow were added; strict seven-route Lighthouse remains a release gate.
+
+
+## A–Z audit update — 2026-11-20 (PR #97)
+
+Audit base: `phase0/pr-c-final` at `ffd1ba752b5cf1896b4175c75aa8f47384fc972a`. This section records repository findings and engineering changes authored in this audit commit; CI verification is pending until the new commit completes all required checks.
+
+### Verified from the PR Lighthouse artifact
+
+- The normal homepage `home.json` network request list contains no Funding Choices or AdSense request. The `854 ms → 6 ms` blocked-Funding-Choices comparison is therefore not valid evidence that Funding Choices caused the normal run's TBT; it is an uncontrolled run-to-run difference for this artifact.
+- The normal report lists long tasks attributed to the main document (594 ms), `homepage-business.js` (485 ms), `theme-init.js` (136 ms) and `wa-home-runtime.js` (131 ms). The normal homepage trace was not present in that artifact, so exact function-level attribution remains unverified.
+- Homepage accessibility defects include Quick EMI text contrast, target spacing for the Scenario Lab link/category cards/ledger row, and a footer-logo accessible-name mismatch.
+- The existing `fix-accessible-names.mjs` normalized the footer link to `aria-label="Wealth Arrays"`, which excluded its visible tagline from the accessible name.
+- The AdSense loader previously injected the Google ad tag without waiting for Funding Choices consent data. The theme bootstrap resumed paused ad requests on any interaction or after six seconds; neither is a consent decision.
+- The runtime build stamp used wall-clock time, so identical source inputs could produce different generated output. The Phase 4 and Phase 4/5 audits also had hardcoded calculator lists (20 and 47) rather than deriving all routes from the canonical registry.
+
+### Changes authored in this audit commit — verification pending
+
+- Homepage business initialization is split into small tasks, scheduled after first paint/idle, with `scheduler.yield()` or `setTimeout(0)` between tasks.
+- Home runtime modules run in separate yielded tasks; theme behavior remains initialized immediately.
+- Theme bootstrap is reduced to synchronous theme selection; the production hotfix is scheduled after load/idle.
+- Funding Choices is delayed until after first paint and idle. AdSense waits for Google's `CONSENT_MODE_DATA_READY` callback and fails closed unless the ad-storage, ad-user-data and ad-personalization purposes are granted or not applicable.
+- Accessibility contrast, target spacing and footer accessible-name generation are corrected in source.
+- Lighthouse now captures three independent runs per route, saves normal homepage traces, gates on each route's median, reports worst-case metrics, and fails on missing/invalid runs.
+- The Funding Choices diagnostic now skips causal comparison when the normal report has no Funding Choices request.
+- Stabilization CI is read-only, no longer commits/pushes generated output to `main`, compares two deterministic `dist/` builds, and uploads `dist/` plus a 55-page HTML audit CSV.
+- Phase 4 and Phase 4/5 audits now derive calculator routes from `calculators.js`; the build stamp is content-derived and reproducible.
+
+### Still not production-verified / release blockers
+
+- Fresh GitHub CI on the new PR head, including canonical, platform, three-run Lighthouse medians and browser consent smoke.
+- Production Brotli response header and Cloudflare's active production Worker version/traffic allocation.
+- Full independent formula validation against authoritative references and jurisdictional/tax legal review; no formulas were changed.
+- Live Supabase, D1, Razorpay/Paddle lifecycle, backups, alerts and production secret configuration; no secrets or payment settings were accessed.
+- Accessibility testing beyond the homepage, field INP and real-device performance remain to be measured.
+- The 55-page CSV is an audit report, not proof that all content meets editorial/legal quality requirements.
+
+Never treat repository source, local builds or CI deploy messages as proof of live production traffic.
+
+## Verification snapshot — PR #97, 2026-11-20
+
+### Last fully verified head before the preference/localization follow-up
+
+- Head: `58898e632fb0b9d9b64fc2bed63f789755882c12`.
+- Canonical CI #1637: PASS — https://github.com/goyalalok565-byte/wealtharrays.github.io/actions/runs/44758536996 .
+- Platform Gates #1039: PASS — https://github.com/goyalalok565-byte/wealtharrays.github.io/actions/runs/44758536992 .
+- Mobile Lighthouse #1907: PASS — https://github.com/goyalalok565-byte/wealtharrays.github.io/actions/runs/44758537088 .
+- All 55-calculator browser checks, static shells, JavaScript-disabled shells, authenticated workspace save/load, consent/ad-slot checks and 3-run-per-route Lighthouse measurements passed.
+- Median route results (Performance / Accessibility / Best Practices / SEO; CLS / TBT / LCP):
+  - Home: 100 / 100 / 100 / 100; 0 / 0 ms / 1,477 ms.
+  - Tools: 99 / 96 / 100 / 100; 0.0003 / 69 ms / 1,625 ms.
+  - SIP: 98 / 96 / 100 / 100; 0.0757 / 16 ms / 1,878 ms.
+  - SWP: 98 / 96 / 100 / 100; 0.0757 / 12 ms / 1,717 ms.
+  - FIRE: 98 / 96 / 100 / 100; 0.0757 / 11 ms / 1,716 ms.
+  - Rent vs Buy: 98 / 96 / 100 / 100; 0.0700 / 15 ms / 1,720 ms.
+  - Compound-interest guide: 100 / 100 / 100 / 100; 0 / 0 ms / 1,522 ms.
+- Normal homepage trace made zero Funding Choices requests; homepage median TBT was 0 ms and the worst observed run was about 16 ms. The diagnostic correctly marked a blocked-Funding-Choices experiment not applicable; it does not claim a causal improvement.
+- SWP interaction profiling recorded no long tasks during the probe; MutationObserver callbacks totalled about 2.3 ms across the four sampled input changes. The CPU profile was predominantly idle.
+- Main-branch same-settings single-run baseline on that workflow: homepage Performance 88 / TBT 460 ms; tools Performance 85 / TBT 590 ms; calculator CLS ranged 0.61–0.66. This is a comparison baseline, not a PR release result.
+
+### 55-page built HTML audit
+
+- Unique title, meta description, H1 and canonical URL: 55/55.
+- Visible FAQ items: 55/55 pages, with 2–4 each. Structured FAQPage JSON-LD: 0/55; visible FAQs and structured FAQ schema are reported separately.
+- Worked examples: 55/55.
+- Article content range: 682–1,126 words; mean about 814 words.
+- External source links detected in calculator article content: 0/55. This is an editorial/source-citation gap, not a formula failure.
+- The shared-paragraph metric reports boilerplate repeated across different calculator pages; it is not an intra-page duplicate-paragraph count.
+- The 55-page audit CSV is an inventory, not proof of legal/editorial sufficiency. Content expansion and authoritative source citations remain planned for the five 11-page content batches after PR C is merged.
+
+### Preference and localization follow-up authored after the verified head
+
+- Added Playwright coverage for the existing bundled theme handlers on home and tools pages, including persisted theme state; the synchronous theme bootstrap remains small and does not add a competing click handler.
+- Homepage currency now reads and writes the shared `waCurrency` preference so it survives reloads and is shared with calculator pages.
+- The localization API advertises only languages with complete dictionaries (currently English and Hindi); the UI does not yet provide a full language switcher or full-site translation.
+- Added Playwright coverage for theme/currency persistence and a localization dictionary audit. The all-calculator smoke label now accurately describes its tested scope.
+- Lighthouse runner now bounds each CLI attempt to 120 seconds and retries known transient trace failures.
+- This follow-up commit requires fresh Canonical CI, Platform Gates and Mobile Lighthouse verification. The prior green run above must not be represented as verification of the follow-up head.
+
+### Production and owner-side blockers — unchanged
+
+- Production `Content-Encoding: br` remains unverified; DNS resolution for `wealtharrays.com` failed in this environment and the web fetch returned 403. Brotli is verified only in the local CI preview. Do not change production settings based on preview evidence.
+- Cloudflare production branch control, active Worker version/traffic allocation, Pages deployment and rollback target require owner/admin dashboard verification. No Cloudflare settings were changed.
+- Live `/v1/health`, D1/Supabase/Razorpay/Paddle operations, production secrets, backups, alerts and production browser checks remain unverified. No secrets or payment settings were accessed.
+- Field INP/CrUX and real-device performance remain unverified; Lighthouse lab TBT is not field INP.
+- CA/legal review and page-specific authoritative source citations remain required. No formulas or tax eligibility logic were changed.
+- PR #97 remains open and unmerged. Do not merge without the exact owner approval phrase `merge approved`.
+
+
+### Exhaustive browser-smoke runtime follow-up
+
+- The 55-calculator smoke now batches each route's numeric min/max checks in the page context while still dispatching real input and Calculate events and validating finite output rows. This reduces Playwright round trips without dropping any declared numeric bound.
+- The mobile Lighthouse job timeout is 45 minutes to accommodate all 55 calculators plus the full 21-run, seven-route performance matrix on slower GitHub-hosted runners.
+- Fresh CI on the new head is required; no verification is implied by the earlier successful run.
+
+
+## Homepage TBT variance and consent observer follow-up — 2026-11-20
+
+- Verified head before this follow-up: `f756d7c12837547e25a6b4d4c8a713834b403808`.
+- Canonical CI #1642 PASS, Platform Gates #1044 PASS, Mobile Lighthouse #1917 PASS.
+- Seven-route median gate passed. Homepage median TBT was 0 ms, but one of three runs had TBT 326.6 ms (worst case); its minimum Performance score was 93. Other route medians remained within all thresholds.
+- Normal homepage trace made zero Funding Choices requests. The diagnostic therefore correctly marked a blocked-Funding-Choices experiment not applicable; no causal claim about Funding Choices is made.
+- The normal-run long-task audit attributed 379 ms to the main document at about 895 ms and 348 ms to `consent-loader.js` at about 1,622 ms. The trace showed substantial style/layout and microtask work; it did not conclusively identify one JavaScript function as the cause of the main-document outlier.
+- A concrete avoidable cost was found in `consent-loader.js`: its document-wide MutationObserver called `document.querySelector(AD_SLOT_SELECTOR)` on every child-list mutation even on pages with no ad slot. It now inspects only newly-added subtrees and starts observing only when the initial page has no slot. The browser smoke counts document-wide ad-slot queries and asserts unrelated DOM mutations do not trigger additional scans; the existing dynamic-slot/CMP/consent tests remain.
+- Fresh Canonical CI, Platform Gates and Mobile Lighthouse on the post-fix head are required. The 326.6 ms outlier is not claimed fixed until a new trace confirms it.
