@@ -89,7 +89,7 @@ const allHtml=[];function walk(dir){for(const e of fs.readdirSync(dir,{withFileT
 const managed=new Set([...required,'wa-site-runtime.js','wa-home-runtime.js','wa-calculator-runtime.js','financial-engine.js','decision-adapters.js','scenario-lab.js','goal-planner.js','financial-workspace.js','report-engine.js','formula-registry.js','i18n.js','accessibility.js','analytics.js','visualization.js']);
 const isScenarioLabPage=(rel)=>rel==='scenario-lab.html';
 const isGoalPlannerPage=(rel)=>rel==='goal-planner.html';
-const isWorkspacePage=(rel)=>rel==='financial-workspace.html';
+const isWorkspacePage=(rel)=>rel==='financial-workspace.html'||rel==='app/index.html';
 const isUtilityNoindexPage=(rel)=>isScenarioLabPage(rel)||isGoalPlannerPage(rel)||isWorkspacePage(rel);
 for(const full of allHtml){
   let html=fs.readFileSync(full,'utf8');
