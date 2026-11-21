@@ -7,6 +7,7 @@ Evidence reviewed at main `dc8ec0237133c37f3aa4098e7f2e9067f4746b80`. “Indepen
 | sip | Annuity-due FV | X/S | Excel FV; contribution timing | independent reference exists in tests |
 | compound-interest | Compound growth | X/S | Excel FV | independent reference exists in tests |
 | mortgage | Amortizing loan | X/S | Excel PMT | independent reference exists in tests |
+| home-loan-emi | Amortizing loan | X/S | Excel PMT | pending |
 | roi | Total/annualized return | X/S | Excel return equations | pending |
 | simple-interest | Linear interest | X/S | Excel arithmetic | pending |
 | freedom-milestone | Goal/withdrawal projection | X/S | Assumption provenance | pending |
@@ -60,4 +61,4 @@ Evidence reviewed at main `dc8ec0237133c37f3aa4098e7f2e9067f4746b80`. “Indepen
 | loan-interest | Amortization interest total | X/S | Excel PMT/schedule | pending |
 
 ## Inventory note
-The definition directory listing returned 56 JavaScript files while the golden-snapshot test asserts 55 canonical calculators. This matrix records 55 unique IDs from the catalogue-level inventory; confirm canonical membership and any legacy file before certification. The existing independent suite contains vectors for sip, swp, fire, mortgage, lumpsum, compound-interest, rent-vs-buy, ssy, income-tax-planner and gst.
+The definition directory contains 55 JavaScript files, matching the 55 canonical calculators asserted by the golden-snapshot test. This matrix contains all 55 definition IDs. The existing independent suite contains vectors for sip, swp, fire, mortgage, lumpsum, compound-interest, rent-vs-buy, ssy, income-tax-planner and gst.
