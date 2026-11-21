@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 
-const account = fs.readFileSync("account.js", "utf8");
-const accountHtml = fs.readFileSync("account.html", "utf8");
-const appHtml = fs.readFileSync("app/index.html", "utf8");
+const root = fs.existsSync("dist") ? "dist" : ".";
+const account = fs.readFileSync(root + "/account.js", "utf8");
+const accountHtml = fs.readFileSync(root + "/account.html", "utf8");
+const appHtml = fs.readFileSync(root + "/app/index.html", "utf8");
 const loadStart = account.indexOf("async function loadReports(){");
 const loadEnd = account.indexOf('\n$("account-form").addEventListener', loadStart);
 assert.ok(loadStart >= 0 && loadEnd > loadStart, "Account must define the saved-report archive loader.");
