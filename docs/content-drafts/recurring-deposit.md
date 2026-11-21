@@ -12,7 +12,7 @@ For equal end-of-period deposits, future value = payment × [((1 + i)^n − 1) �
 
 ## Worked examples
 
-- ₹5,000 at each month-end for 60 months, 7% nominal annual rate compounded monthly: maturity ≈ ₹357,000; deposits = ₹300,000; estimated interest ≈ ₹57,000.
+- ₹5,000 at each month-end for 60 months, 7% nominal annual rate compounded monthly: maturity ≈ ₹357,965; deposits = ₹300,000; estimated interest ≈ ₹57,965.
 - ₹2,000 monthly for 24 months at 0%: maturity = ₹48,000; interest = ₹0.
 
 ## Frequently asked questions

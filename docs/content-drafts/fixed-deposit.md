@@ -13,7 +13,7 @@ For periodic compounding, maturity = principal × (1 + annual nominal rate ÷ co
 ## Worked examples
 
 - ₹100,000 at 7% nominal, compounded quarterly for 5 years: maturity ≈ ₹141,478; estimated interest ≈ ₹41,478.
-- ₹250,000 at 6% nominal, compounded monthly for 3 years: maturity ≈ ₹299,203; estimated interest ≈ ₹49,203.
+- ₹250,000 at 6% nominal, compounded monthly for 3 years: maturity ≈ ₹299,170; estimated interest ≈ ₹49,203.
 
 ## Frequently asked questions
 

@@ -12,7 +12,7 @@ For a standard amortising loan, EMI = P × r × (1+r)^n ÷ [(1+r)^n − 1], wher
 
 ## Worked examples
 
-- Borrow ₹500,000 at 12% nominal annual interest for 60 months: EMI ≈ ₹11,122; total repayment ≈ ₹667,320; interest ≈ ₹167,320.
+- Borrow ₹500,000 at 12% nominal annual interest for 60 months: EMI ≈ ₹11,122.22; total repayment ≈ ₹667,333.43; interest ≈ ₹167,333.43.
 - Borrow ₹120,000 at 0% for 24 months: EMI = ₹5,000; total interest = ₹0.
 
 ## Frequently asked questions
