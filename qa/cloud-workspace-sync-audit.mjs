@@ -35,6 +35,6 @@ const browserSmoke=fs.readFileSync("qa/cloud-workspace-sync-browser-smoke.mjs","
 for(const path of ["/scenario-lab.html","/goal-planner.html","/financial-workspace.html"])assert.ok(browserSmoke.includes(path),"browser smoke missing "+path);
 const workflow=fs.readFileSync(".github/workflows/mobile-lighthouse.yml","utf8");
 assert.match(workflow,/cloud-workspace-sync-browser-smoke\.mjs/);
-const build=JSON.parse(fs.readFileSync("package.json","utf8")).scripts["build:dist"];
-assert.match(build,/cloud-workspace-sync-audit/);
+const unitTests=fs.readFileSync(".github/workflows/unit-tests.yml","utf8");
+assert.match(unitTests,/cloud-workspace-sync-audit\.mjs/,"Cloud workspace security audit must run in Unit Tests");
 console.log("Cloud workspace sync audit PASS — authenticated save/load, shared quota and all three planning workspaces.");
