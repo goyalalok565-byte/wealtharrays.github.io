@@ -162,7 +162,7 @@ const CALCULATORS = [
       ],
     },
     fields: [
-      { id: "cost", label: "Amount invested", type: "number", default: 10000, min: 0.01, step: 100 },
+      { id: "cost", label: "Amount invested", type: "number", default: 10000, min: 0, step: 100 },
       { id: "finalValue", label: "Current / final value", type: "number", default: 14500, min: 0, step: 100 },
       { id: "years", label: "Holding period", type: "number", default: 3, min: 0.1, max: 200, step: 0.1, suffix: "yrs" },
     ],
