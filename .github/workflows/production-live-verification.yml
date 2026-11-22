@@ -25,25 +25,31 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
-      - name: Wait up to 15 minutes for the exact Workers Build deployment
+      - name: Wait up to 15 minutes for Workers Build and exact live HTML provenance
         shell: bash
         run: |
           set -euo pipefail
+          expected_marker="<meta name=\\"wa-build-sha\\" content=\\"$EXPECTED_SHA\\">"
           for attempt in $(seq 1 90); do
             checks="$(gh api "repos/$GITHUB_REPOSITORY/commits/$EXPECTED_SHA/check-runs")"
             conclusion="$(jq -r '[.check_runs[] | select(.name == "Workers Builds: wealtharrays-github-io" and .app.slug == "cloudflare-workers-and-pages")][0].conclusion // empty' <<<"$checks")"
-            if [[ "$conclusion" == "success" ]]; then
-              echo "Cloudflare Workers Builds succeeded on $EXPECTED_SHA."
-              exit 0
-            fi
             if [[ "$conclusion" == "failure" || "$conclusion" == "cancelled" || "$conclusion" == "timed_out" || "$conclusion" == "action_required" ]]; then
               echo "Workers Builds concluded $conclusion for $EXPECTED_SHA. Deployment is not confirmed; no live smoke will run."
               exit 1
             fi
-            echo "Waiting for Workers Builds on $EXPECTED_SHA (attempt $attempt/90; current conclusion: ${conclusion:-pending})."
+            if [[ "$conclusion" == "success" ]]; then
+              html="$(curl -fsSL --max-time 20 -A "WealthArrays-LiveVerification/1.0" -H "Cache-Control: no-cache" -H "Pragma: no-cache" "https://wealtharrays.com/?__wa_verify=$EXPECTED_SHA" 2>/dev/null || true)"
+              if grep -Fq "$expected_marker" <<<"$html"; then
+                echo "Cloudflare Workers Builds and live HTML provenance both match $EXPECTED_SHA."
+                exit 0
+              fi
+              echo "Workers Build passed, but production HTML provenance has not reached $EXPECTED_SHA yet."
+            else
+              echo "Waiting for Workers Builds on $EXPECTED_SHA (attempt $attempt/90; current conclusion: ${conclusion:-pending})."
+            fi
             sleep 10
           done
-          echo "Workers Builds did not confirm the exact merge SHA within 15 minutes. No live smoke was run."
+          echo "Workers Build and exact live HTML provenance did not both confirm within 15 minutes. No live smoke was run."
           exit 1
 
       - name: Verify live routes, merge provenance, calculator shells and response headers
