@@ -69,9 +69,47 @@ PR #100's first post-merge browser smoke run `45022653786` failed at the redirec
 - Unit Tests: 70/70; Canonical and Platform passed.
 - Pre-merge exact-base Lighthouse: 7 routes × 3 runs; all strict thresholds passed. Candidate medians: Performance 98–100, TBT 0–64 ms, LCP 1,393–1,622 ms, Accessibility 100, CLS 0–0.076.
 - L1/L3 run `45024585953`: exact merge SHA provenance matched; all six routes returned HTTP 200; SIP/SWP/FIRE static shell checks passed; Brotli and expected cache-control passed on all six.
-- Post-merge production smoke and Lighthouse runs are pending; do not count them as passed until their final conclusions are available.
+- Post-merge production smoke and Lighthouse verification completed on the next main commit (PR #128, SHA `3587f597a16bce353cce3c66114f0b50b16d0fe5`): live verification run `45025138231`, browser smoke `45025138277`, and 7-route Lighthouse `45025138280` all passed. Runtime code was unchanged by that docs-only commit; the same deployment was re-verified on PR #113's merge SHA below.
 
 ### Accepted Lighthouse SEO warning — Cloudflare Content Signals
 - Production Lighthouse reports SEO 92 because Cloudflare's managed `robots.txt` adds the `Content-Signal` directive, which Lighthouse's robots.txt parser does not recognize. Keep the directive; it expresses the site's crawler/content-use policy and must not be removed merely to improve a lab score.
 - Cloudflare's official documentation says Google Search Console may report `Syntax not understood` for Content Signals/newer directives, but reports no impact on crawling rates or SEO: https://developers.cloudflare.com/bots/additional-configurations/managed-robots-txt/.
 
+
+### PR #128 — verification-ledger refresh and post-merge checks
+
+- Merge SHA: `3587f597a16bce353cce3c66114f0b50b16d0fe5`.
+- Unit Tests: 70/70 pass, 0 fail, 0 skipped.
+- Canonical CI, Platform Gates, Pages deployment, Workers Builds and L1/L3 production live verification passed.
+- Live verification run `45025138231`: six production routes returned HTTP 200; exact SHA provenance, calculator static shells and response-header checks passed.
+- Production browser smoke run `45025138277`: homepage, all registry calculators, Calculate/Compare, shareable inputs, local save/load, PDF download and 375px overflow checks passed. Four money pages passed at 375px, 768px and 1280px; 11 calculations remained blank while editing and updated on Calculate. Embed and homepage-search smoke passed. Deployment hygiene confirmed 241 manifest files reachable and 17 internal probes blocked.
+- Mobile Lighthouse run `45025138280`: strict 7-route, 3-run median gate passed. The full post-merge verification was repeated on the following test-only merge below.
+
+### PR #113 — independent-reference test batch 2
+
+- Squash merge SHA: `0b7be72dec5f0d38427bdb5103aa8a5feda485c5`.
+- Unit Tests: 150/150 pass, 0 fail, 0 skipped. Canonical CI, Platform Gates and Workers Builds passed.
+- L1/L3 live verification run `45031145684`: all six live routes passed exact-SHA provenance and static-shell/header checks.
+- Production browser smoke run `45031145791`: homepage, all 55 calculator routes, Calculate/Compare, shareable inputs, local save/load, PDF download and mobile overflow checks passed. Four money pages passed mobile/tablet/desktop checks and 11 calculation interactions; embed, homepage search and deployment hygiene passed.
+- Mobile Lighthouse run `45031145712`: 7 routes × 3 runs; median release gate passed. Medians:
+
+| Route | Perf | A11y | BP | SEO | CLS | TBT | LCP |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Home | 98 | 100 | 100 | 92 | 0.000 | 0 ms | 1993 ms |
+| Tools | 98 | 100 | 100 | 92 | 0.000 | 0 ms | 2128 ms |
+| SIP | 97 | 100 | 100 | 92 | 0.076 | 0 ms | 2088 ms |
+| SWP | 96 | 100 | 100 | 92 | 0.076 | 0 ms | 2295 ms |
+| FIRE | 97 | 100 | 100 | 92 | 0.076 | 0 ms | 2050 ms |
+| Rent vs Buy | 98 | 100 | 100 | 92 | 0.070 | 0 ms | 1931 ms |
+| Article | 98 | 100 | 100 | 92 | 0.000 | 0 ms | 2048 ms |
+
+- One homepage worst-case run measured Performance 89 and TBT 427 ms, while the three-run median was Performance 98 and TBT 0 ms. The diagnostic attributed long-task time to homepage/runtime/consent bootstrap scripts; no Funding Choices request was made. Treat this as a repeatability follow-up, not as a median-gate failure. PR #132 scopes the broad header observer and is under measurement.
+- Lighthouse SEO remains 92 because Cloudflare-managed `Content-Signal` is not a standard robots.txt directive for Lighthouse. Do not remove the intended crawler policy just to raise the lab score.
+
+### Current pending queue — 2026-11-22
+
+- **Tier 1 ready after daily merge cap:** PR #114 independent-reference batch 3 (230/230 tests); PR #111 workflow lint/security report; PR #112 Dependabot/CodeQL; PR #103 and #104 content drafts/specifications; PR #110 tools register. The docs-only PRs remain held until the Cloudflare build-watch-path setting and the L1 no-deploy behavior are explicitly aligned.
+- **Tier 2 ready for final review:** PR #107 bounded API request parsing (157/157 tests; Canonical/Platform/Workers checks green); PR #108 zero-denominator ratios now return explicit undefined values and render as em dashes (150/150 tests; browser smoke workflow pending).
+- **Performance follow-up:** PR #132 scopes the shared-control observer to the masthead and runs the strict 7-route/3-run Lighthouse gate against the exact main baseline.
+- **Held backlog:** PR #75 static asset cache/versioning requires a current-base rebase and proof of build-pipeline integration. PR #88 health-monitoring work requires isolated review. PRs #80 and #97 contain Tier-3 billing/report/API/migration work and remain held pending the documented backend setup; no live billing changes.
+- Official Cloudflare documentation confirms Build watch paths support `path_includes` and `path_excludes` (for example, include `*`, exclude `docs/*`). The dashboard setting has not been verified, so do not assume docs-only builds are skipped. If exclusions are configured, first update the live-verification workflow so docs-only commits are explicitly classified and do not wait for a Worker deployment that was intentionally skipped.
