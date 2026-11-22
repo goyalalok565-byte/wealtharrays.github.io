@@ -139,7 +139,8 @@ assert.equal(events.get("evt_unlinked").processed_at, null, "unlinked events rem
 
 events.set("evt_processing", { event_type: "subscription.activated", payload_json: "{}", processed_at: "processing:another-worker" });
 response = await deliver({ created_at: 1600, event: "subscription.activated", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_processing");
-assert.equal(response.status, 202);
+assert.equal(response.status, 503);
+assert.equal(response.headers.get("Retry-After"), "5");
 assert.equal((await response.json()).processing, true, "concurrent deliveries must not process an active claim twice");
 
 response = await deliver({ created_at: 1700, event: "subscription.activated", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_bad_signature", true);
