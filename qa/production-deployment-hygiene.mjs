@@ -66,7 +66,6 @@ const forbiddenProbes = [
   '/private-backup.zip'
 ];
 const leaked = [];
-const productionOrigin = new URL(base).origin;
 for (const route of forbiddenProbes) {
   const result = await fetch(base + route, { method: 'HEAD', redirect: 'manual', signal: AbortSignal.timeout(15000) });
   if ([403, 404, 410].includes(result.status)) continue;
