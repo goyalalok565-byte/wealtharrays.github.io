@@ -80,7 +80,7 @@ for (const route of forbiddenProbes) {
       if (notFound.status === 200 && (notFound.headers.get('content-type') || '').includes('text/html')) {
         const body = await notFound.text();
         const explicitNoindex = /<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(body);
-        const explicitNotFoundPage = /<title>\s*Page moved\\b/i.test(body);
+        const explicitNotFoundPage = body.includes('<title>Page moved');
         if (explicitNoindex && explicitNotFoundPage) continue;
       }
     }
