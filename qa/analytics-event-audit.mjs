@@ -7,6 +7,8 @@ assert.match(core,/workspace_save:'scenario_saved'/,"scenario save must use a va
 assert.match(core,/sign_up:'signup'/,"signup must use a canonical funnel event");
 assert.match(core,/begin_checkout:'upgrade_clicked'/,"upgrade click must use a canonical funnel event");
 assert.match(core,/web-vitals@6\.2\.3/,"RUM dependency must be version-pinned");
+const headers=fs.readFileSync("_headers","utf8");
+assert.match(headers,/script-src[^\\n]*https:\/\/unpkg\.com/,"CSP must allow the consent-gated web-vitals library");
 assert.match(core,/if\(get\('waAnalyticsConsent',''\)!=='granted'\|\|window\.__WA_RUM_STARTED__\)return/,"RUM must start only once and only after consent");
 assert.match(core,/vitals\.onCLS\(report\)/);
 assert.match(core,/vitals\.onINP\(report\)/);
