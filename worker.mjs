@@ -100,9 +100,10 @@ export default {
       return withCors(response, request);
     }
     const isWrite = WRITE_PATHS.has(path) && (method === "POST" || method === "DELETE");
-    const shouldRateLimit = (PUBLIC_RATE_LIMIT_PATHS.has(path) && method !== "OPTIONS") || isWrite;
+    const isWebhook = path === "/v1/billing/webhook" && method === "POST";
+    const shouldRateLimit = (PUBLIC_RATE_LIMIT_PATHS.has(path) && method !== "OPTIONS") || isWrite || isWebhook;
     if (shouldRateLimit) {
-      const limiter = env.PUBLIC_API_LIMITER;
+      const limiter = isWrite ? env.WRITE_API_LIMITER : env.PUBLIC_API_LIMITER;
       if (!limiter || typeof limiter.limit !== "function") {
         return withCors(jsonError("RATE_LIMITER_NOT_CONFIGURED", "The API rate limiter is not configured.", 503), request);
       }
