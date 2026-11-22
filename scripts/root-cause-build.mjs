@@ -1,10 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import vm from 'node:vm';
 
 const root=process.cwd();
-const stamp=new Date().toISOString().replace(/\D/g,'').slice(0,14);
 const siteSources=['wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js','calculator-search.js'];
 const homeSources=['final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js'];
 const calcSiteSources=siteSources.filter(file=>file!=='calculator-search.js');
@@ -13,8 +13,53 @@ let calculatorPages=[];
 let slugs=[];
 const required=[...new Set([...siteSources,...calcSources,'calculators.js'])];
 for(const f of required)if(!fs.existsSync(path.join(root,f)))throw new Error(`Missing runtime source: ${f}`);
+
+// Deterministic cache key: identical source inputs produce identical generated HTML and bundles.
+const stampFiles=[...new Set([...required,'homepage-search.js','styles.css','homepage-refresh.css','phase4-premium.css','homepage-business.js','theme-init.js','consent-loader.js','wa-ad-loader.js','production-hotfix.js'])].filter(file=>fs.existsSync(path.join(root,file)));
+const stamp=crypto.createHash('sha256').update(stampFiles.map(file=>file+'|'+fs.readFileSync(path.join(root,file),'utf8')).join('|')).digest('hex').slice(0,14);
+let buildDate=process.env.SOURCE_DATE_DATE;
+if(!buildDate){try{buildDate=execFileSync('git',['log','-1','--format=%cs'],{cwd:root,encoding:'utf8'}).trim();}catch(_error){buildDate='2026-11-20';}}
+if(!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(buildDate))buildDate='2026-11-20';
 if(!fs.existsSync(path.join(root,'homepage-search.js')))throw new Error('Missing homepage-specific search source: homepage-search.js');
-function bundle(sources,label){const parts=sources.map(file=>{const body=fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n').trimEnd();const hash=crypto.createHash('sha256').update(body).digest('hex').slice(0,12);return `/* ===== WA CANONICAL MODULE | ${label} | ${file} | sha256:${hash} ===== */\n${body}\n`;});return `/* Wealth Arrays canonical ${label} runtime. Generated ${stamp}. */\n(function(){const k='__WA_CANONICAL_${label.toUpperCase()}_RUNTIME__';if(window[k])return;window[k]=true;})();\n${parts.join('\n')}`;}
+function bundle(sources,label){
+  const parts=sources.map(file=>{
+    const body=fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n').trimEnd();
+    const hash=crypto.createHash('sha256').update(body).digest('hex').slice(0,12);
+    return {file,marked:`/* ===== WA CANONICAL MODULE | ${label} | ${file} | sha256:${hash} ===== */\n${body}\n`};
+  });
+  const header=`/* Wealth Arrays canonical ${label} runtime. Generated ${stamp}. */\n(function(){const k='__WA_CANONICAL_${label.toUpperCase()}_RUNTIME__';if(window[k])return;window[k]=true;})();\n`;
+  if(label!=='home')return header+parts.map(part=>part.marked).join('\n');
+  const theme=parts.find(part=>part.file==='theme-fix.js');
+  const deferred=parts.filter(part=>part.file!=='theme-fix.js');
+  const tasks=deferred.map(part=>`function(){\n${part.marked}\n}`).join(',');
+  return header+(theme?.marked||'')+`
+(function(){
+  var tasks=[${tasks}],started=false;
+  function runNext(){
+    if(!tasks.length)return;
+    var task=tasks.shift();
+    try{task();}catch(error){setTimeout(function(){throw error;},0);}
+    if(!tasks.length)return;
+    if(window.scheduler&&typeof window.scheduler.yield==='function'){
+      window.scheduler.yield().then(runNext,function(){setTimeout(runNext,0);});
+    }else setTimeout(runNext,0);
+  }
+  function start(){
+    if(started)return;
+    started=true;
+    var run=function(){runNext();};
+    if(typeof window.requestIdleCallback==='function')window.requestIdleCallback(run,{timeout:2500});
+    else window.setTimeout(run,3500);
+  }
+  if(document.readyState==='complete')start();
+  else window.addEventListener('load',start,{once:true});
+  ['pointerdown','keydown','input'].forEach(function(type){
+    document.addEventListener(type,start,{once:true,capture:true,passive:type==='pointerdown'});
+  });
+})();
+`;
+}
+
 fs.writeFileSync(path.join(root,'wa-site-runtime.js'),bundle(siteSources,'site'),'utf8');
 fs.writeFileSync(path.join(root,'wa-home-runtime.js'),bundle(homeSources,'home'),'utf8');
 fs.writeFileSync(path.join(root,'wa-calculator-runtime.js'),bundle(calcSources,'calculator'),'utf8');
@@ -110,7 +155,8 @@ for(const full of allHtml){
 html=html.replace(/(<link\s+[^>]*rel=["'](?:preload|stylesheet)["'][^>]*href=["'])\/?styles\.css(?:\?[^"']*)?(["'][^>]*>)/gi,'$1/styles.css?v='+stamp+'$2');html=html.replace(/(<link\s+[^>]*href=["'])\/?styles\.css(?:\?[^"']*)?(["'][^>]*rel=["'](?:preload|stylesheet)["'][^>]*>)/gi,'$1/styles.css?v='+stamp+'$2');if(!/href=["']\/styles\.css(?:\?[^"']*)?["']/.test(html))html=html.replace('</head>','<link rel="stylesheet" href="/styles.css?v='+stamp+'"></head>');
 html=html.replace(/\s*<link\s+[^>]*rel=["'](?:icon|shortcut icon|apple-touch-icon)["'][^>]*>/gi,'');
 html=html.replace('</head>','<link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="48x48" href="/icon-192.png"><link rel="apple-touch-icon" sizes="180x180" href="/icon-512.png"></head>');
-if(isCalc){const rawId=html.match(/data-wa-calculator="([^"]+)"/i)?.[1];if(!rawId)throw new Error(`Calculator page missing data-wa-calculator: ${full}`);const base=path.basename(full).toLowerCase()==='index.html'?path.basename(path.dirname(full)):path.basename(full,'.html');const id=byId.get(rawId)||bySlug.get(base)||pageAliases.get(base);if(!id)throw new Error(`No calculator definition matches ${full} (${rawId}, ${base})`);html=html.replace(/data-wa-calculator="[^"]+"/i,`data-wa-calculator="${id}"`);html=html.replace(/\s*<script[^>]+calculator-definitions[^>]*><\/script>/gi,'');const def=`<script src="/calculator-definitions/${id}.js?v=${stamp}" defer></script>`;const runtime=`<script src="/wa-calculator-runtime.js?v=${stamp}" defer></script>`;html=html.replace(/\s*<script[^>]+wa-calculator-runtime\.js[^>]*><\/script>/gi,'');html=html.replace('</body>',`${def}${runtime}</body>`);html=html.replace(/(<body[^>]*>)/i,'$1\n<!-- WA-CANONICAL-RUNTIME:v3 -->');}
+if(isCalc){const rawId=html.match(/data-wa-calculator="([^"]+)"/i)?.[1];if(!rawId)throw new Error(`Calculator page missing data-wa-calculator: ${full}`);const base=path.basename(full).toLowerCase()==='index.html'?path.basename(path.dirname(full)):path.basename(full,'.html');const id=byId.get(rawId)||bySlug.get(base)||pageAliases.get(base);if(!id)throw new Error(`No calculator definition matches ${full} (${rawId}, ${base})`);html=html.replace(/data-wa-calculator="[^"]+"/i,`data-wa-calculator="${id}"`);
+html=html.replace(/\s*<script[^>]+calculator-definitions[^>]*><\/script>/gi,'');const def=`<script src="/calculator-definitions/${id}.js?v=${stamp}" defer></script>`;const runtime=`<script src="/wa-calculator-runtime.js?v=${stamp}" defer></script>`;html=html.replace(/\s*<script[^>]+wa-calculator-runtime\.js[^>]*><\/script>/gi,'');html=html.replace('</body>',`${def}${runtime}</body>`);html=html.replace(/(<body[^>]*>)/i,'$1\n<!-- WA-CANONICAL-RUNTIME:v3 -->');}
 else{
   if(isWidget){
     html=html.replace(/\s*<script[^>]+(?:wa-site-runtime|wa-calculator-runtime|calculators\.js|widget\.js|financial-engine|report-engine|financial-workspace)[^>]*><\/script>/gi,'');
@@ -240,7 +286,7 @@ if(isArticle){
         const title=(html.match(/<title>([\s\S]*?)<\/title>/i)||[])[1]?.replace(/<[^>]+>/g,'').trim()||'Wealth Arrays Guide';
         const description=(html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["']/i)||[])[1]||'';
         const canonical=(html.match(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i)||[])[1]||'';
-        const date=(json.match(/"dateModified"\s*:\s*"([^"]+)"/)||json.match(/"datePublished"\s*:\s*"([^"]+)"/)||[])[1]||stamp.slice(0,4)+'-'+stamp.slice(4,6)+'-'+stamp.slice(6,8);
+        const date=(json.match(/"dateModified"\s*:\s*"([^"]+)"/)||json.match(/"datePublished"\s*:\s*"([^"]+)"/)||[])[1]||buildDate;
         const data={"@context":"https://schema.org","@type":"Article","headline":title,"description":description,"author":{"@type":"Person","name":"Alok Goyal","url":"https://wealtharrays.com/about"},"publisher":{"@type":"Organization","name":"Wealth Arrays","url":"https://wealtharrays.com/","logo":"https://wealtharrays.com/favicon-v2.svg"},"datePublished":date,"dateModified":date,"mainEntityOfPage":canonical||undefined,"image":"https://wealtharrays.com/og-card.svg"};
         return '<script type="application/ld+json">'+JSON.stringify(data)+'</script>';
       }
