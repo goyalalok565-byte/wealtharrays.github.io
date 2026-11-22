@@ -97,7 +97,7 @@ Google Search Console, property `sc-domain:wealtharrays.com`, 24 October–20 No
 
 ## Phase 0 — status
 
-<badge>Verified in production</badge>
+**Verified in production**
 
 1. Calculator static shells, CLS reservation and 55-route registry parity are in place.
 2. Strict seven-route mobile Lighthouse median gates pass on production.
@@ -157,12 +157,6 @@ For global payments, the documented decision is Razorpay for India and Paddle fo
 
 
 
-### Payment-provider alternatives checked
-
-- Stripe India new-account onboarding is invite-only; Stripe requires an invite request and may ask for business IDs, site/app URL, business description, bank details, and IEC/RBI Transaction Purpose Code for international transactions. Official: https://support.stripe.com/questions/stripe-accounts-are-invite-only-in-india and https://support.stripe.com/questions/how-can-i-open-a-stripe-account-in-india
-- Lemon Squeezy stopped accepting new users/store sign-ups on 16 Nov 2026 and will stop processing transactions and subscription renewals on 31 Mar 2027. Official: https://docs.lemonsqueezy.com/migration
-- Paddle acts as Merchant of Record for supported sales and handles customer sales-tax calculation/collection/remittance. This does not replace the Indian seller's own income-tax/GST/accounting obligations; CA review remains required.
-
 ## India tax-year terminology and sources
 
 - Tax Year 2026–27 (income from 1 April 2026): Income-tax Act, 2025, Section 156. Current new-regime calculator widget/runtime uses this label.
@@ -170,11 +164,10 @@ For global payments, the documented decision is Razorpay for India and Paddle fo
 - Official Income Tax Department sources: AY/FY transition FAQ https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/income-tax-returns ; AY 2026–27 Section 87A rates/rebate https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/file-itr-2-online ; TY 2026–27 estimator manual https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/income-and-tax-estimator-um ; Section 156 Act PDF https://wmstatic-prd.incometaxindia.gov.in/documents/20117/42998/Section-156_2026-04-01_05-11-58_344893_en.pdf/415b0f0e-8826-feaa-b374-481e54d4b98e?t=1775046534568&version=9.0 .
 - `widget.js` and `wa-calculator-runtime.js` are changed together; canonical CI's root-cause build regenerates the runtime from canonical source modules. No tax formula or rebate eligibility model is changed in this PR. CA/legal review remains required before Phase 1.
 
-## Zero-denominator ratio handling — 2026-11-22
+## Zero-denominator ratio handling — PR #138
 
-- ROI now treats a zero investment-cost denominator as undefined for total and annualized ROI; Profit Margin treats zero revenue as undefined for gross and net margin. The UI, charts, and PDF exports display an em dash rather than a misleading 0%.
-- Blank inputs remain distinct from numeric zero. Regression snapshots and independent reference vectors cover both zero-denominator cases.
-- Browser QA explicitly exercises both cases and restores valid inputs before independent field-boundary checks.
-- Verification evidence from the preceding candidate based on an earlier main SHA: 55/55 calculator browser smoke, 70/70 unit tests, CodeQL, Canonical CI, Platform Gates, Worker build, and the strict seven-route three-run median Lighthouse gate passed. The current-main replay must complete its own fresh CI before merge.
-- Production deployment, live API health, AdSense approval/ad-slot configuration, and Supabase/D1/Razorpay activation remain separate verification/owner-configuration items; do not infer them from preview checks.
-
+- PR #138 merged as `b1610d10e5fe7d389140b20efdce6f63b6ef72e8`.
+- ROI returns explicitly undefined total/annualized ratios when investment cost is zero; Profit Margin returns explicitly undefined gross/net margins when revenue is zero.
+- UI, charts, widget output and PDF exports display an em dash for undefined ratios; blank inputs remain distinct from numeric zero.
+- Independent reference vectors, snapshots and browser checks cover both zero-denominator cases and valid boundary values.
+- Fresh-main CI and exact-SHA production verification passed; see the release evidence above.
