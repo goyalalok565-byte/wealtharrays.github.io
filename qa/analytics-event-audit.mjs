@@ -8,7 +8,10 @@ assert.match(core,/sign_up:'signup'/,"signup must use a canonical funnel event")
 assert.match(core,/begin_checkout:'upgrade_clicked'/,"upgrade click must use a canonical funnel event");
 assert.match(core,/web-vitals@6\.2\.3/,"RUM dependency must be version-pinned");
 const headers=fs.readFileSync("_headers","utf8");
-assert.ok(headers.split("\n").some(line=>line.includes("script-src")&&line.includes("https://unpkg.com")),"CSP must allow the consent-gated web-vitals library");
+const cspLine=headers.split("\n").find(line=>line.includes("Content-Security-Policy:"));
+const scriptDirective=cspLine?.split(";").map(part=>part.trim()).find(part=>part.startsWith("script-src "));
+const scriptSources=scriptDirective?.split(/\s+/).slice(1)||[];
+assert.ok(scriptSources.some(source=>source==="https://unpkg.com"),"CSP must allow the consent-gated web-vitals library");
 assert.match(core,/if\(get\('waAnalyticsConsent',''\)!=='granted'\|\|window\.__WA_RUM_STARTED__\)return/,"RUM must start only once and only after consent");
 assert.match(core,/vitals\.onCLS\(report\)/);
 assert.match(core,/vitals\.onINP\(report\)/);
