@@ -33,7 +33,7 @@ const account=fs.readFileSync("account.html","utf8");
 assert.match(account,/Cloud-saved scenarios/,"Account page must expose the cloud-saved scenario area");
 const browserSmoke=fs.readFileSync("qa/cloud-workspace-sync-browser-smoke.mjs","utf8");
 for(const path of ["/scenario-lab.html","/goal-planner.html","/financial-workspace.html"])assert.ok(browserSmoke.includes(path),"browser smoke missing "+path);
-const workflow=fs.readFileSync(".github/workflows/platform-gates.yml","utf8");
+const workflow=fs.readFileSync(".github/workflows/mobile-lighthouse.yml","utf8");
 assert.match(workflow,/cloud-workspace-sync-browser-smoke\.mjs/);
 const build=JSON.parse(fs.readFileSync("package.json","utf8")).scripts["build:dist"];
 assert.match(build,/cloud-workspace-sync-audit/);
