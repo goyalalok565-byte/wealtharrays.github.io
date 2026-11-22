@@ -21,3 +21,7 @@
   .tool-card h2 { font-size: 12px !important; }
   .tool-card p { font-size: 10px !important; }
 }
+
+.wa-filter-chip.is-active span{background:#5143b8!important;color:#fff!important}
+
+.tools-grid>.tool-card{content-visibility:auto;contain-intrinsic-size:auto 150px}
