@@ -21,7 +21,11 @@
     if(session.expires_at&&Date.now()/1000>session.expires_at-60){
       if(!session.refresh_token)throw new Error("Your session expired. Sign in again.");
       const config=await getAuthConfig();
-      const response=await fetch(config.url.replace(/\/$/,"")+"/auth/v1/token?grant_type=refresh_token",{
+      const authBase=new URL(config.url);
+      if(authBase.protocol!=="https:"||!authBase.hostname.endsWith(".supabase.co"))throw new Error("Account authentication requires the configured HTTPS Supabase project origin.");
+      const refreshUrl=new URL("/auth/v1/token?grant_type=refresh_token",authBase);
+      if(refreshUrl.origin!==authBase.origin)throw new Error("Invalid account authentication destination.");
+      const response=await fetch(refreshUrl.href,{
         method:"POST",
         headers:{apikey:config.anon_key,"Content-Type":"application/json",Accept:"application/json"},
         body:JSON.stringify({refresh_token:session.refresh_token})
@@ -33,11 +37,13 @@
     }
     return session.access_token;
   }
-  async function request(path,options={}){
+  async function request(options={}){
     const token=await accessToken();
-    const response=await fetch(path,{
+    const method=(options.method||"GET").toUpperCase();
+    const turnstileToken=["POST","DELETE","PUT","PATCH"].includes(method)?await window.WATurnstile.getToken():null;
+    const response=await fetch("/v1/scenarios",{
       ...options,
-      headers:{"Content-Type":"application/json",Authorization:"Bearer "+token,...options.headers}
+      headers:{"Content-Type":"application/json",Authorization:"Bearer "+token,...(turnstileToken?{"cf-turnstile-response":turnstileToken}:{}),...options.headers}
     });
     const data=await response.json().catch(()=>({}));
     if(!response.ok){
@@ -49,13 +55,13 @@
   async function save(calculatorId,name,inputs){
     if(!/^[a-z0-9-]{1,80}$/.test(calculatorId))throw new Error("Invalid plan type.");
     if(!inputs||typeof inputs!=="object"||Array.isArray(inputs))throw new Error("Plan inputs are invalid.");
-    return request("/v1/scenarios",{
+    return request({
       method:"POST",
       body:JSON.stringify({calculator_id:calculatorId,name,model_version:"1.0.0",inputs,results:null})
     });
   }
   async function latest(calculatorId){
-    const data=await request("/v1/scenarios",{method:"GET"});
+    const data=await request({method:"GET"});
     return (data.scenarios||[]).find(item=>item.calculator_id===calculatorId)||null;
   }
   window.WACloudScenarios={save,latest};

@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
 
-const baseUrl=(process.env.BASE_URL||'http://127.0.0.1:4173').replace(/\/$/,'');
+const rawBase=process.env.BASE_URL||'http://127.0.0.1:4173';
+const parsedBase=new URL(rawBase);
+const allowedHosts=new Set(['127.0.0.1','localhost','wealtharrays.com','www.wealtharrays.com']);
+if(!allowedHosts.has(parsedBase.hostname)||!['http:','https:'].includes(parsedBase.protocol))throw new Error('BASE_URL must be a local preview or the production Wealth Arrays origin.');
+const baseUrl=parsedBase.origin;
 const browser=await chromium.launch({headless:true});
 const context=await browser.newContext({viewport:{width:1280,height:900},serviceWorkers:'block'});
 await context.addInitScript(()=>{
@@ -36,11 +40,22 @@ try{
     let stored=null;
     let writes=0;
     await page.unrouteAll({behavior:'wait'});
+    await page.addInitScript(() => {
+      window.turnstile = {
+        render(_container, options) { window.__waTurnstileOptions = options; return "browser-test-widget"; },
+        reset() {},
+        execute() { Promise.resolve().then(() => window.__waTurnstileOptions.callback("browser-test-turnstile-token")); }
+      };
+    });
+    await page.route('**/v1/security-config',route=>route.fulfill({
+      status:200,contentType:'application/json',body:JSON.stringify({configured:true,site_key:'browser-test-site-key'})
+    }));
     await page.route('**/v1/scenarios',async route=>{
       const request=route.request();
       const headers=request.headers();
       assert.equal(headers.authorization,'Bearer cloud-sync-browser-test-token','cloud request must use the signed-in session token');
       if(request.method()==='POST'){
+        assert.equal(headers['cf-turnstile-response'],'browser-test-turnstile-token','cloud writes must carry a verified one-time Turnstile token');
         const body=request.postDataJSON();
         assert.equal(body.calculator_id,item.kind,'cloud save must use the correct workspace id');
         assert.ok(body.inputs&&typeof body.inputs==='object','cloud save must include plan inputs');

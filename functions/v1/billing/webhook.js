@@ -18,6 +18,16 @@ const SUBSCRIPTION_STATUS = {
   "subscription.paused": "paused",
   "subscription.resumed": "active"
 };
+async function releaseClaim(db, eventId, claimToken) {
+  try {
+    await db.prepare("UPDATE billing_events SET processed_at = NULL WHERE provider = 'razorpay' AND provider_event_id = ? AND processed_at = ?")
+      .bind(eventId, claimToken).run();
+  } catch {}
+}
+async function linkedSubscription(db, subscriptionId) {
+  return db.prepare("SELECT id FROM subscriptions WHERE provider = 'razorpay' AND provider_subscription_id = ?")
+    .bind(subscriptionId).first();
+}
 export async function onRequestPost({ request, env }) {
   if (!env.RAZORPAY_WEBHOOK_SECRET) return error("WEBHOOK_NOT_CONFIGURED", "Razorpay webhook secret is not configured.", 503);
   if (!env.DB) return error("DATABASE_NOT_CONFIGURED", "Billing event storage is not configured.", 503);
@@ -50,14 +60,27 @@ export async function onRequestPost({ request, env }) {
     payment_currency: payment?.currency || null,
     payment_amount_refunded: Number.isFinite(payment?.amount_refunded) ? payment.amount_refunded : null
   });
+  let claimToken = null;
   try {
-    const inserted = await env.DB.prepare("INSERT OR IGNORE INTO billing_events (id, provider, provider_event_id, event_type, payload_json, processed_at) VALUES (?, 'razorpay', ?, ?, ?, NULL)")
+    await env.DB.prepare("INSERT OR IGNORE INTO billing_events (id, provider, provider_event_id, event_type, payload_json, processed_at) VALUES (?, 'razorpay', ?, ?, ?, NULL)")
       .bind(crypto.randomUUID(), eventId, event.event, safePayload).run();
-    if (!inserted.meta?.changes) {
+
+    // One conditional UPDATE atomically claims the event. A crashed claim can be retried after five minutes.
+    claimToken = "processing:" + crypto.randomUUID();
+    const claim = await env.DB.prepare([
+      "UPDATE billing_events SET processed_at = ?",
+      "WHERE provider = 'razorpay' AND provider_event_id = ?",
+      "AND (processed_at IS NULL OR (processed_at LIKE 'processing:%' AND received_at <= strftime('%Y-%m-%dT%H:%M:%fZ','now','-5 minutes')))"
+    ].join(" ")).bind(claimToken, eventId).run();
+    if (!claim.meta?.changes) {
       const existing = await env.DB.prepare("SELECT processed_at FROM billing_events WHERE provider = 'razorpay' AND provider_event_id = ?")
         .bind(eventId).first();
-      if (existing?.processed_at) return json({ received: true, duplicate: true }, 200, { "Cache-Control": "no-store" });
+      if (existing?.processed_at && !String(existing.processed_at).startsWith("processing:")) {
+        return json({ received: true, duplicate: true }, 200, { "Cache-Control": "no-store" });
+      }
+      return json({ received: true, processing: true }, 503, { "Cache-Control": "no-store", "Retry-After": "5" });
     }
+
     const status = SUBSCRIPTION_STATUS[event.event];
     if (subscriptionId && status) {
       const currentEnd = subscription?.current_end ? new Date(subscription.current_end * 1000).toISOString() : null;
@@ -66,24 +89,45 @@ export async function onRequestPost({ request, env }) {
         "SET status = ?, current_period_end = COALESCE(?, current_period_end),",
         "last_provider_event_at = CASE WHEN ? IS NULL THEN last_provider_event_at ELSE ? END,",
         "updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')",
-        "WHERE provider = 'razorpay' AND provider_subscription_id = ?",
+        "WHERE provider = 'razorpay' AND provider_subscription_id = ? AND status <> 'refunded'",
         "AND ((? IS NOT NULL AND (last_provider_event_at IS NULL OR last_provider_event_at <= ?))",
         "OR (? IS NULL AND last_provider_event_at IS NULL))"
       ].join(" ");
       const updated = await env.DB.prepare(updateSql)
         .bind(status, currentEnd, eventCreatedAt, eventCreatedAt, subscriptionId, eventCreatedAt, eventCreatedAt, eventCreatedAt).run();
-      if (!updated.meta?.changes) {
-        const linked = await env.DB.prepare("SELECT id FROM subscriptions WHERE provider = 'razorpay' AND provider_subscription_id = ?")
-          .bind(subscriptionId).first();
-        if (!linked) return error("SUBSCRIPTION_NOT_LINKED", "The subscription event is valid but its local subscription record is not available yet.", 503);
+      if (!updated.meta?.changes && !(await linkedSubscription(env.DB, subscriptionId))) {
+        await releaseClaim(env.DB, eventId, claimToken);
+        return error("SUBSCRIPTION_NOT_LINKED", "The subscription event is valid but its local subscription record is not available yet.", 503);
       }
     }
-    await env.DB.prepare("UPDATE billing_events SET processed_at = strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE provider = 'razorpay' AND provider_event_id = ? AND processed_at IS NULL")
-      .bind(eventId).run();
-    // payment.failed and payment.refunded are recorded with safe payment metadata.
-    // Subscription lifecycle events remain authoritative for subscription entitlement.
+
+    // A refund event revokes Pro immediately; the event timestamp prevents an older activation from restoring it.
+    if (event.event === "payment.refunded") {
+      if (!subscriptionId) {
+        await releaseClaim(env.DB, eventId, claimToken);
+        return error("SUBSCRIPTION_NOT_LINKED", "The refund event could not be linked to a subscription.", 503);
+      }
+      const revokeSql = [
+        "UPDATE subscriptions",
+        "SET status = 'refunded', cancel_at_period_end = 0,",
+        "last_provider_event_at = CASE WHEN ? IS NULL THEN last_provider_event_at WHEN last_provider_event_at IS NULL OR last_provider_event_at < ? THEN ? ELSE last_provider_event_at END,",
+        "updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')",
+        "WHERE provider = 'razorpay' AND provider_subscription_id = ?"
+      ].join(" ");
+      // Refund is a terminal entitlement state even when its event arrives after a newer lifecycle event.
+      const revoked = await env.DB.prepare(revokeSql)
+        .bind(eventCreatedAt, eventCreatedAt, eventCreatedAt, subscriptionId).run();
+      if (!revoked.meta?.changes && !(await linkedSubscription(env.DB, subscriptionId))) {
+        await releaseClaim(env.DB, eventId, claimToken);
+        return error("SUBSCRIPTION_NOT_LINKED", "The refund event is valid but its subscription record is not available yet.", 503);
+      }
+    }
+
+    await env.DB.prepare("UPDATE billing_events SET processed_at = strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE provider = 'razorpay' AND provider_event_id = ? AND processed_at = ?")
+      .bind(eventId, claimToken).run();
     return json({ received: true }, 200, { "Cache-Control": "no-store" });
   } catch {
+    if (claimToken) await releaseClaim(env.DB, eventId, claimToken);
     return error("WEBHOOK_STORAGE_ERROR", "Could not record or process the billing event.", 500);
   }
 }

@@ -8,7 +8,7 @@ export async function onRequestPost({ request, env }) {
     const current = await env.DB.prepare("SELECT provider_subscription_id, plan_id, status, cancel_at_period_end FROM subscriptions WHERE user_id = ? ORDER BY updated_at DESC LIMIT 1").bind(auth.user.id).first();
     if (!current?.provider_subscription_id) return error("NO_SUBSCRIPTION", "No cancellable subscription was found.", 404);
     if (current.cancel_at_period_end) return json({ cancellation_scheduled: true, status: current.status, message: "Cancellation is already scheduled." });
-    if (["cancelled", "completed", "halted"].includes(current.status)) return error("SUBSCRIPTION_NOT_ACTIVE", "This subscription cannot be cancelled from its current state.", 409);
+    if (["cancelled", "completed", "halted", "refunded"].includes(current.status)) return error("SUBSCRIPTION_NOT_ACTIVE", "This subscription cannot be cancelled from its current state.", 409);
     const response = await fetch("https://api.razorpay.com/v1/subscriptions/" + encodeURIComponent(current.provider_subscription_id) + "/cancel", {
       method: "POST",
       headers: { Authorization: "Basic " + btoa(env.RAZORPAY_KEY_ID + ":" + env.RAZORPAY_KEY_SECRET), "Content-Type": "application/json", Accept: "application/json" },
