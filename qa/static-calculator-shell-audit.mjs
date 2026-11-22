@@ -14,6 +14,12 @@ for (const calc of CALCULATORS) {
   if (!html.includes('data-wa-chart-placeholder="true"') || !/min-height:220px/.test(html)) throw new Error(`${calc.slug}: fixed chart placeholder missing`);
   const fieldCount = (html.match(/id="wa-static-[^"]+"/g) || []).length;
   if (fieldCount !== calc.fields.length) throw new Error(`${calc.slug}: expected ${calc.fields.length} static fields, found ${fieldCount}`);
+  const mobileReserveHeights = { sip: 2100, swp: 2370, fire: 2540, 'rent-vs-buy': 3080 };
+  const reserveHeight = mobileReserveHeights[calc.id];
+  if (reserveHeight) {
+    const reserveRule = `html[data-wa-calculator=\"${calc.id}\"] #calc-widget.calc-widget { min-height: ${reserveHeight}px; }`;
+    if (!html.includes('@media (max-width: 760px)') || !html.includes(reserveRule)) throw new Error(`${calc.slug}: measured mobile CLS reservation missing or incorrect`);
+  }
   checked++;
 }
 console.log(`Static calculator shell audit PASS: ${checked}/${CALCULATORS.length} routes have pre-rendered labels, inputs, result area and fixed chart placeholder.`);
