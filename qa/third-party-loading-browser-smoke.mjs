@@ -36,6 +36,14 @@ try {
   assert.equal(rumRequests, 0, 'Core Web Vitals library must not load before analytics consent');
   assert.equal(adRequests, 0, 'AdSense must not load on a page without ad slots');
 
+  await page.locator('#wa-consent [data-wa-consent="reject"]').click();
+  await page.waitForTimeout(250);
+  assert.equal(analyticsRequests, 0, 'Rejecting consent must keep GA4 unloaded');
+  assert.equal(rumRequests, 0, 'Rejecting consent must keep Core Web Vitals unloaded');
+  await page.evaluate(() => localStorage.removeItem('waAnalyticsConsent'));
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('#wa-consent');
+
   await page.locator('#wa-consent [data-wa-consent="accept"]').click();
   await page.waitForFunction(() => Boolean(document.querySelector('script[data-wa-gtag]')));
   await page.waitForFunction(() => Boolean(document.querySelector('script[data-wa-web-vitals]')));
