@@ -10,7 +10,10 @@ export async function authenticate(request, env) {
     if (!response.ok) return { response: error("INVALID_SESSION", "Your session is invalid or expired. Please sign in again.", 401) };
     const user = await response.json();
     if (!user || typeof user.id !== "string") return { response: error("INVALID_SESSION", "The identity provider did not return a valid user.", 401) };
-    return { user: { id: user.id, email: typeof user.email === "string" ? user.email : null } };
+    if (typeof user.email !== "string" || !(user.email_confirmed_at || user.confirmed_at)) {
+      return { response: error("EMAIL_VERIFICATION_REQUIRED", "Verify your email address before using cloud scenarios or billing.", 403) };
+    }
+    return { user: { id: user.id, email: user.email, email_verified: true } };
   } catch {
     return { response: error("AUTH_PROVIDER_UNAVAILABLE", "Could not verify your account session.", 502) };
   }

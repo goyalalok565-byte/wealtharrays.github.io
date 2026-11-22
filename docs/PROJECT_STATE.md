@@ -4,7 +4,7 @@ Last updated: 2026-11-22
 Repository: `goyalalok565-byte/wealtharrays.github.io`
 Default branch: `main`
 Current phase: Phase 0 engineering gates passed on production main SHA `b1610d10e5fe7d389140b20efdce6f63b6ef72e8`.
-Status: The zero-denominator ROI/profit-margin correction is merged and deployed. L1 measurement improvements are in branch `saas/l1-consent-rum-events` and await CI/review; they are not deployed or counted as production measurements. Current-main unit, security, canonical, platform, Worker/Pages deployment, 55-calculator browser smoke, production smoke, deployment hygiene, and strict seven-route mobile Lighthouse gates passed. Phase 1 remains blocked on owner-managed SaaS credentials/configuration and CA/legal review; global leadership, revenue, and search acquisition are not established.
+Status: Main SHA `c1d860216bc678a20f70fc2cdaa07e024d1f83bf` contains the L1 measurement and CSP fixes. Exact-SHA production verification on prior main SHA `619bacb6b2ac2c77804061f78e61bf61757f9c40` passed; the RUM browser smoke exposed and PR #147 fixed the missing unpkg CSP origin. The post-PR #147 production RUM smoke is pending. L2 backend security/billing hardening remains in draft PR #145; production Worker deployment is blocked by missing owner-managed Cloudflare/D1/Supabase/Razorpay/Turnstile configuration.
 
 
 ## L1 measurement PR candidate — 2026-11-22
@@ -18,19 +18,26 @@ Branch: `saas/l1-consent-rum-events` (not merged).
 - RUM values, GA4 event receipt, health alert delivery and live behavior remain unverified until the PR passes CI, merges under the applicable tier policy, and post-merge L1-L3 verification completes.
 
 
-## L1 production RUM smoke candidate — 2026-11-22
+## L1 measurement — merged; production verification
 
-Branch: `saas/l1-production-rum-smoke` (not merged).
+- PR #144 merged; production live verification passed on SHA `bc33ed7c5d8b98f3344e621392002bd89793aab2`.
+- Seven-route mobile Lighthouse artifact: run 45049859677; three runs per route.
+- PR #146 merged the consent/RUM browser smoke. Its first production run exposed the missing `https://unpkg.com` CSP source.
+- PR #147 merged the exact `script-src` correction; production RUM smoke on the new deployed SHA is pending.
+- GA4 DebugView receipt still requires owner confirmation.
 
-- Production deployment for L1 merge `bc33ed7c5d8b98f3344e621392002bd89793aab2` passed exact-SHA live verification.
-- Seven-route mobile Lighthouse artifact is recorded in Actions run 45048289283.
-- The production browser smoke is being extended to verify that rejecting consent keeps GA4 and web-vitals unloaded, accepting consent loads both, and emitted Web Vitals contain only metric name/value/rating.
-- This browser verification candidate awaits CI and merge; GA4 DebugView receipt and live user RUM remain unverified until the owner confirms the GA4 property.
-## L1 RUM CSP correction — 2026-11-22
+## L2 backend hardening PR candidate — 2026-11-22
 
-- PR #146 merged the production consent/RUM smoke workflow.
-- First production run 45049859678 failed because the site's CSP omitted `https://unpkg.com`, blocking the consent-gated web-vitals library.
-- Branch `saas/l1-rum-csp` adds the narrowly scoped script-src host and a Canonical CI regression assertion. No analytics payload or financial-input handling is changed.
+Branch: `saas/l2-backend-hardening`; draft PR #145 (not merged).
+
+- D1 migration/restore plan committed before any migration change. This branch adds no D1 migration and does not modify the existing migration ledger.
+- Worker write endpoints for scenarios, checkout and cancellation are rate-limited (dedicated write limiter) and require server-verified Cloudflare Turnstile tokens; signed Razorpay webhook delivery is rate-limited separately and uses HMAC verification.
+- Worker CORS uses an explicit production origin allowlist; browser API destinations are constrained to same-origin paths and the HTTPS Supabase project origin.
+- Supabase-backed Worker access requires a verified email address.
+- Razorpay webhook processing uses a conditional atomic claim, retryable unlinked events, and refund-driven entitlement revocation. Refund is terminal even if its webhook arrives after a newer lifecycle event.
+- Browser account and cloud-save requests obtain one-time Turnstile tokens. Supabase CAPTCHA must be enabled by the owner before signup/login can pass.
+- Security and lifecycle audits are wired into Unit Tests. Current CI and CodeQL reruns are pending after URL allowlist audit corrections.
+- No live credentials, D1 database, Razorpay TEST flow, or Cloudflare secrets are present; production SaaS readiness remains blocked.
 
 ## Mission
 
