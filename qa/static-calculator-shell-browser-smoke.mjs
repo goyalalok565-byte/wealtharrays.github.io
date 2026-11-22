@@ -16,9 +16,12 @@ try {
     if (inputs !== calc.fields.length) throw new Error(`${calc.slug}: expected ${calc.fields.length} fields, found ${inputs}`);
     const chartHeight = await shell.locator('[data-wa-chart-placeholder]').evaluate(node => node.getBoundingClientRect().height);
     if (chartHeight < 220) throw new Error(`${calc.slug}: chart placeholder height ${chartHeight}px is below 220px`);
-    const hostHeight = await host.evaluate(node => node.getBoundingClientRect().height);
-    if (hostHeight < 520) throw new Error(`${calc.slug}: host height ${hostHeight}px is below 520px`);
-    if (['sip', 'swp', 'fire', 'rent-vs-buy'].includes(calc.id) && hostHeight > 1100) throw new Error(`${calc.slug}: no-JavaScript fallback host height ${hostHeight}px exceeds 1100px`);
+    const hostMetrics = await host.evaluate(node => ({
+      height: node.getBoundingClientRect().height,
+      minHeight: getComputedStyle(node).minHeight
+    }));
+    if (hostMetrics.height < 520) throw new Error(`${calc.slug}: host height ${hostMetrics.height}px is below 520px`);
+    if (['sip', 'swp', 'fire', 'rent-vs-buy'].includes(calc.id) && hostMetrics.minHeight !== '520px') throw new Error(`${calc.slug}: no-JavaScript fallback retained artificial min-height ${hostMetrics.minHeight}`);
   }
   console.log(`Static calculator shell browser smoke PASS: ${CALCULATORS.length} routes rendered with JavaScript disabled.`);
 } finally { await browser.close(); }
