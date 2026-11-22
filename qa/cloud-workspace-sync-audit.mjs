@@ -15,6 +15,10 @@ assert.match(core,/challenges\.cloudflare\.com\/turnstile\/v0\/api\.js/);
 const accountJs=fs.readFileSync("account.js","utf8");
 assert.match(accountJs,/captcha_token:await window\.WATurnstile\.getToken\(\)/);
 assert.match(accountJs,/cf-turnstile-response/);
+assert.match(accountJs,/target\.origin!==window\.location\.origin/);
+assert.match(accountJs,/authBase\.hostname\.endsWith\("\.supabase\.co"\)/);
+assert.match(helper,/fetch\("\/v1\/scenarios"/);
+assert.doesNotMatch(helper,/fetch\(path/);
 for(const [html,js,save,load,kind] of [
  ["scenario-lab.html","scenario-lab.js","sl-cloud-save","sl-cloud-load","scenario-lab"],
  ["goal-planner.html","goal-planner.js","gp-cloud-save","gp-cloud-load","goal-planner"],
