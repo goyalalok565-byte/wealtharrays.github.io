@@ -1,0 +1,50 @@
+name: CodeQL (JavaScript)
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codeql-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: codeql-javascript-report
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066
+        with:
+          languages: javascript
+          queries: security-extended
+          config: |
+            paths-ignore:
+              - '**/*.min.js'
+              - '**/wa-site-runtime.js'
+              - '**/wa-home-runtime.js'
+              - '**/wa-calculator-runtime.js'
+              - '**/wa-calculator-runtime.js'
+              - '**/widget.js'
+              - '**/widget-bootstrap.js'
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066
+        with:
+          category: '/language:javascript'
