@@ -109,6 +109,14 @@ for(const file of htmlFiles){
     } else {
       s = s.replace(/(<div\b(?=[^>]*\bid=["']calc-widget["'])[^>]*>)(\s*)<\/div>/i, `$1${shell}</div>`);
     }
+    // Reserve measured mobile calculator host height before the runtime replaces the static shell.
+    // Values come from the 360px / 4x CPU Lighthouse layout-shift culprit measurements.
+    const mobileReserveHeights = { sip: 2100, swp: 2370, fire: 2540, 'rent-vs-buy': 3080 };
+    const mobileReserveHeight = mobileReserveHeights[calc.id];
+    if (mobileReserveHeight) {
+      const reserveStyle = `<style id="wa-calculator-mobile-cls-reserve">@media (max-width: 760px) { html[data-wa-calculator="${calc.id}"] #calc-widget.calc-widget { min-height: ${mobileReserveHeight}px; } }</style>`;
+      if (!s.includes('id="wa-calculator-mobile-cls-reserve"')) s = s.replace('</head>', `${reserveStyle}</head>`);
+    }
   }
   // Reuse the preloaded root stylesheet URL on nested article routes; otherwise the
   // same 94 KB stylesheet is downloaded twice under versioned and unversioned URLs.
