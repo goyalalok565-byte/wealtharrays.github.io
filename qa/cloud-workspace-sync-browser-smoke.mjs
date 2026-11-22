@@ -39,7 +39,7 @@ try{
     await page.route('**/v1/security-config',route=>route.fulfill({
       status:200,contentType:'application/json',body:JSON.stringify({configured:true,site_key:'browser-test-site-key'})
     }));
-    await page.route('https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit',route=>route.fulfill({
+    await page.route('**/turnstile/v0/api.js*',route=>route.fulfill({
       status:200,contentType:'application/javascript',
       body:`window.turnstile={render:function(container,options){window.__waTurnstileOptions=options;return 'browser-test-widget';},reset:function(){},execute:function(){Promise.resolve().then(function(){window.__waTurnstileOptions.callback('browser-test-turnstile-token');});}};`
     }));
