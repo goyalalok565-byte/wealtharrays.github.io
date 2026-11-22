@@ -24,7 +24,7 @@ jobs:
         run: node qa/health-monitor.mjs
       - name: Open or refresh a deduplicated operational alert
         if: failure()
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         with:
           script: |
             const title = '[ALERT] Production API health check failed';
@@ -40,7 +40,7 @@ jobs:
             }
       - name: Close operational alert after a successful health check
         if: success()
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         with:
           script: |
             const { owner, repo } = context.repo;
