@@ -1,0 +1,45 @@
+name: Calculator Browser Smoke
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: calculator-browser-smoke-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  calculator-browser-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Build static calculator pages
+        run: npm run build
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save --no-package-lock playwright@1.65.1
+          npx playwright install chromium --with-deps
+      - name: Start built-site preview
+        run: |
+          nohup node qa/performance-preview-server.mjs --root dist --port 4173 >/tmp/wa-calculator-preview.log 2>&1 &
+          echo $! >/tmp/wa-calculator-preview.pid
+          for attempt in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/sip-calculator/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/wa-calculator-preview.log
+          exit 1
+      - name: Test every calculator and zero-denominator display
+        env:
+          BASE_URL: http://127.0.0.1:4173
+        run: node qa/all-calculators-browser-smoke.mjs
