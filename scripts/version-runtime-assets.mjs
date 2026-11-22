@@ -11,7 +11,7 @@ const calculatorVersion=hash('wa-calculator-runtime.js')+'-'+RUNTIME_CACHE_EPOCH
 const staticCacheableAssets=[
   'styles.css','phase3-seo.css','phase4-premium.css','cls-fixes.css',
   'homepage-refresh.css','theme-init.js','homepage-business.js',
-  'homepage-search.js','consent-loader.js','wa-ad-loader.js'
+  'homepage-search.js','consent-loader.js'
 ];
 const staticVersions=new Map(staticCacheableAssets.map(file=>[file,hash(file)]));
 const htmlFiles=[];

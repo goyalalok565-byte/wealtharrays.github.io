@@ -81,7 +81,7 @@ const staticHeaderText = fs.readFileSync(path.join(process.cwd(), '_headers'), '
 const staticCacheableAssets = [
   'styles.css','phase3-seo.css','phase4-premium.css','cls-fixes.css',
   'homepage-refresh.css','theme-init.js','homepage-business.js',
-  'homepage-search.js','consent-loader.js','wa-ad-loader.js'
+  'homepage-search.js','consent-loader.js'
 ];
 const htmlFiles = [];
 function collectHtml(dir) {
