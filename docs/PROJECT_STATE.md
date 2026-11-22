@@ -4,29 +4,40 @@ Last updated: 2026-11-22
 Repository: `goyalalok565-byte/wealtharrays.github.io`
 Default branch: `main`
 Current phase: Phase 0 engineering gates passed on production main SHA `b1610d10e5fe7d389140b20efdce6f63b6ef72e8`.
-Status: Phase 0 engineering gates are deployed on production main SHA `619bacb6b2ac2c77804061f78e61bf61757f9c40`. L1 measurement PR #144 is merged and exact-SHA production verification passed; seven-route mobile Lighthouse artifact is recorded. PR #146 adds production consent/RUM browser coverage and is merged; its post-merge production run is pending. L2 backend security/billing hardening remains in draft PR #145 and requires owner-managed service configuration plus TEST-mode end-to-end verification. Commercial launch remains blocked on credentials, legal/CA review and the owner's written go-live approval.
+Status: Main SHA `c1d860216bc678a20f70fc2cdaa07e024d1f83bf` contains the L1 measurement and CSP fixes. Exact-SHA production verification on prior main SHA `619bacb6b2ac2c77804061f78e61bf61757f9c40` passed; the RUM browser smoke exposed and PR #147 fixed the missing unpkg CSP origin. The post-PR #147 production RUM smoke is pending. L2 backend security/billing hardening remains in draft PR #145; production Worker deployment is blocked by missing owner-managed Cloudflare/D1/Supabase/Razorpay/Turnstile configuration.
 
 
-## L1 measurement — merged and production verified
+## L1 measurement PR candidate — 2026-11-22
 
-- PR #144 merged; production SHA: `bc33ed7c5d8b98f3344e621392002bd89793aab2`.
-- Production live verification and homepage search browser smoke passed on that SHA.
-- Seven-route mobile Lighthouse passed with three measurements per route; artifact is Actions run 45048289283.
-- PR #146 merged to add explicit consent reject/accept browser verification for GA4 and Core Web Vitals. Production execution is pending its next exact-SHA post-stabilization run; GA4 DebugView receipt still requires owner confirmation.
+Branch: `saas/l1-consent-rum-events` (not merged).
+
+- Canonical funnel event names now map existing product interactions to `calculator_completed`, `scenario_saved`, `signup`, and `upgrade_clicked`; only allow-listed categorical metadata is sent.
+- Consent-gated Core Web Vitals collection uses GoogleChrome/web-vitals 6.2.3 for CLS, INP and LCP. The current implementation uses the upstream unpkg IIFE CDN and must pass browser network/privacy verification before production reliance.
+- The analytics audit is added to Canonical CI and explicitly rejects financial inputs and personal/account data from the analytics allow-list.
+- The 15-minute API health workflow is being extended with one deduplicated operational alert issue that closes on recovery.
+- RUM values, GA4 event receipt, health alert delivery and live behavior remain unverified until the PR passes CI, merges under the applicable tier policy, and post-merge L1-L3 verification completes.
+
+
+## L1 measurement — merged; production verification
+
+- PR #144 merged; production live verification passed on SHA `bc33ed7c5d8b98f3344e621392002bd89793aab2`.
+- Seven-route mobile Lighthouse artifact: run 45049859677; three runs per route.
+- PR #146 merged the consent/RUM browser smoke. Its first production run exposed the missing `https://unpkg.com` CSP source.
+- PR #147 merged the exact `script-src` correction; production RUM smoke on the new deployed SHA is pending.
+- GA4 DebugView receipt still requires owner confirmation.
 
 ## L2 backend hardening PR candidate — 2026-11-22
 
 Branch: `saas/l2-backend-hardening`; draft PR #145 (not merged).
 
 - D1 migration/restore plan committed before any migration change. This branch adds no D1 migration and does not modify the existing migration ledger.
-- `docs/saas/LAUNCH-READINESS-TRACKER.md` records Beta/Commercial gates, owner-only setup steps and lead times, L3 product acceptance, L4 content batches, L5 legal review and L6 beta operations.
-- Worker write endpoints for scenarios, checkout and cancellation are rate-limited (dedicated write limiter) and require server-verified Cloudflare Turnstile tokens; the signed Razorpay webhook is rate-limited separately and remains outside the browser challenge flow.
-- Worker CORS uses an explicit production origin allowlist.
+- Worker write endpoints for scenarios, checkout and cancellation are rate-limited (dedicated write limiter) and require server-verified Cloudflare Turnstile tokens; signed Razorpay webhook delivery is rate-limited separately and uses HMAC verification.
+- Worker CORS uses an explicit production origin allowlist; browser API destinations are constrained to same-origin paths and the HTTPS Supabase project origin.
 - Supabase-backed Worker access requires a verified email address.
 - Razorpay webhook processing uses a conditional atomic claim, retryable unlinked events, and refund-driven entitlement revocation. Refund is terminal even if its webhook arrives after a newer lifecycle event.
 - Browser account and cloud-save requests obtain one-time Turnstile tokens. Supabase CAPTCHA must be enabled by the owner before signup/login can pass.
-- Security and lifecycle audits are wired into Unit Tests. Latest branch CI is being rerun after removing dynamic test-module evaluation; final checks remain pending.
-- No live credentials, D1 database, Razorpay TEST flow, or Cloudflare secrets are present in this branch; production SaaS readiness remains blocked.
+- Security and lifecycle audits are wired into Unit Tests. Current CI and CodeQL reruns are pending after URL allowlist audit corrections.
+- No live credentials, D1 database, Razorpay TEST flow, or Cloudflare secrets are present; production SaaS readiness remains blocked.
 
 ## Mission
 
