@@ -17,6 +17,15 @@ Branch: `saas/l1-consent-rum-events` (not merged).
 - The 15-minute API health workflow is being extended with one deduplicated operational alert issue that closes on recovery.
 - RUM values, GA4 event receipt, health alert delivery and live behavior remain unverified until the PR passes CI, merges under the applicable tier policy, and post-merge L1-L3 verification completes.
 
+
+## L1 production RUM smoke candidate — 2026-11-22
+
+Branch: `saas/l1-production-rum-smoke` (not merged).
+
+- Production deployment for L1 merge `bc33ed7c5d8b98f3344e621392002bd89793aab2` passed exact-SHA live verification.
+- Seven-route mobile Lighthouse artifact is recorded in Actions run 45048289283.
+- The production browser smoke is being extended to verify that rejecting consent keeps GA4 and web-vitals unloaded, accepting consent loads both, and emitted Web Vitals contain only metric name/value/rating.
+- This browser verification candidate awaits CI and merge; GA4 DebugView receipt and live user RUM remain unverified until the owner confirms the GA4 property.
 ## Mission
 
 Build Wealth Arrays into a trusted global financial intelligence and calculator SaaS platform around five pillars:

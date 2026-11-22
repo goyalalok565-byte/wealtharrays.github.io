@@ -178,6 +178,11 @@ jobs:
           BASE_URL: https://wealtharrays.com
         run: node qa/home-search-smoke.mjs
 
+      - name: Production consent and Core Web Vitals RUM smoke
+        env:
+          BASE_URL: https://wealtharrays.com
+        run: node qa/third-party-loading-browser-smoke.mjs
+
       - name: Production visual and calculator smoke
         env:
           BASE_URL: https://wealtharrays.com
