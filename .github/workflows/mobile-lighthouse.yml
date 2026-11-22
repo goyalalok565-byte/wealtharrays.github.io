@@ -114,13 +114,13 @@ jobs:
           retention-days: 14
 
   main-homepage-baseline:
-    if: ${{ (github.event_name == 'pull_request' && (github.head_ref == 'release/phase0-clean' || startsWith(github.head_ref, 'phase0/pr-c'))) || (github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/release/phase0-clean' || startsWith(github.ref, 'refs/heads/phase0/pr-c'))) }}
+    if: ${{ (github.event_name == 'pull_request' && (startsWith(github.head_ref, 'release/phase0-clean') || startsWith(github.head_ref, 'phase0/pr-c'))) || (github.event_name == 'workflow_dispatch' && (startsWith(github.ref, 'refs/heads/release/phase0-clean') || startsWith(github.ref, 'refs/heads/phase0/pr-c'))) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || 'main' }}
           path: main
       - uses: actions/checkout@v4
         with:
