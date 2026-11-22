@@ -21,7 +21,7 @@ assert.match(core,/Number\.isFinite\(value\)/);
 const visual=fs.readFileSync("site-runtime.js","utf8");
 assert.match(core,/if\(saved==='granted'\)[\s\S]*?window\.waLoadAnalytics\(\)/,"GA4 must load only when previously granted");
 assert.match(core,/if\(granted\)[\s\S]*?window\.waLoadAnalytics\(\)/,"GA4 must load after explicit acceptance");
-assert.match(visual,/if\(!document\.querySelector\('ins\.adsbygoogle,\[data-ad-slot\],\.wa-ad-slot'\)\) return;/,"AdSense must load only when a page has an explicit ad slot");
+assert.match(visual,/if\(!document\.querySelector\('ins\.adsbygoogle,\[data-ad-slot\],\.wa-ad-slot'\)\)return;/,"AdSense must load only when a page has an explicit ad slot");
 assert.match(visual,/if\(!document\.querySelector\('\.calc-page'\)/,'visual runtime must be scoped away from hub pages');
 const accountHtml=fs.readFileSync("account.html","utf8");
 assert.match(accountHtml,/Free includes 3/);
