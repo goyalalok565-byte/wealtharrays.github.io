@@ -1,5 +1,7 @@
 # Wealth Arrays SaaS activation checklist
 
+See the [launch-readiness tracker](docs/saas/LAUNCH-READINESS-TRACKER.md) for beta/commercial gates, owner lead times, product acceptance criteria and L3–L6 work.
+
 The repository now contains the application code for browser-first scenarios, an optional account sync flow, versioned calculation endpoints, indicative FX rates, an Indian tax estimate endpoint, and Razorpay subscription checkout/webhook handlers. The account, cloud database and billing features remain intentionally fail-closed until the external services are configured.
 
 ## 1. Cloudflare Worker API + D1
