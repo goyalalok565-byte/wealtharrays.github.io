@@ -100,7 +100,26 @@ for (const asset of staticCacheableAssets) {
     continue;
   }
   const expectedHash = crypto.createHash('sha256').update(fs.readFileSync(assetPath)).digest('hex').slice(0,12);
-  const escaped = asset.replace(/[.*+?^${}()|[\]\\]/g, '\\if (failures.length) {');
+  const escaped = asset.replace(/\./g, '\\.');
+  const assetPattern = new RegExp('/' + escaped + '\\?v=([^"\']+)', 'g');
+  let references = 0;
+  for (const htmlFile of htmlFiles) {
+    const html = fs.readFileSync(htmlFile, 'utf8');
+    for (const match of html.matchAll(assetPattern)) {
+      references++;
+      if (match[1] !== expectedHash) failures.push(htmlFile + ': ' + asset + ' cache version does not match its content hash.');
+    }
+  }
+  if (!references) failures.push('No versioned HTML references found for cacheable asset: ' + asset);
+  const start = staticHeaderText.indexOf('/' + asset + '\n');
+  const end = start >= 0 ? staticHeaderText.indexOf('\n/', start + 1) : -1;
+  const block = start >= 0 ? staticHeaderText.slice(start, end >= 0 ? end : undefined) : '';
+  if (!block.includes('! Cache-Control') || !block.includes('max-age=31536000') || !block.includes('immutable')) {
+    failures.push('_headers: ' + asset + ' must use one-year immutable caching with a content-hashed URL.');
+  }
+}
+
+if (failures.length) {');
   const assetPattern = new RegExp('/' + escaped + '\\?v=([^"\\']+)', 'g');
   let references = 0;
   for (const htmlFile of htmlFiles) {
