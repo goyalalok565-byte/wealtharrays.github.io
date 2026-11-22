@@ -14,7 +14,7 @@ Status: required preflight plan; no new production migration is authorized by th
 1. Freeze billing and scenario writes for the maintenance window; keep checkout disabled.
 2. Record the exact Worker production SHA, Cloudflare account/database identifiers, current deployed Worker version, and secret *names only* in the private release record.
 3. Run `npx wrangler d1 info wealtharrays-saas` and `npx wrangler d1 migrations list wealtharrays-saas --remote`; save the output privately.
-4. Capture a Time Travel restore point with `npx wrangler d1 time-travel info wealtharrays-saas --json`; securely record the current bookmark and timestamp.
+4. Capture a Time Travel restore point with `npx wrangler d1 time-travel info wealtharrays-saas`; securely record the current bookmark and timestamp.
 5. Export the full schema and data with `npx wrangler d1 export wealtharrays-saas --remote --output=./pre-migration.sql`. Store the dump in encrypted, access-controlled backup storage, never in this public repository or a public Actions artifact.
 6. Restore the export into a separate staging D1 database and verify row counts, foreign keys, indexes, and all current migration names before testing any new migration.
 
