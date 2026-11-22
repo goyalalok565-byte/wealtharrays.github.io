@@ -4,7 +4,18 @@ Last updated: 2026-11-22
 Repository: `goyalalok565-byte/wealtharrays.github.io`
 Default branch: `main`
 Current phase: Phase 0 engineering gates passed on production main SHA `b1610d10e5fe7d389140b20efdce6f63b6ef72e8`.
-Status: The zero-denominator ROI/profit-margin correction is merged and deployed. L2 backend hardening is in branch `saas/l2-backend-hardening`; it is not deployed, and no D1 migration has been added or applied. Current-main unit, security, canonical, platform, Worker/Pages deployment, 55-calculator browser smoke, production smoke, deployment hygiene, and strict seven-route mobile Lighthouse gates passed. Phase 1 remains blocked on owner-managed SaaS credentials/configuration and CA/legal review; global leadership, revenue, and search acquisition are not established.
+Status: The zero-denominator ROI/profit-margin correction is merged and deployed. L1 measurement improvements are in branch `saas/l1-consent-rum-events` and await CI/review; they are not deployed or counted as production measurements. Current-main unit, security, canonical, platform, Worker/Pages deployment, 55-calculator browser smoke, production smoke, deployment hygiene, and strict seven-route mobile Lighthouse gates passed. Phase 1 remains blocked on owner-managed SaaS credentials/configuration and CA/legal review; global leadership, revenue, and search acquisition are not established.
+
+
+## L1 measurement PR candidate — 2026-11-22
+
+Branch: `saas/l1-consent-rum-events` (not merged).
+
+- Canonical funnel event names now map existing product interactions to `calculator_completed`, `scenario_saved`, `signup`, and `upgrade_clicked`; only allow-listed categorical metadata is sent.
+- Consent-gated Core Web Vitals collection uses GoogleChrome/web-vitals 6.2.3 for CLS, INP and LCP. The current implementation uses the upstream unpkg IIFE CDN and must pass browser network/privacy verification before production reliance.
+- The analytics audit is added to Canonical CI and explicitly rejects financial inputs and personal/account data from the analytics allow-list.
+- The 15-minute API health workflow is being extended with one deduplicated operational alert issue that closes on recovery.
+- RUM values, GA4 event receipt, health alert delivery and live behavior remain unverified until the PR passes CI, merges under the applicable tier policy, and post-merge L1-L3 verification completes.
 
 
 ## L2 backend hardening PR candidate — 2026-11-22
@@ -12,8 +23,8 @@ Status: The zero-denominator ROI/profit-margin correction is merged and deployed
 Branch: `saas/l2-backend-hardening` (not merged).
 
 - D1 migration/restore plan committed before any migration change. This branch adds no D1 migration and does not modify the existing migration ledger.
-- Worker write endpoints for scenarios, checkout and cancellation are rate-limited and require server-verified Cloudflare Turnstile tokens; the signed Razorpay webhook remains outside the browser challenge flow.
-- Worker CORS now uses an explicit production origin allowlist.
+- Worker write endpoints for scenarios, checkout and cancellation are rate-limited (dedicated write limiter) and require server-verified Cloudflare Turnstile tokens; the signed Razorpay webhook is rate-limited separately and remains outside the browser challenge flow.
+- Worker CORS uses an explicit production origin allowlist.
 - Supabase-backed Worker access requires a verified email address.
 - Razorpay webhook processing uses a conditional atomic claim, retryable unlinked events, and refund-driven entitlement revocation. Later lifecycle events cannot reactivate a refunded subscription.
 - Browser account and cloud-save requests obtain one-time Turnstile tokens. Supabase CAPTCHA must be enabled by the owner before signup/login can pass.
