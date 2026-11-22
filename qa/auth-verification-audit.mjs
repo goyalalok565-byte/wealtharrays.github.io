@@ -14,13 +14,13 @@ try {
   globalThis.fetch = async () => new Response(JSON.stringify({
     id: "unverified-user", email: "unverified@example.test", email_confirmed_at: null, confirmed_at: null
   }), { status: 200, headers: { "Content-Type": "application/json" } });
-  const unverified = await authModule.authenticate(new Request("https://example.test/v1/scenarios", {
+  const unverified = await authenticate(new Request("https://example.test/v1/scenarios", {
     headers: { Authorization: "Bearer test-access-token" }
   }), { SUPABASE_URL: "https://auth.example.test", SUPABASE_ANON_KEY: "public-test-key" });
   assert.equal(unverified.response.status, 403);
   assert.equal((await unverified.response.json()).error.code, "EMAIL_VERIFICATION_REQUIRED");
 
-  const missingToken = await authModule.authenticate(new Request("https://example.test/v1/scenarios"), {
+  const missingToken = await authenticate(new Request("https://example.test/v1/scenarios"), {
     SUPABASE_URL: "https://auth.example.test", SUPABASE_ANON_KEY: "public-test-key"
   });
   assert.equal(missingToken.response.status, 401);
