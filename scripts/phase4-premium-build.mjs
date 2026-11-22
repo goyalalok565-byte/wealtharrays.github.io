@@ -132,7 +132,7 @@ for(const file of htmlFiles){
       @media (max-width: 390px) { .calc-page { padding-left: 10px; padding-right: 10px; } }
       .wa-calculator-mounting #calc-widget [data-wa-static-shell="true"] { visibility: hidden; }
       ${reserveRule}
-    </style>`;
+    </style>`.replace(/^\\s+|\\s+$/gm, '');
     const noJsReserveReset = `<noscript><style id="wa-calculator-nojs-reserve-reset">#calc-widget.calc-widget { min-height: 520px !important; }</style></noscript>`;
     if (!s.includes('id="wa-calculator-critical-layout"')) s = s.replace('</head>', `${criticalLayoutStyle}${noJsReserveReset}</head>`);
   }
