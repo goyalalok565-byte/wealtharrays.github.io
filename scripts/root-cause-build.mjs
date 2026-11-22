@@ -326,7 +326,7 @@ if(isArticle){
     html=html.replace('</body>','<footer class="site-footer premium-footer"><div class="site-footer-inner"><nav class="footer-nav-box" aria-label="Company and legal pages"><a class="footer-link" href="/privacy">Privacy Policy</a><a class="footer-link" href="/terms">Terms &amp; Conditions</a><a class="footer-link" href="/disclaimer">Disclaimer</a><a class="footer-link" href="/about">About Us</a><a class="footer-link" href="/contact">Contact Us</a></nav><div class="footer-bottom"><span>© 2026 Wealth Arrays</span><span>Questions or corrections: <a href="mailto:goyalalok565@gmail.com">goyalalok565@gmail.com</a></span></div></div></footer><!-- WA-UTILITY-LEGAL-FOOTER --></body>');
   }
   const provenanceMeta='<meta name="wa-build-sha" content="'+buildSha+'">';
-  if(/<meta\\s+name=["']wa-build-sha["']/i.test(html))html=html.replace(/<meta\\s+name=["']wa-build-sha["'][^>]*>/i,provenanceMeta);
+  if(/<meta\s+name=["']wa-build-sha["']/i.test(html))html=html.replace(/<meta\s+name=["']wa-build-sha["'][^>]*>/i,provenanceMeta);
   else html=html.replace('</head>',provenanceMeta+'</head>');
   fs.writeFileSync(full,html,'utf8');}
 
