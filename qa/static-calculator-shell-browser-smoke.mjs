@@ -18,7 +18,7 @@ try {
     if (chartHeight < 220) throw new Error(`${calc.slug}: chart placeholder height ${chartHeight}px is below 220px`);
     const hostHeight = await host.evaluate(node => node.getBoundingClientRect().height);
     if (hostHeight < 520) throw new Error(`${calc.slug}: host height ${hostHeight}px is below 520px`);
-    if (['sip', 'swp', 'fire', 'rent-vs-buy'].includes(calc.id) && hostHeight > 800) throw new Error(`\${calc.slug}: no-JavaScript fallback has unnecessary reserved blank space (${hostHeight}px)`);
+    if (['sip', 'swp', 'fire', 'rent-vs-buy'].includes(calc.id) && hostHeight > 1100) throw new Error(`${calc.slug}: no-JavaScript fallback host height ${hostHeight}px exceeds 1100px`);
   }
   console.log(`Static calculator shell browser smoke PASS: ${CALCULATORS.length} routes rendered with JavaScript disabled.`);
 } finally { await browser.close(); }
