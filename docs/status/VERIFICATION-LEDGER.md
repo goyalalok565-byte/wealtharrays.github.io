@@ -38,3 +38,40 @@ Every URL must return HTTP 200, expose `meta[name="wa-build-sha"]` equal to the 
 - Merge-SHA `91ddc7c` has a successful Cloudflare Workers Builds check, but the commit predates the new HTML SHA marker. Therefore the strict L1 provenance match is not available for this merge; the legacy live smoke is not counted as L1/L3 evidence.
 - The post-merge smoke run `44988086345` failed only at the deployment-hygiene redirect classifier (HTTP 302 on the configured `/qa/* -> /404.html` path); canonical runtime provenance and the calculator smoke steps before it passed. No live calculator render failure or 5xx was reported. Classification: automation/classifier failure, no rollback. PR #122 updates the checker to accept only the same-origin explicit noindex not-found page; rerun required before any further main merge.
 - The legacy smoke began production checks after the Workers Build success but before exact merge-SHA HTML provenance was available. Treat it as transitional evidence, not full L1/L3 verification.
+
+
+## Verified post-Phase-0 merges
+
+### PR #124 — performance and live-verification protocol
+- Merge SHA: `77602e4323893dfddea833363193027764decbae`.
+- Pre-merge strict Lighthouse: 7 routes × 3 runs; all release thresholds passed. Exact-base comparison showed improved TBT medians on SIP (95→11 ms), SWP (108→49 ms), FIRE (83→14 ms), and Tools (140→94 ms). These are lab medians, not field data.
+- Unit Tests: 63/63; Canonical, Platform, and Pages deployment passed.
+- L1: Cloudflare Workers Builds succeeded on the exact merge SHA; live homepage provenance matched that SHA before smoke.
+- L3 run `45022256810`: all six required routes returned HTTP 200; all six provenance markers matched; SIP/SWP/FIRE static shell and host checks passed; all six responses used Brotli; cache-control was recorded as `public, max-age=0, must-revalidate`.
+
+### PR #100 — roadmap and calculation references
+- Merge SHA: `1ae0dc04bb26325c3aa29a949cfa27b900019023`.
+- Unit Tests: 63/63; Canonical, Platform, and build checks passed.
+- L1: Cloudflare Workers Builds succeeded on the exact merge SHA; live homepage provenance matched before smoke.
+- L3 run `45022653674`: all six required routes returned HTTP 200; all six provenance markers matched; SIP/SWP/FIRE static shell and host checks passed; all six responses used Brotli; cache-control was `public, max-age=0, must-revalidate`.
+
+PR #100's first post-merge browser smoke run `45022653786` failed at the redirect classifier; this was an automation failure, not a calculator failure. After PR #129 fixed bounded same-origin redirect handling, production smoke run `45023440408` passed, including all 55 calculator routes, 375/768/1280px responsive checks on four money pages, 11 calculation interactions, 17 internal-path blocks, embed and search checks. The earlier post-merge Lighthouse run `45022653690` failed the strict TBT/LCP thresholds and triggered the performance follow-up.
+
+### PR #129 — redirect-chain verification fix
+- Merge SHA: `c9d610db723c26738976f0e1d0e4bdb5d49608da`.
+- Unit Tests: 68/68; Canonical, Platform, build and deploy passed.
+- L1/L3 run `45023440402`: exact merge SHA provenance matched; all six routes returned HTTP 200, Brotli and expected cache-control; calculator static shells passed.
+- Production browser smoke run `45023440408`: PASS after the redirect-chain fix.
+- Main live Lighthouse run `45023440383`: strict gate failed because Tools TBT median was 232 ms and SWP TBT median was 238 ms. Other five routes were within the TBT limit. This prompted PR #131.
+
+### PR #131 — consent loading and accessibility
+- Merge SHA: `570575f0e413858c1d2c6a07d1af0f303f03e8ca`.
+- Unit Tests: 70/70; Canonical and Platform passed.
+- Pre-merge exact-base Lighthouse: 7 routes × 3 runs; all strict thresholds passed. Candidate medians: Performance 98–100, TBT 0–64 ms, LCP 1,393–1,622 ms, Accessibility 100, CLS 0–0.076.
+- L1/L3 run `45024585953`: exact merge SHA provenance matched; all six routes returned HTTP 200; SIP/SWP/FIRE static shell checks passed; Brotli and expected cache-control passed on all six.
+- Post-merge production smoke and Lighthouse runs are pending; do not count them as passed until their final conclusions are available.
+
+### Accepted Lighthouse SEO warning — Cloudflare Content Signals
+- Production Lighthouse reports SEO 92 because Cloudflare's managed `robots.txt` adds the `Content-Signal` directive, which Lighthouse's robots.txt parser does not recognize. Keep the directive; it expresses the site's crawler/content-use policy and must not be removed merely to improve a lab score.
+- Cloudflare's official documentation says Google Search Console may report `Syntax not understood` for Content Signals/newer directives, but reports no impact on crawling rates or SEO: https://developers.cloudflare.com/bots/additional-configurations/managed-robots-txt/.
+
