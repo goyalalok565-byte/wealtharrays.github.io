@@ -8,6 +8,7 @@ const RUNTIME_CACHE_EPOCH='20261026-currency-top25-rank1';
 const siteVersion=hash('wa-site-runtime.js')+'-'+RUNTIME_CACHE_EPOCH;
 const homeVersion=hash('wa-home-runtime.js')+'-'+RUNTIME_CACHE_EPOCH;
 const calculatorVersion=hash('wa-calculator-runtime.js')+'-'+RUNTIME_CACHE_EPOCH;
+// Only directly HTML-linked assets are versioned here; dynamically loaded ad bootstrap keeps its normal cache policy.
 const staticCacheableAssets=[
   'styles.css','phase3-seo.css','phase4-premium.css','cls-fixes.css',
   'homepage-refresh.css','theme-init.js','homepage-business.js',
