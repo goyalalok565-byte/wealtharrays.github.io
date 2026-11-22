@@ -131,6 +131,9 @@ try {
       }
 
       if (calc.id === 'roi') {
+        // The production form requires a positive investment. Lower min only in this edge-case test
+        // so the calculation layer's zero-denominator display can be exercised deliberately.
+        await page.locator('#f-cost').evaluate(el => { el.min = '0'; });
         for (const [id, value] of [['cost', 0], ['finalValue', 1000], ['years', 5]]) await page.locator('#f-' + id).fill(String(value));
         await page.locator('#calc-widget button[id$="-calculate"]').click();
         await page.waitForFunction(() => [...document.querySelectorAll('#calc-widget .calc-result-label')].some(el => el.textContent.includes('not defined: cost is 0')), null, { timeout: 5000 });
