@@ -9,7 +9,7 @@ The deployment has two distinct pieces: Cloudflare Pages serves the static websi
 1. Create a Cloudflare D1 database for Wealth Arrays.
 2. Add these GitHub Actions repository secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, and CLOUDFLARE_D1_DATABASE_ID.
 3. The cloudflare-worker-deploy.yml workflow appends the D1 binding named DB, applies every migration in migrations/ in order, and deploys the Worker when Cloudflare credentials are present.
-4. wrangler.toml declares PUBLIC_API_LIMITER. It limits each client IP to 120 requests per minute per API route for /v1/calculate, /v1/india-tax, and /v1/fx. Cloudflare's Rate Limiting API is approximate and distributed per Cloudflare location; it is an abuse-control layer, not a strict global quota.
+4. wrangler.toml declares PUBLIC_API_LIMITER (120 requests/minute per IP and route) for public calculation/tax/FX endpoints and signed webhook delivery, plus WRITE_API_LIMITER (20 requests/minute per IP and route) for scenario writes, checkout and cancellation. Cloudflare's Rate Limiting API is approximate and distributed per Cloudflare location; it is an abuse-control layer, not a strict global quota.
 5. The static Cloudflare Pages deployment remains separate. Confirm its production branch and build/output settings match the repository's static-site build; the Worker workflow does not deploy the Pages site.
 
 ## 2. Supabase authentication
@@ -30,8 +30,19 @@ Create the monthly and yearly subscription plans in the Razorpay dashboard and a
 - `RAZORPAY_PLAN_MONTHLY`
 - `RAZORPAY_PLAN_YEARLY`
 - `RAZORPAY_WEBHOOK_SECRET`
+- `TURNSTILE_SECRET_KEY`
+- `TURNSTILE_SITE_KEY`
 
-Configure the Razorpay webhook URL as https://wealtharrays.com/v1/billing/webhook and enable subscription.authenticated, subscription.activated, subscription.charged, subscription.pending, subscription.halted, subscription.cancelled, subscription.completed, subscription.paused, subscription.resumed, payment.failed, and payment.refunded. The handler verifies HMAC signatures, uses Razorpay's x-razorpay-event-id for idempotency, rejects stale lifecycle transitions using provider event timestamps, and records safe payment metadata. Payment failures/refunds are recorded but do not independently revoke subscription access; subscription lifecycle events remain authoritative. Use test-mode credentials and test plans before enabling live billing. Prices are intentionally not hardcoded; actual amounts and tax treatment must be set and reviewed in Razorpay.
+Configure the Razorpay webhook URL as https://wealtharrays.com/v1/billing/webhook and enable subscription.authenticated, subscription.activated, subscription.charged, subscription.pending, subscription.halted, subscription.cancelled, subscription.completed, subscription.paused, subscription.resumed, payment.failed, and payment.refunded. The handler verifies HMAC signatures, uses Razorpay's x-razorpay-event-id for idempotency, atomically claims each event to prevent concurrent duplicate processing, rejects stale lifecycle transitions using provider event timestamps, and records safe payment metadata. A linked payment.refunded event immediately sets the subscription to refunded and revokes Pro entitlement; later lifecycle events cannot reactivate that refunded provider subscription. payment.failed is recorded without automatically revoking access. Events arriving before their local subscription row remain retryable. Use test-mode credentials and test plans before enabling live billing. Prices are intentionally not hardcoded; actual amounts and tax treatment must be set and reviewed in Razorpay.
+
+## 3A. Turnstile request verification
+
+1. In Cloudflare Dashboard, open **Turnstile → Add widget**; allow `wealtharrays.com` and `www.wealtharrays.com`.
+2. Save the public site key as GitHub Actions secret `TURNSTILE_SITE_KEY` and the secret key as `TURNSTILE_SECRET_KEY`. Never paste either value into chat or commit them.
+3. In Supabase Dashboard, open **Authentication → Security and Protection → CAPTCHA** (wording may vary), enable CAPTCHA, choose Cloudflare Turnstile, and enter the secret key.
+4. The account page supplies Supabase's `captcha_token` on signup/password sign-in. The Worker independently verifies Turnstile for cloud scenario writes, checkout and cancellation; the Razorpay webhook is excluded and remains protected by signed event verification.
+5. The Worker write routes fail closed with a service-unavailable response until the secret is configured, reject missing/invalid tokens, apply the API rate limiter, and allow browser origins only from the production Wealth Arrays domains.
+6. After deployment, test one valid and one invalid token in TEST mode; verify 429 responses include `Retry-After`, and confirm unapproved origins receive no CORS allow-origin header.
 
 ## 4. API notes
 
@@ -44,7 +55,8 @@ Configure the Razorpay webhook URL as https://wealtharrays.com/v1/billing/webhoo
 - Local scenarios stay in browser storage until the user explicitly clicks **Sync to account**.
 - Shared scenario links contain input values in URL query parameters. Do not put sensitive identifiers or credentials in them.
 - Cloud scenarios require a valid Supabase session and are scoped to that user's ID.
-- Razorpay webhook events are accepted only after HMAC signature verification and are deduplicated by provider event ID. Events arriving before their local subscription row remain retryable.
-- Public calculation, tax and FX endpoints fail closed if the Cloudflare rate-limiter binding is missing.
+- Razorpay webhook events are accepted only after HMAC signature verification, atomically claimed by provider event ID, and deduplicated. Full lifecycle state transitions are ordered by provider event timestamp; a refund revokes Pro and later events cannot reactivate that refunded subscription. Events arriving before their local subscription row remain retryable.
+- Public calculation, tax and FX endpoints fail closed if the Cloudflare rate-limiter binding is missing. Scenario writes, checkout and cancellation are also rate-limited and require Turnstile; the webhook uses signature verification and event idempotency instead.
+- The Worker requires verified Supabase email for account-backed API access. D1 migrations and restore prerequisites are documented in [D1 migration and restore plan](docs/saas/D1-MIGRATION-AND-RESTORE-PLAN.md).
 - Before production billing, test account confirmation, expired sessions, cross-user scenario isolation, webhook retries, out-of-order events, cancellations, refunds and subscription state reconciliation against Razorpay test mode.
 - Backups/retention policy, alerting/abuse monitoring and a full DPDP Act review still need to be completed for production.

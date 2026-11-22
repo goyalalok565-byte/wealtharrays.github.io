@@ -36,11 +36,19 @@ try{
     let stored=null;
     let writes=0;
     await page.unrouteAll({behavior:'wait'});
+    await page.route('**/v1/security-config',route=>route.fulfill({
+      status:200,contentType:'application/json',body:JSON.stringify({configured:true,site_key:'browser-test-site-key'})
+    }));
+    await page.route('**/turnstile/v0/api.js*',route=>route.fulfill({
+      status:200,contentType:'application/javascript',
+      body:`window.turnstile={render:function(container,options){window.__waTurnstileOptions=options;return 'browser-test-widget';},reset:function(){},execute:function(){Promise.resolve().then(function(){window.__waTurnstileOptions.callback('browser-test-turnstile-token');});}};`
+    }));
     await page.route('**/v1/scenarios',async route=>{
       const request=route.request();
       const headers=request.headers();
       assert.equal(headers.authorization,'Bearer cloud-sync-browser-test-token','cloud request must use the signed-in session token');
       if(request.method()==='POST'){
+        assert.equal(headers['cf-turnstile-response'],'browser-test-turnstile-token','cloud writes must carry a verified one-time Turnstile token');
         const body=request.postDataJSON();
         assert.equal(body.calculator_id,item.kind,'cloud save must use the correct workspace id');
         assert.ok(body.inputs&&typeof body.inputs==='object','cloud save must include plan inputs');

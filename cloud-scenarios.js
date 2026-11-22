@@ -35,9 +35,11 @@
   }
   async function request(path,options={}){
     const token=await accessToken();
+    const method=(options.method||"GET").toUpperCase();
+    const turnstileToken=["POST","DELETE","PUT","PATCH"].includes(method)?await window.WATurnstile.getToken():null;
     const response=await fetch(path,{
       ...options,
-      headers:{"Content-Type":"application/json",Authorization:"Bearer "+token,...options.headers}
+      headers:{"Content-Type":"application/json",Authorization:"Bearer "+token,...(turnstileToken?{"cf-turnstile-response":turnstileToken}:{}),...options.headers}
     });
     const data=await response.json().catch(()=>({}));
     if(!response.ok){
