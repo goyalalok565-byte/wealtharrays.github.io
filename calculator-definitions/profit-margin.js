@@ -23,7 +23,7 @@ window.CALCULATORS=window.CALCULATORS||[];window.CALCULATORS.push({
     compute(v) {
       const grossProfit = v.revenue - v.cogs;
       const netProfit = grossProfit - v.expenses;
-      const revenueIsZero = v.revenue === 0;
+      const revenueIsZero = v.revenue !== null && v.revenue !== undefined && String(v.revenue).trim() !== '' && Number(v.revenue) === 0;
       const grossMargin = revenueIsZero ? null : (grossProfit / v.revenue) * 100;
       const netMargin = revenueIsZero ? null : (netProfit / v.revenue) * 100;
       return [

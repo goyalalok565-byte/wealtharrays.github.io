@@ -22,7 +22,7 @@ window.CALCULATORS=window.CALCULATORS||[];window.CALCULATORS.push({
     ],
     compute(v) {
       const gain = v.finalValue - v.cost;
-      const costIsZero = v.cost === 0;
+      const costIsZero = v.cost !== null && v.cost !== undefined && String(v.cost).trim() !== '' && Number(v.cost) === 0;
       const roi = costIsZero ? null : (gain / v.cost) * 100;
       const annualized = costIsZero ? null : (v.cost <= 0 || v.finalValue < 0 || v.years <= 0 ? 0 : (Math.pow(v.finalValue / v.cost, 1 / v.years) - 1) * 100);
       return [
