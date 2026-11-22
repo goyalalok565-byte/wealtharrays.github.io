@@ -1,0 +1,136 @@
+name: Homepage and production browser smoke
+
+on:
+  workflow_run:
+    workflows: ["Wealth Arrays Canonical CI"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+
+      - name: Wait for current canonical build artifacts on main
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 30); do
+            git fetch origin main
+            if git cat-file -e FETCH_HEAD:wa-home-runtime.js 2>/dev/null &&
+               git show FETCH_HEAD:index.html | grep -F '/wa-home-runtime.js?v=' >/dev/null &&
+               git show FETCH_HEAD:tools.html | grep -F '/wa-site-runtime.js?v=' >/dev/null &&
+               git show FETCH_HEAD:sip-calculator/index.html | grep -F '/wa-calculator-runtime.js?v=' >/dev/null; then
+              if node <<'NODE'
+          const {execFileSync}=require('child_process');
+          const crypto=require('crypto');
+          const show=(p)=>execFileSync('git',['show',`FETCH_HEAD:${p}`],{encoding:'utf8'});
+          const hash=(p)=>crypto.createHash('sha256').update(show(p).replace(/\r\n/g,'\n').trimEnd()).digest('hex').slice(0,12);
+          const checks=[['wa-home-runtime.js','home','final-polish.js'],['wa-site-runtime.js','site','wa-core.js'],['wa-calculator-runtime.js','calculator','calculator-page-init.js']];
+          for(const [bundlePath,label,sourcePath] of checks){
+            const marker=`WA CANONICAL MODULE | ${label} | ${sourcePath} | sha256:${hash(sourcePath)}`;
+            if(!show(bundlePath).includes(marker))process.exit(1);
+          }
+          NODE
+              then
+                git checkout --detach FETCH_HEAD
+                echo "Checked out current canonical build commit $(git rev-parse --short HEAD)."
+                exit 0
+              fi
+            fi
+            echo "Waiting for the canonical build bot to refresh runtime bundles from current sources... attempt $i/30"
+            sleep 10
+          done
+          echo "Current source and canonical runtime bundle provenance did not match within five minutes."
+          exit 1
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local site
+        run: |
+          python3 -m http.server 4173 --directory . > /tmp/wealtharrays-http.log 2>&1 &
+          echo $! > /tmp/wealtharrays-http.pid
+          for i in $(seq 1 20); do
+            curl -fsS http://127.0.0.1:4173/index.html >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/wealtharrays-http.log
+          exit 1
+
+      - name: Run homepage search smoke against exact checkout
+        run: node qa/home-search-smoke.mjs
+      - name: Run embed browser smoke against exact checkout
+        run: node qa/embed-browser-smoke.mjs
+
+      - name: Run visual and calculator smoke against exact checkout
+        run: node qa/production-browser-smoke.mjs
+
+      - name: Wait for exact production runtime versions
+        shell: bash
+        run: |
+          set -euo pipefail
+          set -euo pipefail
+          node <<'NODE' > "$RUNNER_TEMP/wa-runtime-markers"
+          const fs=require('fs');
+          const crypto=require('crypto');
+          const hash=(p)=>crypto.createHash('sha256').update(fs.readFileSync(p,'utf8').replace(/\r\n/g,'\n').trimEnd()).digest('hex').slice(0,12);
+          console.log('WA CANONICAL MODULE | home | final-polish.js | sha256:'+hash('final-polish.js'));
+          console.log('WA CANONICAL MODULE | site | wa-core.js | sha256:'+hash('wa-core.js'));
+          console.log('WA CANONICAL MODULE | calculator | calculator-page-init.js | sha256:'+hash('calculator-page-init.js'));
+          NODE
+          mapfile -t expected_markers < "$RUNNER_TEMP/wa-runtime-markers"
+          expected_home_marker="${expected_markers[0]}"
+          expected_site_marker="${expected_markers[1]}"
+          expected_calc_marker="${expected_markers[2]}"
+          ua="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+          for i in $(seq 1 60); do
+            home="$(curl -fsSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" -H "Pragma: no-cache" "https://wealtharrays.com/?__wa_verify=$GITHUB_SHA" 2>/dev/null || true)"
+            tools="$(curl -fsSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" -H "Pragma: no-cache" "https://wealtharrays.com/tools/?__wa_verify=$GITHUB_SHA" 2>/dev/null || true)"
+            calc="$(curl -fsSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" -H "Pragma: no-cache" "https://wealtharrays.com/sip-calculator/?__wa_verify=$GITHUB_SHA" 2>/dev/null || true)"
+            actual_home="$(grep -oE '/wa-home-runtime\.js\?v=[^"]+' <<<"$home" | head -n1 || true)"
+            actual_site="$(grep -oE '/wa-site-runtime\.js\?v=[^"]+' <<<"$tools" | head -n1 || true)"
+            actual_calc="$(grep -oE '/wa-calculator-runtime\.js\?v=[^"]+' <<<"$calc" | head -n1 || true)"
+            if [[ -n "$actual_home" && -n "$actual_site" && -n "$actual_calc" ]]; then
+              home_runtime="$(curl -fsSL --max-time 20 -A "$ua" "https://wealtharrays.com${actual_home}" 2>/dev/null || true)"
+              site_runtime="$(curl -fsSL --max-time 20 -A "$ua" "https://wealtharrays.com${actual_site}" 2>/dev/null || true)"
+              calc_runtime="$(curl -fsSL --max-time 20 -A "$ua" "https://wealtharrays.com${actual_calc}" 2>/dev/null || true)"
+              if grep -Fq "$expected_home_marker" <<<"$home_runtime" && grep -Fq "$expected_site_marker" <<<"$site_runtime" && grep -Fq "$expected_calc_marker" <<<"$calc_runtime"; then
+                echo "Production serves canonical runtime bundles built from the exact checked-out source modules."
+                echo "Observed asset URLs: home=$actual_home site=$actual_site calc=$actual_calc"
+                exit 0
+              fi
+            fi
+            if (( i % 10 == 0 )); then
+              echo "Expected source markers: home=$expected_home_marker | site=$expected_site_marker | calculator=$expected_calc_marker"
+              echo "Observed asset URLs: home=$actual_home site=$actual_site calc=$actual_calc"
+              echo "Runtime bundle provenance did not match yet; waiting for deployment."
+            fi
+            sleep 10
+          done
+          echo "Production did not expose canonical runtime bundles built from the checked-out source within ten minutes."
+          echo "Final observed asset URLs: home=$actual_home site=$actual_site calc=$actual_calc"
+          exit 1
+
+      - name: Verify production embed browser smoke
+        env:
+          BASE_URL: https://wealtharrays.com
+        run: node qa/embed-browser-smoke.mjs
+
+      - name: Verify production homepage search
+        env:
+          BASE_URL: https://wealtharrays.com
+        run: node qa/home-search-smoke.mjs
+
+      - name: Verify production visual and calculator health
+        env:
+          BASE_URL: https://wealtharrays.com
+        run: node qa/production-browser-smoke.mjs
