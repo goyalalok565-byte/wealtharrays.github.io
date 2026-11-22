@@ -2,6 +2,9 @@
 
 Last updated: 2026-11-22
 
+## Current release pointer
+The latest verified production release is PR #138, merge SHA `b1610d10e5fe7d389140b20efdce6f63b6ef72e8`. See the PR #138 entry at the end of this ledger. All earlier release records below are historical.
+
 ## Release protocol (mandatory)
 
 ### L1 — deployment confirmation before live smoke
@@ -31,7 +34,7 @@ Every URL must return HTTP 200, expose `meta[name="wa-build-sha"]` equal to the 
 - Merge docs/test PRs individually, never as a batch. Stop the line after any failed required check.
 - Cloudflare's official Workers Build watch-paths setting supports `path_includes` and `path_excludes`. Configure include `*` and exclude `docs/*` (or narrower approved documentation-only paths) in Workers & Pages → Worker → Settings → Build → Build watch paths. A docs-only push then skips the Worker build. Do not use an unverified `[skip ci]` commit-message convention.
 
-## Current Phase 0 record
+## Historical Phase 0 record — PR #120 (superseded by PR #138)
 - PR #120 merged as `91ddc7ccaf4545b79e874b3dfdb69abec2897af4`.
 - Exact-head strict Lighthouse: 7 routes × 3 runs; all medians passed. Main-vs-PR baseline job was skipped for the `release/phase0-clean-v4` branch, so a same-workflow BEFORE/AFTER comparison is not available for this merge.
 - On the merge SHA, Cloudflare Workers Builds, Canonical, Platform, Unit Tests, Pages build/deploy, and API Worker deploy completed successfully. Unit Tests: 63/63.
@@ -69,7 +72,7 @@ PR #100's first post-merge browser smoke run `45022653786` failed at the redirec
 - Unit Tests: 70/70; Canonical and Platform passed.
 - Pre-merge exact-base Lighthouse: 7 routes × 3 runs; all strict thresholds passed. Candidate medians: Performance 98–100, TBT 0–64 ms, LCP 1,393–1,622 ms, Accessibility 100, CLS 0–0.076.
 - L1/L3 run `45024585953`: exact merge SHA provenance matched; all six routes returned HTTP 200; SIP/SWP/FIRE static shell checks passed; Brotli and expected cache-control passed on all six.
-- Post-merge production smoke and Lighthouse runs are pending; do not count them as passed until their final conclusions are available.
+- At the time of this historical entry, post-merge production smoke and Lighthouse runs were pending. The later PR #138 release has its own complete production evidence below.
 
 ### Accepted Lighthouse SEO warning — Cloudflare Content Signals
 - Production Lighthouse reports SEO 92 because Cloudflare's managed `robots.txt` adds the `Content-Signal` directive, which Lighthouse's robots.txt parser does not recognize. Keep the directive; it expresses the site's crawler/content-use policy and must not be removed merely to improve a lab score.
