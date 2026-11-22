@@ -75,3 +75,15 @@ PR #100's first post-merge browser smoke run `45022653786` failed at the redirec
 - Production Lighthouse reports SEO 92 because Cloudflare's managed `robots.txt` adds the `Content-Signal` directive, which Lighthouse's robots.txt parser does not recognize. Keep the directive; it expresses the site's crawler/content-use policy and must not be removed merely to improve a lab score.
 - Cloudflare's official documentation says Google Search Console may report `Syntax not understood` for Content Signals/newer directives, but reports no impact on crawling rates or SEO: https://developers.cloudflare.com/bots/additional-configurations/managed-robots-txt/.
 
+## PR #138 — zero-denominator financial ratios and production release
+
+- Merge SHA: `b1610d10e5fe7d389140b20efdce6f63b6ef72e8`.
+- PR #138 was replayed onto the then-current main SHA `fc26bc155fe8988965bc664aa43158f2832c5c5e` before merge; its fresh-main checks passed.
+- Pre-merge: 70/70 Unit Tests, 55/55 calculator browser smoke, Canonical CI, Platform Gates, CodeQL and Cloudflare Workers Builds passed. PR Lighthouse was skipped because this was a correctness-only change; production Lighthouse was run after deployment.
+- Zero investment cost now yields undefined ROI and annualized ROI, not 0%. Zero revenue yields undefined gross/net margin, not 0%. UI, charts and PDF exports display an em dash. Blank values remain distinct from numeric zero.
+- L1/L3 production verification run `45042953840`: exact merge-SHA HTML provenance matched; all six required routes returned HTTP 200; SIP/SWP/FIRE static shells passed; all six responses used Brotli and cache-control `public, max-age=0, must-revalidate`.
+- Post-stabilization production browser smoke run `45042953874`: PASS. Homepage search, embeds, all 55 canonical calculator pages, visual/calculation checks, four production money-page responsive/calculation checks, deployment-manifest/internal-path exclusions, production embed, homepage search and production visual/calculator checks passed.
+- Production mobile Lighthouse run `45042953831`: seven routes × three runs; strict medians passed. Performance 97–98, Accessibility 100, Best Practices 100, SEO 92; maximum median CLS 0.076, TBT 1 ms, LCP 2,201 ms.
+- SEO 92 is the accepted Cloudflare-managed Content Signals parser warning above; do not remove the managed directive to chase a lab score.
+- The separate GitHub API Worker deployment workflow run `45042922460` completed its workflow but explicitly reported **Worker deployment NOT performed** because `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_D1_DATABASE_ID` were absent. It also reported Supabase and Razorpay runtime variables missing. Cloudflare's native Workers Builds check and exact live HTML provenance did pass. Do not interpret the static/live-site checks as proof that D1, Supabase Auth or Razorpay billing is ready.
+- `GET /v1/health` and the 15-minute health-monitor workflow exist; the post-release scheduled health-monitor result still needs to be recorded. SaaS readiness remains unverified until the health endpoint reports D1, Supabase, Razorpay and rate-limiter readiness.
