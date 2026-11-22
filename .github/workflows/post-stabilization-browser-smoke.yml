@@ -8,11 +8,14 @@ on:
 
 permissions:
   contents: read
+  checks: read
 
 jobs:
   smoke:
     if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[stabilization-build]')) }}
     runs-on: ubuntu-24.04
+    env:
+      EXPECTED_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
     steps:
       - name: Checkout stabilized main
         uses: actions/checkout@v4
@@ -70,10 +73,28 @@ jobs:
             node qa/all-calculators-browser-smoke.mjs
           fi
 
-      - name: Production four money pages responsive and calculation smoke
+      - name: Wait up to 15 minutes for Workers Builds on the exact merge SHA
         env:
-          BASE_URL: https://wealtharrays.com
-        run: node qa/money-pages-browser-smoke.mjs
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 90); do
+            checks="$(gh api "repos/$GITHUB_REPOSITORY/commits/$EXPECTED_SHA/check-runs")"
+            conclusion="$(jq -r '[.check_runs[] | select(.name == "Workers Builds: wealtharrays-github-io" and .app.slug == "cloudflare-workers-and-pages")][0].conclusion // empty' <<<"$checks")"
+            if [[ "$conclusion" == "success" ]]; then
+              echo "Cloudflare Workers Builds succeeded on $EXPECTED_SHA."
+              exit 0
+            fi
+            if [[ "$conclusion" == "failure" || "$conclusion" == "cancelled" || "$conclusion" == "timed_out" || "$conclusion" == "action_required" ]]; then
+              echo "Workers Builds concluded $conclusion. No live smoke will run."
+              exit 1
+            fi
+            echo "Waiting for Workers Builds on $EXPECTED_SHA (attempt $attempt/90)."
+            sleep 10
+          done
+          echo "Workers Builds did not confirm the exact SHA within 15 minutes. No live smoke was run."
+          exit 1
 
       - name: Wait for exact canonical runtime and widget route to reach production
         shell: bash
@@ -95,13 +116,17 @@ jobs:
           expected_calc_marker="${expected_markers[2]}"
           ua="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
           for i in $(seq 1 60); do
-            home="$(curl -fsSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" -H "Pragma: no-cache" "https://wealtharrays.com/?__wa_verify=$GITHUB_SHA" 2>/dev/null || true)"
-            tools="$(curl -fsSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" -H "Pragma: no-cache" "https://wealtharrays.com/tools/?__wa_verify=$GITHUB_SHA" 2>/dev/null || true)"
-            calc="$(curl -fsSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" -H "Pragma: no-cache" "https://wealtharrays.com/sip-calculator/?__wa_verify=$GITHUB_SHA" 2>/dev/null || true)"
+            home="$(curl -fsSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" -H "Pragma: no-cache" "https://wealtharrays.com/?__wa_verify=$EXPECTED_SHA" 2>/dev/null || true)"
+            tools="$(curl -fsSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" -H "Pragma: no-cache" "https://wealtharrays.com/tools/?__wa_verify=$EXPECTED_SHA" 2>/dev/null || true)"
+            calc="$(curl -fsSL --max-time 20 -A "$ua" -H "Cache-Control: no-cache" -H "Pragma: no-cache" "https://wealtharrays.com/sip-calculator/?__wa_verify=$EXPECTED_SHA" 2>/dev/null || true)"
             actual_home="$(grep -oE '/wa-home-runtime\.js\?v=[^"]+' <<<"$home" | head -n1 || true)"
             actual_site="$(grep -oE '/wa-site-runtime\.js\?v=[^"]+' <<<"$tools" | head -n1 || true)"
             actual_calc="$(grep -oE '/wa-calculator-runtime\.js\?v=[^"]+' <<<"$calc" | head -n1 || true)"
-            if [[ -n "$actual_home" && -n "$actual_site" && -n "$actual_calc" ]]; then
+            expected_build_marker="<meta name=\"wa-build-sha\" content=\"$EXPECTED_SHA\">"
+            if [[ -n "$actual_home" && -n "$actual_site" && -n "$actual_calc" ]] &&
+               grep -Fq "$expected_build_marker" <<<"$home" &&
+               grep -Fq "$expected_build_marker" <<<"$tools" &&
+               grep -Fq "$expected_build_marker" <<<"$calc"; then
               home_runtime="$(curl -fsSL --max-time 20 -A "$ua" "https://wealtharrays.com${actual_home}" 2>/dev/null || true)"
               site_runtime="$(curl -fsSL --max-time 20 -A "$ua" "https://wealtharrays.com${actual_site}" 2>/dev/null || true)"
               calc_runtime="$(curl -fsSL --max-time 20 -A "$ua" "https://wealtharrays.com${actual_calc}" 2>/dev/null || true)"
@@ -131,6 +156,12 @@ jobs:
           echo "Production did not expose canonical runtime bundles built from the checked-out source within ten minutes."
           echo "Final observed asset URLs: home=$actual_home site=$actual_site calc=$actual_calc"
           exit 1
+
+      - name: Production four money pages responsive and calculation smoke
+        env:
+          BASE_URL: https://wealtharrays.com
+        run: node qa/money-pages-browser-smoke.mjs
+
 
       - name: Verify production deployment manifest and internal path exclusions
         env:
