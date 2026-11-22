@@ -662,7 +662,7 @@
           "label": "Net gain",
           "value": 0,
           "format": "currency",
-          "emphasis": "negative"
+          "emphasis": "positive"
         },
         {
           "label": "Total ROI",
