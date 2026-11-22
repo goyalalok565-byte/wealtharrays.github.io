@@ -86,8 +86,10 @@ jobs:
           RAZORPAY_PLAN_MONTHLY: ${{ secrets.RAZORPAY_PLAN_MONTHLY }}
           RAZORPAY_PLAN_YEARLY: ${{ secrets.RAZORPAY_PLAN_YEARLY }}
           RAZORPAY_WEBHOOK_SECRET: ${{ secrets.RAZORPAY_WEBHOOK_SECRET }}
+          TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
+          TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY }}
         run: |
-          for name in SUPABASE_URL SUPABASE_ANON_KEY RAZORPAY_KEY_ID RAZORPAY_KEY_SECRET RAZORPAY_PLAN_MONTHLY RAZORPAY_PLAN_YEARLY RAZORPAY_WEBHOOK_SECRET; do
+          for name in SUPABASE_URL SUPABASE_ANON_KEY RAZORPAY_KEY_ID RAZORPAY_KEY_SECRET RAZORPAY_PLAN_MONTHLY RAZORPAY_PLAN_YEARLY RAZORPAY_WEBHOOK_SECRET TURNSTILE_SECRET_KEY TURNSTILE_SITE_KEY; do
             value="${!name}"
             if [ -n "$value" ]; then
               printf '%s' "$value" | npx wrangler secret put "$name" --name wealtharrays-github-io
@@ -105,6 +107,8 @@ jobs:
           RAZORPAY_PLAN_MONTHLY: ${{ secrets.RAZORPAY_PLAN_MONTHLY }}
           RAZORPAY_PLAN_YEARLY: ${{ secrets.RAZORPAY_PLAN_YEARLY }}
           RAZORPAY_WEBHOOK_SECRET: ${{ secrets.RAZORPAY_WEBHOOK_SECRET }}
+          TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
+          TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY }}
         run: |
           {
             echo "## Wealth Arrays API deployment readiness"
@@ -122,5 +126,7 @@ jobs:
             [ -n "$RAZORPAY_PLAN_MONTHLY" ] || echo "- Missing runtime config: RAZORPAY_PLAN_MONTHLY (monthly plan unavailable)."
             [ -n "$RAZORPAY_PLAN_YEARLY" ] || echo "- Missing runtime config: RAZORPAY_PLAN_YEARLY (yearly plan unavailable)."
             [ -n "$RAZORPAY_WEBHOOK_SECRET" ] || echo "- Missing runtime config: RAZORPAY_WEBHOOK_SECRET (webhook verification unavailable)."
+            [ -n "$TURNSTILE_SECRET_KEY" ] || echo "- Missing runtime config: TURNSTILE_SECRET_KEY (write requests remain blocked)."
+            [ -n "$TURNSTILE_SITE_KEY" ] || echo "- Missing runtime config: TURNSTILE_SITE_KEY (request verification widget unavailable)."
             echo "- This report never prints secret values."
           } >> "$GITHUB_STEP_SUMMARY"
