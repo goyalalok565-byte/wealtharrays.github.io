@@ -185,11 +185,19 @@ try {
           button.click();
           await nextFrame();
           const rows = [...document.querySelectorAll('#calc-widget .calc-result-row')];
-          const values = rows.map(row => row.querySelector('.calc-result-value')?.textContent?.trim() || '');
+          const invalidValues = rows.filter(row => {
+            const label = row.querySelector('.calc-result-label')?.textContent?.trim() || '';
+            const value = row.querySelector('.calc-result-value')?.textContent?.trim() || '';
+            const intentionallyUndefined = value === '—' && /not defined/i.test(label);
+            return !value || /NaN|Infinity|undefined|null/.test(value) || (value === '—' && !intentionallyUndefined);
+          }).map(row => ({
+            label: row.querySelector('.calc-result-label')?.textContent?.trim() || '',
+            value: row.querySelector('.calc-result-value')?.textContent?.trim() || ''
+          }));
           results.push({
             ...check,
             rowCount: rows.length,
-            invalidValues: values.filter(value => !value || /NaN|Infinity|undefined|null|^—$/.test(value))
+            invalidValues
           });
           input.value = previous;
           input.dispatchEvent(new Event('input', { bubbles: true }));
