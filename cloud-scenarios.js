@@ -22,7 +22,7 @@
       if(!session.refresh_token)throw new Error("Your session expired. Sign in again.");
       const config=await getAuthConfig();
       const authBase=new URL(config.url);
-      if(authBase.protocol!=="https:")throw new Error("Account authentication requires HTTPS.");
+      if(authBase.protocol!=="https:"||!authBase.hostname.endsWith(".supabase.co"))throw new Error("Account authentication requires the configured HTTPS Supabase project origin.");
       const refreshUrl=new URL("/auth/v1/token?grant_type=refresh_token",authBase);
       if(refreshUrl.origin!==authBase.origin)throw new Error("Invalid account authentication destination.");
       const response=await fetch(refreshUrl.href,{
