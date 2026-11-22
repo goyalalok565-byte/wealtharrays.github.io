@@ -75,3 +75,26 @@ PR #100's first post-merge browser smoke run `45022653786` failed at the redirec
 - Production Lighthouse reports SEO 92 because Cloudflare's managed `robots.txt` adds the `Content-Signal` directive, which Lighthouse's robots.txt parser does not recognize. Keep the directive; it expresses the site's crawler/content-use policy and must not be removed merely to improve a lab score.
 - Cloudflare's official documentation says Google Search Console may report `Syntax not understood` for Content Signals/newer directives, but reports no impact on crawling rates or SEO: https://developers.cloudflare.com/bots/additional-configurations/managed-robots-txt/.
 
+## PR #138 — ROI / Profit Margin zero-denominator correctness and current production verification
+
+- Merge SHA: `b1610d10e5fe7d389140b20efdce6f63b6ef72e8`; merged 2026-11-22.
+- Calculation behavior: zero investment cost and zero revenue now produce undefined ratios (displayed as an em dash) rather than false 0% ROI / margin. Blank inputs remain distinct from numeric zero. UI, chart, PDF, snapshots, independent references and browser regression coverage updated.
+- Exact merge-SHA checks: Unit Tests **244/244**; CodeQL, Canonical CI, Platform Gates, Cloudflare Worker deploy and Pages build/deploy passed.
+- L1 deployment: Cloudflare Workers Builds succeeded on the exact merge SHA. Production homepage, tools and SIP HTML carried the exact `wa-build-sha` marker; home/site/calculator runtime bundles matched canonical source-module provenance before live smoke.
+- L3 live route verification: production verification workflow passed. Production `/v1/health` returned HTTP success with `status=ok`, correct service identity and API version. This is liveness only; it does not assert `ready_for_saas=true` or prove D1/Supabase/Razorpay activation.
+- Production calculator browser smoke run `45042953874`: **55/55** canonical calculator pages passed. All 55 were tested for valid outputs, click-only calculation, changed-input recalculation, min/max bounds and 375/768/1280px layouts. Homepage, shareable inputs, local save/load, PDF download and 375px overflow checks passed.
+- Four production money pages (SIP, SWP, FIRE, Rent vs Buy) passed 375/768/1280px responsive checks and 11 calculation interactions. Embed copy/flow and homepage calculator search passed.
+- Deployment hygiene: **241/241** manifest files reachable, exact manifest commit deployed, **17/17** internal-path probes blocked. Production embed and homepage search smoke passed.
+- Strict production Lighthouse run `45042953831`: **7 routes × 3 runs = 21 runs**, all median thresholds passed. Performance medians 97–98; Accessibility 100; Best Practices 100; SEO 92. Maximum observed CLS 0.0757403, TBT 6.5 ms, LCP 2,349.991 ms. Route medians:
+  - Homepage: Performance 98, CLS 0, TBT 0 ms, LCP 2,083 ms.
+  - Tools: Performance 97, CLS 0, TBT 0 ms, LCP 2,144 ms.
+  - SIP: Performance 97, CLS 0.0757, TBT 0 ms, LCP 2,092 ms.
+  - SWP: Performance 97, CLS 0.0757, TBT 1 ms, LCP 2,201 ms.
+  - FIRE: Performance 97, CLS 0.0757, TBT 0 ms, LCP 1,929 ms.
+  - Rent vs Buy: Performance 97, CLS 0.0700, TBT 0 ms, LCP 1,951 ms.
+  - Compound Interest guide: Performance 98, CLS 0, TBT 0 ms, LCP 2,091 ms.
+- Environment: 360×800 CSS px, DPR 2, 4× CPU slowdown, simulated slow 4G (150 ms RTT / 1,600 Kbps). Emulation is not a physical device. INP is not available in these lab reports and must be measured from real users.
+- Diagnostics: homepage normal baseline made zero Google Funding Choices requests; no blocked-vs-normal comparison was justified. SWP CPU profile and MutationObserver probe were captured. Do not alter consent/CMP behavior based on an unobserved request.
+- Evidence: [PR #138](https://github.com/goyalalok565-byte/wealtharrays.github.io/pull/138), [production smoke](https://github.com/goyalalok565-byte/wealtharrays.github.io/actions/runs/45042953874), [mobile Lighthouse](https://github.com/goyalalok565-byte/wealtharrays.github.io/actions/runs/45042953831).
+- Remaining owner / external verification: configure and test D1, Supabase Auth, Razorpay test-mode lifecycle and server-side entitlements; obtain CA/legal review of TY 2026-27 tax wording; verify AdSense approval/ad-unit delivery and Paddle India seller/payout eligibility; establish real-user Core Web Vitals, INP, backups, alerts, and DPDP review. Do not infer revenue or SaaS readiness from this release.
+
