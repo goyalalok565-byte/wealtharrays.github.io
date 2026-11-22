@@ -110,14 +110,13 @@ export async function onRequestPost({ request, env }) {
       const revokeSql = [
         "UPDATE subscriptions",
         "SET status = 'refunded', cancel_at_period_end = 0,",
-        "last_provider_event_at = CASE WHEN ? IS NULL THEN last_provider_event_at ELSE ? END,",
+        "last_provider_event_at = CASE WHEN ? IS NULL THEN last_provider_event_at WHEN last_provider_event_at IS NULL OR last_provider_event_at < ? THEN ? ELSE last_provider_event_at END,",
         "updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')",
-        "WHERE provider = 'razorpay' AND provider_subscription_id = ?",
-        "AND ((? IS NOT NULL AND (last_provider_event_at IS NULL OR last_provider_event_at <= ?))",
-        "OR (? IS NULL AND last_provider_event_at IS NULL))"
+        "WHERE provider = 'razorpay' AND provider_subscription_id = ?"
       ].join(" ");
+      // Refund is a terminal entitlement state even when its event arrives after a newer lifecycle event.
       const revoked = await env.DB.prepare(revokeSql)
-        .bind(eventCreatedAt, eventCreatedAt, subscriptionId, eventCreatedAt, eventCreatedAt, eventCreatedAt).run();
+        .bind(eventCreatedAt, eventCreatedAt, eventCreatedAt, subscriptionId).run();
       if (!revoked.meta?.changes && !(await linkedSubscription(env.DB, subscriptionId))) {
         await releaseClaim(env.DB, eventId, claimToken);
         return error("SUBSCRIPTION_NOT_LINKED", "The refund event is valid but its subscription record is not available yet.", 503);
