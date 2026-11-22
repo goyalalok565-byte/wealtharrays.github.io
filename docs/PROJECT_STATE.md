@@ -4,7 +4,21 @@ Last updated: 2026-11-22
 Repository: `goyalalok565-byte/wealtharrays.github.io`
 Default branch: `main`
 Current phase: Phase 0 engineering gates passed on production main SHA `b1610d10e5fe7d389140b20efdce6f63b6ef72e8`.
-Status: The zero-denominator ROI/profit-margin correction is merged and deployed. Current-main unit, security, canonical, platform, Worker/Pages deployment, 55-calculator browser smoke, production smoke, deployment hygiene, and strict seven-route mobile Lighthouse gates passed. Phase 1 remains blocked on owner-managed SaaS credentials/configuration and CA/legal review; global leadership, revenue, and search acquisition are not established.
+Status: The zero-denominator ROI/profit-margin correction is merged and deployed. L2 backend hardening is in branch `saas/l2-backend-hardening`; it is not deployed, and no D1 migration has been added or applied. Current-main unit, security, canonical, platform, Worker/Pages deployment, 55-calculator browser smoke, production smoke, deployment hygiene, and strict seven-route mobile Lighthouse gates passed. Phase 1 remains blocked on owner-managed SaaS credentials/configuration and CA/legal review; global leadership, revenue, and search acquisition are not established.
+
+
+## L2 backend hardening PR candidate — 2026-11-22
+
+Branch: `saas/l2-backend-hardening` (not merged).
+
+- D1 migration/restore plan committed before any migration change. This branch adds no D1 migration and does not modify the existing migration ledger.
+- Worker write endpoints for scenarios, checkout and cancellation are rate-limited and require server-verified Cloudflare Turnstile tokens; the signed Razorpay webhook remains outside the browser challenge flow.
+- Worker CORS now uses an explicit production origin allowlist.
+- Supabase-backed Worker access requires a verified email address.
+- Razorpay webhook processing uses a conditional atomic claim, retryable unlinked events, and refund-driven entitlement revocation. Later lifecycle events cannot reactivate a refunded subscription.
+- Browser account and cloud-save requests obtain one-time Turnstile tokens. Supabase CAPTCHA must be enabled by the owner before signup/login can pass.
+- Security and lifecycle audits are wired into Unit Tests. CI and TEST-mode live behavior remain unverified until this PR's checks and owner configuration complete.
+- No live credentials, D1 database, Razorpay TEST flow, or Cloudflare secrets are present in this branch; production SaaS readiness remains blocked.
 
 ## Mission
 
