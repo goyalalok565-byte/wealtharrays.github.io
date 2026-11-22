@@ -5,7 +5,6 @@ import * as fx from "./functions/v1/fx.js";
 import * as indiaTax from "./functions/v1/india-tax.js";
 import * as authConfig from "./functions/v1/auth-config.js";
 import * as securityConfig from "./functions/v1/security-config.js";
-import * as securityConfig from "./functions/v1/security-config.js";
 import * as scenarios from "./functions/v1/scenarios.js";
 import * as checkout from "./functions/v1/billing/checkout.js";
 import * as billingStatus from "./functions/v1/billing/status.js";
@@ -20,7 +19,6 @@ const ROUTES = new Map([
   ["/v1/fx", fx],
   ["/v1/india-tax", indiaTax],
   ["/v1/auth-config", authConfig],
-  ["/v1/security-config", securityConfig],
   ["/v1/security-config", securityConfig],
   ["/v1/scenarios", scenarios],
   ["/v1/billing/checkout", checkout],
