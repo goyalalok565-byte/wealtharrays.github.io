@@ -26,8 +26,8 @@
         const safe=sanitize(calc,values||{});
         let results=[];
         try{results=original(safe)||[];}catch(_){return[];}
-        if(!Array.isArray(results)||!results.length||results.some(result=>!result||!Number.isFinite(Number(result.value))))return[];
-        return results.map(result=>({...result,value:round(Number(result.value),precision(result.format))}));
+        if(!Array.isArray(results)||!results.length||results.some(result=>!result||!(result.value!==null&&result.value!==undefined&&Number.isFinite(Number(result.value)))&&!(result.value===null&&/\(not defined:/.test(String(result.label)))))return[];
+        return results.map(result=>({...result,value:result.value===null?null:round(Number(result.value),precision(result.format))}));
       };
       wrapped.__waSafe=true;
       calc.compute=wrapped;

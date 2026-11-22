@@ -23,13 +23,14 @@ window.CALCULATORS=window.CALCULATORS||[];window.CALCULATORS.push({
     compute(v) {
       const grossProfit = v.revenue - v.cogs;
       const netProfit = grossProfit - v.expenses;
-      const grossMargin = v.revenue === 0 ? 0 : (grossProfit / v.revenue) * 100;
-      const netMargin = v.revenue === 0 ? 0 : (netProfit / v.revenue) * 100;
+      const revenueIsZero = v.revenue !== null && v.revenue !== undefined && String(v.revenue).trim() !== '' && Number(v.revenue) === 0;
+      const grossMargin = revenueIsZero ? null : (grossProfit / v.revenue) * 100;
+      const netMargin = revenueIsZero ? null : (netProfit / v.revenue) * 100;
       return [
         { label: "Gross profit", value: grossProfit, format: "currency" },
-        { label: "Gross margin", value: grossMargin, format: "percent", emphasis: "neutral" },
+        { label: revenueIsZero ? "Gross margin (not defined: revenue is 0)" : "Gross margin", value: grossMargin, format: "percent", emphasis: "neutral" },
         { label: "Net profit", value: netProfit, format: "currency", emphasis: netProfit >= 0 ? "positive" : "negative" },
-        { label: "Net margin", value: netMargin, format: "percent", emphasis: netProfit >= 0 ? "positive" : "negative" },
+        { label: revenueIsZero ? "Net margin (not defined: revenue is 0)" : "Net margin", value: netMargin, format: "percent", emphasis: revenueIsZero ? "neutral" : netProfit >= 0 ? "positive" : "negative" },
       ];
     },
   });

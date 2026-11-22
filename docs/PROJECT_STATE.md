@@ -165,3 +165,11 @@ CI scope: strict seven-route Lighthouse runs on PR C (performance branch), manua
 - Assessment Year 2026–27 (income in FY 2025–26): Income-tax Act, 1961, Section 87A. This remains the applicable old-Act reference despite return filing after 1 April 2026.
 - Official Income Tax Department sources: AY/FY transition FAQ https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/income-tax-returns ; AY 2026–27 Section 87A rates/rebate https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/file-itr-2-online ; TY 2026–27 estimator manual https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/income-and-tax-estimator-um ; Section 156 Act PDF https://wmstatic-prd.incometaxindia.gov.in/documents/20117/42998/Section-156_2026-04-01_05-11-58_344893_en.pdf/415b0f0e-8826-feaa-b374-481e54d4b98e?t=1775046534568&version=9.0 .
 - `widget.js` and `wa-calculator-runtime.js` are changed together; canonical CI's root-cause build regenerates the runtime from canonical source modules. No tax formula or rebate eligibility model is changed in this PR. CA/legal review remains required before Phase 1.
+
+## Zero-denominator ratio handling — 2026-11-22
+
+- ROI now treats a zero investment-cost denominator as undefined for total and annualized ROI; Profit Margin treats zero revenue as undefined for gross and net margin. The UI, charts, and PDF exports display an em dash rather than a misleading 0%.
+- Blank inputs remain distinct from numeric zero. Regression snapshots and independent reference vectors cover both zero-denominator cases.
+- Browser QA explicitly exercises both cases and restores valid inputs before independent field-boundary checks.
+- Verification evidence from the preceding candidate based on an earlier main SHA: 55/55 calculator browser smoke, 70/70 unit tests, CodeQL, Canonical CI, Platform Gates, Worker build, and the strict seven-route three-run median Lighthouse gate passed. The current-main replay must complete its own fresh CI before merge.
+- Production deployment, live API health, AdSense approval/ad-slot configuration, and Supabase/D1/Razorpay activation remain separate verification/owner-configuration items; do not infer them from preview checks.

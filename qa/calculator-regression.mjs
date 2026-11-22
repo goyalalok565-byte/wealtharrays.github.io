@@ -9,6 +9,8 @@ vm.runInContext(`${source}\n;globalThis.__WA_TEST_CALCULATORS__ = CALCULATORS;`,
 const calculators = context.__WA_TEST_CALCULATORS__;
 
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
+const validResultValue = row => (typeof row?.value === 'number' && Number.isFinite(row.value)) ||
+  (row?.value === null && /\(not defined:/.test(String(row.label)));
 assert(Array.isArray(calculators), 'CALCULATORS must be an array');
 assert(calculators.length === 55, `Expected 55 calculators, found ${calculators.length}`);
 const actualSlugs = calculators.map(c => c.slug);
@@ -70,7 +72,7 @@ for (const calc of calculators) {
   assert(Array.isArray(result) && result.length > 0, `${calc.slug}: no result rows`);
   for (const row of result) {
     assert(row && typeof row.label === 'string', `${calc.slug}: invalid result label`);
-    assert(typeof row.value === 'number' && Number.isFinite(row.value), `${calc.slug}: non-finite valid-input result for ${row.label}; inputs=${JSON.stringify(safeDefaults)}`);
+    assert(validResultValue(row), `${calc.slug}: non-finite valid-input result for ${row.label}; inputs=${JSON.stringify(safeDefaults)}`);
   }
 
   const maxStress = Object.fromEntries(calc.fields.map(f => [
@@ -81,11 +83,11 @@ for (const calc of calculators) {
   ]));
   try { result = calc.compute(maxStress); } catch (error) { throw new Error(`${calc.slug}: maximum-boundary calculation threw: ${error.message}; inputs=${JSON.stringify(maxStress)}`); }
   assert(Array.isArray(result) && result.length > 0, `${calc.slug}: no maximum-boundary result rows; inputs=${JSON.stringify(maxStress)}`);
-  for (const row of result) assert(row && Number.isFinite(Number(row.value)), `${calc.slug}: non-finite maximum-boundary result for ${row?.label}; inputs=${JSON.stringify(maxStress)}`);
+  for (const row of result) assert(validResultValue(row), `${calc.slug}: non-finite maximum-boundary result for ${row?.label}; inputs=${JSON.stringify(maxStress)}`);
 
   const zeroed = Object.fromEntries(calc.fields.map(f => [f.id, typeof f.default === 'number' ? 0 : (f.type === 'select' ? f.default ?? f.options?.[0]?.value ?? '' : 0)]));
   try { result = calc.compute(zeroed); } catch (error) { throw new Error(`${calc.slug}: zero-boundary calculation threw: ${error.message}; inputs=${JSON.stringify(zeroed)}`); }
-  for (const row of result) assert(typeof row.value === 'number' && Number.isFinite(row.value), `${calc.slug}: zero-boundary non-finite result for ${row.label}; inputs=${JSON.stringify(zeroed)}`);
+  for (const row of result) assert(validResultValue(row), `${calc.slug}: zero-boundary non-finite result for ${row.label}; inputs=${JSON.stringify(zeroed)}`);
 }
 
 assert(!toolsPage.includes('/income-tax-scenario-calculator/'), 'Tools library still points to legacy income-tax route');
