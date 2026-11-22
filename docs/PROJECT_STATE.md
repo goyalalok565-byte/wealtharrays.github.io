@@ -26,6 +26,12 @@ Branch: `saas/l1-production-rum-smoke` (not merged).
 - Seven-route mobile Lighthouse artifact is recorded in Actions run 45048289283.
 - The production browser smoke is being extended to verify that rejecting consent keeps GA4 and web-vitals unloaded, accepting consent loads both, and emitted Web Vitals contain only metric name/value/rating.
 - This browser verification candidate awaits CI and merge; GA4 DebugView receipt and live user RUM remain unverified until the owner confirms the GA4 property.
+## L1 RUM CSP correction — 2026-11-22
+
+- PR #146 merged the production consent/RUM smoke workflow.
+- First production run 45049859678 failed because the site's CSP omitted `https://unpkg.com`, blocking the consent-gated web-vitals library.
+- Branch `saas/l1-rum-csp` adds the narrowly scoped script-src host and a Canonical CI regression assertion. No analytics payload or financial-input handling is changed.
+
 ## Mission
 
 Build Wealth Arrays into a trusted global financial intelligence and calculator SaaS platform around five pillars:
