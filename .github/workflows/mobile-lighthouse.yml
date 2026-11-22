@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   lighthouse:
-    if: ${{ (github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/phase0/pr-c')) || (github.event_name == 'pull_request' && startsWith(github.head_ref, 'phase0/pr-c')) || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
+    if: ${{ (github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/release/phase0-clean' || startsWith(github.ref, 'refs/heads/phase0/pr-c'))) || (github.event_name == 'pull_request' && (github.head_ref == 'release/phase0-clean' || startsWith(github.head_ref, 'phase0/pr-c'))) || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -114,7 +114,7 @@ jobs:
           retention-days: 14
 
   main-homepage-baseline:
-    if: ${{ (github.event_name == 'pull_request' && startsWith(github.head_ref, 'phase0/pr-c')) || (github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/phase0/pr-c')) }}
+    if: ${{ (github.event_name == 'pull_request' && (github.head_ref == 'release/phase0-clean' || startsWith(github.head_ref, 'phase0/pr-c'))) || (github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/release/phase0-clean' || startsWith(github.ref, 'refs/heads/phase0/pr-c'))) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
