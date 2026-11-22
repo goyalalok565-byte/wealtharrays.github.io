@@ -61,13 +61,16 @@
     announceErrors();
     externalLinks();
     observeVitals();
-    if(window.MutationObserver){
+    // Only watch the header control cluster. Observing the whole document body
+    // reruns header deduplication for unrelated calculator, search and consent mutations.
+    var mastheadControls=document.querySelector('.masthead-controls');
+    if(mastheadControls&&window.MutationObserver){
       var pending=false;
       new MutationObserver(function(){
         if(pending)return;
         pending=true;
         requestAnimationFrame(function(){pending=false;dedupeSharedControls();});
-      }).observe(document.body,{childList:true,subtree:true});
+      }).observe(mastheadControls,{childList:true,subtree:true});
     }
   });
 })();
