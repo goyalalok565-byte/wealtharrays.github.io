@@ -10,7 +10,15 @@
     var def=window.CALCULATORS.find(function(c){return c.id===id;});
     if(def){
       host.dataset.waBooted='1';
-      window.mountCalculator(def,'calc-widget');
+      document.documentElement.classList.add('wa-calculator-mounting');
+      try {
+        window.mountCalculator(def,'calc-widget');
+      } catch(error) {
+        document.documentElement.classList.remove('wa-calculator-mounting');
+        host.dataset.waBooted='';
+        throw error;
+      }
+      document.documentElement.classList.remove('wa-calculator-mounting');
       if(typeof window.waTrack==='function') window.waTrack('calculator_open',{calculator_id:id});
       /* NOTE: WA_CALCULATOR_ENHANCEMENTS.enhance() is intentionally NOT called here.
        * It re-mounted the calculator a second time and injected a duplicate
