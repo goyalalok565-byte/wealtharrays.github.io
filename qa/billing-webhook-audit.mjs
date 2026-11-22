@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 const source = fs.readFileSync("functions/v1/billing/webhook.js", "utf8")
-  .replace(/^import \{ error, json \} from "\.\.\/_shared\.js";\n/, [
+  .replace(/^import \{ error, json \} from "\.\.\/\_shared\.js";\n/, [
     'const json = (data, status = 200, extra = {}) => new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json", ...extra } });',
     'const error = (code, message, status = 400) => json({ error: { code, message } }, status, { "Cache-Control": "no-store" });'
   ].join("\n"))
@@ -10,7 +10,10 @@ const source = fs.readFileSync("functions/v1/billing/webhook.js", "utf8")
   + "\nexport { onRequestPost };";
 const webhookModule = await import("data:text/javascript;base64," + Buffer.from(source).toString("base64"));
 const events = new Map();
-const subscriptions = new Map([["sub_1", { id: "row_1", status: "created", current_period_end: null, last_provider_event_at: null }]]);
+const subscriptions = new Map([["sub_1", {
+  id: "row_1", status: "created", current_period_end: null,
+  last_provider_event_at: null, cancel_at_period_end: 0
+}]]);
 const db = {
   prepare(sql) {
     return { bind(...values) {
@@ -22,21 +25,52 @@ const db = {
             events.set(eventId, { event_type: eventType, payload_json: payload, processed_at: null });
             return { meta: { changes: 1 } };
           }
+          if (sql.startsWith("UPDATE billing_events SET processed_at = ?")) {
+            const [claimToken, eventId] = values;
+            const row = events.get(eventId);
+            if (!row || row.processed_at !== null) return { meta: { changes: 0 } };
+            row.processed_at = claimToken;
+            return { meta: { changes: 1 } };
+          }
+          if (sql.startsWith("UPDATE billing_events SET processed_at = NULL")) {
+            const [eventId, claimToken] = values;
+            const row = events.get(eventId);
+            if (!row || row.processed_at !== claimToken) return { meta: { changes: 0 } };
+            row.processed_at = null;
+            return { meta: { changes: 1 } };
+          }
+          if (sql.startsWith("UPDATE billing_events SET processed_at = strftime")) {
+            const [eventId, claimToken] = values;
+            const row = events.get(eventId);
+            if (!row || row.processed_at !== claimToken) return { meta: { changes: 0 } };
+            row.processed_at = "2026-11-22T00:00:00.000Z";
+            return { meta: { changes: 1 } };
+          }
+          if (sql.startsWith("UPDATE subscriptions") && sql.includes("SET status = 'refunded'")) {
+            const [eventAt, eventAtForSet, subscriptionId, whereAt, whereAt2, whereAt3] = values;
+            const row = subscriptions.get(subscriptionId);
+            if (!row) return { meta: { changes: 0 } };
+            const canApply = whereAt !== null
+              ? row.last_provider_event_at === null || row.last_provider_event_at <= whereAt2
+              : row.last_provider_event_at === null;
+            if (!canApply) return { meta: { changes: 0 } };
+            row.status = "refunded";
+            row.cancel_at_period_end = 0;
+            row.last_provider_event_at = eventAtForSet ?? row.last_provider_event_at;
+            return { meta: { changes: 1 } };
+          }
           if (sql.startsWith("UPDATE subscriptions")) {
             const [status, currentEnd, eventAt, eventAtForSet, subscriptionId, whereAt, whereAt2] = values;
             const row = subscriptions.get(subscriptionId);
-            if (!row) return { meta: { changes: 0 } };
-            const canApply = whereAt !== null ? row.last_provider_event_at === null || row.last_provider_event_at <= whereAt2 : row.last_provider_event_at === null;
+            if (!row || row.status === "refunded") return { meta: { changes: 0 } };
+            const canApply = whereAt !== null
+              ? row.last_provider_event_at === null || row.last_provider_event_at <= whereAt2
+              : row.last_provider_event_at === null;
             if (!canApply) return { meta: { changes: 0 } };
             row.status = status;
             row.current_period_end = currentEnd ?? row.current_period_end;
             row.last_provider_event_at = eventAtForSet ?? row.last_provider_event_at;
             return { meta: { changes: 1 } };
-          }
-          if (sql.startsWith("UPDATE billing_events")) {
-            const row = events.get(values[0]);
-            if (row) row.processed_at = "processed";
-            return { meta: { changes: row ? 1 : 0 } };
           }
           throw new Error("Unexpected D1 run query: " + sql);
         },
@@ -69,27 +103,46 @@ let response = await deliver({ created_at: 1000, event: "subscription.activated"
 assert.equal(response.status, 200);
 assert.equal(subscriptions.get("sub_1").status, "active");
 assert.equal(subscriptions.get("sub_1").last_provider_event_at, 1000);
-assert.equal(events.get("evt_1").processed_at, "processed");
+assert.ok(events.get("evt_1").processed_at.startsWith("2026-"));
+
 response = await deliver({ created_at: 1000, event: "subscription.halted", payload: { subscription: { entity: { id: "sub_1", status: "halted" } } } }, "evt_1");
 assert.equal(response.status, 200);
 assert.equal((await response.json()).duplicate, true);
 assert.equal(subscriptions.get("sub_1").status, "active");
+
 response = await deliver({ created_at: 900, event: "subscription.halted", payload: { subscription: { entity: { id: "sub_1", status: "halted" } } } }, "evt_old");
 assert.equal(response.status, 200);
 assert.equal(subscriptions.get("sub_1").status, "active");
+
 response = await deliver({ created_at: 1100, event: "subscription.halted", payload: { subscription: { entity: { id: "sub_1", status: "halted" } } } }, "evt_new");
 assert.equal(response.status, 200);
 assert.equal(subscriptions.get("sub_1").status, "halted");
+
 response = await deliver({ created_at: 1200, event: "payment.failed", payload: { payment: { entity: { id: "pay_1", subscription_id: "sub_1", status: "failed", amount: 50000, currency: "INR" } } } }, "evt_payment_failed");
 assert.equal(response.status, 200);
 assert.equal(subscriptions.get("sub_1").status, "halted");
 assert.match(events.get("evt_payment_failed").payload_json, /pay_1/);
+
 response = await deliver({ created_at: 1300, event: "payment.refunded", payload: { payment: { entity: { id: "pay_1", subscription_id: "sub_1", status: "refunded", amount: 50000, amount_refunded: 50000, currency: "INR" } } } }, "evt_payment_refunded");
 assert.equal(response.status, 200);
+assert.equal(subscriptions.get("sub_1").status, "refunded");
+assert.equal(subscriptions.get("sub_1").cancel_at_period_end, 0);
 assert.match(events.get("evt_payment_refunded").payload_json, /50000/);
-response = await deliver({ created_at: 1400, event: "subscription.activated", payload: { subscription: { entity: { id: "sub_not_linked", status: "active" } } } }, "evt_unlinked");
+
+response = await deliver({ created_at: 1400, event: "subscription.activated", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_activation_after_refund");
+assert.equal(response.status, 200);
+assert.equal(subscriptions.get("sub_1").status, "refunded", "later lifecycle events must not restore refunded entitlement");
+
+response = await deliver({ created_at: 1500, event: "subscription.activated", payload: { subscription: { entity: { id: "sub_not_linked", status: "active" } } } }, "evt_unlinked");
 assert.equal(response.status, 503);
-assert.equal(events.get("evt_unlinked").processed_at, null);
-response = await deliver({ created_at: 1500, event: "subscription.activated", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_bad_signature", true);
+assert.equal(events.get("evt_unlinked").processed_at, null, "unlinked events remain retryable");
+
+events.set("evt_processing", { event_type: "subscription.activated", payload_json: "{}", processed_at: "processing:another-worker" });
+response = await deliver({ created_at: 1600, event: "subscription.activated", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_processing");
+assert.equal(response.status, 503);
+assert.equal(response.headers.get("Retry-After"), "5");
+assert.equal((await response.json()).processing, true, "concurrent deliveries must not process an active claim twice");
+
+response = await deliver({ created_at: 1700, event: "subscription.activated", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_bad_signature", true);
 assert.equal(response.status, 401);
-console.log("Razorpay webhook audit PASS: signature, header idempotency, event ordering, retryable unlinked events, payment failure and refund recording.");
+console.log("Razorpay webhook audit PASS: HMAC, atomic claim, duplicate and out-of-order delivery, retryable unlinked events, and refund entitlement revocation.");

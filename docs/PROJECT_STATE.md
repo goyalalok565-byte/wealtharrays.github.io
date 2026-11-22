@@ -17,6 +17,20 @@ Branch: `saas/l1-consent-rum-events` (not merged).
 - The 15-minute API health workflow is being extended with one deduplicated operational alert issue that closes on recovery.
 - RUM values, GA4 event receipt, health alert delivery and live behavior remain unverified until the PR passes CI, merges under the applicable tier policy, and post-merge L1-L3 verification completes.
 
+
+## L2 backend hardening PR candidate — 2026-11-22
+
+Branch: `saas/l2-backend-hardening` (not merged).
+
+- D1 migration/restore plan committed before any migration change. This branch adds no D1 migration and does not modify the existing migration ledger.
+- Worker write endpoints for scenarios, checkout and cancellation are rate-limited (dedicated write limiter) and require server-verified Cloudflare Turnstile tokens; the signed Razorpay webhook is rate-limited separately and remains outside the browser challenge flow.
+- Worker CORS uses an explicit production origin allowlist.
+- Supabase-backed Worker access requires a verified email address.
+- Razorpay webhook processing uses a conditional atomic claim, retryable unlinked events, and refund-driven entitlement revocation. Later lifecycle events cannot reactivate a refunded subscription.
+- Browser account and cloud-save requests obtain one-time Turnstile tokens. Supabase CAPTCHA must be enabled by the owner before signup/login can pass.
+- Security and lifecycle audits are wired into Unit Tests. CI and TEST-mode live behavior remain unverified until this PR's checks and owner configuration complete.
+- No live credentials, D1 database, Razorpay TEST flow, or Cloudflare secrets are present in this branch; production SaaS readiness remains blocked.
+
 ## Mission
 
 Build Wealth Arrays into a trusted global financial intelligence and calculator SaaS platform around five pillars:

@@ -7,6 +7,14 @@ assert.match(helper,/Authorization:"Bearer "\+token/);
 assert.match(helper,/method:"POST"/);
 assert.match(helper,/method:"GET"/);
 assert.match(helper,/calculator_id/);
+assert.match(helper,/window\.WATurnstile\.getToken/);
+assert.match(helper,/cf-turnstile-response/);
+const core=fs.readFileSync("wa-core.js","utf8");
+assert.match(core,/function setupTurnstile\(\)/);
+assert.match(core,/challenges\.cloudflare\.com\/turnstile\/v0\/api\.js/);
+const accountJs=fs.readFileSync("account.js","utf8");
+assert.match(accountJs,/captcha_token:await window\.WATurnstile\.getToken\(\)/);
+assert.match(accountJs,/cf-turnstile-response/);
 for(const [html,js,save,load,kind] of [
  ["scenario-lab.html","scenario-lab.js","sl-cloud-save","sl-cloud-load","scenario-lab"],
  ["goal-planner.html","goal-planner.js","gp-cloud-save","gp-cloud-load","goal-planner"],

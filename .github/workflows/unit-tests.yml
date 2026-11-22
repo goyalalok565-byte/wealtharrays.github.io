@@ -27,3 +27,13 @@ jobs:
           node-version: 24
       - name: Run unit tests
         run: npm test
+      - name: Verify account email enforcement
+        run: node qa/auth-verification-audit.mjs
+      - name: Verify billing webhook ordering and refund revocation
+        run: node qa/billing-webhook-audit.mjs
+      - name: Verify server-authoritative entitlements
+        run: node qa/entitlement-audit.mjs
+      - name: Verify Worker CORS, rate limits and Turnstile
+        run: node qa/cloudflare-worker-routing.mjs
+      - name: Verify cloud workspace Turnstile integration
+        run: node qa/cloud-workspace-sync-audit.mjs

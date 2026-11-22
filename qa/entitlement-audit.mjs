@@ -16,6 +16,7 @@ assert.equal(mod.resolveEntitlement({ status: "active", plan_id: "yearly", curre
 assert.equal(mod.resolveEntitlement({ status: "active", plan_id: "yearly", current_period_end: "2026-11-17T00:00:00.000Z" }, Date.parse("2026-11-18T00:00:00.000Z")).tier, "free");
 assert.equal(mod.resolveEntitlement({ status: "cancelled", plan_id: "monthly" }).tier, "free");
 assert.equal(mod.resolveEntitlement({ status: "halted", plan_id: "monthly" }).tier, "free");
+assert.equal(mod.resolveEntitlement({ status: "refunded", plan_id: "monthly" }).tier, "free");
 assert.equal(mod.resolveEntitlement({ status: "active", plan_id: "monthly", current_period_end: "not-a-date" }).tier, "free");
 
 const scenarios = fs.readFileSync("functions/v1/scenarios.js", "utf8");
