@@ -47,16 +47,14 @@ const db = {
             return { meta: { changes: 1 } };
           }
           if (sql.startsWith("UPDATE subscriptions") && sql.includes("SET status = 'refunded'")) {
-            const [eventAt, eventAtForSet, subscriptionId, whereAt, whereAt2, whereAt3] = values;
+            const [eventAt, eventAtForCompare, eventAtForSet, subscriptionId] = values;
             const row = subscriptions.get(subscriptionId);
             if (!row) return { meta: { changes: 0 } };
-            const canApply = whereAt !== null
-              ? row.last_provider_event_at === null || row.last_provider_event_at <= whereAt2
-              : row.last_provider_event_at === null;
-            if (!canApply) return { meta: { changes: 0 } };
             row.status = "refunded";
             row.cancel_at_period_end = 0;
-            row.last_provider_event_at = eventAtForSet ?? row.last_provider_event_at;
+            if (eventAtForSet !== null && (row.last_provider_event_at === null || row.last_provider_event_at < eventAtForCompare)) {
+              row.last_provider_event_at = eventAtForSet;
+            }
             return { meta: { changes: 1 } };
           }
           if (sql.startsWith("UPDATE subscriptions")) {
@@ -123,13 +121,17 @@ assert.equal(response.status, 200);
 assert.equal(subscriptions.get("sub_1").status, "halted");
 assert.match(events.get("evt_payment_failed").payload_json, /pay_1/);
 
+response = await deliver({ created_at: 1400, event: "subscription.activated", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_activation_before_late_refund");
+assert.equal(response.status, 200);
+assert.equal(subscriptions.get("sub_1").status, "active");
+
 response = await deliver({ created_at: 1300, event: "payment.refunded", payload: { payment: { entity: { id: "pay_1", subscription_id: "sub_1", status: "refunded", amount: 50000, amount_refunded: 50000, currency: "INR" } } } }, "evt_payment_refunded");
 assert.equal(response.status, 200);
-assert.equal(subscriptions.get("sub_1").status, "refunded");
+assert.equal(subscriptions.get("sub_1").status, "refunded", "refund must revoke entitlement even when delivered after a newer event");
 assert.equal(subscriptions.get("sub_1").cancel_at_period_end, 0);
 assert.match(events.get("evt_payment_refunded").payload_json, /50000/);
 
-response = await deliver({ created_at: 1400, event: "subscription.activated", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_activation_after_refund");
+response = await deliver({ created_at: 1500, event: "subscription.activated", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_activation_after_refund");
 assert.equal(response.status, 200);
 assert.equal(subscriptions.get("sub_1").status, "refunded", "later lifecycle events must not restore refunded entitlement");
 
