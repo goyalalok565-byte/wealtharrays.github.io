@@ -168,12 +168,13 @@ const CALCULATORS = [
     ],
     compute(v) {
       const gain = v.finalValue - v.cost;
-      const roi = v.cost === 0 ? 0 : (gain / v.cost) * 100;
-      const annualized = v.cost <= 0 || v.finalValue < 0 || v.years <= 0 ? 0 : (Math.pow(v.finalValue / v.cost, 1 / v.years) - 1) * 100;
+      const costIsZero = Number(v.cost) === 0;
+      const roi = costIsZero ? null : (gain / v.cost) * 100;
+      const annualized = costIsZero ? null : (v.cost <= 0 || v.finalValue < 0 || v.years <= 0 ? 0 : (Math.pow(v.finalValue / v.cost, 1 / v.years) - 1) * 100);
       return [
         { label: "Net gain", value: gain, format: "currency", emphasis: gain >= 0 ? "positive" : "negative" },
-        { label: "Total ROI", value: roi, format: "percent", emphasis: roi >= 0 ? "positive" : "negative" },
-        { label: "Annualized ROI", value: annualized, format: "percent", emphasis: "neutral" },
+        { label: costIsZero ? "Total ROI (not defined: cost is 0)" : "Total ROI", value: roi, format: "percent", emphasis: costIsZero ? "neutral" : roi >= 0 ? "positive" : "negative" },
+        { label: costIsZero ? "Annualized ROI (not defined: cost is 0)" : "Annualized ROI", value: annualized, format: "percent", emphasis: "neutral" },
       ];
     },
   },
@@ -310,13 +311,14 @@ const CALCULATORS = [
     compute(v) {
       const grossProfit = v.revenue - v.cogs;
       const netProfit = grossProfit - v.expenses;
-      const grossMargin = v.revenue === 0 ? 0 : (grossProfit / v.revenue) * 100;
-      const netMargin = v.revenue === 0 ? 0 : (netProfit / v.revenue) * 100;
+      const revenueIsZero = Number(v.revenue) === 0;
+      const grossMargin = revenueIsZero ? null : (grossProfit / v.revenue) * 100;
+      const netMargin = revenueIsZero ? null : (netProfit / v.revenue) * 100;
       return [
         { label: "Gross profit", value: grossProfit, format: "currency" },
-        { label: "Gross margin", value: grossMargin, format: "percent", emphasis: "neutral" },
+        { label: revenueIsZero ? "Gross margin (not defined: revenue is 0)" : "Gross margin", value: grossMargin, format: "percent", emphasis: "neutral" },
         { label: "Net profit", value: netProfit, format: "currency", emphasis: netProfit >= 0 ? "positive" : "negative" },
-        { label: "Net margin", value: netMargin, format: "percent", emphasis: netProfit >= 0 ? "positive" : "negative" },
+        { label: revenueIsZero ? "Net margin (not defined: revenue is 0)" : "Net margin", value: netMargin, format: "percent", emphasis: revenueIsZero ? "neutral" : netProfit >= 0 ? "positive" : "negative" },
       ];
     },
   },

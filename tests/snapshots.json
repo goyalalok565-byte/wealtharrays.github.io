@@ -575,14 +575,14 @@
           "emphasis": "positive"
         },
         {
-          "label": "Total ROI",
-          "value": 0,
+          "label": "Total ROI (not defined: cost is 0)",
+          "value": null,
           "format": "percent",
-          "emphasis": "positive"
+          "emphasis": "neutral"
         },
         {
-          "label": "Annualized ROI",
-          "value": 0,
+          "label": "Annualized ROI (not defined: cost is 0)",
+          "value": null,
           "format": "percent",
           "emphasis": "neutral"
         }
@@ -1126,8 +1126,8 @@
           "emphasis": null
         },
         {
-          "label": "Gross margin",
-          "value": 0,
+          "label": "Gross margin (not defined: revenue is 0)",
+          "value": null,
           "format": "percent",
           "emphasis": "neutral"
         },
@@ -1138,10 +1138,10 @@
           "emphasis": "positive"
         },
         {
-          "label": "Net margin",
-          "value": 0,
+          "label": "Net margin (not defined: revenue is 0)",
+          "value": null,
           "format": "percent",
-          "emphasis": "positive"
+          "emphasis": "neutral"
         }
       ]
     },

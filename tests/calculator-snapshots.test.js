@@ -47,7 +47,7 @@ function normalize(result) {
   if (!Array.isArray(result)) return { type: typeof result, value: String(result) };
   return result.map(row => ({
     label: row?.label ?? null,
-    value: Number.isFinite(row?.value) ? row.value : String(row?.value),
+    value: row?.value === null ? null : Number.isFinite(row?.value) ? row.value : String(row?.value),
     format: row?.format ?? null,
     emphasis: row?.emphasis ?? null
   }));

@@ -3,7 +3,7 @@ const safeStorage={get(k){try{return localStorage.getItem(k)}catch(e){return nul
 const currencyList=()=>window.WA?.currencies||[["USD","$","US Dollar"],["EUR","€","Euro"],["GBP","£","British Pound"],["INR","₹","Indian Rupee"],["JPY","¥","Japanese Yen"],["CNY","CN¥","Chinese Yuan"],["CAD","C$","Canadian Dollar"],["AUD","A$","Australian Dollar"],["CHF","CHF","Swiss Franc"],["SGD","S$","Singapore Dollar"],["HKD","HK$","Hong Kong Dollar"],["KRW","₩","South Korean Won"],["AED","د.إ","UAE Dirham"],["SAR","﷼","Saudi Riyal"],["NZD","NZ$","New Zealand Dollar"],["MXN","MX$","Mexican Peso"],["BRL","R$","Brazilian Real"],["ZAR","R","South African Rand"],["TRY","₺","Turkish Lira"],["THB","฿","Thai Baht"],["MYR","RM","Malaysian Ringgit"],["IDR","Rp","Indonesian Rupiah"],["PHP","₱","Philippine Peso"],["PLN","zł","Polish Zloty"],["SEK","kr","Swedish Krona"]];
 const waState={currency:safeStorage.get('waCurrency')||'INR',theme:safeStorage.get('waTheme')||'light'};
 function waCurrencySymbol(){const c=currencyList().find(c=>c[0]===waState.currency);return c?c[1]:'₹'}
-function waFormatValue(value,format){if(!Number.isFinite(Number(value)))return'—';const n=Number(value);if(format==='percent')return n.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})+'%';if(format==='number')return Math.round(n).toLocaleString('en-IN');if(format==='years')return n.toLocaleString('en-IN',{minimumFractionDigits:1,maximumFractionDigits:1})+' yrs';return waCurrencySymbol()+n.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function waFormatValue(value,format){if(value===null||value===undefined||!Number.isFinite(Number(value)))return'—';const n=Number(value);if(format==='percent')return n.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})+'%';if(format==='number')return Math.round(n).toLocaleString('en-IN');if(format==='years')return n.toLocaleString('en-IN',{minimumFractionDigits:1,maximumFractionDigits:1})+' yrs';return waCurrencySymbol()+n.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function esc(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function applyGlobalTheme(){document.documentElement.dataset.theme=waState.theme;const b=document.getElementById('theme-toggle'),s=b?.querySelector('[data-theme-label]')||document.getElementById('theme-toggle-label');if(s)s.textContent=waState.theme==='dark'?'Light mode':'Dark mode';if(b)b.setAttribute('aria-pressed',String(waState.theme==='dark'))}
 function initMasthead(onChange){
@@ -45,7 +45,7 @@ function waOpenPrintReport(calc,values,results){
    svg.setAttribute('width','520');svg.setAttribute('height','300');
    chart='<section class="chartbox"><h2>Result breakdown</h2><p>Visualised from the same calculation shown on the calculator page.</p><div class="chartsvg">'+new XMLSerializer().serializeToString(svg)+'</div></section>';
  } else {
-   const numeric=results.map(r=>({label:r.label,value:Number(r.value)})).filter(r=>Number.isFinite(r.value)&&r.value>=0);
+   const numeric=results.filter(r=>r.value!==null&&r.value!==undefined).map(r=>({label:r.label,value:Number(r.value)})).filter(r=>Number.isFinite(r.value)&&r.value>=0);
    const max=Math.max(...numeric.map(r=>r.value),1);
    const bars=numeric.slice(0,6).map(r=>{const pct=Math.max(2,Math.round(r.value/max*100));return `<div class="bar"><span>${esc(r.label)}</span><div><i style="width:${pct}%"></i></div><b>${esc(waFormatValue(r.value,'number'))}</b></div>`;}).join('');
    chart=bars?`<section class="chartbox"><h2>Calculation summary</h2><p>Bars use the actual calculated values; they are not fabricated percentage shares.</p>${bars}</section>`:'';
@@ -131,7 +131,7 @@ function waRenderAccuratePie(id,calc,values,rows){
    title='Income split';
  }
  if(!parts||parts.length<2||parts.some(p=>p.value<0)||parts.reduce((s,p)=>s+p.value,0)<=0){
-   const numeric=rows.filter(r=>Number.isFinite(clean(r.value))&&clean(r.value)>=0).slice(0,5).map(r=>add(r.label,r.value,r.format||'number'));
+   const numeric=rows.filter(r=>r.value!==null&&r.value!==undefined&&Number.isFinite(clean(r.value))&&clean(r.value)>=0).slice(0,5).map(r=>add(r.label,r.value,r.format||'number'));
    if(numeric.length>=2){host.innerHTML='<div class="wa-pie-head"><span>CALCULATION SUMMARY</span><h3>'+esc(title)+'</h3><p>These bars use the actual values calculated from your inputs.</p></div><div class="wa-value-bars">'+numeric.map(r=>'<div><span>'+esc(r.label)+'</span><i style="width:'+Math.max(4,clean(r.value)/Math.max(...numeric.map(x=>clean(x.value)))*100).toFixed(2)+'%"></i><b>'+esc(waFormatValue(r.value,r.format))+'</b></div>').join('')+'</div>';return;}
    host.innerHTML='';return;
  }

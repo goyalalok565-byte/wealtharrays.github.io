@@ -130,6 +130,23 @@ try {
         assert(lossValues[2].trim() === expectedLoss.loss, 'capital-gain: after-tax result must preserve the loss');
       }
 
+      if (calc.id === 'roi') {
+        for (const [id, value] of [['cost', 0], ['finalValue', 1000], ['years', 5]]) await page.locator('#f-' + id).fill(String(value));
+        await page.locator('#calc-widget button[id$="-calculate"]').click();
+        const labels = await page.locator('#calc-widget .calc-result-label').allTextContents();
+        const values = await page.locator('#calc-widget .calc-result-value').allTextContents();
+        assert(labels[1].includes('not defined: cost is 0') && labels[2].includes('not defined: cost is 0'), 'roi: zero-cost ratios must be explicitly undefined');
+        assert(values[1].trim() === '—' && values[2].trim() === '—', 'roi: undefined ratios must not display as 0%');
+      }
+      if (calc.id === 'profit-margin') {
+        for (const [id, value] of [['revenue', 0], ['cogs', 0], ['expenses', 0]]) await page.locator('#f-' + id).fill(String(value));
+        await page.locator('#calc-widget button[id$="-calculate"]').click();
+        const labels = await page.locator('#calc-widget .calc-result-label').allTextContents();
+        const values = await page.locator('#calc-widget .calc-result-value').allTextContents();
+        assert(labels[1].includes('not defined: revenue is 0') && labels[3].includes('not defined: revenue is 0'), 'profit-margin: zero-revenue ratios must be explicitly undefined');
+        assert(values[1].trim() === '—' && values[3].trim() === '—', 'profit-margin: undefined margins must not display as 0%');
+      }
+
       // Exercise every declared numeric min/max through the real Calculate event.
       // Batch browser-side interactions per route to avoid thousands of Playwright round trips.
       const boundaryChecks = calc.fields.filter(f => f.type !== 'select').flatMap(f => [
