@@ -30,7 +30,7 @@ for(const [html,js,save,load,kind] of [
  assert.ok(script.includes("cloud_scenario_load"),js+" missing load analytics event");
 }
 const account=fs.readFileSync("account.html","utf8");
-assert.match(account,/Scenario Lab, Goal Planner or Financial Workspace/);
+assert.match(account,/Cloud-saved scenarios/,"Account page must expose the cloud-saved scenario area");
 const browserSmoke=fs.readFileSync("qa/cloud-workspace-sync-browser-smoke.mjs","utf8");
 for(const path of ["/scenario-lab.html","/goal-planner.html","/financial-workspace.html"])assert.ok(browserSmoke.includes(path),"browser smoke missing "+path);
 const workflow=fs.readFileSync(".github/workflows/platform-gates.yml","utf8");
