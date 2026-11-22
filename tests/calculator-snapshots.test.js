@@ -47,7 +47,7 @@ function normalize(result) {
   if (!Array.isArray(result)) return { type: typeof result, value: String(result) };
   return result.map(row => ({
     label: row?.label ?? null,
-    value: Number.isFinite(row?.value) ? row.value : String(row?.value),
+    value: row?.value === null ? null : Number.isFinite(row?.value) ? row.value : String(row?.value),
     format: row?.format ?? null,
     emphasis: row?.emphasis ?? null
   }));
@@ -91,4 +91,19 @@ test('snapshot numeric tolerance accepts runtime rounding but rejects material d
     () => assertSnapshotEquivalent(null, 0, 'null drift'),
     assert.AssertionError
   );
+});
+
+test('zero-denominator ratios are explicitly undefined, while blank inputs stay blank', () => {
+  const roi = fixture.snapshots.find(s => s.calculator === 'roi' && s.case === 'zero');
+  assert.equal(roi.output[1].value, null);
+  assert.equal(roi.output[2].value, null);
+  assert.match(roi.output[1].label, /not defined: cost is 0/);
+  assert.match(roi.output[2].label, /not defined: cost is 0/);
+  const margin = fixture.snapshots.find(s => s.calculator === 'profit-margin' && s.case === 'zero');
+  assert.equal(margin.output[1].value, null);
+  assert.equal(margin.output[3].value, null);
+  assert.match(margin.output[1].label, /not defined: revenue is 0/);
+  assert.match(margin.output[3].label, /not defined: revenue is 0/);
+  const roiBlank = fixture.snapshots.find(s => s.calculator === 'roi' && s.case === 'blank');
+  assert.notEqual(roiBlank.output[1].value, null);
 });
