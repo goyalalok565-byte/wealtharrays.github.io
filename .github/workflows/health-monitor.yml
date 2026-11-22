@@ -5,6 +5,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  issues: write
 concurrency:
   group: wealth-arrays-api-health-monitor
   cancel-in-progress: true
@@ -21,3 +22,31 @@ jobs:
         env:
           BASE_URL: https://wealtharrays.com
         run: node qa/health-monitor.mjs
+      - name: Open or refresh a deduplicated operational alert
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '[ALERT] Production API health check failed';
+            const { owner, repo } = context.repo;
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+            const body = `The scheduled production API health check failed.\n\nWorkflow run: ${runUrl}\n\nInvestigate the health endpoint and dependency readiness. Do not include credentials, user data, or request payloads in this issue.\n\nThis alert is automatically closed after a later successful health check.`;
+            const { data: issues } = await github.rest.issues.listForRepo({ owner, repo, state: 'open', per_page: 100 });
+            const existing = issues.find(issue => issue.title === title && !issue.pull_request);
+            if (existing) {
+              await github.rest.issues.update({ owner, repo, issue_number: existing.number, body });
+            } else {
+              await github.rest.issues.create({ owner, repo, title, body });
+            }
+      - name: Close operational alert after a successful health check
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const { data: issues } = await github.rest.issues.listForRepo({ owner, repo, state: 'open', per_page: 100 });
+            for (const issue of issues) {
+              if (issue.title === '[ALERT] Production API health check failed' && !issue.pull_request) {
+                await github.rest.issues.update({ owner, repo, issue_number: issue.number, state: 'closed', state_reason: 'completed' });
+              }
+            }
