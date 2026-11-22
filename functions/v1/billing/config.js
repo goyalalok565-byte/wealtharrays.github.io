@@ -4,7 +4,7 @@ import { json } from "../_shared.js";
 export async function onRequestGet({ env }) {
   const platformReady = Boolean(
     env.DB && env.SUPABASE_URL && env.SUPABASE_ANON_KEY &&
-    env.TURNSTILE_SITE_KEY && env.TURNSTILE_SECRET_KEY &&
+    env.TURNSTILE_SITE_KEY && env.TURNSTILE_SECRET_KEY && env.RAZORPAY_WEBHOOK_SECRET &&
     env.PUBLIC_API_LIMITER && typeof env.PUBLIC_API_LIMITER.limit === "function" &&
     env.WRITE_API_LIMITER && typeof env.WRITE_API_LIMITER.limit === "function"
   );
