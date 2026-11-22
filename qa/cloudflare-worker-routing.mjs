@@ -8,7 +8,7 @@ const env = {
   PUBLIC_API_LIMITER: {
     async limit({ key }) {
       limiterCalls++;
-      assert.match(key, /^\/v1\/(calculate|india-tax|fx):/);
+      assert.match(key, /^\/v1\/(calculate|india-tax|fx|scenarios|billing\/checkout|billing\/cancel):/);
       return { success: allowRateLimitedRequest };
     }
   },
@@ -71,6 +71,13 @@ const missingLimiter = await worker.fetch(new Request("https://example.test/v1/c
   body: JSON.stringify({ model: "sip", inputs: { monthly: 5000, annualRate: 10, years: 10 } })
 }), { ASSETS: env.ASSETS }, {});
 assert.equal(missingLimiter.status, 503, "Public calculation API must fail closed if rate limiting is unconfigured");
+const securityConfig = await worker.fetch(new Request("https://example.test/v1/security-config"), { ...env, TURNSTILE_SITE_KEY: "public-site-key" }, {});
+assert.equal(securityConfig.status, 200);
+assert.equal((await securityConfig.json()).site_key, "public-site-key");
+const allowedOrigin = await worker.fetch(new Request("https://example.test/v1/models", { headers: { Origin: "https://wealtharrays.com" } }), env, {});
+assert.equal(allowedOrigin.headers.get("Access-Control-Allow-Origin"), "https://wealtharrays.com");
+const deniedOrigin = await worker.fetch(new Request("https://example.test/v1/models", { headers: { Origin: "https://untrusted.example" } }), env, {});
+assert.equal(deniedOrigin.headers.get("Access-Control-Allow-Origin"), null);
 const authConfig = await worker.fetch(new Request("https://example.test/v1/auth-config"), env, {});
 assert.equal(authConfig.status, 503, "Account config must fail closed until credentials are set");
 const unknown = await worker.fetch(new Request("https://example.test/v1/does-not-exist"), env, {});
@@ -80,6 +87,45 @@ const wrongMethod = await worker.fetch(new Request("https://example.test/v1/calc
 assert.equal(wrongMethod.status, 405);
 const unauthenticated = await worker.fetch(new Request("https://example.test/v1/scenarios"), env, {});
 assert.equal(unauthenticated.status, 401);
+allowRateLimitedRequest = false;
+const throttledWrite = await worker.fetch(new Request("https://example.test/v1/scenarios", {
+  method: "POST", headers: { "Content-Type": "application/json", "cf-connecting-ip": "203.0.113.11" },
+  body: JSON.stringify({ calculator_id: "sip", inputs: {} })
+}), env, {});
+assert.equal(throttledWrite.status, 429, "Cloud writes must pass through the rate limiter");
+assert.equal(throttledWrite.headers.get("Retry-After"), "60");
+allowRateLimitedRequest = true;
+const turnstileNotConfigured = await worker.fetch(new Request("https://example.test/v1/scenarios", {
+  method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ calculator_id: "sip", inputs: {} })
+}), env, {});
+assert.equal(turnstileNotConfigured.status, 503, "Cloud writes must fail closed when Turnstile is not configured");
+const turnstileRequired = await worker.fetch(new Request("https://example.test/v1/scenarios", {
+  method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ calculator_id: "sip", inputs: {} })
+}), { ...env, TURNSTILE_SECRET_KEY: "test-turnstile-secret" }, {});
+assert.equal(turnstileRequired.status, 403);
+const originalFetch = globalThis.fetch;
+let turnstileSuccess = false;
+globalThis.fetch = async (url, options) => {
+  assert.equal(String(url), "https://challenges.cloudflare.com/turnstile/v0/siteverify");
+  assert.equal(options.method, "POST");
+  assert.match(String(options.body), /response=valid-turnstile-token/);
+  return new Response(JSON.stringify({ success: turnstileSuccess }), { status: 200, headers: { "Content-Type": "application/json" } });
+};
+try {
+  const turnstileRejected = await worker.fetch(new Request("https://example.test/v1/scenarios", {
+    method: "POST", headers: { "Content-Type": "application/json", "cf-turnstile-response": "valid-turnstile-token" },
+    body: JSON.stringify({ calculator_id: "sip", inputs: {} })
+  }), { ...env, TURNSTILE_SECRET_KEY: "test-turnstile-secret" }, {});
+  assert.equal(turnstileRejected.status, 403);
+  turnstileSuccess = true;
+  const verifiedButUnauthenticated = await worker.fetch(new Request("https://example.test/v1/scenarios", {
+    method: "POST", headers: { "Content-Type": "application/json", "cf-turnstile-response": "valid-turnstile-token" },
+    body: JSON.stringify({ calculator_id: "sip", inputs: {} })
+  }), { ...env, TURNSTILE_SECRET_KEY: "test-turnstile-secret" }, {});
+  assert.equal(verifiedButUnauthenticated.status, 401, "Valid Turnstile proceeds to the authenticated handler");
+} finally {
+  globalThis.fetch = originalFetch;
+}
 const staticResponse = await worker.fetch(new Request("https://example.test/index.html"), env, {});
 assert.equal(await staticResponse.text(), "static asset");
 assert.deepEqual(assetCalls, ["/index.html"]);
