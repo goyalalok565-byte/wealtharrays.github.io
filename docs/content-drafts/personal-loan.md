@@ -30,8 +30,9 @@ Do not compare loans by EMI alone. Check net disbursed amount, all fees, APR, pa
 ## Official references reviewed
 
 - [RBI — Key Facts Statement for Loans & Advances](https://rbi.org.in/Scripts/NotificationUser.aspx?Id=12663)
-- [CFPB — How mortgage lenders calculate monthly payments](https://www.consumerfinance.gov/ask-cfpb/how-do-mortgage-lenders-calculate-monthly-payments-en-1965/)
-- [CFPB — Where to get auto loan rates](https://www.consumerfinance.gov/ask-cfpb/where-can-i-get-information-on-auto-loan-rates-en-761/)
+- [CFPB — Do personal installment loans have fees?](https://www.consumerfinance.gov/ask-cfpb/do-personal-installment-loans-have-fees-en-2120/)
+- [CFPB — Difference between interest rate and APR](https://www.consumerfinance.gov/ask-cfpb/what-is-the-difference-between-a-loan-interest-rate-and-the-apr-en-733/)
+
 
 ## Editorial and implementation notes
 
