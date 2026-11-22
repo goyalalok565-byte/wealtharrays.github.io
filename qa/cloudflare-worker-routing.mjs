@@ -93,6 +93,22 @@ const deniedOrigin = await worker.fetch(new Request("https://example.test/v1/mod
 assert.equal(deniedOrigin.headers.get("Access-Control-Allow-Origin"), null);
 const authConfig = await worker.fetch(new Request("https://example.test/v1/auth-config"), env, {});
 assert.equal(authConfig.status, 503, "Account config must fail closed until credentials are set");
+const billingDisabled = await worker.fetch(new Request("https://example.test/v1/billing/config"), env, {});
+assert.equal(billingDisabled.status, 200);
+assert.equal((await billingDisabled.json()).configured, false, "Checkout must remain disabled before backend activation");
+const billingReady = await worker.fetch(new Request("https://example.test/v1/billing/config"), {
+  ...env,
+  DB: { prepare() { return { async first() { return { ok: 1 }; } }; } },
+  SUPABASE_URL: "https://supabase.example.test",
+  SUPABASE_ANON_KEY: "public-anon-test-value",
+  RAZORPAY_KEY_ID: "rzp_test_key",
+  RAZORPAY_KEY_SECRET: "test-secret-must-not-leak",
+  RAZORPAY_PLAN_MONTHLY: "plan_monthly",
+  RAZORPAY_PLAN_YEARLY: "plan_yearly",
+  TURNSTILE_SITE_KEY: "public-site-key",
+  TURNSTILE_SECRET_KEY: "turnstile-secret-must-not-leak"
+}, {});
+assert.equal((await billingReady.json()).configured, true, "Checkout readiness requires every backend control");
 const unknown = await worker.fetch(new Request("https://example.test/v1/does-not-exist"), env, {});
 assert.equal(unknown.status, 404);
 assert.equal((await unknown.json()).error.code, "NOT_FOUND");
