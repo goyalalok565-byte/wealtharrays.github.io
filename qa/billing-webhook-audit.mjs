@@ -1,14 +1,5 @@
 import assert from "node:assert/strict";
-import fs from "node:fs";
-
-const source = fs.readFileSync("functions/v1/billing/webhook.js", "utf8")
-  .replace(/^import \{ error, json \} from "\.\.\/\_shared\.js";\n/, [
-    'const json = (data, status = 200, extra = {}) => new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json", ...extra } });',
-    'const error = (code, message, status = 400) => json({ error: { code, message } }, status, { "Cache-Control": "no-store" });'
-  ].join("\n"))
-  .replace("export async function onRequestPost", "async function onRequestPost")
-  + "\nexport { onRequestPost };";
-const webhookModule = await import("data:text/javascript;base64," + Buffer.from(source).toString("base64"));
+import { onRequestPost } from "../functions/v1/billing/webhook.js";
 const events = new Map();
 const subscriptions = new Map([["sub_1", {
   id: "row_1", status: "created", current_period_end: null,
@@ -91,7 +82,7 @@ async function deliver(event, eventId, badSignature = false) {
   const raw = JSON.stringify(event);
   const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
   const signature = toHex(await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(raw)));
-  return webhookModule.onRequestPost({ request: new Request("https://example.test/v1/billing/webhook", {
+  return onRequestPost({ request: new Request("https://example.test/v1/billing/webhook", {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-razorpay-signature": badSignature ? "invalid" : signature, "x-razorpay-event-id": eventId },
     body: raw
