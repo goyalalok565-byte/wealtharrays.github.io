@@ -29,9 +29,10 @@ Do not assume overtime starts after a daily threshold or a weekend shift unless 
 
 ## Official references reviewed
 
-- [IRS — Instructions for Form 1040 (2025)](https://www.irs.gov/instructions/i1040gi)
-- [IRS — Working Families Tax Cuts: Individuals and Workers](https://www.irs.gov/newsroom/working-families-tax-cuts-individuals-and-workers)
-- [BLS — Current Employment Statistics FAQ: Hours and Earnings](https://www.bls.gov/web/empsit/cesfaq.htm?mod=article_inline)
+- [U.S. Department of Labor — Fact Sheet 23: Overtime Pay Requirements of the FLSA](https://www.dol.gov/agencies/whd/fact-sheets/23-flsa-overtime-pay)
+- [India Ministry of Labour — Factories Act, 1948, Section 59: Extra wages for overtime](https://www.labour.gov.in/static/uploads/2025/06/b878b8d9f3d9abc62fbe0a6c92f606e3.pdf)
+- [India Ministry of Labour — Labour Codes overtime FAQ (November 2026)](https://www.labour.gov.in/static/uploads/2026/11/da640b1558a315e81e22ce5ac12f463f.pdf)
+
 
 ## Editorial and implementation notes
 
