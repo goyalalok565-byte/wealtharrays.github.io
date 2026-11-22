@@ -32,8 +32,8 @@ for(const full of htmlFiles){
   html=html.replace(/\/wa-home-runtime\.js\?v=[^"']+/g,'/wa-home-runtime.js?v='+homeVersion);
   html=html.replace(/\/wa-calculator-runtime\.js\?v=[^"']+/g,'/wa-calculator-runtime.js?v='+calculatorVersion);
   for(const [asset,version] of staticVersions){
-    const escaped=asset.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-    const pattern=new RegExp('(/'+escaped+')(?:\\?v=[^"\\']*)?','g');
+    const escaped=asset.replace(/\./g,'\\.');
+    const pattern=new RegExp("(/"+escaped+")(?:\\?v=[^\"']*)?","g");
     html=html.replace(pattern,'$1?v='+version);
   }
   if(html!==before){fs.writeFileSync(full,html,'utf8');changed++;}
