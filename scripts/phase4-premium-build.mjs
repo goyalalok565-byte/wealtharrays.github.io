@@ -109,6 +109,14 @@ for(const file of htmlFiles){
     } else {
       s = s.replace(/(<div\b(?=[^>]*\bid=["']calc-widget["'])[^>]*>)(\s*)<\/div>/i, `$1${shell}</div>`);
     }
+    // Hide the no-JS shell only during the synchronous runtime replacement. This keeps
+    // its accessible fallback intact when JavaScript is disabled and avoids visible
+    // child-to-child shifts while mountCalculator swaps the markup.
+    const mobileReserveHeights = { sip: 2100, swp: 2370, fire: 2540, 'rent-vs-buy': 3080 };
+    const mobileReserveHeight = mobileReserveHeights[calc.id];
+    const reserveRule = mobileReserveHeight ? `@media (max-width: 760px) { html[data-wa-calculator="${calc.id}"] #calc-widget.calc-widget { min-height: ${mobileReserveHeight}px; } }` : '';
+    const mountStabilityStyle = `<style id="wa-calculator-mount-stability">.wa-calculator-mounting #calc-widget [data-wa-static-shell="true"] { visibility: hidden; } ${reserveRule}</style>`;
+    if (!s.includes('id="wa-calculator-mount-stability"')) s = s.replace('</head>', `${mountStabilityStyle}</head>`);
   }
   // Reuse the preloaded root stylesheet URL on nested article routes; otherwise the
   // same 94 KB stylesheet is downloaded twice under versioned and unversioned URLs.
