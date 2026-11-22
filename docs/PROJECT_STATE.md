@@ -1,10 +1,10 @@
 # Wealth Arrays Project State
 
-Last updated: 2026-11-20
+Last updated: 2026-11-22
 Repository: `goyalalok565-byte/wealtharrays.github.io`
 Default branch: `main`
-Current phase: Phase 0 — Stabilization
-Status: Phase 0 engineering changes are in final verification review; strict performance targets and production evidence remain outstanding.
+Current phase: Phase 0 engineering gates passed on production main SHA `b1610d10e5fe7d389140b20efdce6f63b6ef72e8`.
+Status: The zero-denominator ROI/profit-margin correction is merged and deployed. Current-main unit, security, canonical, platform, Worker/Pages deployment, 55-calculator browser smoke, production smoke, deployment hygiene, and strict seven-route mobile Lighthouse gates passed. Phase 1 remains blocked on owner-managed SaaS credentials/configuration and CA/legal review; global leadership, revenue, and search acquisition are not established.
 
 ## Mission
 
@@ -40,7 +40,7 @@ Trust, accuracy, privacy and measurable quality take precedence over growth clai
 - Never claim production success without Cloudflare evidence and a real browser check.
 - Never request passwords, API tokens or secret values in chat.
 
-## Audit baseline — 2026-11-20
+## Historical audit baseline — 2026-11-20 (superseded by the current assessment above)
 
 Scores are preliminary engineering assessments from repository inspection, uploaded ZIP and available CI evidence, not production KPI measurements.
 
@@ -68,29 +68,61 @@ Scores are preliminary engineering assessments from repository inspection, uploa
 - `qa/performance-budget-audit.mjs` failed: calculator runtime was 129,214 bytes vs 118,000-byte budget.
 - Local checks are not proof of the current GitHub head or production deployment.
 
-## Verified in GitHub CI / PR previews
+## Verified in GitHub CI and production — 2026-11-22
 
-- PR #78 was closed without merging as superseded by the consolidated PR #88. Its earlier seven-route mobile preview remains the known baseline: multiple routes missed strict performance, TBT or LCP targets; homepage accessibility scored 92 vs the 95 floor.
-- PRs #81–#87 are historical/superseded engineering or verification branches. PR #87 was closed without merging because it was based on a stale mainline.
-- **Active release candidate:** PR #88, branch `fix/phase0-clean-mainline-2026-11-20`, based on the current `main` branch. GitHub reports the branch mergeable; this is not equivalent to release approval.
-- The previous documentation-only verification head was `41583eda808d2fb6c42caa3cdd09261a35264670`. Subsequent ad-slot-aware loading fixes are being committed; re-check the latest head and its fresh CI before relying on results.
-- On that PR run, **Canonical CI passed**: source/Pages/Worker syntax, privacy and auth CSP regression, privacy policy, calculator regression and independent formula audit, generated routes/runtime, Section 156 terminology, canonical embed regression and regression gates.
-- **Platform Gates passed**: registry parity, 55-calculator catalogue audit, Phase 1–20 audits, research data audit, static accessibility audit, production `dist` build, deployment exclusion and exact manifest audit, dist integrity, literal `npm run build`, minification and production asset budget.
-- On the latest completed browser run before the ad-slot fix, the PR preview built; canonical calculator embed, all-registry/scenario smoke, all 55 calculators across responsive layouts/currency/theme/language/exports, and authenticated cloud workspace save/load all passed. The third-party loading smoke failed because `/tools.html` loaded the AdSense library despite having no ad slot. This correctly blocked the workflow; seven-page Lighthouse, homepage TBT diagnosis, SWP CPU profile and strict threshold enforcement were skipped. The fix now makes the build inject AdSense only on eligible pages containing a real `ins.adsbygoogle[data-ad-slot]` placement and removes ad-network preconnects when no slot exists. Fresh CI and browser verification are pending; no seven-route Lighthouse pass is claimed.
-- Strict owner release targets remain unchanged on all seven routes: Performance >=90, CLS <=0.10, TBT <=200ms and LCP <=2.5s; accessibility >=95, best practices >=80 and SEO >=90. The earlier baseline failed multiple targets. Do not relax gates.
-- Prior trace evidence found expensive `wa-site-runtime.js`, GTM and AdSense work on Tools; the release candidate defers GA4 until explicit analytics consent, now gates AdSense and ad-network preconnects on actual ad slots, and scopes visual runtime to calculator/embed routes. Fresh browser and performance measurements must still prove the benefit.
-- Production deployment, live Cloudflare file manifest, live `/v1/health`, production Core Web Vitals, AdSense approval, and CA/legal review are **not verified**.
+Exact production main SHA: `b1610d10e5fe7d389140b20efdce6f63b6ef72e8` (merge commit for PR #138).
 
-## Phase 0 — status and open items
+- PR #138 merged the ROI and Profit Margin zero-denominator correction. Zero investment cost / zero revenue are represented as undefined rather than misleading 0% ratios. UI, chart and PDF paths are covered; blank remains distinct from numeric zero.
+- Current-main Unit Tests: **244/244 passed**. Canonical CI, Platform Gates, CodeQL, Cloudflare Worker deploy and Pages build/deploy passed on the exact main SHA.
+- Current-main calculator browser smoke: **55/55 passed**, including click-only calculation, changed-input recalculation, min/max bounds and 375/768/1280px layouts. Static calculator shells: 55/55.
+- Production browser smoke passed on `https://wealtharrays.com`: homepage, all registry calculators, Calculate/Compare interactions, shareable inputs, local save/load, PDF download and 375px overflow checks.
+- Four production money pages (SIP, SWP, FIRE, Rent vs Buy) passed at 375/768/1280px. Eleven tested calculations stayed blank while editing and updated only after clicking Calculate.
+- Production embed and homepage search smoke passed. Exact merge-SHA Cloudflare Worker build and runtime provenance matched before live smoke.
+- Production deployment hygiene passed: all **241** manifest files reachable and **17** internal-path probes blocked. Production `/v1/health` returned a valid liveness response; this does **not** prove SaaS readiness.
+- Strict production mobile Lighthouse: **7 routes × 3 runs = 21 runs**, all thresholds passed. Route medians: Performance 97–98, Accessibility 100, Best Practices 100, SEO 92; maximum observed CLS 0.0758, TBT 6.5 ms and LCP 2,350 ms. Emulated 360×800, DPR 2, 4× CPU slowdown and simulated slow 4G; this is lab evidence, not physical-device or field INP evidence.
+- Lighthouse diagnostics: homepage normal baseline made zero Google Funding Choices requests; SWP CPU profile and observer probe were captured. No evidence justifies changing consent behavior based on Funding Choices.
+- Evidence links: [merged PR #138](https://github.com/goyalalok565-byte/wealtharrays.github.io/pull/138), [production smoke run 45042953874](https://github.com/goyalalok565-byte/wealtharrays.github.io/actions/runs/45042953874), [mobile Lighthouse run 45042953831](https://github.com/goyalalok565-byte/wealtharrays.github.io/actions/runs/45042953831).
 
-1. **P0-1 Calculator CLS:** PR #88 carries the missing `.calc-widget` host class and static reservation. Do not merge until strict release gates and browser regressions pass.
-2. **P0-2 Performance gates:** This PR adds strict numeric checks for Performance >=90, CLS <=0.10, TBT <=200ms and LCP <=2500ms, retaining accessibility >=95, best practices >=80 and SEO >=90. Tests must prove a threshold violation fails. The current preview is expected to fail until performance is improved; never relax thresholds.
-3. **P0-3 Tax terminology:** PR #88 includes the Tax Year 2026-27 widget wording update to Section 156 plus source/runtime regression coverage and build audit. No formula or eligibility logic changed. CA/legal review is still a release prerequisite.
-4. **P0-4 Registry source of truth:** PR #88 removes stale 47/55 workflow labels and adds a registry audit across calculator pages, split definitions, homepage, tools, search, sitemap, `llms.txt`, methodology and metadata. The previous Platform Gates run passed; revalidation is pending for the latest ad-loading fix.
-5. **P0-5 Health and monitoring:** PR #88 adds `GET /v1/health` with API version, liveness, D1 probe, Supabase/Razorpay/rate-limiter readiness flags, `ready_for_saas`, no secret values, OpenAPI docs and Worker routing regression tests. A 15-minute GitHub Actions health monitor and post-deploy health check are included; live monitoring starts only after deployment.
-6. **P0-6 Deployment hygiene:** PR #88 adds a shared exclusion policy for QA, scripts, docs, tests, workflows, bundled source-only runtime modules, backups and archives; a deterministic public-file manifest; local dist inventory audit; and a production check that probes internal paths and HEAD-checks manifest files. The previous Platform Gates run passed; fresh CI and post-deploy verification remain pending.
+### Current quality assessment (engineering estimates, not global rankings)
 
-## Phase 1 — blocked pending Phase 0
+| Area | Score / 100 | Basis and limitation |
+|---|---:|---|
+| Calculation accuracy | 82 | 55 browser calculators, 244 CI tests and independent vectors; legal/tax review remains external |
+| Performance | 96 | Seven production routes passed strict three-run mobile lab gates; field Core Web Vitals remain unknown |
+| Interaction smoothness | 85 | Production browser interactions pass; physical-device profiling and field INP remain unknown |
+| SEO | 82 | Lighthouse SEO 92 and technical indexation contracts pass; non-brand search acquisition remains weak |
+| AEO/GEO | 65 | Machine-readable contract exists; external answer-engine visibility is not an outcome guarantee |
+| Content quality | 60 | 55/55 value-content checks; independent editorial/financial expert review and depth across all pages remain |
+| Accessibility | 90 | Seven Lighthouse routes scored 100 and static gates pass; manual screen-reader/keyboard review remains |
+| Security | 78 | CodeQL and platform security gates pass; live auth/billing configuration, abuse monitoring and legal privacy review remain |
+| Globalization | 32 | Global structure exists; API exposes 20 models and country-specific engines/localization remain limited |
+| SaaS readiness | 35 | Worker health liveness passes; D1, Supabase and Razorpay end-to-end activation is not verified |
+
+### Search and monetization evidence
+
+- Google Search Console, 2026-10-24 to 2026-11-20: 38 clicks, 96 impressions, 39.58% CTR and average position 11.88. 29 clicks came from the branded `wealth arrays` query; meaningful non-brand acquisition is not yet established. Search Console showed 16 countries with impressions; India supplied 38 clicks. This is an early baseline, not scale.
+- The API model registry currently contains **20** models, not 55. Do not advertise full 55-model public API coverage.
+- `ads.txt` publisher record exists, but AdSense approval, active publisher ad units, fill rate and earnings are not verified. A publisher record alone is not revenue.
+- Razorpay checkout/webhook code exists, but D1, Supabase Auth, Razorpay plans/secrets, test-mode lifecycle, server-enforced paid entitlements and Paddle global seller/payout approval remain owner-side activation tasks.
+- No revenue, global ranking, product-market fit, or number-one status is claimed.
+
+### Phase 0 — status and remaining blockers
+
+- **Engineering release gates:** passed for the current production SHA as listed above.
+- **Tax terminology:** current TY 2026-27 wording uses Section 156; AY 2026-27 under the 1961 Act remains Section 87A. Formula/eligibility model has not been independently approved by a CA/lawyer. Obtain review before tax-product expansion or paid tax workflows.
+- **Field performance:** connect/validate real-user Core Web Vitals and mobile INP; Lighthouse lab TBT is not INP.
+- **Content and discovery:** grow non-brand topical authority with reviewed original content; measure Search Console query/page trends, indexing and conversion. Do not mass-generate thin pages.
+- **SaaS and privacy:** keep account/cloud/billing features fail-closed until owner credentials, migrations, test checkout/webhooks, backup/restore, monitoring, deletion/export controls and DPDP review are complete.
+- **Open PRs #88 and #97 are stale, diverged historical candidates; do not merge them.** PR #133 is an older docs-only candidate superseded by the current verification record. Dependency PRs #136/#137 require their own current-main review/CI and are not release blockers for the current product deployment.
+
+## Current next actions
+
+1. Owner: configure Cloudflare D1 + Worker bindings, Supabase Auth, Razorpay test plans/webhook and secrets directly in GitHub Settings; never share secret values in chat.
+2. Owner: obtain CA/lawyer review for TY 2026-27 tax terminology, assumptions and eligibility language; confirm Paddle India payout and seller approval before global checkout.
+3. Engineering: perform real-device accessibility/performance review, establish field INP/Core Web Vitals and privacy-safe product/conversion analytics.
+4. Engineering: plan Phase 1 activation only after external setup and legal review; expand API beyond 20 models only with adapter equivalence and independent golden vectors.
+
+## Phase 1 — blocked pending owner activation and legal review
 
 Backend activation: Cloudflare Worker + D1, Supabase Auth, Razorpay test-mode subscriptions, server-side Free/Pro entitlements, backups, monitoring and error tracking.
 
@@ -112,18 +144,18 @@ Owner configures these directly in GitHub Settings > Secrets. Never request secr
 
 - India-first, global architecture; metadata-only country codes are not country engines.
 - Preserve financial formulas unless authoritative reference vectors and tests justify a change.
-- Do not merge PR #88 until strict mobile thresholds, accessibility and browser checks pass.
+- Historical decision: PR #88 was not a valid current-main release candidate; it is now stale/diverged and must not be merged.
 - Do not alter ads/CMP based on one Lighthouse observation; profile first.
 - Local `dist/` is not a substitute for production Cloudflare evidence.
 - Never claim AdSense approval, traffic, revenue, rankings or SaaS activation without measurements.
 
-Active verification PR: #88 (`fix/phase0-clean-mainline-2026-11-20`), based on current `main`. This branch consolidates the CLS, tax terminology, strict performance gates, registry parity, health monitor, deployment hygiene and ad-slot-aware third-party loading work. Do not merge until the seven-route release matrix passes.
+PR #88 is a historical, stale/diverged candidate and has been superseded by changes merged through current main, including the verified PR #138 release. PR #97 is likewise stale/diverged; neither is an active release candidate.
 
 ## Next three actions
 
-1. Re-run canonical CI, Platform Gates and the full PR #88 browser suite after the AdSense slot-detection fix; confirm consent, no-slot pages and any future slot-bearing page behavior.
-2. Complete seven-route mobile Lighthouse, homepage TBT diagnosis and SWP CPU profiling; fix measured route-level failures without changing release thresholds and rerun all checks on the final head.
-3. Only after the seven-route release matrix passes, review and merge PR #88, verify the Cloudflare deployment manifest and `/v1/health`, measure production Core Web Vitals, and obtain CA/legal review of tax eligibility wording.
+1. Owner: activate and verify D1, Supabase Auth and Razorpay test-mode subscriptions/webhooks/entitlements; keep features fail-closed until this is proven.
+2. Owner: obtain CA/legal review of Tax Year 2026-27 terminology, assumptions and eligibility language; confirm Paddle seller/payout approval before global billing.
+3. Engineering: add real-device accessibility/performance checks and privacy-safe field INP/Core Web Vitals analytics; expand public API only through equivalence-tested adapters.
 
 
 ## Owner decisions — 2026-11-20
@@ -136,9 +168,9 @@ Active verification PR: #88 (`fix/phase0-clean-mainline-2026-11-20`), based on c
 
 ## Snapshot baseline
 
-PR #89 (merged) adds 275 snapshots (55 calculators × default/zero/blank/large/invalid) and independent top-10 reference tests. Canonical CI passed; Platform Gates status pending recheck. These snapshots lock current behaviour, not correctness by themselves.
+PR #89 (merged) added 275 snapshots (55 calculators × default/zero/blank/large/invalid) and independent top-10 reference tests. The current-main verification in the section above supersedes the historical pending Platform Gates note.
 
-PR #88 Cloudflare bot reported a successful Worker deployment from unmerged head 6221a1b with a `/production/builds/` dashboard record. Treat as production Worker deployment report. Pages and live `/v1/health` remain unverified.
+PR #88's unmerged-head Cloudflare Worker build report is historical and is not current production evidence. Current exact-main Worker deployment, runtime provenance, Pages production smoke and API health liveness are recorded in the 2026-11-22 verification section above.
 
 
 CI scope: strict seven-route Lighthouse runs on PR C (performance branch), manual dispatch and main-branch release validation. PR A/B run Canonical CI and Platform Gates plus the Lighthouse threshold unit tests; they do not run the performance measurement because they do not own performance changes. No thresholds are relaxed; PR C must pass the same strict limits.
