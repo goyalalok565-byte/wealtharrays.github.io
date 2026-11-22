@@ -107,7 +107,7 @@ jobs:
         run: node qa/lighthouse-quality-gate.mjs /tmp/wa-lighthouse/summary.json
       - name: Upload Lighthouse and CPU profile reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: wealth-arrays-seven-page-mobile-performance
           path: /tmp/wa-lighthouse/
@@ -163,7 +163,7 @@ jobs:
         run: node ../pr-tools/qa/homepage-performance-diagnostic.mjs
       - name: Upload main-branch baseline artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: wealth-arrays-main-homepage-baseline
           path: /tmp/wa-main-lighthouse/
