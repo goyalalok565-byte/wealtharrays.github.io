@@ -30,8 +30,9 @@ A longer term can lower EMI while increasing total interest. Do not treat the EM
 ## Official references reviewed
 
 - [RBI — Key Facts Statement for Loans & Advances](https://rbi.org.in/Scripts/NotificationUser.aspx?Id=12663)
-- [CFPB — How mortgage lenders calculate monthly payments](https://www.consumerfinance.gov/ask-cfpb/how-do-mortgage-lenders-calculate-monthly-payments-en-1965/)
-- [CFPB — Where to get auto loan rates](https://www.consumerfinance.gov/ask-cfpb/where-can-i-get-information-on-auto-loan-rates-en-761/)
+- [CFPB — Where to get information on auto loan rates](https://www.consumerfinance.gov/ask-cfpb/where-can-i-get-information-on-auto-loan-rates-en-761/)
+- [CFPB — How to compare auto loan offers](https://www.consumerfinance.gov/ask-cfpb/how-do-i-compare-auto-loan-offers-what-should-i-look-at-besides-the-monthly-payment-en-753/)
+
 
 ## Editorial and implementation notes
 
