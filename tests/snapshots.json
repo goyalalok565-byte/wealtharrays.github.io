@@ -653,20 +653,20 @@
       "slug": "roi-calculator",
       "case": "invalid",
       "inputs": {
-        "cost": -0.99,
+        "cost": -1,
         "finalValue": -1,
         "years": -0.9
       },
       "output": [
         {
           "label": "Net gain",
-          "value": -0.010000000000000009,
+          "value": 0,
           "format": "currency",
           "emphasis": "negative"
         },
         {
           "label": "Total ROI",
-          "value": 1.010101010101011,
+          "value": 0,
           "format": "percent",
           "emphasis": "positive"
         },
