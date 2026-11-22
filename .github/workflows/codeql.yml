@@ -40,8 +40,6 @@ jobs:
               - '**/wa-site-runtime.js'
               - '**/wa-home-runtime.js'
               - '**/wa-calculator-runtime.js'
-              - '**/wa-calculator-runtime.js'
-              - '**/widget.js'
               - '**/widget-bootstrap.js'
 
       - name: Perform CodeQL analysis
