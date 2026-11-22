@@ -1,10 +1,42 @@
 import { API_VERSION, calculate, error, json, MODEL_LIST } from "./_shared.js";
 export async function onRequestOptions() { return new Response(null, { status: 204, headers: { ...({ "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET,POST,OPTIONS", "Access-Control-Allow-Headers": "Content-Type,Authorization", "Access-Control-Max-Age": "86400", Vary: "Origin" }) } }); }
+async function readJsonBodyLimited(request, limit = 32768) {
+  if (!request.body) throw new SyntaxError("Missing request body");
+  const reader = request.body.getReader();
+  const chunks = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > limit) {
+        try { await reader.cancel(); } catch {}
+        const error = new Error("Request body must be 32 KB or smaller.");
+        error.code = "PAYLOAD_TOO_LARGE";
+        throw error;
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
+}
 export async function onRequestPost({ request }) {
-  const length = Number(request.headers.get("content-length") || 0);
-  if (length > 32768) return error("PAYLOAD_TOO_LARGE", "Request body must be 32 KB or smaller.", 413);
   let body;
-  try { body = await request.json(); } catch { return error("INVALID_JSON", "Request body must be valid JSON.", 400); }
+  try {
+    body = await readJsonBodyLimited(request);
+  } catch (e) {
+    if (e?.code === "PAYLOAD_TOO_LARGE") return error("PAYLOAD_TOO_LARGE", "Request body must be 32 KB or smaller.", 413);
+    return error("INVALID_JSON", "Request body must be valid JSON.", 400);
+  }
   if (!body || typeof body !== "object" || Array.isArray(body) || typeof body.model !== "string" || !body.inputs || typeof body.inputs !== "object" || Array.isArray(body.inputs)) return error("INVALID_REQUEST", "Provide a model string and an inputs object.", 400);
   const model = body.model.toLowerCase();
   const registered = MODEL_LIST.find(item => item.id === model);
