@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { inspectExpectedNotFoundRedirect } from './expected-not-found-redirect.mjs';
 
 const base = (process.env.BASE_URL || 'https://wealtharrays.com').replace(/\/$/, '');
 const manifestUrl = base + '/.well-known/wa-public-manifest.json';
@@ -69,23 +70,10 @@ const productionOrigin = new URL(base).origin;
 for (const route of forbiddenProbes) {
   const result = await fetch(base + route, { method: 'HEAD', redirect: 'manual', signal: AbortSignal.timeout(15000) });
   if ([403, 404, 410].includes(result.status)) continue;
-  let terminalStatus = null;
-  let terminalLocation = result.headers.get('location') || '';
-  if (result.status >= 300 && result.status < 400 && terminalLocation) {
-    const destination = new URL(terminalLocation, base);
-    if (destination.origin === productionOrigin && destination.pathname === '/404.html') {
-      const notFound = await fetch(destination.href, { method: 'GET', redirect: 'manual', signal: AbortSignal.timeout(15000) });
-      terminalStatus = notFound.status;
-      if ([403, 404, 410].includes(notFound.status)) continue;
-      if (notFound.status === 200 && (notFound.headers.get('content-type') || '').includes('text/html')) {
-        const body = await notFound.text();
-        const explicitNoindex = /<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(body);
-        const explicitNotFoundPage = body.includes('<title>Page moved');
-        if (explicitNoindex && explicitNotFoundPage) continue;
-      }
-    }
-  }
-  leaked.push(route + ' (HTTP ' + result.status + ', location ' + (terminalLocation || 'missing') + (terminalStatus === null ? '' : ', terminal HTTP ' + terminalStatus) + ')');
+  const terminalLocation = result.headers.get('location') || '';
+  const notFound = await inspectExpectedNotFoundRedirect(result, base, fetch);
+  if (notFound.accepted) continue;
+  leaked.push(route + ' (HTTP ' + result.status + ', location ' + (terminalLocation || 'missing') + (notFound.terminalStatus === null ? '' : ', terminal HTTP ' + notFound.terminalStatus) + ', final ' + (notFound.finalUrl || 'unresolved') + ')');
 }
 if (leaked.length) throw new Error('Internal repository paths are publicly reachable: ' + leaked.join(', '));
 console.log('Production deployment hygiene PASS — ' + manifest.public_files.length + ' manifest files are reachable; ' + forbiddenProbes.length + ' internal path probes are blocked; manifest commit is deployed.');
