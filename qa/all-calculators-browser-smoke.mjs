@@ -130,6 +130,45 @@ try {
         assert(lossValues[2].trim() === expectedLoss.loss, 'capital-gain: after-tax result must preserve the loss');
       }
 
+      if (calc.id === 'roi') {
+        // The production form requires a positive investment. Lower min only in this edge-case test
+        // so the calculation layer's zero-denominator display can be exercised deliberately.
+        await page.locator('#f-cost').evaluate(el => { el.min = '0'; });
+        for (const [id, value] of [['cost', 0], ['finalValue', 1000], ['years', 5]]) await page.locator('#f-' + id).fill(String(value));
+        await page.locator('#calc-widget button[id$="-calculate"]').click();
+        await page.waitForFunction(() => [...document.querySelectorAll('#calc-widget .calc-result-label')].some(el => el.textContent.includes('not defined: cost is 0')), null, { timeout: 5000 });
+        const rows = page.locator('#calc-widget .calc-result-row');
+        const labels = [];
+        const values = [];
+        for (let i = 0; i < await rows.count(); i++) {
+          labels.push((await rows.nth(i).locator('.calc-result-label').innerText()).trim());
+          values.push((await rows.nth(i).locator('.calc-result-value').innerText()).trim());
+        }
+        assert(labels[1].includes('not defined: cost is 0') && labels[2].includes('not defined: cost is 0'), 'roi: zero-cost ratios must be explicitly undefined');
+        assert(values[1].trim() === '—' && values[2].trim() === '—', 'roi: undefined ratios must not display as 0%');
+        // Restore a valid non-zero denominator before independent field-boundary checks.
+        // Otherwise the following finalValue=0 test inherits cost=0 and masks the
+        // boundary behavior with intentionally undefined ROI ratios.
+        await page.locator('#f-cost').fill('10000');
+        await page.locator('#f-finalValue').fill('14500');
+        await page.locator('#f-years').fill('3');
+        await page.locator('#calc-widget button[id$="-calculate"]').click();
+      }
+      if (calc.id === 'profit-margin') {
+        for (const [id, value] of [['revenue', 0], ['cogs', 0], ['expenses', 0]]) await page.locator('#f-' + id).fill(String(value));
+        await page.locator('#calc-widget button[id$="-calculate"]').click();
+        await page.waitForFunction(() => [...document.querySelectorAll('#calc-widget .calc-result-label')].some(el => el.textContent.includes('not defined: revenue is 0')), null, { timeout: 5000 });
+        const rows = page.locator('#calc-widget .calc-result-row');
+        const labels = [];
+        const values = [];
+        for (let i = 0; i < await rows.count(); i++) {
+          labels.push((await rows.nth(i).locator('.calc-result-label').innerText()).trim());
+          values.push((await rows.nth(i).locator('.calc-result-value').innerText()).trim());
+        }
+        assert(labels[1].includes('not defined: revenue is 0') && labels[3].includes('not defined: revenue is 0'), 'profit-margin: zero-revenue ratios must be explicitly undefined');
+        assert(values[1].trim() === '—' && values[3].trim() === '—', 'profit-margin: undefined margins must not display as 0%');
+      }
+
       // Exercise every declared numeric min/max through the real Calculate event.
       // Batch browser-side interactions per route to avoid thousands of Playwright round trips.
       const boundaryChecks = calc.fields.filter(f => f.type !== 'select').flatMap(f => [
@@ -153,11 +192,19 @@ try {
           button.click();
           await nextFrame();
           const rows = [...document.querySelectorAll('#calc-widget .calc-result-row')];
-          const values = rows.map(row => row.querySelector('.calc-result-value')?.textContent?.trim() || '');
+          const invalidValues = rows.filter(row => {
+            const label = row.querySelector('.calc-result-label')?.textContent?.trim() || '';
+            const value = row.querySelector('.calc-result-value')?.textContent?.trim() || '';
+            const intentionallyUndefined = value === '—' && /not defined/i.test(label);
+            return !value || /NaN|Infinity|undefined|null/.test(value) || (value === '—' && !intentionallyUndefined);
+          }).map(row => ({
+            label: row.querySelector('.calc-result-label')?.textContent?.trim() || '',
+            value: row.querySelector('.calc-result-value')?.textContent?.trim() || ''
+          }));
           results.push({
             ...check,
             rowCount: rows.length,
-            invalidValues: values.filter(value => !value || /NaN|Infinity|undefined|null|^—$/.test(value))
+            invalidValues
           });
           input.value = previous;
           input.dispatchEvent(new Event('input', { bubbles: true }));
