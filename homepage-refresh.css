@@ -410,3 +410,11 @@ main#main-content .section-head>a{display:inline-flex;align-items:center;min-hei
 main#main-content .cat-grid{gap:28px!important}
 .ledger-index .tool-board{display:grid;gap:28px;overflow:visible;border:0;background:transparent}
 .ledger-index .ledger-row{display:flex;min-height:88px;border:1px solid var(--line);border-radius:14px}
+
+
+/* Keep the quick EMI result readable in both light and dark themes. */
+.wa-emi-result{color:var(--text)!important}
+.wa-emi-result>span{color:var(--text)!important;opacity:1!important}
+.wa-emi-result output{color:var(--text)!important}
+.wa-emi-result-meta span{color:var(--text)!important;opacity:1!important}
+.wa-emi-result-meta strong{color:var(--text)!important;opacity:1!important}

@@ -17,6 +17,43 @@
 /*.js
   Cache-Control: public, max-age=3600, stale-while-revalidate
 
+/styles.css
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/phase3-seo.css
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/phase4-premium.css
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/cls-fixes.css
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/homepage-refresh.css
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/theme-init.js
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/homepage-business.js
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/homepage-search.js
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/consent-loader.js
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+
 /widget
   Cache-Control: no-store
   CDN-Cache-Control: no-store
@@ -33,12 +70,15 @@
   Cache-Control: no-cache, no-store, must-revalidate
 
 /wa-site-runtime.js
+  ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 
 /wa-home-runtime.js
+  ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 
 /wa-calculator-runtime.js
+  ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 
 /*.svg
