@@ -3,12 +3,20 @@ import worker from "../worker.mjs";
 
 const assetCalls = [];
 let limiterCalls = 0;
+let writeLimiterCalls = 0;
 let allowRateLimitedRequest = true;
 const env = {
   PUBLIC_API_LIMITER: {
     async limit({ key }) {
       limiterCalls++;
-      assert.match(key, /^\/v1\/(calculate|india-tax|fx|scenarios|billing\/checkout|billing\/cancel):/);
+      assert.match(key, /^\/v1\/(calculate|india-tax|fx|billing\/webhook):/);
+      return { success: allowRateLimitedRequest };
+    }
+  },
+  WRITE_API_LIMITER: {
+    async limit({ key }) {
+      writeLimiterCalls++;
+      assert.match(key, /^\/v1\/(scenarios|billing\/checkout|billing\/cancel):/);
       return { success: allowRateLimitedRequest };
     }
   },
@@ -49,6 +57,7 @@ assert.equal(JSON.stringify(healthData).includes("test-secret-must-not-leak"), f
 assert.equal(JSON.stringify(healthData).includes("public-anon-test-value"), false);
 assert.equal(JSON.stringify(healthData).includes("turnstile-secret-must-not-leak"), false);
 assert.equal(healthData.dependencies.turnstile, "configured");
+assert.equal(healthData.dependencies.write_api_rate_limiter, "configured");
 const unhealthy = await worker.fetch(new Request("https://example.test/v1/health"), {
   ...env,
   DB: { prepare() { return { async first() { throw new Error("database offline"); } }; } }
@@ -98,7 +107,12 @@ const throttledWrite = await worker.fetch(new Request("https://example.test/v1/s
 }), env, {});
 assert.equal(throttledWrite.status, 429, "Cloud writes must pass through the rate limiter");
 assert.equal(throttledWrite.headers.get("Retry-After"), "60");
+assert.equal(writeLimiterCalls, 1, "User writes must use the dedicated write limiter");
 allowRateLimitedRequest = true;
+const missingWriteLimiter = await worker.fetch(new Request("https://example.test/v1/scenarios", {
+  method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ calculator_id: "sip", inputs: {} })
+}), { ...env, WRITE_API_LIMITER: undefined }, {});
+assert.equal(missingWriteLimiter.status, 503, "User writes must fail closed without the dedicated write limiter");
 const turnstileNotConfigured = await worker.fetch(new Request("https://example.test/v1/scenarios", {
   method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ calculator_id: "sip", inputs: {} })
 }), env, {});
@@ -107,6 +121,13 @@ const turnstileRequired = await worker.fetch(new Request("https://example.test/v
   method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ calculator_id: "sip", inputs: {} })
 }), { ...env, TURNSTILE_SECRET_KEY: "test-turnstile-secret" }, {});
 assert.equal(turnstileRequired.status, 403);
+allowRateLimitedRequest = false;
+const throttledWebhook = await worker.fetch(new Request("https://example.test/v1/billing/webhook", {
+  method: "POST", headers: { "Content-Type": "application/json", "cf-connecting-ip": "203.0.113.12" }, body: "{}"
+}), env, {});
+assert.equal(throttledWebhook.status, 429, "Signed webhook writes must also be rate-limited");
+assert.equal(throttledWebhook.headers.get("Retry-After"), "60");
+allowRateLimitedRequest = true;
 const originalFetch = globalThis.fetch;
 let turnstileSuccess = false;
 globalThis.fetch = async (url, options) => {
