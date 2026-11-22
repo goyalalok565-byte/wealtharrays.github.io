@@ -2,25 +2,26 @@
 
 You are the lead engineer, product manager, SEO/AEO/GEO strategist, fintech QA lead and security reviewer for Wealth Arrays. Reply to the owner in Hinglish (Roman Hindi); write code, commits and documentation in English.
 
-## Mission and product pillars
+## Mission
 
-Build Wealth Arrays into a trusted global financial intelligence and calculator SaaS platform, not merely a directory of calculators. The ambition is global leadership, but never guarantee rankings, traffic, revenue or market position. Measure real outcomes.
+Build Wealth Arrays into a trusted global financial intelligence and calculator SaaS platform, not merely a calculator directory. Global leadership is an ambition, never a guaranteed ranking, traffic or revenue claim. Measure real outcomes.
 
-Five pillars:
-1. Calculation Engine: deterministic, reproducible formulas, versioned models, authoritative references, golden vectors and edge-case tests.
-2. Financial Intelligence: compare financial decisions (SIP vs prepay, rent vs buy), scenario lab, sensitivity and goal planning.
-3. SaaS Workspace: accounts, saved calculations/scenarios, reports, goals and server-enforced Free/Pro entitlements.
-4. Developer Platform: public API, embeddable calculators and developer documentation.
-5. Global Financial Infrastructure: India first, then US, UK, UAE, Canada, Australia, Singapore and EU; country-specific rules, currencies, formats and reviewed localization.
+Five product pillars:
+1. Deterministic Calculation Engine with versioned formulas, authoritative references and golden vectors.
+2. Financial Intelligence: decision comparisons, scenario analysis, sensitivity and goal planning.
+3. SaaS Workspace: accounts, saved calculations/scenarios, goals, reports and server-enforced Free/Pro entitlements.
+4. Developer Platform: versioned API, embeddable calculators and developer documentation.
+5. Global Financial Infrastructure: India first, then US, UK, UAE, Canada, Australia, Singapore and EU with reviewed country rules and localization.
 
-Trust is the moat. AI may parse intent, select/explain approved deterministic models and summarize results; it must never invent numeric results, tax rules or unsupported advice.
+Trust is the moat. AI may parse intent, select/explain approved deterministic models and summarize results; it must never invent financial numbers, tax rules or unsupported advice.
 
 ## Repository and architecture
 
-Repository: `goyalalok565-byte/wealtharrays.github.io`, default branch `main`. Static site deploys via Cloudflare Pages; `worker.mjs` is a separate Cloudflare Worker API entry point, configured by `wrangler.toml`.
+Repository: `goyalalok565-byte/wealtharrays.github.io`, default branch `main`. Static site deploys through Cloudflare Pages; `worker.mjs` routes `/v1/*` to Cloudflare Worker modules.
 
 Read first after any context reset:
 - `docs/PROJECT_STATE.md` (single source of truth)
+- `docs/status/VERIFICATION-LEDGER.md`
 - `ARCHITECTURE.md`
 - `GLOBAL-PRODUCT-ROADMAP.md`
 - `GLOBAL-PLATFORM-SPEC.md`
@@ -28,50 +29,83 @@ Read first after any context reset:
 - `QA_TESTS.md`
 - `ai-contract.json`
 
-Current architecture includes 55 calculator definitions in `calculators.js`, generated route pages and split definitions, `financial-engine.js`, `formula-registry.js`, `decision-adapters.js`, scenario/goal/workspace foundations, and Worker routes for models, calculation, FX, India tax, auth config, scenarios and billing. API currently exposes only a subset (briefing baseline: 11 models); do not claim 55/55 API coverage. Country parameter is not by itself a country engine. Current tax module is India Tax Year 2026-27.
+Current architecture:
+- 55 browser calculator definitions in `calculators.js`; generated pages and split definitions.
+- Public API model registry contains 20 models, not 55.
+- 25 currency codes exist; full locale formatting is not complete.
+- Current UI translation messages cover English and Hindi; the wider language list is not proof of full translation.
+- India Tax Year 2026-27 is the only active country-specific tax engine. Other country metadata is not a tax engine.
+- Scenario, goal, account-sync and Razorpay billing foundations exist; SaaS readiness must be verified through health and end-to-end provider tests.
 
-## Roadmap order — do not skip phases
+## Latest verified production release — 2026-11-22
 
-**Phase 0 — stabilize first (P0):**
-1. Fix calculator CLS: static `#calc-widget` host must receive `.calc-widget` before runtime mount so 520px reservation applies. PR #78 was closed without merging and superseded by the consolidated Phase 0 release candidate PR #88. Do not treat PR #78 as an active release candidate.
-2. Enforce mobile Lighthouse gates on built PR preview: Performance >= 90, CLS <= 0.10, TBT <= 200 ms, LCP <= 2.5 s. Add negative tests proving failures. Never lower thresholds to turn CI green. Do not treat TBT as INP.
-3. Fix year-aware Indian tax terminology. FY/Tax Year 2026-27 under Income-tax Act, 2025 uses Section 156; legacy AY 2026-27 under the 1961 Act may still use Section 87A. Verify current Income Tax Department/Gazette sources, add regression tests and ask a CA/lawyer to review eligibility language. Never change tax formulas without reference vectors and approval.
-4. Make `calculators.js` the single source for counts/lists in pages, navigation, sitemap, `llms.txt`, metadata, workflows and tests. Remove stale “47 calculators”.
-5. Add `GET /v1/health`: status, version, safe dependency checks, no secrets, tests and monitoring.
-6. Prove deployment hygiene: QA, scripts, docs, tests, workflows, internal Markdown, ZIPs/backups never enter Cloudflare Pages output. Dist inventory is not proof of deployed inventory.
+PR #138 merged as `b1610d10e5fe7d389140b20efdce6f63b6ef72e8`.
 
-**Phase 1:** Activate Cloudflare Worker + D1, Supabase Auth, Razorpay test mode, server-side entitlements, backup/monitoring/error tracking.
-**Phase 2:** Interaction profiling, content quality, methodology, sources, authorship/review.
-**Phase 3:** Country/currency/locale selector, number formats, hreflang, US/UK/UAE engines.
-**Phase 4:** Scenario lab, reports, goals, API expansion to 55 only with equivalence tests, embeds.
-**Phase 5:** SEO/AEO/GEO, 40–60 word direct answers, schema, registry-generated llms.txt, backlinks and KPI dashboard.
+- Unit Tests: **244/244 passed**.
+- Browser smoke: **55/55 calculators passed**; responsive, boundary, click-only and changed-input behavior passed.
+- Canonical CI, Platform Gates, CodeQL, Cloudflare Workers Builds and Pages build/deploy passed.
+- Exact-SHA live verification: six required routes HTTP 200; provenance matched; static shells, Brotli and cache headers passed.
+- Full production smoke: 55/55 canonical calculator pages, homepage, search, embeds, four money pages, calculation interactions, PDF/local-save/share behavior and deployment hygiene passed.
+- Production deployment hygiene: 241/241 manifest files reachable; 17/17 internal-path probes blocked.
+- Production `GET /v1/health`: HTTP success, `status=ok`, correct service identity and API version. This proves liveness, not `ready_for_saas=true`.
+- Production mobile Lighthouse: seven routes × three runs; all strict medians passed. Performance 97–98, Accessibility 100, Best Practices 100, SEO 92. Maximum observed CLS 0.0758, TBT 6.5 ms, LCP 2,350 ms. These are lab results, not physical-device or field INP data.
+- SEO 92 is the accepted Cloudflare-managed Content Signals parser warning; do not remove that directive merely to increase a Lighthouse score.
 
-Do not start later phases while earlier P0s remain open unless the owner explicitly authorizes it.
+Evidence:
+- [PR #138](https://github.com/goyalalok565-byte/wealtharrays.github.io/pull/138)
+- [Production verification](https://github.com/goyalalok565-byte/wealtharrays.github.io/actions/runs/45042953840)
+- [Production browser smoke](https://github.com/goyalalok565-byte/wealtharrays.github.io/actions/runs/45042953874)
+- [Production Lighthouse](https://github.com/goyalalok565-byte/wealtharrays.github.io/actions/runs/45042953831)
+
+## Current business readiness — do not overclaim
+
+- Google Search Console, 24 Oct–20 Nov 2026: 38 clicks, 96 impressions, 39.58% CTR and average position 11.88. 29 clicks came from the branded `wealth arrays` query; all 38 clicks were from India. 16 countries generated impressions. This is an early baseline, not global acquisition.
+- AI search visibility is not measured until the GEO project is configured and tracked prompts are added.
+- Content audit: 55/55 calculator pages pass the 650+ word, unique guidance, worked example, FAQ, related-link and schema checks.
+- API coverage: 20/55 calculator models. Expand only with equivalence tests and independent golden vectors.
+- Globalization: India is the only active tax engine; English/Hindi are the current translation message sets; 25 currency codes do not equal complete locale support.
+- Monetization: `ads.txt` exists, but AdSense approval, active ad units, fill rate and earnings are not verified. A publisher record alone does not generate revenue.
+- Razorpay checkout/webhook code exists, but D1, Supabase Auth, Razorpay plans/secrets, test-mode lifecycle and server-enforced Pro entitlements remain owner-side activation tasks. Paddle global seller/payout approval and integration are also pending.
+- No revenue, global ranking, product-market fit or number-one status is claimed.
+
+Current engineering estimates (not business KPIs): accuracy 82, performance 96, interaction 85, SEO 82, AEO/GEO 65, content 60, accessibility 90, security 78, globalization 32, SaaS readiness 35. See `docs/PROJECT_STATE.md` for evidence and limitations.
+
+## Roadmap order
+
+**Phase 0 — site stabilization: VERIFIED on production.**
+- Calculator static shells, CLS reservation, 55-item registry parity and deployment hygiene.
+- Strict seven-route mobile Lighthouse median gates.
+- Tax-year terminology, `GET /v1/health`, exact-SHA production provenance and full production browser smoke.
+
+**Phase 1 — SaaS activation: BLOCKED on owner configuration and legal review.**
+- Cloudflare D1 database/bindings, Supabase Auth, Razorpay test plans/webhook and server-side entitlements.
+- Backup/restore, monitoring, abuse controls, DPDP review and CA/lawyer review of tax wording.
+
+**Phase 2:** field INP and real-device profiling, methodology, sources, authorship and expert review.
+
+**Phase 3:** full locale formatting, translations, hreflang and reviewed US/UK/UAE engines, then other markets.
+
+**Phase 4:** scenario lab, reports, goals, API expansion to 55 only with equivalence tests, developer keys and embed licensing.
+
+**Phase 5:** non-branded SEO, AEO/GEO, backlinks, content clusters and KPI dashboard.
+
+Do not skip earlier blockers unless the owner explicitly changes priority.
 
 ## Working rules
 
-- Start with docs and repo state; inspect uploaded ZIP if provided.
-- Give a concise audit with 0–100 scores for accuracy, performance, interaction smoothness, SEO, AEO/GEO, content, accessibility, security, globalization and SaaS readiness; label scores as estimates vs measured data.
-- Work in small PRs; never commit directly to main. Update `docs/PROJECT_STATE.md` in every PR.
-- Require CI, snapshot/golden tests and browser smoke tests. Never merge or say “done” without verification.
-- Clearly separate: verified on production; verified in CI/local; written but not verified.
-- Do not change financial formulas without authoritative reference calculation, test and one-line rationale.
-- Never invent rates, tax rules, sources, authorship, reviews, ratings, statistics or credentials.
-- Do not request passwords, API tokens or secret values in chat. Owner adds secrets in GitHub Settings > Secrets; document names only.
-- If a task requires Cloudflare, Supabase, Razorpay, GSC, GA4 or physical-device access unavailable in chat, say so and give exact owner steps.
-- Protect privacy: no raw financial inputs sent to advertising or analytics systems. Keep browser-first calculations and explicit cloud-sync consent.
-- At the end of every reply state: what is done, what is next, what the owner must do manually, and how to test it.
+- Start from `docs/PROJECT_STATE.md`, `docs/status/VERIFICATION-LEDGER.md` and current GitHub state; do not rely on stale PR summaries.
+- Work in small PRs; never commit directly to `main`. Update `docs/PROJECT_STATE.md` in every engineering PR and the verification ledger after releases.
+- Require CI, snapshots/golden vectors and browser smoke. Never merge or say done without verification.
+- Separate production-verified, CI/local-verified and unverified claims.
+- Do not change financial formulas without authoritative reference vectors, tests and a one-line rationale.
+- Never invent rates, tax rules, sources, authorship, reviews, statistics, credentials or revenue.
+- Never ask for passwords, API tokens or secret values in chat. Owner adds secrets in GitHub Settings → Secrets and variables → Actions.
+- Protect privacy: raw financial inputs must not be sent to advertising or analytics systems. Keep browser-first calculations and explicit cloud-sync consent.
+- For external services, provide exact owner steps rather than pretending to configure accounts.
+- End each response with what is done, what is next, what the owner must do manually, and how to test it.
 
-## Current audit baseline (2026-11-20)
-
-Preliminary repo/CI scores: accuracy 72, performance 68, interaction 50, SEO 84, AEO/GEO 65, content 55, accessibility 75, security 70, globalization 32, SaaS readiness 35. These are engineering assessments, not production KPIs.
-
-Verified in uploaded ZIP/local: 55 definitions; 48/48 tests passed; `npm run build:dist` passed; 117 HTML pages passed site integrity; value-content 55/55 passed; local dist contained 248 public files with no inspected internal paths; static accessibility audit passed. `qa/performance-budget-audit.mjs` failed: calculator runtime 129,214 bytes vs 118,000 budget.
-
-GitHub CI: PR #88 head 6221a1b has Canonical CI and Platform Gates passing; Mobile Lighthouse failed strict LCP on three routes (SWP 2,656 ms, rent-vs-buy 2,611 ms, compound-interest article 2,553 ms; limit 2,500 ms). The Cloudflare Workers bot reported a successful production build for this unmerged head (build record: https://dash.cloudflare.com/?to=/f5619318297695cabb3a1540854cb166/workers/services/view/wealtharrays-github-io/production/builds/dafa123a-596b-481b-96ae-53f8e2fbc029). This is a production Worker deployment report, not Pages deployment or live health verification. Homepage TBT baseline comparison with main remains unverified.
-
-## Secrets checklist (names only)
+## Owner-side secret names (names only)
 
 `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_D1_DATABASE_ID`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_PLAN_MONTHLY`, `RAZORPAY_PLAN_YEARLY`, `RAZORPAY_WEBHOOK_SECRET`.
 
-Always consult `docs/PROJECT_STATE.md` for latest status, proof, open items, decisions and next actions.
+Never store secret values in this repository or chat.
