@@ -98,3 +98,9 @@ PR #100's first post-merge browser smoke run `45022653786` failed at the redirec
 - Evidence: [PR #138](https://github.com/goyalalok565-byte/wealtharrays.github.io/pull/138), [production smoke](https://github.com/goyalalok565-byte/wealtharrays.github.io/actions/runs/45042953874), [mobile Lighthouse](https://github.com/goyalalok565-byte/wealtharrays.github.io/actions/runs/45042953831).
 - Remaining owner / external verification: configure and test D1, Supabase Auth, Razorpay test-mode lifecycle and server-side entitlements; obtain CA/legal review of TY 2026-27 tax wording; verify AdSense approval/ad-unit delivery and Paddle India seller/payout eligibility; establish real-user Core Web Vitals, INP, backups, alerts, and DPDP review. Do not infer revenue or SaaS readiness from this release.
 
+## GitHub Actions Node 24 runtime upgrade — pending
+
+- Branch: `chore/upgrade-github-actions-node24-2026-11-22`.
+- Updates checkout v4→v5, setup-node v4→v7, upload-artifact v4→v7 across active workflows, including pinned artifact-action reference in workflow audit.
+- Motivation: current production/Lighthouse job logs emitted Node 20 deprecation warnings for v4 actions.
+- No product code, financial formulas or release thresholds changed. Fresh current-main CI and browser smoke are required before merge.

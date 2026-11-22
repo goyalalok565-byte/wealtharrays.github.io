@@ -17,10 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || (github.event_name == 'workflow_dispatch' && github.ref) || 'main' }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
       - name: Verify mobile release gate rejects threshold violations
@@ -107,7 +107,7 @@ jobs:
         run: node qa/lighthouse-quality-gate.mjs /tmp/wa-lighthouse/summary.json
       - name: Upload Lighthouse and CPU profile reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: wealth-arrays-seven-page-mobile-performance
           path: /tmp/wa-lighthouse/
@@ -118,15 +118,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || 'main' }}
           path: main
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.ref }}
           path: pr-tools
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
       - name: Install main dependencies and Lighthouse
@@ -163,7 +163,7 @@ jobs:
         run: node ../pr-tools/qa/homepage-performance-diagnostic.mjs
       - name: Upload main-branch baseline artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: wealth-arrays-main-homepage-baseline
           path: /tmp/wa-main-lighthouse/
