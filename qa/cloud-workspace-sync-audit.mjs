@@ -11,7 +11,7 @@ assert.match(helper,/window\.WATurnstile\.getToken/);
 assert.match(helper,/cf-turnstile-response/);
 const core=fs.readFileSync("wa-core.js","utf8");
 assert.match(core,/function setupTurnstile\(\)/);
-assert.match(core,/challenges\.cloudflare\.com\/turnstile\/v0\/api\.js/);
+assert.ok(core.includes("https://challenges.cloudflare.com/turnstile/v0/api.js"),"Turnstile script URL must remain pinned to Cloudflare");
 const accountJs=fs.readFileSync("account.js","utf8");
 assert.match(accountJs,/captcha_token:await window\.WATurnstile\.getToken\(\)/);
 assert.match(accountJs,/cf-turnstile-response/);
