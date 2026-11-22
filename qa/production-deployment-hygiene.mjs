@@ -65,9 +65,21 @@ const forbiddenProbes = [
   '/private-backup.zip'
 ];
 const leaked = [];
+const productionOrigin = new URL(base).origin;
 for (const route of forbiddenProbes) {
   const result = await fetch(base + route, { method: 'HEAD', redirect: 'manual', signal: AbortSignal.timeout(15000) });
-  if (![403, 404, 410].includes(result.status)) leaked.push(route + ' (HTTP ' + result.status + ')');
+  if ([403, 404, 410].includes(result.status)) continue;
+  if (result.status >= 300 && result.status < 400) {
+    const location = result.headers.get('location');
+    if (location) {
+      const destination = new URL(location, base);
+      if (destination.origin === productionOrigin && destination.pathname === '/404.html') {
+        const notFound = await fetch(destination.href, { method: 'HEAD', redirect: 'manual', signal: AbortSignal.timeout(15000) });
+        if ([403, 404, 410].includes(notFound.status)) continue;
+      }
+    }
+  }
+  leaked.push(route + ' (HTTP ' + result.status + ')');
 }
 if (leaked.length) throw new Error('Internal repository paths are publicly reachable: ' + leaked.join(', '));
 console.log('Production deployment hygiene PASS — ' + manifest.public_files.length + ' manifest files are reachable; ' + forbiddenProbes.length + ' internal path probes are blocked; manifest commit is deployed.');
