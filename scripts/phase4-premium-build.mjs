@@ -115,8 +115,26 @@ for(const file of htmlFiles){
     const mobileReserveHeights = { sip: 2100, swp: 2370, fire: 2540, 'rent-vs-buy': 3080 };
     const mobileReserveHeight = mobileReserveHeights[calc.id];
     const reserveRule = mobileReserveHeight ? `@media (max-width: 760px) { html[data-wa-calculator="${calc.id}"] #calc-widget.calc-widget { min-height: ${mobileReserveHeight}px; } }` : '';
-    const mountStabilityStyle = `<style id="wa-calculator-mount-stability">.wa-calculator-mounting #calc-widget [data-wa-static-shell="true"] { visibility: hidden; } ${reserveRule}</style>`;
-    if (!s.includes('id="wa-calculator-mount-stability"')) s = s.replace('</head>', `${mountStabilityStyle}</head>`);
+    const criticalLayoutStyle = `<style id="wa-calculator-critical-layout">
+      .calc-page { width: min(1040px, 100%); margin: auto; padding: 24px 20px 65px; }
+      .calc-title { font-size: clamp(38px, 6vw, 66px); line-height: 1; letter-spacing: -.065em; margin: 13px 0; }
+      .calc-desc { max-width: 720px; color: var(--muted); font-size: 16px; }
+      .calc-category-tag { display: inline-block; margin-top: 14px; color: var(--accent); font-size: 11px; font-weight: 800; }
+      .calc-body { display: grid; grid-template-columns: minmax(0, 1fr) 270px; gap: 20px; margin-top: 30px; }
+      .calc-main, .calc-widget { min-width: 0; }
+      @media (max-width: 760px) {
+        .calc-page { width: 100%; max-width: 100%; padding: 18px 14px 50px; overflow-x: clip; }
+        .calc-title { font-size: clamp(36px, 11vw, 52px); }
+        .calc-desc { font-size: 14px; }
+        .calc-body { display: block; margin-top: 20px; }
+        .calc-widget { width: 100%; max-width: 100%; }
+      }
+      @media (max-width: 390px) { .calc-page { padding-left: 10px; padding-right: 10px; } }
+      .wa-calculator-mounting #calc-widget [data-wa-static-shell="true"] { visibility: hidden; }
+      ${reserveRule}
+    </style>`;
+    const noJsReserveReset = `<noscript><style id="wa-calculator-nojs-reserve-reset">#calc-widget.calc-widget { min-height: 520px !important; }</style></noscript>`;
+    if (!s.includes('id="wa-calculator-critical-layout"')) s = s.replace('</head>', `${criticalLayoutStyle}${noJsReserveReset}</head>`);
   }
   // Reuse the preloaded root stylesheet URL on nested article routes; otherwise the
   // same 94 KB stylesheet is downloaded twice under versioned and unversioned URLs.
