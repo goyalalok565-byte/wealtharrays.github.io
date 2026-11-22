@@ -1,23 +1,5 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { createRequire } from 'node:module';
-const require = createRequire(import.meta.url);
-const { CALCULATORS } = require('../calculators.js');
-const calculatorsByRoute = new Map(CALCULATORS.map(calc => [calc.slug + '/index.html', calc]));
-const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, ch => { switch (ch) { case '&': return '&amp;'; case '<': return '&lt;'; case '>': return '&gt;'; case '"': return '&quot;'; default: return '&#39;'; } });
-function renderStaticShell(calc) {
-  const fields = calc.fields.map(field => {
-    const id = `wa-static-${calc.id}-${field.id}`;
-    const label = escapeHtml(field.label);
-    if (field.type === 'select') {
-      const options = (field.options || []).map(option => `<option value=\"${escapeHtml(option.value)}\">${escapeHtml(option.label)}</option>`).join('');
-      return `<div class=\"field\"><label for=\"${id}\">${label}</label><select id=\"${id}\"><option value=\"\">Choose ${label}</option>${options}</select></div>`;
-    }
-    const attrs = [typeof field.min === 'number' ? `min=\"${field.min}\"` : '', typeof field.max === 'number' ? `max=\"${field.max}\"` : '', typeof field.step === 'number' ? `step=\"${field.step}\"` : ''].filter(Boolean).join(' ');
-    return `<div class=\"field\"><label for=\"${id}\">${label}${field.suffix ? ` <span class=\"hint\">(${escapeHtml(field.suffix)})</span>` : ''}</label><input id=\"${id}\" type=\"number\" inputmode=\"decimal\" placeholder=\"Enter ${label.toLowerCase()}\" ${attrs}></div>`;
-  }).join('');
-  return `<!-- WA-STATIC-CALC-SHELL-START --><div class=\"calc-widget-shell\" data-wa-static-shell=\"true\" aria-label=\"${escapeHtml(calc.title)} calculator static form\" style=\"min-height:520px\"><p class=\"wa-static-shell-note\">Calculator fields are shown below. Enable JavaScript to calculate results.</p><div class=\"calc-grid\">${fields}</div><button type=\"button\" disabled aria-disabled=\"true\">Calculate result</button><div class=\"calc-result\" aria-live=\"polite\">Results appear here when the calculator is available.</div><div class=\"wa-portfolio-card\" data-wa-chart-placeholder=\"true\" aria-label=\"Chart placeholder\" style=\"min-height:220px;display:grid;place-items:center\">Chart preview</div></div><!-- WA-STATIC-CALC-SHELL-END -->`;
-}
 
 const root = process.cwd();
 const htmlFiles = [];
@@ -43,17 +25,6 @@ let changed=0;
 for(const file of htmlFiles){
   let s=fs.readFileSync(file,'utf8');
   const before=s;
-  // The calculator host must carry the class used by its layout, styling and CLS reservation
-  // before the deferred calculator runtime mounts. Adding it only after mount creates a large
-  // layout shift and leaves the calculator surface unstyled during initial rendering.
-  s=s.replace(/<div\b[^>]*\bid=["']calc-widget["'][^>]*>/gi, (tag) => {
-    const classAttr = tag.match(/\bclass=(["'])(.*?)\1/i);
-    if (classAttr) {
-      if (/(?:^|\s)calc-widget(?:\s|$)/.test(classAttr[2])) return tag;
-      return tag.replace(classAttr[0], `class=${classAttr[1]}${classAttr[2]} calc-widget${classAttr[1]}`);
-    }
-    return tag.replace(/>$/, ' class="calc-widget">');
-  });
   s=s.replace(/<script>[^<]*(?:document\.documentElement\.dataset\.theme|localStorage\.(?:waTheme|getItem\(['"]waTheme['"]\)))[^<]*<\/script>/gi, '');
   if(!s.includes('/theme-init.js')) s=s.replace('</head>',`${themeJs}</head>`);
   // Replace every inline calculator bootstrap, including legacy formatting variants.
@@ -62,8 +33,7 @@ for(const file of htmlFiles){
   const base=path.basename(file);
   const rel=path.relative(root,file).replaceAll(path.sep,'/');
   const routeName=rel==='widget/index.html'?'widget/index.html':rel;
-  const calc = calculatorsByRoute.get(rel);
-  const canonicalId=calc?.id || calcIds[rel] || calcIds[base];
+  const canonicalId=calcIds[rel] || calcIds[base];
   const id=canonicalId||mountId;
   if(canonicalId && base!=='widget.html'){
     s=s.replace(/<html\s+data-wa-calculator="[^"]*"/i,'<html');
@@ -102,18 +72,6 @@ for(const file of htmlFiles){
     s=s.replace(/<link\b(?=[^>]*\brel=["']preconnect["'])(?=[^>]*\bhref=["']https:\/\/(?:pagead2\.googlesyndication\.com|googleads\.g\.doubleclick\.net)(?:\/|["']))[^>]*>/gi,'');
   }
   if(!adsenseExcluded) s=s.replace('</head>',adsenseJs+'</head>');
-  if(calc && s.includes('id="calc-widget"')) {
-    const shell = renderStaticShell(calc);
-    if (s.includes('<!-- WA-STATIC-CALC-SHELL-START -->')) {
-      s = s.replace(/<!-- WA-STATIC-CALC-SHELL-START -->[\s\S]*?<!-- WA-STATIC-CALC-SHELL-END -->/g, shell);
-    } else {
-      s = s.replace(/(<div\b(?=[^>]*\bid=["']calc-widget["'])[^>]*>)(\s*)<\/div>/i, `$1${shell}</div>`);
-    }
-  }
-  // Reuse the preloaded root stylesheet URL on nested article routes; otherwise the
-  // same 94 KB stylesheet is downloaded twice under versioned and unversioned URLs.
-  const stylesPreload = s.match(/<link\b(?=[^>]*\brel=["']preload["'])(?=[^>]*\bas=["']style["'])[^>]*\bhref=["']([^"']*styles\.css[^"']*)["'][^>]*>/i);
-  if (stylesPreload) s = s.replace(/href=["'](?:\.\.\/)+styles\.css["']/gi, `href="${stylesPreload[1]}"`);
   if(id && s.includes('id="calc-widget"') && base!=='widget.html'){
     if(!s.includes('/wa-calculator-runtime.js')) s=s.replace('</body>','<script src="/wa-calculator-runtime.js" defer></script></body>');
   }

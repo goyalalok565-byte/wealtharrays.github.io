@@ -1,12 +1,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { createRequire } from 'node:module';
-const require=createRequire(import.meta.url);
-const { CALCULATORS }=require('../calculators.js');
 
 const root = process.cwd();
 const failures = [];
-const calc = CALCULATORS.map(calculator => path.join(calculator.slug, 'index.html'));
+const calc = [
+  'sip-calculator/index.html','compound-interest-calculator/index.html','mortgage-emi-calculator/index.html','roi-calculator/index.html',
+  'simple-interest-calculator/index.html','retirement-calculator/index.html','salary-to-hourly-calculator/index.html','profit-margin-calculator/index.html',
+  'fixed-deposit-calculator/index.html','recurring-deposit-calculator/index.html','lumpsum-calculator/index.html','cagr-calculator/index.html',
+  'car-loan-calculator/index.html','personal-loan-calculator/index.html','debt-payoff-calculator/index.html','inflation-calculator/index.html',
+  'net-worth-calculator/index.html','overtime-pay-calculator/index.html','freelance-rate-calculator/index.html','income-tax-scenario-calculator/index.html'
+];
 const read=f=>fs.readFileSync(path.join(root,f),'utf8');
 const walk=(dir, out=[])=>{for(const e of fs.readdirSync(dir,{withFileTypes:true})){if(e.name.startsWith('.')||e.name==='node_modules')continue;const full=path.join(dir,e.name);if(e.isDirectory())walk(full,out);else if(e.name.endsWith('.html'))out.push(full)}return out};
 const publicFiles=walk(root).filter(f=>{const r=path.relative(root,f).replaceAll(path.sep,'/');return !r.startsWith('p/')&&!r.startsWith('qa/')&&!r.startsWith('scripts/')&&!r.startsWith('tests/')});

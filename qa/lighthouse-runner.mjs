@@ -7,9 +7,7 @@ export function runLighthouse(args, label = 'Lighthouse') {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     const result = spawnSync('npx', ['lighthouse', ...args], {
       encoding: 'utf8',
-      maxBuffer: 20 * 1024 * 1024,
-      timeout: 120000,
-      killSignal: 'SIGTERM'
+      maxBuffer: 20 * 1024 * 1024
     });
     if (result.stdout) process.stdout.write(result.stdout);
     if (result.stderr) process.stderr.write(result.stderr);

@@ -4,14 +4,15 @@
   /* Hub pages already have one shared runtime owner; keep this visual/calculator layer off them. */
   if(!document.querySelector('.calc-page')&&!/(?:^|\/)widget(?:\/|\.html$)/.test(location.pathname))return;
   function installAdSense(){
-    if(/(?:^|\/)404\.html$|(?:^|\/)widget(?:\/|\.html$)/.test(location.pathname))return;
-    if(!document.querySelector('ins.adsbygoogle,[data-ad-slot],.wa-ad-slot'))return;
-    if(document.querySelector('script[data-wa-ad-loader],script[src*="/wa-ad-loader.js"]'))return;
-    var script=document.createElement('script');
-    script.async=true;
-    script.src='/wa-ad-loader.js';
-    script.dataset.waAdLoader='1';
-    document.head.appendChild(script);
+    if(/(?:^|\/)404\.html$|(?:^|\/)widget(?:\/|\.html$)/.test(location.pathname)) return;
+    // No current page has an ad slot. Load AdSense only on pages that explicitly add one.
+    if(!document.querySelector('ins.adsbygoogle,[data-ad-slot],.wa-ad-slot')) return;
+    if(document.querySelector('script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]')) return;
+    var s=document.createElement('script');
+    s.async=true;
+    s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6507600103785450';
+    s.crossOrigin='anonymous';
+    document.head.appendChild(s);
   }
   function resultRows() { return Array.from(document.querySelectorAll('.calc-result-row')).map(function (row) { var text = row.querySelector('.calc-result-value')?.textContent || ''; return { label: row.querySelector('.calc-result-label')?.textContent?.trim() || '', text: text.trim(), value: Number(text.replace(/[^0-9.eE+-]/g, '')) }; }).filter(function (row) { return Number.isFinite(row.value); }); }
   function safePie(host) { var rows = resultRows().filter(function (row) { return row.value > 0; }).slice(0, 6); if (!rows.length) return; var total = rows.reduce(function (a, r) { return a + r.value; }, 0); if (!Number.isFinite(total) || total <= 0) return; var ns = 'http://www.w3.org/2000/svg', svg = document.createElementNS(ns, 'svg'); svg.setAttribute('viewBox', '0 0 200 200'); svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', 'Result composition chart'); var angle = -Math.PI / 2; rows.forEach(function (r) { var next = angle + (r.value / total) * Math.PI * 2, x1 = 100 + 78 * Math.cos(angle), y1 = 100 + 78 * Math.sin(angle), x2 = 100 + 78 * Math.cos(next), y2 = 100 + 78 * Math.sin(next), large = next - angle > Math.PI ? 1 : 0; var path = document.createElementNS(ns, 'path'); path.setAttribute('d', 'M100 100 L' + x1 + ' ' + y1 + ' A78 78 0 ' + large + ' 1 ' + x2 + ' ' + y2 + ' Z'); path.setAttribute('fill', 'none'); path.setAttribute('stroke', 'currentColor'); path.setAttribute('stroke-width', '30'); path.setAttribute('stroke-dasharray', '1 1'); path.setAttribute('pathLength', '1'); path.setAttribute('stroke-dashoffset', String(-angle / (Math.PI * 2))); svg.appendChild(path); angle = next; }); host.innerHTML = ''; host.appendChild(svg); }
@@ -22,7 +23,7 @@
     styles(); graphGuard();
     if ('MutationObserver' in window) {
       var scheduled = false;
-      var rerun = function(){ if(scheduled) return; scheduled=true; requestAnimationFrame(function(){scheduled=false;installAdSense();graphGuard();}); };
+      var rerun = function(){ if(scheduled) return; scheduled=true; requestAnimationFrame(function(){scheduled=false;graphGuard();}); };
       new MutationObserver(rerun).observe(document.body,{childList:true,subtree:true});
       window.addEventListener('resize', rerun, {passive:true});
     }

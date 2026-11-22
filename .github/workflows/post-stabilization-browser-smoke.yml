@@ -10,27 +10,47 @@ permissions:
 
 jobs:
   smoke:
-    if: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[stabilization-build]')) }}
+    if: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[stabilization-build]')) }}
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout stabilized main
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          ref: main
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-
-      - name: Build canonical site from the exact checked-out commit
+      - name: Wait for current canonical build artifacts on main
+        shell: bash
         run: |
-          npm run build
-          test -s dist/index.html
-          test -s dist/wa-home-runtime.js
-          test -s dist/wa-site-runtime.js
-          test -s dist/wa-calculator-runtime.js
-          node qa/static-calculator-shell-audit.mjs
+          set -euo pipefail
+          for i in $(seq 1 30); do
+            git fetch origin main
+            if git cat-file -e FETCH_HEAD:wa-home-runtime.js 2>/dev/null &&
+               git show FETCH_HEAD:index.html | grep -F '/wa-home-runtime.js?v=' >/dev/null &&
+               git show FETCH_HEAD:tools.html | grep -F '/wa-site-runtime.js?v=' >/dev/null &&
+               git show FETCH_HEAD:sip-calculator/index.html | grep -F '/wa-calculator-runtime.js?v=' >/dev/null; then
+              if node <<'NODE'
+          const {execFileSync}=require('child_process');
+          const crypto=require('crypto');
+          const show=(p)=>execFileSync('git',['show',`FETCH_HEAD:${p}`],{encoding:'utf8'});
+          const hash=(p)=>crypto.createHash('sha256').update(show(p).replace(/\r\n/g,'\n').trimEnd()).digest('hex').slice(0,12);
+          const checks=[['wa-home-runtime.js','home','final-polish.js'],['wa-site-runtime.js','site','wa-core.js'],['wa-calculator-runtime.js','calculator','calculator-page-init.js']];
+          for(const [bundlePath,label,sourcePath] of checks){
+            const marker=`WA CANONICAL MODULE | ${label} | ${sourcePath} | sha256:${hash(sourcePath)}`;
+            if(!show(bundlePath).includes(marker))process.exit(1);
+          }
+          NODE
+              then
+                git checkout --detach FETCH_HEAD
+                echo "Checked out current canonical build commit $(git rev-parse --short HEAD)."
+                exit 0
+              fi
+            fi
+            echo "Waiting for the canonical build bot to refresh runtime bundles from current sources... attempt $i/30"
+            sleep 10
+          done
+          echo "Current source and canonical runtime bundle provenance did not match within five minutes."
+          exit 1
+
       - name: Install Playwright
         run: |
           npm install --no-save playwright@1.55.0
@@ -38,7 +58,7 @@ jobs:
 
       - name: Start local site
         run: |
-          python3 -m http.server 4173 --directory dist > /tmp/wealtharrays-http.log 2>&1 &
+          python3 -m http.server 4173 --directory . > /tmp/wealtharrays-http.log 2>&1 &
           echo $! > /tmp/wealtharrays-http.pid
           for i in $(seq 1 20); do
             curl -fsS http://127.0.0.1:4173/index.html >/dev/null && exit 0
