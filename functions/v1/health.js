@@ -20,8 +20,9 @@ export async function onRequestGet({ env }) {
     env.RAZORPAY_WEBHOOK_SECRET
   );
   const rateLimiter = Boolean(env.PUBLIC_API_LIMITER && typeof env.PUBLIC_API_LIMITER.limit === "function");
+  const turnstile = Boolean(env.TURNSTILE_SITE_KEY && env.TURNSTILE_SECRET_KEY);
   const degraded = database === "unavailable";
-  const readyForSaas = database === "ok" && auth && billing && rateLimiter;
+  const readyForSaas = database === "ok" && auth && billing && rateLimiter && turnstile;
 
   return json({
     status: degraded ? "degraded" : "ok",
@@ -34,7 +35,8 @@ export async function onRequestGet({ env }) {
       d1_database: database,
       supabase_auth: auth ? "configured" : "not_configured",
       razorpay_billing: billing ? "configured" : "not_configured",
-      public_api_rate_limiter: rateLimiter ? "configured" : "not_configured"
+      public_api_rate_limiter: rateLimiter ? "configured" : "not_configured",
+      turnstile: turnstile ? "configured" : "not_configured"
     }
   }, degraded ? 503 : 200, { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" });
 }
