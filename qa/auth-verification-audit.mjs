@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 const source = fs.readFileSync("functions/v1/_auth.js", "utf8")
-  .replace(/^import \{ error \} from "\.\/\_shared\.js";\n/, 'const error = (code, message, status = 400) => ({ response: new Response(JSON.stringify({ error: { code, message } }), { status }) });')
+  .replace(/^import \{ error \} from "\.\/\_shared\.js";\n/, 'const error = (code, message, status = 400) => new Response(JSON.stringify({ error: { code, message } }), { status });')
   .replace("export async function authenticate", "async function authenticate")
   .replace("export async function ensureProfile", "async function ensureProfile")
   + "\nexport { authenticate, ensureProfile };";
