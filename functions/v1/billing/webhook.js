@@ -89,7 +89,7 @@ export async function onRequestPost({ request, env }) {
         "SET status = ?, current_period_end = COALESCE(?, current_period_end),",
         "last_provider_event_at = CASE WHEN ? IS NULL THEN last_provider_event_at ELSE ? END,",
         "updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')",
-        "WHERE provider = 'razorpay' AND provider_subscription_id = ?",
+        "WHERE provider = 'razorpay' AND provider_subscription_id = ? AND status <> 'refunded'",
         "AND ((? IS NOT NULL AND (last_provider_event_at IS NULL OR last_provider_event_at <= ?))",
         "OR (? IS NULL AND last_provider_event_at IS NULL))"
       ].join(" ");
@@ -109,7 +109,7 @@ export async function onRequestPost({ request, env }) {
       }
       const revokeSql = [
         "UPDATE subscriptions",
-        "SET status = 'halted', cancel_at_period_end = 0,",
+        "SET status = 'refunded', cancel_at_period_end = 0,",
         "last_provider_event_at = CASE WHEN ? IS NULL THEN last_provider_event_at ELSE ? END,",
         "updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')",
         "WHERE provider = 'razorpay' AND provider_subscription_id = ?",
