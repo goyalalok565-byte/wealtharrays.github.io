@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main, "saas/l1-**"]
+    branches: [main, "saas/l1-**", "content/**"]
   workflow_dispatch:
 
 permissions:
@@ -27,6 +27,8 @@ jobs:
           node-version: 24
       - name: Run unit tests
         run: npm test
+      - name: Verify wired calculator content drafts
+        run: node qa/content-draft-audit.mjs
       - name: Build production static preview
         run: npm run build
       - name: Install Playwright for consent and RUM browser smoke
