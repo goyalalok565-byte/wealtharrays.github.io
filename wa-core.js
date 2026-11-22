@@ -104,7 +104,7 @@
         script.async=true;script.defer=true;script.dataset.waTurnstile='1';
         script.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
         script.onload=()=>window.turnstile?resolve():reject(new Error('Request verification could not start.'));
-        script.onerror=()=>{scriptPromise=null;reject(new Error('Request verification is temporarily unavailable.'))};
+        script.onerror=()=>{scriptPromise=null;script.remove();reject(new Error('Request verification is temporarily unavailable.'))};
         if(!existing)document.head.appendChild(script);
       });
       await scriptPromise;
