@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
 
-const baseUrl=(process.env.BASE_URL||'http://127.0.0.1:4173').replace(/\/$/,'');
+const rawBase=process.env.BASE_URL||'http://127.0.0.1:4173';
+const parsedBase=new URL(rawBase);
+const allowedHosts=new Set(['127.0.0.1','localhost','wealtharrays.com','www.wealtharrays.com']);
+if(!allowedHosts.has(parsedBase.hostname)||!['http:','https:'].includes(parsedBase.protocol))throw new Error('BASE_URL must be a local preview or the production Wealth Arrays origin.');
+const baseUrl=parsedBase.origin;
 const browser=await chromium.launch({headless:true});
 const context=await browser.newContext({viewport:{width:1280,height:900},serviceWorkers:'block'});
 await context.addInitScript(()=>{
