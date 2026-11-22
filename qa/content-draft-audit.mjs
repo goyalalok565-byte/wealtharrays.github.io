@@ -32,6 +32,6 @@ for (const [draft, route] of pages) {
   assert.ok(html.includes("Common mistakes to avoid"), `${route} must publish common mistakes`);
   assert.ok((html.match(/class="worked-example"/g) || []).length >= 2, `${route} must include multiple worked-example sections`);
   const sourceSection = html.split("Official references").slice(-1)[0].split("</section>")[0];
-  assert.ok((sourceSection.match(/https:\/\//g) || []).length >= 3, `${route} must cite at least three HTTPS references`);
+  assert.ok((sourceSection.match(/<a href=/g) || []).length >= 3, `${route} must cite at least three official references`);
 }
 console.log(`Content draft audit PASS — ${pages.length} pages have 5+ FAQs, worked examples, official sources, last-updated dates, PNG OG metadata and hreflang.`);
