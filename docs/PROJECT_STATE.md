@@ -19,6 +19,7 @@ Status: Phase 0 engineering gates are deployed on production main SHA `619bacb6b
 Branch: `saas/l2-backend-hardening`; draft PR #145 (not merged).
 
 - D1 migration/restore plan committed before any migration change. This branch adds no D1 migration and does not modify the existing migration ledger.
+- `docs/saas/LAUNCH-READINESS-TRACKER.md` records Beta/Commercial gates, owner-only setup steps and lead times, L3 product acceptance, L4 content batches, L5 legal review and L6 beta operations.
 - Worker write endpoints for scenarios, checkout and cancellation are rate-limited (dedicated write limiter) and require server-verified Cloudflare Turnstile tokens; the signed Razorpay webhook is rate-limited separately and remains outside the browser challenge flow.
 - Worker CORS uses an explicit production origin allowlist.
 - Supabase-backed Worker access requires a verified email address.
