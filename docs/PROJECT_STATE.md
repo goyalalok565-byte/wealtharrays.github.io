@@ -40,7 +40,7 @@ Trust, accuracy, privacy and measurable quality take precedence over growth clai
 - Never claim production success without Cloudflare evidence and a real browser check.
 - Never request passwords, API tokens or secret values in chat.
 
-## Audit baseline — 2026-11-20
+## Historical audit baseline — 2026-11-20 (superseded by the current assessment above)
 
 Scores are preliminary engineering assessments from repository inspection, uploaded ZIP and available CI evidence, not production KPI measurements.
 
@@ -144,18 +144,18 @@ Owner configures these directly in GitHub Settings > Secrets. Never request secr
 
 - India-first, global architecture; metadata-only country codes are not country engines.
 - Preserve financial formulas unless authoritative reference vectors and tests justify a change.
-- Do not merge PR #88 until strict mobile thresholds, accessibility and browser checks pass.
+- Historical decision: PR #88 was not a valid current-main release candidate; it is now stale/diverged and must not be merged.
 - Do not alter ads/CMP based on one Lighthouse observation; profile first.
 - Local `dist/` is not a substitute for production Cloudflare evidence.
 - Never claim AdSense approval, traffic, revenue, rankings or SaaS activation without measurements.
 
-Active verification PR: #88 (`fix/phase0-clean-mainline-2026-11-20`), based on current `main`. This branch consolidates the CLS, tax terminology, strict performance gates, registry parity, health monitor, deployment hygiene and ad-slot-aware third-party loading work. Do not merge until the seven-route release matrix passes.
+PR #88 is a historical, stale/diverged candidate and has been superseded by changes merged through current main, including the verified PR #138 release. PR #97 is likewise stale/diverged; neither is an active release candidate.
 
 ## Next three actions
 
-1. Re-run canonical CI, Platform Gates and the full PR #88 browser suite after the AdSense slot-detection fix; confirm consent, no-slot pages and any future slot-bearing page behavior.
-2. Complete seven-route mobile Lighthouse, homepage TBT diagnosis and SWP CPU profiling; fix measured route-level failures without changing release thresholds and rerun all checks on the final head.
-3. Only after the seven-route release matrix passes, review and merge PR #88, verify the Cloudflare deployment manifest and `/v1/health`, measure production Core Web Vitals, and obtain CA/legal review of tax eligibility wording.
+1. Owner: activate and verify D1, Supabase Auth and Razorpay test-mode subscriptions/webhooks/entitlements; keep features fail-closed until this is proven.
+2. Owner: obtain CA/legal review of Tax Year 2026-27 terminology, assumptions and eligibility language; confirm Paddle seller/payout approval before global billing.
+3. Engineering: add real-device accessibility/performance checks and privacy-safe field INP/Core Web Vitals analytics; expand public API only through equivalence-tested adapters.
 
 
 ## Owner decisions — 2026-11-20
@@ -168,9 +168,9 @@ Active verification PR: #88 (`fix/phase0-clean-mainline-2026-11-20`), based on c
 
 ## Snapshot baseline
 
-PR #89 (merged) adds 275 snapshots (55 calculators × default/zero/blank/large/invalid) and independent top-10 reference tests. Canonical CI passed; Platform Gates status pending recheck. These snapshots lock current behaviour, not correctness by themselves.
+PR #89 (merged) added 275 snapshots (55 calculators × default/zero/blank/large/invalid) and independent top-10 reference tests. The current-main verification in the section above supersedes the historical pending Platform Gates note.
 
-PR #88 Cloudflare bot reported a successful Worker deployment from unmerged head 6221a1b with a `/production/builds/` dashboard record. Treat as production Worker deployment report. Pages and live `/v1/health` remain unverified.
+PR #88's unmerged-head Cloudflare Worker build report is historical and is not current production evidence. Current exact-main Worker deployment, runtime provenance, Pages production smoke and API health liveness are recorded in the 2026-11-22 verification section above.
 
 
 CI scope: strict seven-route Lighthouse runs on PR C (performance branch), manual dispatch and main-branch release validation. PR A/B run Canonical CI and Platform Gates plus the Lighthouse threshold unit tests; they do not run the performance measurement because they do not own performance changes. No thresholds are relaxed; PR C must pass the same strict limits.
