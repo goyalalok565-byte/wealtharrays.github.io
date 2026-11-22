@@ -22,12 +22,13 @@ window.CALCULATORS=window.CALCULATORS||[];window.CALCULATORS.push({
     ],
     compute(v) {
       const gain = v.finalValue - v.cost;
-      const roi = v.cost === 0 ? 0 : (gain / v.cost) * 100;
-      const annualized = v.cost <= 0 || v.finalValue < 0 || v.years <= 0 ? 0 : (Math.pow(v.finalValue / v.cost, 1 / v.years) - 1) * 100;
+      const costIsZero = v.cost !== null && v.cost !== undefined && String(v.cost).trim() !== '' && Number(v.cost) === 0;
+      const roi = costIsZero ? null : (gain / v.cost) * 100;
+      const annualized = costIsZero ? null : (v.cost <= 0 || v.finalValue < 0 || v.years <= 0 ? 0 : (Math.pow(v.finalValue / v.cost, 1 / v.years) - 1) * 100);
       return [
         { label: "Net gain", value: gain, format: "currency", emphasis: gain >= 0 ? "positive" : "negative" },
-        { label: "Total ROI", value: roi, format: "percent", emphasis: roi >= 0 ? "positive" : "negative" },
-        { label: "Annualized ROI", value: annualized, format: "percent", emphasis: "neutral" },
+        { label: costIsZero ? "Total ROI (not defined: cost is 0)" : "Total ROI", value: roi, format: "percent", emphasis: costIsZero ? "neutral" : roi >= 0 ? "positive" : "negative" },
+        { label: costIsZero ? "Annualized ROI (not defined: cost is 0)" : "Annualized ROI", value: annualized, format: "percent", emphasis: "neutral" },
       ];
     },
   });
