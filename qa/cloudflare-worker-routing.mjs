@@ -32,7 +32,9 @@ const healthResponse = await worker.fetch(new Request("https://example.test/v1/h
   RAZORPAY_KEY_SECRET: "test-secret-must-not-leak",
   RAZORPAY_PLAN_MONTHLY: "plan_monthly",
   RAZORPAY_PLAN_YEARLY: "plan_yearly",
-  RAZORPAY_WEBHOOK_SECRET: "webhook-secret-must-not-leak"
+  RAZORPAY_WEBHOOK_SECRET: "webhook-secret-must-not-leak",
+  TURNSTILE_SITE_KEY: "public-site-key",
+  TURNSTILE_SECRET_KEY: "turnstile-secret-must-not-leak"
 }, {});
 assert.equal(healthResponse.status, 200);
 const healthData = await healthResponse.json();
