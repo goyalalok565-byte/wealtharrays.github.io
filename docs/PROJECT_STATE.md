@@ -1,10 +1,10 @@
 # Wealth Arrays Project State
 
-Last updated: 2026-11-20
+Last updated: 2026-11-22
 Repository: `goyalalok565-byte/wealtharrays.github.io`
 Default branch: `main`
-Current phase: Phase 0 — Stabilization
-Status: Phase 0 engineering changes are in final verification review; strict performance targets and production evidence remain outstanding.
+Current phase: Phase 0 stabilization verified; Phase 1 SaaS activation is blocked on owner-side service configuration.
+Status: Production release `b1610d10e5fe7d389140b20efdce6f63b6ef72e8` passed exact-SHA live verification, full production browser smoke and seven-route mobile Lighthouse.
 
 ## Mission
 
@@ -20,81 +20,96 @@ Trust, accuracy, privacy and measurable quality take precedence over growth clai
 
 ## Architecture and source of truth
 
-- Static site is built from repository source and deployed through Cloudflare.
-- `scripts/build-dist.mjs` creates public `dist/` output.
+- Static site is built from repository source and deployed through Cloudflare Pages.
+- `scripts/build-dist.mjs` creates the public `dist/` output.
 - `calculators.js` is the canonical 55-calculator browser catalogue; `scripts/root-cause-build.mjs` generates split definitions, pages, runtime bundles and sitemap data.
-- `wa-calculator-runtime.js` is the calculator-page runtime entry point.
-- `worker.mjs` routes `/v1/*` to Cloudflare Worker modules.
-- Supabase, D1 and Razorpay integration code exists but live end-to-end activation is not verified.
-- API model coverage is smaller than the browser calculator catalogue. A country code in generic API metadata is not a country-specific tax engine.
-- India tax labels must be tax-year-aware and legally reviewed. Never change formula or eligibility logic without approved sources and regression vectors.
+- `worker.mjs` routes `/v1/*` to Cloudflare Worker modules, including `GET /v1/health`.
+- The browser calculator library has 55 definitions; the API model registry currently exposes 20 models. Do not claim 55/55 API coverage.
+- The current country-specific tax engine is India Tax Year 2026-27. Other country codes/metadata are not country engines.
+- 25 currency codes are available, but complete locale-specific formatting and translated UI are not finished. Current translation messages cover English and Hindi; the broader language list is not proof of full localization.
+- Supabase, D1 and Razorpay integration code exists but live SaaS readiness is not confirmed.
 
-## Release discipline
+## Latest verified production release — 2026-11-22
 
-- Complete Phase 0 before Phase 1–5 unless the owner explicitly changes priority.
-- Work in small PRs; never commit directly to `main`.
-- Update this file in every engineering PR.
-- Require CI, golden/snapshot tests and browser smoke tests before merge.
-- Never lower a quality threshold to get a green workflow.
-- Distinguish local/CI verification from production verification.
-- Never claim production success without Cloudflare evidence and a real browser check.
-- Never request passwords, API tokens or secret values in chat.
+**PR #138** merged as `b1610d10e5fe7d389140b20efdce6f63b6ef72e8`.
 
-## Audit baseline — 2026-11-20
+### Verification evidence
 
-Scores are preliminary engineering assessments from repository inspection, uploaded ZIP and available CI evidence, not production KPI measurements.
+- Unit Tests: 70/70 passed.
+- Calculator browser smoke: 55/55 passed, including zero-denominator and independent boundary behavior.
+- Canonical CI, Platform Gates, CodeQL and Cloudflare Workers Builds: PASS.
+- Pages build/deployment: PASS.
+- L1/L3 live verification run `45042953840`: exact merge-SHA provenance matched; all six required routes returned HTTP 200; SIP/SWP/FIRE static shells passed; all six responses used Brotli and expected cache-control.
+- Post-stabilization browser smoke run `45042953874`: PASS. Homepage search, embed, all 55 canonical calculator pages, visual/calculation smoke, four production money-page responsive/calculation checks, deployment manifest exclusions, production embed and homepage search all passed.
+- Production mobile Lighthouse run `45042953831`: seven routes × three runs; all strict median thresholds passed.
 
-| Area | Score / 100 | Evidence / limitation |
-|---|---:|---|
-| Calculation accuracy | 72 | 55 calculator definitions and local tests; API coverage remains smaller |
-| Performance | 68 | Existing mobile preview shows routes failing strict performance/TBT/LCP targets; runtime byte budget also failed locally |
-| Interaction smoothness | 50 | Full interaction profiling and field INP remain unverified |
-| SEO | 84 | Metadata and sitemap foundations exist; Search Console/GA4 outcomes not connected |
-| AEO/GEO | 65 | AI contract and machine-readable content exist; external visibility unmeasured |
-| Content quality | 55 | Value-content audit passes; 1,200+ original words per calculator not proven |
-| Accessibility | 75 | Static audit passed; Lighthouse homepage accessibility previously scored 92 vs 95 |
-| Security | 70 | CSP/auth/webhook tests exist; live service configuration remains unverified |
-| Globalization | 32 | i18n foundation exists; country engines/localization remain limited |
-| SaaS readiness | 35 | Worker/auth/D1/billing code exists; live lifecycle is unverified |
+### Production Lighthouse medians
 
-## Verified in uploaded ZIP / local runtime
+| Route | Performance | Accessibility | Best Practices | SEO | CLS | TBT | LCP |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Homepage | 98 | 100 | 100 | 92 | 0.000 | 0 ms | 2,083 ms |
+| Tools | 97 | 100 | 100 | 92 | 0.000 | 0 ms | 2,144 ms |
+| SIP | 97 | 100 | 100 | 92 | 0.076 | 0 ms | 2,092 ms |
+| SWP | 97 | 100 | 100 | 92 | 0.076 | 1 ms | 2,201 ms |
+| FIRE | 97 | 100 | 100 | 92 | 0.076 | 0 ms | 1,929 ms |
+| Rent vs Buy | 97 | 100 | 100 | 92 | 0.070 | 0 ms | 1,951 ms |
+| Compound Interest guide | 98 | 100 | 100 | 92 | 0.000 | 0 ms | 2,091 ms |
 
-- `npm test`: 48/48 passed on the supplied ZIP snapshot.
-- `npm run build:dist`: passed on the supplied ZIP snapshot.
-- 55 calculator definitions generated/copied; 117 HTML pages passed site integrity.
-- Value-content audit: 55/55; static accessibility audit: 117 HTML pages.
-- SaaS readiness, entitlement, privacy-safe analytics, billing webhook and Worker routing audits passed.
-- Local `dist/` contained 248 public files; inspected forbidden internal paths were absent.
-- `qa/performance-budget-audit.mjs` failed: calculator runtime was 129,214 bytes vs 118,000-byte budget.
-- Local checks are not proof of the current GitHub head or production deployment.
+Performance average: 97.3. Worst median LCP: 2,201 ms. Worst median CLS: 0.076. Worst median TBT: 1 ms.
 
-## Verified in GitHub CI / PR previews
+Production SEO 92 is the known Cloudflare-managed Content Signals / Lighthouse parser warning documented below. Keep the directive; do not remove it solely to increase a lab score.
 
-- PR #78 was closed without merging as superseded by the consolidated PR #88. Its earlier seven-route mobile preview remains the known baseline: multiple routes missed strict performance, TBT or LCP targets; homepage accessibility scored 92 vs the 95 floor.
-- PRs #81–#87 are historical/superseded engineering or verification branches. PR #87 was closed without merging because it was based on a stale mainline.
-- **Active release candidate:** PR #88, branch `fix/phase0-clean-mainline-2026-11-20`, based on the current `main` branch. GitHub reports the branch mergeable; this is not equivalent to release approval.
-- The previous documentation-only verification head was `41583eda808d2fb6c42caa3cdd09261a35264670`. Subsequent ad-slot-aware loading fixes are being committed; re-check the latest head and its fresh CI before relying on results.
-- On that PR run, **Canonical CI passed**: source/Pages/Worker syntax, privacy and auth CSP regression, privacy policy, calculator regression and independent formula audit, generated routes/runtime, Section 156 terminology, canonical embed regression and regression gates.
-- **Platform Gates passed**: registry parity, 55-calculator catalogue audit, Phase 1–20 audits, research data audit, static accessibility audit, production `dist` build, deployment exclusion and exact manifest audit, dist integrity, literal `npm run build`, minification and production asset budget.
-- On the latest completed browser run before the ad-slot fix, the PR preview built; canonical calculator embed, all-registry/scenario smoke, all 55 calculators across responsive layouts/currency/theme/language/exports, and authenticated cloud workspace save/load all passed. The third-party loading smoke failed because `/tools.html` loaded the AdSense library despite having no ad slot. This correctly blocked the workflow; seven-page Lighthouse, homepage TBT diagnosis, SWP CPU profile and strict threshold enforcement were skipped. The fix now makes the build inject AdSense only on eligible pages containing a real `ins.adsbygoogle[data-ad-slot]` placement and removes ad-network preconnects when no slot exists. Fresh CI and browser verification are pending; no seven-route Lighthouse pass is claimed.
-- Strict owner release targets remain unchanged on all seven routes: Performance >=90, CLS <=0.10, TBT <=200ms and LCP <=2.5s; accessibility >=95, best practices >=80 and SEO >=90. The earlier baseline failed multiple targets. Do not relax gates.
-- Prior trace evidence found expensive `wa-site-runtime.js`, GTM and AdSense work on Tools; the release candidate defers GA4 until explicit analytics consent, now gates AdSense and ad-network preconnects on actual ad slots, and scopes visual runtime to calculator/embed routes. Fresh browser and performance measurements must still prove the benefit.
-- Production deployment, live Cloudflare file manifest, live `/v1/health`, production Core Web Vitals, AdSense approval, and CA/legal review are **not verified**.
+## Current product, growth and business readiness
 
-## Phase 0 — status and open items
+### Product and calculation quality
 
-1. **P0-1 Calculator CLS:** PR #88 carries the missing `.calc-widget` host class and static reservation. Do not merge until strict release gates and browser regressions pass.
-2. **P0-2 Performance gates:** This PR adds strict numeric checks for Performance >=90, CLS <=0.10, TBT <=200ms and LCP <=2500ms, retaining accessibility >=95, best practices >=80 and SEO >=90. Tests must prove a threshold violation fails. The current preview is expected to fail until performance is improved; never relax thresholds.
-3. **P0-3 Tax terminology:** PR #88 includes the Tax Year 2026-27 widget wording update to Section 156 plus source/runtime regression coverage and build audit. No formula or eligibility logic changed. CA/legal review is still a release prerequisite.
-4. **P0-4 Registry source of truth:** PR #88 removes stale 47/55 workflow labels and adds a registry audit across calculator pages, split definitions, homepage, tools, search, sitemap, `llms.txt`, methodology and metadata. The previous Platform Gates run passed; revalidation is pending for the latest ad-loading fix.
-5. **P0-5 Health and monitoring:** PR #88 adds `GET /v1/health` with API version, liveness, D1 probe, Supabase/Razorpay/rate-limiter readiness flags, `ready_for_saas`, no secret values, OpenAPI docs and Worker routing regression tests. A 15-minute GitHub Actions health monitor and post-deploy health check are included; live monitoring starts only after deployment.
-6. **P0-6 Deployment hygiene:** PR #88 adds a shared exclusion policy for QA, scripts, docs, tests, workflows, bundled source-only runtime modules, backups and archives; a deterministic public-file manifest; local dist inventory audit; and a production check that probes internal paths and HEAD-checks manifest files. The previous Platform Gates run passed; fresh CI and post-deploy verification remain pending.
+- 55/55 calculator pages pass the value-content audit: at least 650 educational words, calculator-specific guidance, a worked example, FAQs, related article links and valid software/breadcrumb schema.
+- 55/55 canonical calculator pages pass browser smoke and responsive checks.
+- Independent reference vectors exist for selected financial models; snapshots across 55 calculators lock behavior but do not independently prove every formula correct.
+- India tax terminology is year-aware; CA/legal review of tax eligibility wording remains outstanding.
 
-## Phase 1 — blocked pending Phase 0
+### Search and AI visibility
 
-Backend activation: Cloudflare Worker + D1, Supabase Auth, Razorpay test-mode subscriptions, server-side Free/Pro entitlements, backups, monitoring and error tracking.
+Google Search Console, property `sc-domain:wealtharrays.com`, 24 October–20 November 2026:
 
-Credential names only (never store values here):
+- 38 organic clicks and 96 impressions.
+- 29 clicks came from the visible branded query `wealth arrays`.
+- 16 countries generated impressions; all 38 clicks were from India.
+- Mobile: 19 clicks, average position 2.84. Desktop: 19 clicks, average position 17.79.
+- This is an early, low-volume baseline, not evidence of global organic scale. A comparable previous 28-day period is not available in the connected trial history.
+- AI search visibility is not measured yet: the GEO project needs setup and tracked prompts before share-of-voice claims can be made.
+
+### Globalization and developer platform
+
+- API registry: 20 models versus 55 browser calculators; 35 browser calculators are not yet exposed as API models.
+- India is the only active country-specific tax engine. US, UK, UAE, Canada, Australia, Singapore and EU engines require separate reviewed implementations.
+- 25 currency codes exist; locale-specific grouping, formats, translations, hreflang and country-specific legal content still need completion.
+- Current UI translation messages cover English and Hindi; do not advertise the other language codes as fully translated.
+
+### Monetization and SaaS activation
+
+- `ads.txt` exists, but no verified publisher ad-slot placements are present in the public calculator/article HTML. AdSense approval is not verified. A publisher record alone does not generate ad revenue.
+- Razorpay checkout/webhook code and Pro monthly/yearly plan hooks exist; live billing is not active/verified.
+- Supabase Auth and D1 scenario-sync code exist; production activation is not verified.
+- The API deployment-readiness workflow on merge SHA `b1610d1` reported **Worker deployment NOT performed** by that GitHub workflow because `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_D1_DATABASE_ID` were empty in its environment. It also reported Supabase and Razorpay runtime configuration missing. The separate Cloudflare Workers Builds check and live static-site provenance succeeded; this does not prove D1/auth/billing readiness.
+- `GET /v1/health` and a 15-minute health-monitor workflow exist. The latest post-release health-monitor result still needs to be captured; static route verification does not prove `ready_for_saas=true`.
+- Public pricing, live Free/Pro entitlements, backup/retention, alerting/abuse monitoring and a full DPDP Act review remain pending.
+
+## Phase 0 — status
+
+<badge>Verified in production</badge>
+
+1. Calculator static shells, CLS reservation and 55-route registry parity are in place.
+2. Strict seven-route mobile Lighthouse median gates pass on production.
+3. Tax Year 2026-27 / Section 156 terminology and regression coverage are in place; legal review remains.
+4. The canonical 55-calculator registry drives pages, tools, search, sitemap, `llms.txt`, methodology and metadata.
+5. `GET /v1/health`, dependency readiness flags and scheduled health monitor code are present; actual SaaS readiness remains unverified.
+6. Public deployment manifest and internal-path exclusion checks pass in production smoke.
+
+## Phase 1 — owner configuration required
+
+Backend activation requires the owner to configure these names as GitHub Actions repository secrets (never put values in chat or documentation):
+
 - `CLOUDFLARE_API_TOKEN`
 - `CLOUDFLARE_ACCOUNT_ID`
 - `CLOUDFLARE_D1_DATABASE_ID`
@@ -106,43 +121,24 @@ Credential names only (never store values here):
 - `RAZORPAY_PLAN_YEARLY`
 - `RAZORPAY_WEBHOOK_SECRET`
 
-Owner configures these directly in GitHub Settings > Secrets. Never request secret values in chat.
+Owner steps: create the D1 database; configure Supabase email auth and redirect URLs; create Razorpay test plans and webhook; add secrets in GitHub Settings → Secrets and variables → Actions; then run migrations and test account confirmation, cross-user isolation, checkout, webhook retries, cancellation, refunds and entitlement reconciliation. Use test mode before live billing.
+
+For global payments, the documented decision is Razorpay for India and Paddle for international sales, subject to Paddle seller approval and India payout-route confirmation. Paddle integration is not present in the current code.
+
+## Next actions
+
+1. Capture the scheduled `/v1/health` result and activate D1, Supabase and Razorpay only after owner-side configuration.
+2. Obtain AdSense approval and create real ad-unit slots before expecting ad revenue; keep ad loading consent-aware and absent on pages without slots.
+3. Complete CA/lawyer review, DPDP review, backup/retention and monitoring; then expand API parity, localization and country engines one jurisdiction at a time.
+4. Grow non-branded search traffic and set up GEO prompts/monitoring. Prioritize useful financial decision workflows over adding calculator count alone.
 
 ## Decisions
 
 - India-first, global architecture; metadata-only country codes are not country engines.
 - Preserve financial formulas unless authoritative reference vectors and tests justify a change.
-- Do not merge PR #88 until strict mobile thresholds, accessibility and browser checks pass.
-- Do not alter ads/CMP based on one Lighthouse observation; profile first.
-- Local `dist/` is not a substitute for production Cloudflare evidence.
-- Never claim AdSense approval, traffic, revenue, rankings or SaaS activation without measurements.
-
-Active verification PR: #88 (`fix/phase0-clean-mainline-2026-11-20`), based on current `main`. This branch consolidates the CLS, tax terminology, strict performance gates, registry parity, health monitor, deployment hygiene and ad-slot-aware third-party loading work. Do not merge until the seven-route release matrix passes.
-
-## Next three actions
-
-1. Re-run canonical CI, Platform Gates and the full PR #88 browser suite after the AdSense slot-detection fix; confirm consent, no-slot pages and any future slot-bearing page behavior.
-2. Complete seven-route mobile Lighthouse, homepage TBT diagnosis and SWP CPU profiling; fix measured route-level failures without changing release thresholds and rerun all checks on the final head.
-3. Only after the seven-route release matrix passes, review and merge PR #88, verify the Cloudflare deployment manifest and `/v1/health`, measure production Core Web Vitals, and obtain CA/legal review of tax eligibility wording.
-
-
-## Owner decisions — 2026-11-20
-
-- Payments: Razorpay India + Paddle global, subject to seller approval and India payout-route confirmation. Stripe is not default (India invite-only); Lemon Squeezy is winding down.
-- Pricing test cells only after Pro MVP; no live tests now. Ultra waitlist-only.
-- Pro trial 14 days, no card; Ultra 7-day invite-only beta, no card. Verified email, one trial per account, server-side D1 enforcement, idempotency and rate/risk controls. Combined refunds/chargebacks target <1% of paid transactions (internal target, not measured).
-- Countries: India, US, UK, UAE, then Canada, Australia, Singapore.
-- CA and lawyer review before Phase 1; owner will identify advisers.
-
-## Snapshot baseline
-
-PR #89 (merged) adds 275 snapshots (55 calculators × default/zero/blank/large/invalid) and independent top-10 reference tests. Canonical CI passed; Platform Gates status pending recheck. These snapshots lock current behaviour, not correctness by themselves.
-
-PR #88 Cloudflare bot reported a successful Worker deployment from unmerged head 6221a1b with a `/production/builds/` dashboard record. Treat as production Worker deployment report. Pages and live `/v1/health` remain unverified.
-
-
-CI scope: strict seven-route Lighthouse runs on PR C (performance branch), manual dispatch and main-branch release validation. PR A/B run Canonical CI and Platform Gates plus the Lighthouse threshold unit tests; they do not run the performance measurement because they do not own performance changes. No thresholds are relaxed; PR C must pass the same strict limits.
-
+- Do not lower release thresholds to get a green workflow.
+- Local `dist/` is not a substitute for exact-SHA production evidence.
+- Never claim AdSense approval, revenue, rankings, global traction or SaaS activation without measurements.
 
 ## Paddle seller onboarding — India preflight
 
@@ -159,7 +155,15 @@ CI scope: strict seven-route Lighthouse runs on PR C (performance branch), manua
 - Paddle acts as Merchant of Record for supported sales and handles customer sales-tax calculation/collection/remittance. This does not replace the Indian seller's own income-tax/GST/accounting obligations; CA review remains required.
 
 
-## PR B — India tax-year terminology and sources
+
+
+### Payment-provider alternatives checked
+
+- Stripe India new-account onboarding is invite-only; Stripe requires an invite request and may ask for business IDs, site/app URL, business description, bank details, and IEC/RBI Transaction Purpose Code for international transactions. Official: https://support.stripe.com/questions/stripe-accounts-are-invite-only-in-india and https://support.stripe.com/questions/how-can-i-open-a-stripe-account-in-india
+- Lemon Squeezy stopped accepting new users/store sign-ups on 16 Nov 2026 and will stop processing transactions and subscription renewals on 31 Mar 2027. Official: https://docs.lemonsqueezy.com/migration
+- Paddle acts as Merchant of Record for supported sales and handles customer sales-tax calculation/collection/remittance. This does not replace the Indian seller's own income-tax/GST/accounting obligations; CA review remains required.
+
+## India tax-year terminology and sources
 
 - Tax Year 2026–27 (income from 1 April 2026): Income-tax Act, 2025, Section 156. Current new-regime calculator widget/runtime uses this label.
 - Assessment Year 2026–27 (income in FY 2025–26): Income-tax Act, 1961, Section 87A. This remains the applicable old-Act reference despite return filing after 1 April 2026.
@@ -173,3 +177,4 @@ CI scope: strict seven-route Lighthouse runs on PR C (performance branch), manua
 - Browser QA explicitly exercises both cases and restores valid inputs before independent field-boundary checks.
 - Verification evidence from the preceding candidate based on an earlier main SHA: 55/55 calculator browser smoke, 70/70 unit tests, CodeQL, Canonical CI, Platform Gates, Worker build, and the strict seven-route three-run median Lighthouse gate passed. The current-main replay must complete its own fresh CI before merge.
 - Production deployment, live API health, AdSense approval/ad-slot configuration, and Supabase/D1/Razorpay activation remain separate verification/owner-configuration items; do not infer them from preview checks.
+
