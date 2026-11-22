@@ -78,7 +78,7 @@ export async function onRequestPost({ request, env }) {
       if (existing?.processed_at && !String(existing.processed_at).startsWith("processing:")) {
         return json({ received: true, duplicate: true }, 200, { "Cache-Control": "no-store" });
       }
-      return json({ received: true, processing: true }, 202, { "Cache-Control": "no-store", "Retry-After": "5" });
+      return json({ received: true, processing: true }, 503, { "Cache-Control": "no-store", "Retry-After": "5" });
     }
 
     const status = SUBSCRIPTION_STATUS[event.event];
