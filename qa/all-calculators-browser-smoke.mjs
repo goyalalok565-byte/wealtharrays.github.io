@@ -133,16 +133,28 @@ try {
       if (calc.id === 'roi') {
         for (const [id, value] of [['cost', 0], ['finalValue', 1000], ['years', 5]]) await page.locator('#f-' + id).fill(String(value));
         await page.locator('#calc-widget button[id$="-calculate"]').click();
-        const labels = await page.locator('#calc-widget .calc-result-label').allTextContents();
-        const values = await page.locator('#calc-widget .calc-result-value').allTextContents();
+        await page.waitForFunction(() => [...document.querySelectorAll('#calc-widget .calc-result-label')].some(el => el.textContent.includes('not defined: cost is 0')), null, { timeout: 5000 });
+        const rows = page.locator('#calc-widget .calc-result-row');
+        const labels = [];
+        const values = [];
+        for (let i = 0; i < await rows.count(); i++) {
+          labels.push((await rows.nth(i).locator('.calc-result-label').innerText()).trim());
+          values.push((await rows.nth(i).locator('.calc-result-value').innerText()).trim());
+        }
         assert(labels[1].includes('not defined: cost is 0') && labels[2].includes('not defined: cost is 0'), 'roi: zero-cost ratios must be explicitly undefined');
         assert(values[1].trim() === '—' && values[2].trim() === '—', 'roi: undefined ratios must not display as 0%');
       }
       if (calc.id === 'profit-margin') {
         for (const [id, value] of [['revenue', 0], ['cogs', 0], ['expenses', 0]]) await page.locator('#f-' + id).fill(String(value));
         await page.locator('#calc-widget button[id$="-calculate"]').click();
-        const labels = await page.locator('#calc-widget .calc-result-label').allTextContents();
-        const values = await page.locator('#calc-widget .calc-result-value').allTextContents();
+        await page.waitForFunction(() => [...document.querySelectorAll('#calc-widget .calc-result-label')].some(el => el.textContent.includes('not defined: revenue is 0')), null, { timeout: 5000 });
+        const rows = page.locator('#calc-widget .calc-result-row');
+        const labels = [];
+        const values = [];
+        for (let i = 0; i < await rows.count(); i++) {
+          labels.push((await rows.nth(i).locator('.calc-result-label').innerText()).trim());
+          values.push((await rows.nth(i).locator('.calc-result-value').innerText()).trim());
+        }
         assert(labels[1].includes('not defined: revenue is 0') && labels[3].includes('not defined: revenue is 0'), 'profit-margin: zero-revenue ratios must be explicitly undefined');
         assert(values[1].trim() === '—' && values[3].trim() === '—', 'profit-margin: undefined margins must not display as 0%');
       }
