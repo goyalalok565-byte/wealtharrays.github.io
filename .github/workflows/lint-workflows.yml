@@ -1,0 +1,94 @@
+name: Workflow Lint and Security (Report Only)
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: workflow-lint-security-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  workflow-audit:
+    name: workflow-audit-report-only
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout PR source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Prepare report directory
+        run: mkdir -p reports
+
+      - name: Install and run actionlint v1.7.12
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSLo /tmp/actionlint_1.7.12_linux_amd64.tar.gz https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz
+          curl -fsSLo /tmp/actionlint_checksums.txt https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_checksums.txt
+          (cd /tmp && grep 'actionlint_1.7.12_linux_amd64.tar.gz' actionlint_checksums.txt | sha256sum -c -)
+          tar -xzf /tmp/actionlint_1.7.12_linux_amd64.tar.gz -C /tmp actionlint
+          /tmp/actionlint -color=false .github/workflows > reports/actionlint.txt 2>&1 || true
+
+      - name: Install and run zizmor v1.32.0
+        shell: bash
+        run: |
+          python -m pip install --disable-pip-version-check --user 'zizmor==1.32.0'
+          "$HOME/.local/bin/zizmor" --format=json .github/workflows > reports/zizmor.json 2> reports/zizmor.stderr || true
+
+      - name: Install and run gitleaks v8.30.1 (binary only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSLo /tmp/gitleaks_8.30.1_linux_x64.tar.gz https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz
+          curl -fsSLo /tmp/gitleaks_checksums.txt https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_checksums.txt
+          (cd /tmp && grep 'gitleaks_8.30.1_linux_x64.tar.gz' gitleaks_checksums.txt | sha256sum -c -)
+          tar -xzf /tmp/gitleaks_8.30.1_linux_x64.tar.gz -C /tmp gitleaks
+          /tmp/gitleaks detect --source . --report-format json --report-path reports/gitleaks.json --exit-code 0 > reports/gitleaks.stdout 2> reports/gitleaks.stderr || true
+
+      - name: Publish redacted aggregate summary
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          out = ["# Workflow lint/security — redacted report-only summary", "",
+                 "Raw diagnostics and secret locations are intentionally not uploaded to this public repository.", ""]
+          actionlint = Path("reports/actionlint.txt")
+          al_count = sum(1 for line in actionlint.read_text(errors="replace").splitlines() if line.strip()) if actionlint.exists() else 0
+          out += [f"- actionlint v1.7.12: {al_count} diagnostic line(s)"]
+          try:
+              data = json.loads(Path("reports/zizmor.json").read_text())
+              findings = data if isinstance(data, list) else data.get("findings", data.get("results", []))
+              out += [f"- zizmor v1.32.0: {len(findings)} finding(s)"]
+          except Exception:
+              out += ["- zizmor v1.32.0: report unavailable/unparseable"]
+          try:
+              findings = json.loads(Path("reports/gitleaks.json").read_text())
+              out += [f"- gitleaks v8.30.1: {len(findings) if isinstance(findings, list) else 'report shape unknown'} finding(s)"]
+          except Exception:
+              out += ["- gitleaks v8.30.1: report unavailable/unparseable"]
+          out += ["", "This workflow is report-only: findings do not fail the job and do not create a required check."]
+          Path("reports/summary.md").write_text("\n".join(out) + "\n")
+          Path(__import__("os").environ["GITHUB_STEP_SUMMARY"]).write_text("\n".join(out) + "\n")
+          PY
+
+      - name: Upload redacted aggregate artifact
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: workflow-lint-security-redacted-summary
+          path: reports/summary.md
+          if-no-files-found: warn
+          retention-days: 14
