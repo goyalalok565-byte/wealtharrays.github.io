@@ -20,6 +20,8 @@ const stamp=crypto.createHash('sha256').update(stampFiles.map(file=>file+'|'+fs.
 let buildDate=process.env.SOURCE_DATE_DATE;
 if(!buildDate){try{buildDate=execFileSync('git',['log','-1','--format=%cs'],{cwd:root,encoding:'utf8'}).trim();}catch(_error){buildDate='2026-11-20';}}
 if(!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(buildDate))buildDate='2026-11-20';
+const buildSha=execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim();
+if(!/^[0-9a-f]{40}$/i.test(buildSha))throw new Error('Could not determine the exact source commit SHA for deployment provenance.');
 if(!fs.existsSync(path.join(root,'homepage-search.js')))throw new Error('Missing homepage-specific search source: homepage-search.js');
 function bundle(sources,label){
   const parts=sources.map(file=>{
@@ -323,6 +325,9 @@ if(isArticle){
   if(isUtilityNoindexPage(relPath) && !html.includes('WA-UTILITY-LEGAL-FOOTER')){
     html=html.replace('</body>','<footer class="site-footer premium-footer"><div class="site-footer-inner"><nav class="footer-nav-box" aria-label="Company and legal pages"><a class="footer-link" href="/privacy">Privacy Policy</a><a class="footer-link" href="/terms">Terms &amp; Conditions</a><a class="footer-link" href="/disclaimer">Disclaimer</a><a class="footer-link" href="/about">About Us</a><a class="footer-link" href="/contact">Contact Us</a></nav><div class="footer-bottom"><span>© 2026 Wealth Arrays</span><span>Questions or corrections: <a href="mailto:goyalalok565@gmail.com">goyalalok565@gmail.com</a></span></div></div></footer><!-- WA-UTILITY-LEGAL-FOOTER --></body>');
   }
+  const provenanceMeta='<meta name="wa-build-sha" content="'+buildSha+'">';
+  if(/<meta\\s+name=["']wa-build-sha["']/i.test(html))html=html.replace(/<meta\\s+name=["']wa-build-sha["'][^>]*>/i,provenanceMeta);
+  else html=html.replace('</head>',provenanceMeta+'</head>');
   fs.writeFileSync(full,html,'utf8');}
 
 const routes=['/','/tools','/articles','/research','/faq','/about','/contact','/privacy','/terms','/disclaimer','/methodology','/editorial-policy','/advertising-policy','/category-investment','/category-loan','/category-banking','/category-retirement','/category-salary','/category-business',...slugs.map(s=>`/${s}/`)];for(const full of allHtml){const rel=path.relative(root,full).replaceAll(path.sep,'/');if(/^articles\/[^/]+\.html$/.test(rel))routes.push('/'+rel.replace(/\.html$/,''));}
