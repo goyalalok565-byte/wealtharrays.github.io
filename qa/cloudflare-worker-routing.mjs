@@ -105,6 +105,7 @@ const billingReady = await worker.fetch(new Request("https://example.test/v1/bil
   RAZORPAY_KEY_SECRET: "test-secret-must-not-leak",
   RAZORPAY_PLAN_MONTHLY: "plan_monthly",
   RAZORPAY_PLAN_YEARLY: "plan_yearly",
+  RAZORPAY_WEBHOOK_SECRET: "webhook-secret-must-not-leak",
   TURNSTILE_SITE_KEY: "public-site-key",
   TURNSTILE_SECRET_KEY: "turnstile-secret-must-not-leak"
 }, {});
