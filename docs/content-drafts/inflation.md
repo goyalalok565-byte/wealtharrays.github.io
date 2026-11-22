@@ -32,6 +32,8 @@ Do not confuse nominal growth with real purchasing-power growth. Do not use a US
 - [BLS — CPI Inflation Calculator](https://www.bls.gov/data/inflation_calculator.htm)
 - [BLS — Consumer Price Index](https://www.bls.gov/CPI/)
 - [BEA — Personal Consumption Expenditures Price Index](https://www.bea.gov/data/personal-consumption-expenditures-price-index)
+- [MoSPI — Consumer Price Index, September 2026](https://mospi.gov.in/uploads/documents/productChartTable/1792047845899-Press%20Release%20for%20the%20month%20of%20September%2C%202026.pdf)
+
 
 ## Editorial and implementation notes
 
