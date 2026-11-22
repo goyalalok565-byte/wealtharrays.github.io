@@ -205,3 +205,10 @@ CI scope: strict seven-route Lighthouse runs on PR C (performance branch), manua
 - Browser QA explicitly exercises both cases and restores valid inputs before independent field-boundary checks.
 - Verification evidence from the preceding candidate based on an earlier main SHA: 55/55 calculator browser smoke, 70/70 unit tests, CodeQL, Canonical CI, Platform Gates, Worker build, and the strict seven-route three-run median Lighthouse gate passed. The current-main replay must complete its own fresh CI before merge.
 - Production deployment, live API health, AdSense approval/ad-slot configuration, and Supabase/D1/Razorpay activation remain separate verification/owner-configuration items; do not infer them from preview checks.
+
+## CI runtime maintenance — pending verification
+
+- Branch `chore/upgrade-github-actions-node24-2026-11-22` updates workflow action runtimes: `actions/checkout@v4 → @v5` (Node 24), `actions/setup-node@v4 → @v7` (Node 24), and `actions/upload-artifact@v4 → @v7`, including the pinned workflow-audit artifact action SHA.
+- This addresses Node 20 deprecation warnings observed in the 2026-11-22 production and Lighthouse workflow logs.
+- These are workflow dependency updates only; no product runtime, financial formula, threshold or deployment code is intentionally changed.
+- Do not merge until the fresh current-main CodeQL, Canonical CI, Platform Gates, Unit Tests, workflow audit and calculator browser smoke checks pass. Recheck the resulting main SHA after merge.
