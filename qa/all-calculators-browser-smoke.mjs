@@ -146,6 +146,13 @@ try {
         }
         assert(labels[1].includes('not defined: cost is 0') && labels[2].includes('not defined: cost is 0'), 'roi: zero-cost ratios must be explicitly undefined');
         assert(values[1].trim() === '—' && values[2].trim() === '—', 'roi: undefined ratios must not display as 0%');
+        // Restore a valid non-zero denominator before independent field-boundary checks.
+        // Otherwise the following finalValue=0 test inherits cost=0 and masks the
+        // boundary behavior with intentionally undefined ROI ratios.
+        await page.locator('#f-cost').fill('10000');
+        await page.locator('#f-finalValue').fill('14500');
+        await page.locator('#f-years').fill('3');
+        await page.locator('#calc-widget button[id$="-calculate"]').click();
       }
       if (calc.id === 'profit-margin') {
         for (const [id, value] of [['revenue', 0], ['cogs', 0], ['expenses', 0]]) await page.locator('#f-' + id).fill(String(value));
