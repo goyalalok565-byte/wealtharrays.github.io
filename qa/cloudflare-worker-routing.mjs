@@ -47,6 +47,8 @@ assert.equal(healthData.dependencies.razorpay_billing, "configured");
 assert.equal(healthData.ready_for_saas, true);
 assert.equal(JSON.stringify(healthData).includes("test-secret-must-not-leak"), false);
 assert.equal(JSON.stringify(healthData).includes("public-anon-test-value"), false);
+assert.equal(JSON.stringify(healthData).includes("turnstile-secret-must-not-leak"), false);
+assert.equal(healthData.dependencies.turnstile, "configured");
 const unhealthy = await worker.fetch(new Request("https://example.test/v1/health"), {
   ...env,
   DB: { prepare() { return { async first() { throw new Error("database offline"); } }; } }
