@@ -284,3 +284,5 @@ Branch: `feature/verified-receipts-batch1`; PR pending CI/review.
 - Error reporting is a mailto with calculator/model/build metadata only; no inputs or outputs are attached. No new analytics events or server calls are added by the receipt UI.
 - UI is a candidate only until CI, browser smoke, keyboard/a11y, privacy/network checks and the required Lighthouse gate pass. Production deployment/live behaviour is UNVERIFIED.
 - Hash is an integrity fingerprint, not a digital signature, external audit or guarantee of future results.
+
+- Strict seven-route Lighthouse release gate is being explicitly run on the `phase0/pr-c-receipt-batch1` PR because the default feature-branch workflow intentionally skips Lighthouse outside the designated release-gate branch prefixes. This does not represent a production performance result.
