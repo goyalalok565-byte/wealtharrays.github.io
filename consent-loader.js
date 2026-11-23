@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Wealth Arrays — Google Funding Choices loader.
  * Load after the first rendering window or immediately on interaction.
  * Ad requests remain paused until this consent script has loaded.
@@ -21,6 +21,8 @@
     };
     script.onerror = function () {
       window.__waFundingChoicesFailed = true;
+      window.__waFundingChoicesReady = true;
+      window.dispatchEvent(new Event('wa:fundingchoices-ready'));
       window.dispatchEvent(new Event('wa:fundingchoices-failed'));
     };
     document.head.appendChild(script);
