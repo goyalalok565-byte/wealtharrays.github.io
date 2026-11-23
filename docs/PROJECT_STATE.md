@@ -13,12 +13,12 @@ Status: The zero-denominator ROI/profit-margin correction is merged and deployed
 - GitHub Actions on that SHA: Unit Tests, CodeQL, Canonical CI, Platform Gates, Worker deploy, Pages build/deploy, production live verification, homepage search smoke, and mobile Lighthouse all completed successfully.
 - Cloudflare Workers production build check succeeded for that SHA; GitHub Pages deployment check also succeeded.
 - PR #163 is merged. The previous Canonical CI failure is no longer current on main.
-- Remaining Phase 1 code issue: preserve the homepage publisher-verification snippet through the generated `dist/` build while keeping manual ad-slot loading rules intact. The candidate fix is in `phase1/adsense-home-verification-build-fix`; it is not production code until merged and deployed.
+- Phase 1 code correction: preserve the homepage publisher-verification snippet through both build transforms and the generated `dist/` output while keeping manual ad-slot loading rules intact. The candidate fix is in `phase1/adsense-home-verification-build-fix`; it is not production code until merged and deployed.
 - Owner-only checks still required: AdSense account/site approval, account-side Auto Ads configuration, and confirmation that the publisher ID belongs to the intended account. Never claim approval or revenue from repository evidence alone.
 
 ## AdSense quality remediation, corrupted header deduplication & E-E-A-T enhancement — 2026-11-23
 
-- Added the Google AdSense publisher verification script to homepage source. A Phase 1 build audit found that `phase4-premium-build.mjs` strips that script from generated homepage output; the correction is isolated in branch `phase1/adsense-home-verification-build-fix` and is not yet merged/deployed. No manual `<ins>` ad slot is present on the homepage, so publisher verification must not be confused with a manual placement.
+- Added the Google AdSense publisher verification script to homepage source. A Phase 1 build audit found that both `root-cause-build.mjs` and `phase4-premium-build.mjs` stripped that script from generated homepage output; the correction is isolated in branch `phase1/adsense-home-verification-build-fix` and is not yet merged/deployed. No manual `<ins>` ad slot is present on the homepage, so publisher verification must not be confused with a manual placement.
 - Unblocked consent deadlock in `consent-loader.js` so failure in unconfigured Funding Choices does not permanently freeze ad requests.
 - Removed 121x duplicate stylesheet links in `about.html`, `editorial-standards.html`, `decoding-auto-financing-how-car-loan.html`, `income-tax-planner.html`, and `privacy-policy.html`.
 - Removed 19x duplicate `<!-- WA-CALCULATOR-SCHEMA -->` tags across 56 calculator pages.
