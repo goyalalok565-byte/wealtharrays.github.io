@@ -26,6 +26,9 @@ for(const full of publicFiles){
 }
 for(const f of calc){const s=read(f);if(!/<h1\b/i.test(s)) failures.push(`${f}: missing H1`);if(!s.includes('/wa-calculator-runtime.js')) failures.push(`${f}: missing canonical calculator runtime`);}
 for(const f of calc){const s=read(f);const m=s.match(/<article class=[\"']tool-article[\"']>([\s\S]*?)<\/article>/i);if(m){const text=m[1].replace(/<[^>]+>/g,' ').replace(/&[^;]+;/g,' ').replace(/\s+/g,' ').trim();const words=text?text.split(/\s+/).length:0;if(words<400) failures.push(`${f}: calculator educational content below 400 words (${words})`);}}
+const homepageVerification=read('index.html');
+if(!/<meta\\s+name=[\"']google-adsense-account[\"']\\s+content=[\"']ca-pub-6507600103785450[\"']/i.test(homepageVerification)) failures.push('index.html: AdSense publisher verification meta tag missing');
+if(/adsbygoogle\\.js/i.test(homepageVerification)||homepageVerification.includes('/wa-ad-loader.js')) failures.push('index.html: homepage ownership verification must not bypass the ad-slot loader policy');
 for(const full of publicFiles){
   const r=path.relative(root,full).replaceAll(path.sep,'/'), s=fs.readFileSync(full,'utf8');
   if(/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(s) && /ca-pub-6507600103785450|adsbygoogle\.js/i.test(s)){
@@ -39,13 +42,8 @@ for(const full of publicFiles){
   const routeName=r==='widget/index.html'?'widget/index.html':r;
   const intentionallyExcluded=['index.html','404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html','research.html','category-investment.html','category-loan.html','category-banking.html','category-retirement.html','category-salary.html','category-business.html','financial-workspace.html','goal-planner.html','scenario-lab.html','home-loan-emi-calculator/index.html','loan-emi-calculator/index.html','loan-interest-calculator/index.html'].includes(routeName) || noindex;
   const shouldLoadAds=hasAdSlot && !intentionallyExcluded;
-  const hasRuntimeAdLoader=html.includes('/wa-ad-loader.js');
-  const hasStaticAdScript=/adsbygoogle\.js/i.test(html);
-  const publisherVerification=routeName==='index.html' && /<script\b(?=[^>]*src=["']https:\/\/pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js\?client=ca-pub-6507600103785450["'])[^>]*>\s*<\/script>/i.test(html);
-  if(shouldLoadAds!==(hasRuntimeAdLoader||hasStaticAdScript) && !publisherVerification) failures.push(r+': AdSense loader must be present only when an eligible ad slot exists');
-  if(publisherVerification && (hasAdSlot || hasRuntimeAdLoader)) failures.push(r+': homepage publisher verification must not be treated as a manual ad placement');
-  if(routeName==='index.html' && !publisherVerification) failures.push(r+': homepage AdSense publisher verification code missing');
-  if(routeName!=='index.html' && hasStaticAdScript) failures.push(r+': static AdSense script is only allowed for homepage publisher verification');
+  const hasAdLoader=html.includes('/wa-ad-loader.js') || /adsbygoogle\.js/i.test(html);
+  if(shouldLoadAds!==hasAdLoader) failures.push(r+': AdSense loader must be present only when an eligible ad slot exists');
   if(!hasAdSlot && /<link\b(?=[^>]*\brel=["']preconnect["'])(?=[^>]*\bhref=["']https:\/\/(?:pagead2\.googlesyndication\.com|googleads\.g\.doubleclick\.net))/i.test(html)){
     failures.push(r+': ad-network preconnect must not be present without an ad slot');
   }
