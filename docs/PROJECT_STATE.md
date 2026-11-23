@@ -32,6 +32,18 @@ Branch: `saas/l1-production-rum-smoke` (not merged).
 - First production run 45049859678 failed because the site's CSP omitted `https://unpkg.com`, blocking the consent-gated web-vitals library.
 - Branch `saas/l1-rum-csp` adds the narrowly scoped script-src host and a Canonical CI regression assertion. No analytics payload or financial-input handling is changed.
 
+## L4 content wiring candidate — 2026-11-22
+
+Branch: `content/12-draft-wiring`; PR pending.
+
+- Copied and corrected all 12 drafts from PR #103 into `docs/content-drafts/`.
+- Wired the 12 drafts into their calculator pages: overview, calculation method/assumptions, additional worked examples, five FAQs, common mistakes, official references and visible last-updated date.
+- Updated those 12 pages to PNG `/og-image.png` Open Graph metadata and `en` / `x-default` hreflang.
+- Corrected the CAGR ending-value constraint and fixed-deposit example arithmetic; replaced mortgage-only references with auto/personal-loan guidance where relevant.
+- The remaining 43 pages still require the same page-specific editorial/source audit. The six requested Batch 1 calculators and Batch 2 calculators are not implemented in this candidate.
+- The canonical sitemap currently lists 54 calculator directory URLs while the registry has 55 definitions; route/sitemap parity needs a dedicated audit before claiming all 55 content pages are wired.
+- The current shared PNG is the site's existing `/og-image.png`; unique per-calculator social images are not included.
+
 ## Mission
 
 Build Wealth Arrays into a trusted global financial intelligence and calculator SaaS platform around five pillars:
