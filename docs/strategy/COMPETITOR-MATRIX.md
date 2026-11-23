@@ -1,0 +1,46 @@
+# Competitor matrix — public evidence snapshot
+
+**Reviewed:** 2026-11-23  
+**Purpose:** product discovery, not a ranking. Public pages can change; this is a point-in-time desk review. A missing public statement is **UNVERIFIED**, not proof that a feature does not exist. No competitor copy or UI text is reused.
+
+## Comparison
+
+| Product | Calculator breadth (public evidence) | Embed / API | Account, save, compare | Ads / load | Country coverage | Trust signals |
+|---|---|---|---|---|---|---|
+| Omni Calculator | Broad multi-category library. “600+ finance / 4,000+ total” is **UNVERIFIED in this source pass**. [Docs](https://www.omnicalculator.com/reports/documentation) | Embed and cite controls documented; AI-assisted Builder documented. General-purpose calculation API: **UNVERIFIED**. [Docs](https://www.omnicalculator.com/reports/documentation) · [Builder](https://www.omnicalculator.com/reports/omni-calculator-builder-getting-started) | Account optional; recently used calculators and Builder perks described. Cross-scenario compare: **UNVERIFIED**. [Help](https://www.omnicalculator.com/help) | Ads/load/privacy impact: **UNVERIFIED**. | International audience implied; jurisdiction-specific rule coverage: **UNVERIFIED**. | Articles describe equations, examples, authorship, update status and sources; feedback, share, embed and cite. [Docs](https://www.omnicalculator.com/reports/documentation) |
+| Calculator.net | Financial, fitness/health, math and other sections; launched on calculators.info in 2007 and migrated to calculator.net in 2008. [About](https://www.calculator.net/about-us.html) | FAQ explicitly says no calculator API. Linking allowed. Embed: **UNVERIFIED**. [About/FAQ](https://www.calculator.net/about-us.html) | Registered users can delete registration info, saved calculations and settings. Scenario comparison: **UNVERIFIED**. [About/FAQ](https://www.calculator.net/about-us.html) | Advertising explicitly discussed; actual ad density/load: **UNVERIFIED**. [About/FAQ](https://www.calculator.net/about-us.html) | Global availability/jurisdiction packs: **UNVERIFIED**. | About page says financial calculator descriptive content is created/reviewed by its financial team. [About](https://www.calculator.net/about-us.html) |
+| Bankrate | Hub lists mortgage, auto, credit-card, home-equity, investing/CD, savings, personal-finance, small-business, college and loan calculators. [Calculators](https://www.bankrate.com/calculators/) | Embed and public API: **UNVERIFIED**. Third-party non-embeddable claims are not treated as established fact. | Calculator account/save/compare workflow: **UNVERIFIED**. | Ads/load: **UNVERIFIED**. | Reviewed hub is US-oriented; wider jurisdiction coverage: **UNVERIFIED**. | Hub says estimates factor interest, fees and taxes. Individual methodology/source review is page-specific. [Calculators](https://www.bankrate.com/calculators/) |
+| NerdWallet | Hubs cover budgeting, savings goals, banking/deposit, investing and retirement calculators. [Personal finance](https://www.nerdwallet.com/finance/calculators) · [Banking](https://www.nerdwallet.com/banking/calculators) · [Investing](https://www.nerdwallet.com/investing/calculators) | Embed and public API: **UNVERIFIED**. Third-party non-embeddable claims are not established fact. | Reviewed pages state no sign-up; persistent save and side-by-side scenario compare: **UNVERIFIED**. [Personal finance](https://www.nerdwallet.com/finance/calculators) | Ads/load: **UNVERIFIED**. | US-oriented product examples (Roth IRA/CD); other countries: **UNVERIFIED**. | Pages state calculators are built/reviewed by writers/editors and rates, limits and formulas are reviewed regularly. [Personal finance](https://www.nerdwallet.com/finance/calculators) |
+| Groww (India) | SIP, lumpsum, SWP, MF, SSY, PPF, EPF, FD, RD, ROI, NPS, HRA, retirement, EMI, tax, GST, CAGR, XIRR/IRR and others. [Calculators](https://groww.in/calculators) | Embed/API: **UNVERIFIED**. | Signup requirement, save and cross-scenario compare: **UNVERIFIED**. | Ads/load: **UNVERIFIED**. | India-specific schemes and rupee examples; other country packs: **UNVERIFIED**. | EMI page shows inputs, amortization and formula explanation; source/effective-date coverage needs page-by-page audit. [EMI](https://groww.in/calculators/emi-calculator) |
+| ClearTax (India) | Public hub includes income tax, HRA, advance tax, gratuity and salary calculators. [Calculators](https://cleartax.in/calculators) | Embed/API: **UNVERIFIED**. | Account, save and compare calculator scenarios: **UNVERIFIED**. | Ads/load: **UNVERIFIED**. | Indian tax/payroll terminology; other country packs: **UNVERIFIED**. | Tax-specific explanatory context is present; authoritative source/date and reviewer details need page-level audit. [Calculators](https://cleartax.in/calculators) |
+| BankBazaar (India) | Directory includes home/personal/car EMI, FD, RD, income tax, HRA, PPF, SSY, NPS and monthly savings. [Calculators](https://money.bankbazaar.com/calculators.html) | Embed/API: **UNVERIFIED**. | Product comparison journeys exist on main site; calculator-scenario saving and compare: **UNVERIFIED**. [Main site](https://www.bankbazaar.com/) | Ads/load: **UNVERIFIED**. | India-specific PPF, SSY, NPS and HRA; other country packs: **UNVERIFIED**. | Main site states ISO and PCI DSS certification; scope, validity and relevance to each calculator flow need independent checking. [Main site](https://www.bankbazaar.com/) |
+
+## What this means for Wealth Arrays
+
+Do not compete on raw breadth. Compete on a coherent trust-and-decision loop:
+
+1. **Receipts:** reproducible output, assumptions, formula/model version, dated sources where rules apply, independently counted tests and a privacy-safe integrity hash.
+2. **Compare:** answer a real decision with parallel scenarios, sensitivities and explicit trade-offs.
+3. **AI-native:** AI interprets and explains; the deterministic engine computes. Never let a language model author financial numbers or invent missing inputs.
+4. **Jurisdiction packs:** separate universal math from country rules; label jurisdiction, effective date and official source.
+5. **Privacy-first:** no financial inputs in analytics/ads; verify the claim with automated network/payload tests before displaying a badge.
+6. **Continuity:** My Money Plan should let a user revisit decisions without forcing signup for basic calculations.
+
+## Pain-point hypotheses — not competitor facts
+
+| Hypothesis | Search Console validation | Interview question | On-site feedback validation |
+|---|---|---|---|
+| Users cannot see/export assumptions or source receipts easily | Query/page pairs containing “formula”, “assumptions”, “source”, “how calculated”, “accuracy” | “What proof do you need before relying on a calculator result?” | “What is missing from this result for you to trust it?” |
+| Users need to compare alternatives, not run isolated calculators | Queries containing “A vs B”, “rent vs buy”, “prepay vs invest”, “SIP vs lump sum” | “Tell me about the last two financial options you compared. How did you compare them?” | “Which alternative would you like to compare against this result?” |
+| Local rules or jurisdiction/year are unclear | Country/currency/tax-year modifiers and country-specific landing-page queries | “Which country and tax year does this calculation need to reflect?” | Ask jurisdiction/year only on rule-dependent pages; allow “not sure”. |
+| Ads or tracking reduce trust / raise privacy concerns | Queries containing “private”, “without login”, “no data”, plus landing-page engagement | “What financial information would you never want a site to collect?” | “Did anything here make you uncomfortable about privacy?” |
+| Users get a number but no useful next step | Queries combining calculator intent with “what next”, “how much should I save”, “pay off debt” | “After seeing the result, what decision did you still need to make?” | “What would you like to do next with this result?” |
+| Users must re-enter values across tools | Multi-page sessions and navigation paths between related tools; never send financial values to analytics | “When you move between tools, which values do you have to type again?” | “Would carrying these assumptions into a comparison help?” |
+| AI explanations may be persuasive but not verifiable | Search Console can reveal AI/explanation query themes but cannot prove trust | “Would you trust an AI explanation more if it showed the exact calculation tool, inputs and model version?” | “Does this explanation match the displayed calculation? Report mismatch without sending values.” |
+
+## Research and measurement safeguards
+
+- Search Console shows query and landing-page performance, not the user's full decision context. Use it for demand discovery, not causal claims.
+- Interviews must be voluntary and must not request credentials, bank details or unnecessary personal financial information.
+- Feedback events must not include amounts, rates, balances, tax identifiers or unrestricted free text. Warn users not to include personal/financial data.
+- Do not infer “no save”, “no comparison”, “ads-heavy” or “no local rules” from a feature not found on a marketing page. Mark **UNVERIFIED** until direct product testing or first-party documentation confirms it.
