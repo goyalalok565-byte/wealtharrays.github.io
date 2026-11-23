@@ -61,6 +61,7 @@ if (!read('index.html').match(/rel=["']manifest["']/i)) fail('Homepage manifest 
 if (!read('robots.txt').includes('Sitemap: https://wealtharrays.com/sitemap.xml')) fail('robots.txt sitemap contract missing');
 if (!read('sitemap.xml').includes('https://wealtharrays.com/')) fail('sitemap root URL missing');
 if (!read('ads.txt').includes('google.com, pub-6507600103785450, DIRECT, f08c47fec0942fa0')) fail('AdSense ads.txt contract changed');
+if (!/<meta\s+name=["']google-adsense-account["']\s+content=["']ca-pub-6507600103785450["']/i.test(read('index.html'))) fail('Homepage AdSense publisher verification meta tag missing');
 // AdSense verification is permitted on homepage for Google AdSense account approval
 if (!read('_headers').includes('Content-Security-Policy')) fail('CSP header missing');
 if (!read('_headers').includes('Referrer-Policy')) fail('Referrer-Policy header missing');

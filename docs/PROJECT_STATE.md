@@ -1,15 +1,24 @@
 ﻿# Wealth Arrays Project State
 
-Last updated: 2026-11-22
+Last updated: 2026-11-23
 Repository: `goyalalok565-byte/wealtharrays.github.io`
 Default branch: `main`
-Current phase: Phase 0 engineering gates passed on production main SHA `b1610d10e5fe7d389140b20efdce6f63b6ef72e8`.
-Status: The zero-denominator ROI/profit-margin correction is merged and deployed. L1 measurement improvements are in branch `saas/l1-consent-rum-events` and await CI/review; they are not deployed or counted as production measurements. Current-main unit, security, canonical, platform, Worker/Pages deployment, 55-calculator browser smoke, production smoke, deployment hygiene, and strict seven-route mobile Lighthouse gates passed. Phase 1 remains blocked on owner-managed SaaS credentials/configuration and CA/legal review; global leadership, revenue, and search acquisition are not established.
+Current phase: Phase 1 AdSense/release verification remediation. Phase 0 engineering gates are passing on production main SHA `21ad5fa5846a8f177b1fa7e4a94461b73c8c9e14`.
+Status: The zero-denominator ROI/profit-margin correction is merged and deployed. Main SHA `21ad5fa5846a8f177b1fa7e4a94461b73c8c9e14` has passing unit, CodeQL, canonical, platform, Worker/Pages deploy, production live verification, homepage browser smoke, and mobile Lighthouse checks. Phase 1 AdSense ownership-verification correction is in branch `phase1/adsense-home-verification-build-fix`; it is not merged or deployed. Google AdSense account approval and live ad serving remain owner/account-side verification items. L1 measurement improvements remain unverified until their PR passes and GA4 ownership/configuration is confirmed. Global leadership, revenue, and search acquisition are not established.
 
+
+## Phase 1 release and AdSense verification audit — 2026-11-23
+
+- Exact current production source SHA: `21ad5fa5846a8f177b1fa7e4a94461b73c8c9e14`.
+- GitHub Actions on that SHA: Unit Tests, CodeQL, Canonical CI, Platform Gates, Worker deploy, Pages build/deploy, production live verification, homepage search smoke, and mobile Lighthouse all completed successfully.
+- Cloudflare Workers production build check succeeded for that SHA; GitHub Pages deployment check also succeeded.
+- PR #163 is merged. The previous Canonical CI failure is no longer current on main.
+- Phase 1 code correction: use Google's documented `google-adsense-account` meta-tag ownership verification on the homepage, without loading AdSense JavaScript when no ad placement exists. Regression checks cover source and generated `dist/` output. The candidate fix is in `phase1/adsense-home-verification-build-fix`; it is not production code until merged and deployed.
+- Owner-only checks still required: AdSense account/site approval, account-side Auto Ads configuration, and confirmation that the publisher ID belongs to the intended account. Never claim approval or revenue from repository evidence alone.
 
 ## AdSense quality remediation, corrupted header deduplication & E-E-A-T enhancement — 2026-11-23
 
-- Resolved AdSense rejection root causes: added official Google AdSense verification tag and compliant ad container on `index.html`.
+- The homepage now uses Google's documented `google-adsense-account` meta-tag ownership-verification method in the Phase 1 candidate, instead of a direct AdSense script that violated the site's single-loader/performance policy. The candidate also adds source and generated-`dist/` regression assertions. No manual `<ins>` ad slot is present on the homepage; account-side selection of the meta-tag verification method and site approval remain owner actions.
 - Unblocked consent deadlock in `consent-loader.js` so failure in unconfigured Funding Choices does not permanently freeze ad requests.
 - Removed 121x duplicate stylesheet links in `about.html`, `editorial-standards.html`, `decoding-auto-financing-how-car-loan.html`, `income-tax-planner.html`, and `privacy-policy.html`.
 - Removed 19x duplicate `<!-- WA-CALCULATOR-SCHEMA -->` tags across 56 calculator pages.
