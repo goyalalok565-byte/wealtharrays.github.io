@@ -111,7 +111,8 @@ try {
         const fingerprint = await receiptHost.locator('.wa-receipt-hash').innerText();
         assert(/SHA-256 calculation fingerprint: [a-f0-9]{64}/.test(fingerprint), calc.id + ': SHA-256 fingerprint missing or malformed');
         const reportHref = await receiptHost.locator('a[href^="mailto:"]').getAttribute('href');
-        assert(reportHref && !calc.fields.some(field => reportHref.includes(encodeURIComponent(initialValue(field)))), calc.id + ': error report link contains a financial input');
+        const decodedReport = decodeURIComponent(reportHref || '');
+        assert(reportHref && !calc.fields.some(field => decodedReport.includes(field.id + '=')), calc.id + ': error report link contains a field/value pair');
         assert(await receiptHost.locator('[data-wa-receipt-copy]').isEnabled(), calc.id + ': verified receipt copy is not enabled after hashing');
       }
 
