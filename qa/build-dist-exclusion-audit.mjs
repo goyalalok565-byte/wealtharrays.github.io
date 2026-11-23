@@ -10,7 +10,7 @@ if (!fs.existsSync(manifestPath)) fail('public deployment manifest is missing');
 const homepagePath = path.join(dist, 'index.html');
 if (!fs.existsSync(homepagePath)) fail('homepage output is missing');
 const homepageHtml = fs.readFileSync(homepagePath, 'utf8');
-const publisherScript = /<script\b(?=[^>]*src=["']https:\/\/pagead\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js\?client=ca-pub-6507600103785450["'])[^>]*>\s*<\/script>/i;
+const publisherScript = /<script\b(?=[^>]*src=["']https:\/\/pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js\?client=ca-pub-6507600103785450["'])[^>]*>\s*<\/script>/i;
 if (!publisherScript.test(homepageHtml)) fail('homepage publisher verification script was removed from dist output');
 if ((homepageHtml.match(/adsbygoogle\.js/gi) || []).length !== 1) fail('homepage must contain exactly one publisher verification script');
 if (homepageHtml.includes('/wa-ad-loader.js')) fail('homepage without a manual ad slot must not receive the manual ad loader');
