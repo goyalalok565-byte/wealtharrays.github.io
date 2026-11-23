@@ -73,7 +73,7 @@ await assert.rejects(() => getEntitlement({}, "user_test_1"), /D1 database is no
 
 // Keep the schema contract aligned with every column used by billing and entitlement paths.
 const baseMigration = fs.readFileSync("migrations/0001_saas.sql", "utf8");
-const cancelMigration = fs.readFileSync("migrations/0002_subscription_cancel_flag.sql", "utf8");
+const cancelMigration = fs.readFileSync("migrations/0003_subscription_cancel_flag.sql", "utf8");
 const orderingMigration = fs.readFileSync("migrations/0002_billing_webhook_order.sql", "utf8");
 assert.match(baseMigration, /CREATE TABLE IF NOT EXISTS subscriptions/);
 assert.match(baseMigration, /current_period_end TEXT/);
