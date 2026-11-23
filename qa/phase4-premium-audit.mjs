@@ -41,7 +41,7 @@ for(const full of publicFiles){
   const shouldLoadAds=hasAdSlot && !intentionallyExcluded;
   const hasRuntimeAdLoader=html.includes('/wa-ad-loader.js');
   const hasStaticAdScript=/adsbygoogle\.js/i.test(html);
-  const publisherVerification=routeName==='index.html' && /<script\b(?=[^>]*src=["']https:\/\/pagead\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js\?client=ca-pub-6507600103785450["'])[^>]*>\s*<\/script>/i.test(html);
+  const publisherVerification=routeName==='index.html' && /<script\b(?=[^>]*src=["']https:\/\/pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js\?client=ca-pub-6507600103785450["'])[^>]*>\s*<\/script>/i.test(html);
   if(shouldLoadAds!==(hasRuntimeAdLoader||hasStaticAdScript) && !publisherVerification) failures.push(r+': AdSense loader must be present only when an eligible ad slot exists');
   if(publisherVerification && (hasAdSlot || hasRuntimeAdLoader)) failures.push(r+': homepage publisher verification must not be treated as a manual ad placement');
   if(routeName==='index.html' && !publisherVerification) failures.push(r+': homepage AdSense publisher verification code missing');
