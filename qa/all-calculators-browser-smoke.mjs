@@ -99,6 +99,22 @@ try {
         assert(actual === expected[i].formatted, calc.id + ': rendered value mismatch for ' + expected[i].label + ' (got ' + actual + ', expected ' + expected[i].formatted + ')');
         assert(!/NaN|Infinity|undefined|null|^—$/.test(actual), calc.id + ': invalid rendered value for ' + expected[i].label + ': ' + actual);
       }
+      const receiptModels = new Set(['sip', 'mortgage', 'compound-interest', 'swp', 'rent-vs-buy']);
+      if (receiptModels.has(calc.id)) {
+        const receiptHost = page.locator('#calc-widget-receipt');
+        await page.waitForFunction(() => {
+          const host = document.getElementById('calc-widget-receipt');
+          return host && !host.hidden && /SHA-256 calculation fingerprint: [a-f0-9]{64}/.test(host.textContent || '');
+        });
+        assert(await receiptHost.locator('summary').innerText().then(text => text.includes('How this was calculated')), calc.id + ': receipt disclosure heading missing');
+        assert((await receiptHost.innerText()).includes('Independent tests: 1 case(s) passed'), calc.id + ': model-specific independent test evidence missing');
+        const fingerprint = await receiptHost.locator('.wa-receipt-hash').innerText();
+        assert(/SHA-256 calculation fingerprint: [a-f0-9]{64}/.test(fingerprint), calc.id + ': SHA-256 fingerprint missing or malformed');
+        const reportHref = await receiptHost.locator('a[href^="mailto:"]').getAttribute('href');
+        assert(reportHref && !calc.fields.some(field => reportHref.includes(encodeURIComponent(initialValue(field)))), calc.id + ': error report link contains a financial input');
+        assert(await receiptHost.locator('[data-wa-receipt-copy]').isEnabled(), calc.id + ': verified receipt copy is not enabled after hashing');
+      }
+
       const before = await rows.allTextContents();
 
       // Edit a meaningful numeric input: old results must be invalidated and must not recalculate until clicked.
@@ -108,6 +124,7 @@ try {
       const nextValue = changedNumber(field, oldValue);
       await page.locator('#f-' + field.id).fill(nextValue);
       assert(await page.locator('#calc-widget .calc-result-row').count() === 0, calc.id + ': old result stayed visible or auto-calculated after editing');
+      if (receiptModels.has(calc.id)) assert(await page.locator('#calc-widget-receipt').isHidden(), calc.id + ': receipt remained visible after inputs changed');
       const editMessage = (await page.locator('#calc-widget-result').innerText()).toLowerCase();
       assert(editMessage.includes('click calculate') || editMessage.includes('complete all fields'), calc.id + ': edit state did not explain how to recalculate');
       await page.locator('#calc-widget button[id$="-calculate"]').click();
