@@ -3,6 +3,7 @@ import crypto from 'node:crypto';
 const CASES = {
   sip: {
     model_version: '1.0.0',
+    input_units: { monthly: 'currency/month', rate: '%/year', years: 'years', inflation: '%/year' }, output_units: ['currency', 'currency', 'currency', 'currency'],
     case_id: 'sip-annuity-due-200-10-15y',
     formula_id: 'sip-annuity-due-monthly-v1',
     assumptions: [{ id: 'contribution_timing', label: 'Contribution timing', value: 'Beginning of each month' }, { id: 'compounding_period', label: 'Return compounding', value: 'Monthly' }],
@@ -16,6 +17,7 @@ const CASES = {
   },
   mortgage: {
     model_version: '1.0.0',
+    input_units: { principal: 'currency', rate: '%/year', years: 'years' }, output_units: ['currency/month', 'currency', 'currency'],
     case_id: 'mortgage-standard-amortization-250k-6.5-25y',
     formula_id: 'loan-amortization-monthly-fixed-rate-v1',
     assumptions: [{ id: 'rate_type', label: 'Interest rate', value: 'Fixed for the full loan term' }, { id: 'payment_frequency', label: 'Payment frequency', value: 'Monthly, end-of-period amortization' }],
@@ -28,6 +30,7 @@ const CASES = {
   },
   'compound-interest': {
     model_version: '1.0.0',
+    input_units: { principal: 'currency', rate: '%/year', years: 'years', inflation: '%/year', freq: 'compounding periods/year' }, output_units: ['currency', 'currency', 'currency', 'currency'],
     case_id: 'compound-monthly-5000-6-10y',
     formula_id: 'compound-periodic-v1',
     assumptions: [{ id: 'rate_type', label: 'Rate type', value: 'Nominal annual rate divided by selected compounding periods' }],
@@ -39,6 +42,7 @@ const CASES = {
   },
   swp: {
     model_version: '1.0.0',
+    input_units: { corpus: 'currency', withdrawal: 'currency/month', rate: '%/year', years: 'years', stepUp: '%/year' }, output_units: ['currency', 'currency', 'currency', 'years'],
     case_id: 'swp-step-up-withdrawal-exhaustion-5m-8-20y',
     formula_id: 'swp-withdraw-first-monthly-return-v1',
     assumptions: [{ id: 'withdrawal_timing', label: 'Withdrawal timing', value: 'At the start of each month' }, { id: 'return_timing', label: 'Return timing', value: 'Applied monthly after withdrawal' }, { id: 'step_up_timing', label: 'Annual step-up', value: 'Applied once each year after the first month' }],
@@ -58,6 +62,7 @@ const CASES = {
   },
   'rent-vs-buy': {
     model_version: '1.0.0',
+    input_units: { price: 'currency', downPct: '%', loanRate: '%/year', loanYears: 'years', appreciation: '%/year', rent: 'currency/month', rentGrowth: '%/year', investReturn: '%/year', maintPct: '%/year', buyCostPct: '%', horizon: 'years' }, output_units: ['currency/month', 'currency', 'currency', 'currency'],
     case_id: 'rent-buy-monthly-amortization-8m-10y',
     formula_id: 'rent-vs-buy-monthly-cashflow-v1',
     assumptions: [{ id: 'loan_rate', label: 'Loan rate', value: 'Fixed for the modeled loan term' }, { id: 'cashflow_timing', label: 'Cash-flow timing', value: 'Monthly' }, { id: 'rent_escalation', label: 'Rent escalation', value: 'Applied annually' }, { id: 'maintenance', label: 'Maintenance', value: 'Calculated as a percentage of initial property price each month' }],
@@ -111,7 +116,9 @@ export function buildReceiptEvidence(calculators, buildId) {
       independent_case_count: 1,
       case_ids: [spec.case_id],
       formula_id: spec.formula_id,
-      assumptions: spec.assumptions
+      assumptions: spec.assumptions,
+      input_units: spec.input_units,
+      output_units: spec.output_units
     };
   }
   return { schema_version: 1, build_id: buildId, models };
