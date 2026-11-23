@@ -39,8 +39,13 @@ for(const full of publicFiles){
   const routeName=r==='widget/index.html'?'widget/index.html':r;
   const intentionallyExcluded=['index.html','404.html','widget.html','widget/index.html','privacy.html','privacy-policy.html','terms.html','disclaimer.html','advertising-policy.html','contact.html','about.html','research.html','category-investment.html','category-loan.html','category-banking.html','category-retirement.html','category-salary.html','category-business.html','financial-workspace.html','goal-planner.html','scenario-lab.html','home-loan-emi-calculator/index.html','loan-emi-calculator/index.html','loan-interest-calculator/index.html'].includes(routeName) || noindex;
   const shouldLoadAds=hasAdSlot && !intentionallyExcluded;
-  const hasAdLoader=html.includes('/wa-ad-loader.js') || /adsbygoogle\.js/i.test(html);
-  if(shouldLoadAds!==hasAdLoader) failures.push(r+': AdSense loader must be present only when an eligible ad slot exists');
+  const hasRuntimeAdLoader=html.includes('/wa-ad-loader.js');
+  const hasStaticAdScript=/adsbygoogle\.js/i.test(html);
+  const publisherVerification=routeName==='index.html' && /<script\b(?=[^>]*src=["']https:\/\/pagead\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js\?client=ca-pub-6507600103785450["'])[^>]*>\s*<\/script>/i.test(html);
+  if(shouldLoadAds!==(hasRuntimeAdLoader||hasStaticAdScript) && !publisherVerification) failures.push(r+': AdSense loader must be present only when an eligible ad slot exists');
+  if(publisherVerification && (hasAdSlot || hasRuntimeAdLoader)) failures.push(r+': homepage publisher verification must not be treated as a manual ad placement');
+  if(routeName==='index.html' && !publisherVerification) failures.push(r+': homepage AdSense publisher verification code missing');
+  if(routeName!=='index.html' && hasStaticAdScript) failures.push(r+': static AdSense script is only allowed for homepage publisher verification');
   if(!hasAdSlot && /<link\b(?=[^>]*\brel=["']preconnect["'])(?=[^>]*\bhref=["']https:\/\/(?:pagead2\.googlesyndication\.com|googleads\.g\.doubleclick\.net))/i.test(html)){
     failures.push(r+': ad-network preconnect must not be present without an ad slot');
   }
