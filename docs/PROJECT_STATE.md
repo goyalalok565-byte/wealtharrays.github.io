@@ -1,4 +1,4 @@
-# Wealth Arrays Project State
+﻿# Wealth Arrays Project State
 
 Last updated: 2026-11-22
 Repository: `goyalalok565-byte/wealtharrays.github.io`
@@ -6,6 +6,15 @@ Default branch: `main`
 Current phase: Phase 0 engineering gates passed on production main SHA `b1610d10e5fe7d389140b20efdce6f63b6ef72e8`.
 Status: The zero-denominator ROI/profit-margin correction is merged and deployed. L1 measurement improvements are in branch `saas/l1-consent-rum-events` and await CI/review; they are not deployed or counted as production measurements. Current-main unit, security, canonical, platform, Worker/Pages deployment, 55-calculator browser smoke, production smoke, deployment hygiene, and strict seven-route mobile Lighthouse gates passed. Phase 1 remains blocked on owner-managed SaaS credentials/configuration and CA/legal review; global leadership, revenue, and search acquisition are not established.
 
+
+## AdSense quality remediation, corrupted header deduplication & E-E-A-T enhancement — 2026-11-23
+
+- Resolved AdSense rejection root causes: added official Google AdSense verification tag and compliant ad container on `index.html`.
+- Unblocked consent deadlock in `consent-loader.js` so failure in unconfigured Funding Choices does not permanently freeze ad requests.
+- Removed 121x duplicate stylesheet links in `about.html`, `editorial-standards.html`, `decoding-auto-financing-how-car-loan.html`, `income-tax-planner.html`, and `privacy-policy.html`.
+- Removed 19x duplicate `<!-- WA-CALCULATOR-SCHEMA -->` tags across 56 calculator pages.
+- Strengthened E-E-A-T signals in `about.html` and `contact.html` (Alok Goyal computational engineering profile, regulatory standards compliance, New Delhi headquarters, categorized inquiry routing and response SLA).
+- Updated `qa/phase45-production-audit.mjs` to permit Google AdSense publisher verification on homepage.
 
 ## L1 measurement PR candidate — 2026-11-22
 
