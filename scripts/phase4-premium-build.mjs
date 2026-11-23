@@ -95,10 +95,7 @@ for(const file of htmlFiles){
   s=s.replace(/<script>[^]*?waSubscriptionCache[^]*?<\/script>/gi,'');
   // Normalize every page to zero or one publisher loader. A static AdSense tag
   // plus wa-ad-loader.js caused the same third-party library to be injected twice.
-  // Keep the publisher verification snippet on the homepage. It is not a
-  // manual ad placement: pages without an eligible <ins> slot still do not
-  // receive the runtime ad loader. Other pages are normalized as before.
-  if (routeName !== 'index.html') s=s.replace(staticAdScript,'');
+  s=s.replace(staticAdScript,'');
   s=s.replace(adLoaderScript,'');
   if(!hasAdSlot) {
     // Do not preconnect to ad networks on pages that have no ad placement.
