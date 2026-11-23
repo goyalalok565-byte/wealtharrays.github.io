@@ -5,7 +5,7 @@ const CASES = {
     model_version: '1.0.0',
     case_id: 'sip-annuity-due-200-10-15y',
     formula_id: 'sip-annuity-due-monthly-v1',
-    assumptions: [{ id: 'contribution_timing', label: 'Contribution timing', value: 'Beginning of each month' }, { id: 'compounding_period', label: 'Return compounding', value: 'Monthly' }],
+    assumptions: [{ id: 'contribution_timing', label: 'Contribution timing', value: 'At each month start' }, { id: 'compounding_period', label: 'Return compounding', value: 'Monthly cash flows' }],
     inputs: { monthly: 200, rate: 10, years: 15, inflation: 6 },
     reference(v) {
       const i = v.rate / 1200, n = v.years * 12;
@@ -18,7 +18,7 @@ const CASES = {
     model_version: '1.0.0',
     case_id: 'mortgage-standard-amortization-250k-6.5-25y',
     formula_id: 'loan-amortization-monthly-fixed-rate-v1',
-    assumptions: [{ id: 'rate_type', label: 'Interest rate', value: 'Fixed for the full loan term' }, { id: 'payment_frequency', label: 'Payment frequency', value: 'Monthly, end-of-period amortization' }],
+    assumptions: [{ id: 'rate_type', label: 'Interest rate', value: 'Fixed for full term' }, { id: 'payment_frequency', label: 'Payment frequency', value: 'Monthly, paid after each period' }],
     inputs: { principal: 250000, rate: 6.5, years: 25 },
     reference(v) {
       const n = v.years * 12, r = v.rate / 1200;
@@ -30,7 +30,7 @@ const CASES = {
     model_version: '1.0.0',
     case_id: 'compound-monthly-5000-6-10y',
     formula_id: 'compound-periodic-v1',
-    assumptions: [{ id: 'rate_type', label: 'Rate type', value: 'Nominal annual rate divided by selected compounding periods' }],
+    assumptions: [{ id: 'rate_type', label: 'Rate type', value: 'Nominal annual rate divided by periods/year' }],
     inputs: { principal: 5000, rate: 6, years: 10, inflation: 6, freq: '12' },
     reference(v) {
       const future = v.principal * Math.pow(1 + (v.rate / 100) / Number(v.freq), Number(v.freq) * v.years);
@@ -41,7 +41,7 @@ const CASES = {
     model_version: '1.0.0',
     case_id: 'swp-step-up-withdrawal-exhaustion-5m-8-20y',
     formula_id: 'swp-withdraw-first-monthly-return-v1',
-    assumptions: [{ id: 'withdrawal_timing', label: 'Withdrawal timing', value: 'At the start of each month' }, { id: 'return_timing', label: 'Return timing', value: 'Applied monthly after withdrawal' }, { id: 'step_up_timing', label: 'Annual step-up', value: 'Applied once each year after the first month' }],
+    assumptions: [{ id: 'withdrawal_timing', label: 'Withdrawal timing', value: 'At month start' }, { id: 'return_timing', label: 'Return timing', value: 'Monthly after withdrawal' }, { id: 'step_up_timing', label: 'Annual step-up', value: 'Each anniversary' }],
     inputs: { corpus: 5000000, withdrawal: 30000, rate: 8, years: 20, stepUp: 5 },
     reference(v) {
       let balance = v.corpus, withdrawal = v.withdrawal, total = 0, fullMonths = 0;
@@ -60,7 +60,7 @@ const CASES = {
     model_version: '1.0.0',
     case_id: 'rent-buy-monthly-amortization-8m-10y',
     formula_id: 'rent-vs-buy-monthly-cashflow-v1',
-    assumptions: [{ id: 'loan_rate', label: 'Loan rate', value: 'Fixed for the modeled loan term' }, { id: 'cashflow_timing', label: 'Cash-flow timing', value: 'Monthly' }, { id: 'rent_escalation', label: 'Rent escalation', value: 'Applied annually' }, { id: 'maintenance', label: 'Maintenance', value: 'Calculated as a percentage of initial property price each month' }],
+    assumptions: [{ id: 'loan_rate', label: 'Loan rate', value: 'Fixed during modeled term' }, { id: 'cashflow_timing', label: 'Cash-flow timing', value: 'Monthly' }, { id: 'rent_escalation', label: 'Rent escalation', value: 'Annual increase' }, { id: 'maintenance', label: 'Maintenance', value: 'Percent of initial price each month' }],
     inputs: { price: 8000000, downPct: 20, loanRate: 8.75, loanYears: 20, appreciation: 5, rent: 25000, rentGrowth: 5, investReturn: 10, maintPct: 1, buyCostPct: 6, horizon: 10 },
     reference(v) {
       const down = v.price * v.downPct / 100, loan = v.price - down;
