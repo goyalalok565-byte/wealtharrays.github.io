@@ -10,7 +10,7 @@ if (!fs.existsSync(manifestPath)) fail('public deployment manifest is missing');
 const homepagePath = path.join(dist, 'index.html');
 if (!fs.existsSync(homepagePath)) fail('homepage output is missing');
 const homepageHtml = fs.readFileSync(homepagePath, 'utf8');
-const publisherMeta = /<meta\\s+name=[\"']google-adsense-account[\"']\\s+content=[\"']ca-pub-6507600103785450[\"']/i;
+if (/adsbygoogle\.js/i.test(homepageHtml) || homepageHtml.includes('/wa-ad-loader.js')) fail('homepage ownership verification must not load AdSense without an eligible ad slot');
 if (!publisherMeta.test(homepageHtml)) fail('homepage AdSense publisher verification meta tag was removed from dist output');
 if (/adsbygoogle\\.js/i.test(homepageHtml) || homepageHtml.includes('/wa-ad-loader.js')) fail('homepage ownership verification must not load AdSense without an eligible ad slot');
 const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
