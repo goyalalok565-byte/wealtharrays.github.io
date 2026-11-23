@@ -35,7 +35,9 @@ assert.equal(
   "free",
   "An expired subscription must not retain Pro entitlements"
 );
-for (const status of ["created", "pending", "authenticated", "halted", "paused", "cancelled", "completed"]) {
+assert.equal(resolveEntitlement({ status: "active", plan_id: "monthly", current_period_end: null }, now).tier, "free", "An active status without a paid-through timestamp must fail closed");
+assert.equal(resolveEntitlement({ status: "active", plan_id: "monthly", current_period_end: "not-a-date" }, now).tier, "free", "An invalid paid-through timestamp must fail closed");
+for (const status of ["created", "pending", "authenticated", "halted", "paused", "cancelled", "completed", "refunded"]) {
   assert.equal(
     resolveEntitlement({ status, plan_id: "monthly", current_period_end: future }, now).tier,
     "free",
@@ -78,4 +80,4 @@ assert.match(baseMigration, /current_period_end TEXT/);
 assert.match(cancelMigration, /ADD COLUMN cancel_at_period_end INTEGER NOT NULL DEFAULT 0/);
 assert.match(orderingMigration, /ADD COLUMN last_provider_event_at INTEGER/);
 
-console.log("Phase 1 entitlement/D1 audit PASS: Free/Pro boundaries, expiry, cancellation period, inactive statuses, D1 fail-closed and billing migration columns.");
+console.log("Phase 1 entitlement/D1 audit PASS: Free/Pro boundaries, expiry, missing/invalid paid-through timestamps, cancellation period, inactive/refunded statuses, D1 fail-closed and billing migration columns.");
