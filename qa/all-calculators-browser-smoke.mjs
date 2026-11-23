@@ -107,6 +107,7 @@ try {
           return host && !host.hidden && /SHA-256 calculation fingerprint: [a-f0-9]{64}/.test(host.textContent || '');
         });
         assert(await receiptHost.locator('summary').innerText().then(text => text.includes('How this was calculated')), calc.id + ': receipt disclosure heading missing');
+        await receiptHost.locator('summary').click();
         assert((await receiptHost.innerText()).includes('Independent tests: 1 case(s) passed'), calc.id + ': model-specific independent test evidence missing');
         const fingerprint = await receiptHost.locator('.wa-receipt-hash').innerText();
         assert(/SHA-256 calculation fingerprint: [a-f0-9]{64}/.test(fingerprint), calc.id + ': SHA-256 fingerprint missing or malformed');
