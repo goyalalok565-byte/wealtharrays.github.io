@@ -3,11 +3,12 @@ export const MAX_SCENARIO_LIMIT = 500;
 
 /**
  * Resolve server-authoritative access from the latest persisted subscription.
- * A cancellation scheduled for period end remains active only until that end.
+ * Pro access requires an explicit, valid paid-through timestamp. A cancellation
+ * scheduled for period end remains active only until that timestamp.
  */
 export function resolveEntitlement(subscription, now = Date.now()) {
-  const end = subscription?.current_period_end ? Date.parse(subscription.current_period_end) : null;
-  const periodValid = end === null || (Number.isFinite(end) && end > now);
+  const end = Date.parse(subscription?.current_period_end || "");
+  const periodValid = Number.isFinite(end) && end > now;
   const active = subscription?.status === "active" && periodValid;
   return {
     tier: active ? "pro" : "free",
