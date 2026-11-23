@@ -250,3 +250,11 @@ CI scope: strict seven-route Lighthouse runs on PR C (performance branch), manua
 - This addresses Node 20 deprecation warnings observed in the 2026-11-22 production and Lighthouse workflow logs.
 - These are workflow dependency updates only; no product runtime, financial formula, threshold or deployment code is intentionally changed.
 - Do not merge until the fresh current-main CodeQL, Canonical CI, Platform Gates, Unit Tests, workflow audit and calculator browser smoke checks pass. Recheck the resulting main SHA after merge.
+
+## L4 content wiring — merged 2026-11-23
+
+- PR #148 was merged by squash at main commit `8ef60e4bf8e0864a31ac458a03546f448d37bfd7` (source head `131c83c536750255dc9dfbc7f70f235d41a5505a`). The 12 reviewed content drafts listed above are now part of main; the candidate is no longer pending.
+- Exact PR-head CI passed: Unit Tests (including the 12-page content audit and consent/RUM browser smoke), Canonical CI, Platform Gates, CodeQL, and Calculator Browser Smoke. The PR Lighthouse workflow was skipped by workflow scope; do not count it as a new Lighthouse measurement.
+- No post-merge Cloudflare deployment or production browser verification has yet been retrieved for merge commit `8ef60e4bf8e0864a31ac458a03546f448d37bfd7`. Treat deployment/live state as unverified until the release workflow and live checks confirm it.
+- Remaining L4: 43 pages need page-specific editorial/source review; the 55-definition vs 54-sitemap-URL parity discrepancy needs resolution; Batch 1 and Batch 2 calculator work remains pending; current shared PNG is not a set of unique calculator OG images.
+- PR #145 remains an open draft Tier 3 backend/billing hardening candidate. It is not merged or production-active. Owner-side D1/Supabase/Cloudflare/Turnstile/Razorpay TEST configuration and full test-mode lifecycle proof are still prerequisites; no live checkout or commercial activation is authorized.
