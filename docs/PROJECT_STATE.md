@@ -265,3 +265,10 @@ CI scope: strict seven-route Lighthouse runs on PR C (performance branch), manua
 - Strategic choice: position Wealth Arrays as a financial decision workspace bridging free calculators and connected-account personal finance apps. AI is an intent/orchestration/explanation layer; all financial numeric outputs must come from versioned deterministic tools.
 - This document is a proposed operating strategy, not evidence of completed features, legal approval, market leadership or production readiness.
 - Current execution priorities: verify PR #148 deployment/live state; reconcile 55 registry definitions vs 54 sitemap URLs; keep PR #145 draft until owner-managed TEST configuration and full lifecycle evidence; implement Batch 1 six calculators with independent vectors.
+
+## Route/sitemap parity verification — 2026-11-23
+
+- Recounted canonical `calculators.js` slugs against the current-main `sitemap.xml`: **55/55 calculator routes are present**. Sitemap has 97 total URLs because it also contains 42 non-calculator pages/content routes.
+- Cross-checked all 55 slugs against homepage links, tools directory, calculator search, `llms.txt`, and methodology page: **55/55 present in each**.
+- The earlier "55 definitions vs 54 sitemap calculator URLs" statement was a counting error from a partial calculator-directory-only count and is superseded by this explicit audit. No missing calculator route is currently evidenced.
+- This was a read-only source audit, not a post-merge production deployment/live-browser verification.
