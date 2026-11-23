@@ -258,3 +258,10 @@ CI scope: strict seven-route Lighthouse runs on PR C (performance branch), manua
 - No post-merge Cloudflare deployment or production browser verification has yet been retrieved for merge commit `8ef60e4bf8e0864a31ac458a03546f448d37bfd7`. Treat deployment/live state as unverified until the release workflow and live checks confirm it.
 - Remaining L4: 43 pages need page-specific editorial/source review; the 55-definition vs 54-sitemap-URL parity discrepancy needs resolution; Batch 1 and Batch 2 calculator work remains pending; current shared PNG is not a set of unique calculator OG images.
 - PR #145 remains an open draft Tier 3 backend/billing hardening candidate. It is not merged or production-active. Owner-side D1/Supabase/Cloudflare/Turnstile/Razorpay TEST configuration and full test-mode lifecycle proof are still prerequisites; no live checkout or commercial activation is authorized.
+
+## Product strategy baseline — 2026-11-23
+
+- Added `docs/strategy/WEALTH_ARRAYS_NORTH_STAR.md`: 10-year product principles, competitive positioning, deterministic calculation kernel, decision workspace, explainable AI copilot, source intelligence, privacy/security, API/professional platform, phased gates and monthly scorecard.
+- Strategic choice: position Wealth Arrays as a financial decision workspace bridging free calculators and connected-account personal finance apps. AI is an intent/orchestration/explanation layer; all financial numeric outputs must come from versioned deterministic tools.
+- This document is a proposed operating strategy, not evidence of completed features, legal approval, market leadership or production readiness.
+- Current execution priorities: verify PR #148 deployment/live state; reconcile 55 registry definitions vs 54 sitemap URLs; keep PR #145 draft until owner-managed TEST configuration and full lifecycle evidence; implement Batch 1 six calculators with independent vectors.
