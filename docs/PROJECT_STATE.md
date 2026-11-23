@@ -18,7 +18,7 @@ Status: The zero-denominator ROI/profit-margin correction is merged and deployed
 
 ## AdSense quality remediation, corrupted header deduplication & E-E-A-T enhancement — 2026-11-23
 
-- Added the Google AdSense publisher verification script to homepage source. A Phase 1 build audit found that both `root-cause-build.mjs` and `phase4-premium-build.mjs` stripped that script from generated homepage output; the correction is isolated in branch `phase1/adsense-home-verification-build-fix` and is not yet merged/deployed. No manual `<ins>` ad slot is present on the homepage, so publisher verification must not be confused with a manual placement.
+- Added the Google AdSense publisher verification script to homepage source. A Phase 1 build audit found that `root-cause-build.mjs` removed the script in its generic runtime normalization and homepage exclusion rules, before `phase4-premium-build.mjs` could preserve it; the correction is isolated in branch `phase1/adsense-home-verification-build-fix` and is not yet merged/deployed. No manual `<ins>` ad slot is present on the homepage, so publisher verification must not be confused with a manual placement.
 - Unblocked consent deadlock in `consent-loader.js` so failure in unconfigured Funding Choices does not permanently freeze ad requests.
 - Removed 121x duplicate stylesheet links in `about.html`, `editorial-standards.html`, `decoding-auto-financing-how-car-loan.html`, `income-tax-planner.html`, and `privacy-policy.html`.
 - Removed 19x duplicate `<!-- WA-CALCULATOR-SCHEMA -->` tags across 56 calculator pages.
