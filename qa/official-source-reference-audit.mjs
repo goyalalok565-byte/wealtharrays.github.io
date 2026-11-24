@@ -55,7 +55,7 @@ const cases = [
   {
     id: 'gratuity-calculator',
     route: 'gratuity-calculator',
-    required: ['Ministry of Labour and Employment: Labour Codes and current rules', 'Ministry of Labour and Employment: Additional FAQs on Labour Codes (November 2026)', 'Code on Social Security, 2020 took effect from 21 November 2025', 'not a legal entitlement decision']
+    required: ['Ministry of Labour and Employment: Labour Codes and current rules', 'Ministry of Labour and Employment: Additional FAQs on Labour Codes (November 2026)', 'Code on Social Security, 2020 took effect on 21 November 2025', 'not a legal entitlement decision']
   },
   {
     id: 'hra-exemption-calculator',
