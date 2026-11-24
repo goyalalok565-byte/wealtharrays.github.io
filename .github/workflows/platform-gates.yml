@@ -58,6 +58,8 @@ jobs:
         run: npm run qa:dist
       - name: Canonical sitemap and URL integrity
         run: npm run qa:seo
+      - name: Calculator embed offer page contract
+        run: npm run qa:embed-offer
       - name: Diff check
         run: git diff --check
       - name: Verify literal npm run build
