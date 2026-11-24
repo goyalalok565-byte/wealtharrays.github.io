@@ -4,6 +4,7 @@ import path from 'node:path';
 const root = process.cwd();
 const source = fs.readFileSync(path.join(root, 'budget-calculator/index.html'), 'utf8');
 const built = fs.readFileSync(path.join(root, 'dist/budget-calculator/index.html'), 'utf8');
+const expectedDescription = 'Use weekly, biweekly or monthly take-home pay: convert it to a monthly amount, then compare 50/30/20 needs, wants and savings targets with actual spending.';
 const required = [
   'Use weekly, biweekly or monthly take-home pay',
   'weekly take-home pay × 52 ÷ 12',
@@ -16,6 +17,14 @@ for (const [name, html] of [['source', source], ['dist', built]]) {
   for (const text of required) {
     if (!html.toLowerCase().includes(text.toLowerCase())) {
       throw new Error('Budget pay-frequency audit failed in ' + name + ': missing "' + text + '"');
+    }
+  }
+  const description = html.match(/<meta\\s+name=["']description["']\\s+content=["']([^"']+)["']/i)?.[1] || '';
+  const ogDescription = html.match(/<meta\\s+property=["']og:description["']\\s+content=["']([^"']+)["']/i)?.[1] || '';
+  const twitterDescription = html.match(/<meta\\s+name=["']twitter:description["']\\s+content=["']([^"']+)["']/i)?.[1] || '';
+  for (const [label, actual] of [['description', description], ['og:description', ogDescription], ['twitter:description', twitterDescription]]) {
+    if (actual !== expectedDescription) {
+      throw new Error('Budget pay-frequency audit failed in ' + name + ': ' + label + ' did not match the weekly/biweekly guidance description');
     }
   }
 }
