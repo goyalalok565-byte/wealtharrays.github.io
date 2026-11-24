@@ -8,6 +8,7 @@ This is a dated status snapshot. It supplements, and does not rewrite, the histo
 
 ## Latest production evidence
 
+- Live GET `/v1/health` returned `status=ok`, calculation engine/D1/rate limiter `ok` or `configured`, Supabase Auth and Razorpay `not_configured`, and `ready_for_saas=false`. Live GET `/v1/models` returned 11 supported models; this is the verified current API catalogue, not 20.
 - Read-only Cloudflare API inspection on 2026-11-24 observed Worker `wealtharrays-github-io` deployment version **2087** (version ID `62384984-ca6f-45dc-897b-cacfb275ca59`) receiving 100% of traffic; deployment timestamp: 2026-11-24 19:19:59 UTC.
 - Version resources include the static-assets binding, D1 binding `DB` → `wealtharrays-saas`, and rate-limiter binding `PUBLIC_API_LIMITER`. Custom domain `wealtharrays.com` and route `wealtharrays.com/v1/*` remain configured; `workers.dev` remains disabled.
 - The previously owner-inspected dashboard snapshot for PR #185 showed 162 invocations and 0 errors over 24 hours. That is historical evidence, not a current availability guarantee; no fresh invocation/error metric is asserted here.
@@ -48,7 +49,7 @@ These are early, low-volume Search Console observations, not revenue, conversion
 - Current exact-head CI on PR #200 passed **258 unit tests (0 failures)**, the 55-calculator browser smoke, Platform Gates, Canonical CI, CodeQL and workflow-security checks. Mobile Lighthouse was skipped for this content/label-only change; the previously recorded seven-route mobile Lighthouse baseline remains historical. Field INP/Core Web Vitals and physical Android accessibility/performance testing remain unverified.
 - Official source sections now cover 12 calculator pages: Budget, SIP, FD, RD, PPF, SSY, GST, income-tax planner, gratuity, HRA, NPS and EPF. Build-wired QA verifies source titles, HTTPS URLs and explanatory notes in source pages and production dist.
 - Methodology QA now guards the retirement withdrawal-rate limitation, single source-of-truth note and current Social Security Code gratuity wording.
-- Public API coverage is 20 calculation models, not 55.
+- Public API coverage is 11 calculation models, not 55; the live GET /v1/models endpoint returns 11.
 - Cloudflare API health and D1 have previously passed health checks; SaaS readiness remains `ready_for_saas=false` until Supabase Auth and Razorpay billing are configured and the full TEST lifecycle is proven.
 - AdSense site/account approval and Auto Ads are not verified. The owner previously reported a Low value content rejection and account-access issue; do not claim approval, ads serving, or revenue.
 - Three initial B2B outreach emails were sent. No reply or paid customer conversion is confirmed.
@@ -87,7 +88,7 @@ These are early, low-volume Search Console observations, not revenue, conversion
 2. The first Search Console-led content improvements are merged and live for Budget, About and Methodology. Continue monitoring the low-volume non-brand 50/30/20 queries; do not overfit titles to tiny impression counts.
 3. Reconcile and document Search Console host variants and canonical signals; prepare recommendations only, no redirect/DNS changes.
 4. Complete real-device keyboard/screen-reader/accessibility checks and field Core Web Vitals/INP monitoring.
-5. Expand public API coverage beyond 20 models only with typed adapters, independent golden vectors, and API contract tests.
+5. Expand public API coverage beyond 11 models only with typed adapters, independent golden vectors, and API contract tests.
 6. Revisit SaaS activation only after TEST configuration, backup/restore rehearsal, privacy/deletion/export checks, and complete webhook/entitlement lifecycle evidence.
 7. Continue zero-budget B2B distribution and measure actual replies, demos, pilots and conversions.
 
