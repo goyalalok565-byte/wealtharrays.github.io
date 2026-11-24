@@ -1,5 +1,5 @@
 import { authenticate } from "../_auth.js";
-import { error, json } from "../_shared.js";
+import { error, json, enforceRateLimit } from "../_shared.js";
 export async function onRequestOptions() { return new Response(null, { status: 204, headers: { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "POST,OPTIONS", "Access-Control-Allow-Headers": "Content-Type,Authorization" } }); }
 export async function onRequestPost({ request, env }) {
   const auth = await authenticate(request, env); if (auth.response) return auth.response;
