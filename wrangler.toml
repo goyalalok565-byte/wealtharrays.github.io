@@ -14,3 +14,9 @@ not_found_handling = "404-page"
 name = "PUBLIC_API_LIMITER"
 namespace_id = "2026103001"
 simple = { limit = 120, period = 60 }
+
+[[d1_databases]]
+binding = "DB"
+database_name = "wealtharrays-saas"
+database_id = "b09bd71a-40dc-40f4-81bd-6018b302916b"
+migrations_dir = "migrations"
