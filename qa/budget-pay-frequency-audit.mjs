@@ -11,7 +11,11 @@ const required = [
   'biweekly take-home pay × 26 ÷ 12',
   'semimonthly take-home pay × 24 ÷ 12',
   'do not simply multiply weekly pay by four or biweekly pay by two',
-  'Can I use weekly or biweekly pay?'
+  'Can I use weekly or biweekly pay?',
+  'Build a monthly budget from real spending',
+  'Plan for irregular and annual expenses',
+  'Adjust the percentages without losing the comparison',
+  'not a grade'
 ];
 for (const [name, html] of [['source', source], ['dist', built]]) {
   for (const text of required) {
