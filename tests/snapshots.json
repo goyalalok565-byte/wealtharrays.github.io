@@ -5332,27 +5332,39 @@
       "output": [
         {
           "label": "Estimated loan interest saved",
-          "value": 260054.64250149392,
+          "value": 601815.1774744308,
           "format": "currency",
           "emphasis": "positive"
         },
         {
-          "label": "Investment value of the same cash",
+          "label": "Investment value if you invest the available cash",
           "value": 1353520.7454311217,
           "format": "currency",
           "emphasis": "neutral"
         },
         {
-          "label": "Loan EMI after prepayment",
-          "value": 31668.943437562215,
+          "label": "Investment value after prepayment and investing released EMI",
+          "value": 1240510.0588849778,
+          "format": "currency",
+          "emphasis": "neutral"
+        },
+        {
+          "label": "Original monthly loan payment",
+          "value": 38002.73212507466,
           "format": "currency",
           "emphasis": null
         },
         {
-          "label": "Difference (investment value − interest saved)",
-          "value": 1093466.1029296278,
+          "label": "Loan payoff after prepayment (months)",
+          "value": 92,
+          "format": "number",
+          "emphasis": null
+        },
+        {
+          "label": "Difference (prepayment strategy − invest-cash strategy)",
+          "value": -113010.68654614384,
           "format": "currency",
-          "emphasis": "positive"
+          "emphasis": "negative"
         }
       ]
     },
@@ -5375,19 +5387,31 @@
           "emphasis": "positive"
         },
         {
-          "label": "Investment value of the same cash",
+          "label": "Investment value if you invest the available cash",
           "value": 0,
           "format": "currency",
           "emphasis": "neutral"
         },
         {
-          "label": "Loan EMI after prepayment",
+          "label": "Investment value after prepayment and investing released EMI",
+          "value": 0,
+          "format": "currency",
+          "emphasis": "neutral"
+        },
+        {
+          "label": "Original monthly loan payment",
           "value": 0,
           "format": "currency",
           "emphasis": null
         },
         {
-          "label": "Difference (investment value − interest saved)",
+          "label": "Loan payoff after prepayment (months)",
+          "value": 0,
+          "format": "number",
+          "emphasis": null
+        },
+        {
+          "label": "Difference (prepayment strategy − invest-cash strategy)",
           "value": 0,
           "format": "currency",
           "emphasis": "positive"
@@ -5413,19 +5437,31 @@
           "emphasis": "positive"
         },
         {
-          "label": "Investment value of the same cash",
+          "label": "Investment value if you invest the available cash",
           "value": 0,
           "format": "currency",
           "emphasis": "neutral"
         },
         {
-          "label": "Loan EMI after prepayment",
+          "label": "Investment value after prepayment and investing released EMI",
+          "value": 0,
+          "format": "currency",
+          "emphasis": "neutral"
+        },
+        {
+          "label": "Original monthly loan payment",
           "value": 0,
           "format": "currency",
           "emphasis": null
         },
         {
-          "label": "Difference (investment value − interest saved)",
+          "label": "Loan payoff after prepayment (months)",
+          "value": 0,
+          "format": "number",
+          "emphasis": null
+        },
+        {
+          "label": "Difference (prepayment strategy − invest-cash strategy)",
           "value": 0,
           "format": "currency",
           "emphasis": "positive"
@@ -5446,25 +5482,37 @@
       "output": [
         {
           "label": "Estimated loan interest saved",
-          "value": 99000000000000,
+          "value": 99999999999999.03,
           "format": "currency",
           "emphasis": "positive"
         },
         {
-          "label": "Investment value of the same cash",
+          "label": "Investment value if you invest the available cash",
           "value": 5.182359194216828e+53,
           "format": "currency",
           "emphasis": "neutral"
         },
         {
-          "label": "Loan EMI after prepayment",
-          "value": 0,
+          "label": "Investment value after prepayment and investing released EMI",
+          "value": 5.182359194216829e+53,
+          "format": "currency",
+          "emphasis": "neutral"
+        },
+        {
+          "label": "Original monthly loan payment",
+          "value": 83333333333.33333,
           "format": "currency",
           "emphasis": null
         },
         {
-          "label": "Difference (investment value − interest saved)",
-          "value": 5.182359194216828e+53,
+          "label": "Loan payoff after prepayment (months)",
+          "value": 0,
+          "format": "number",
+          "emphasis": null
+        },
+        {
+          "label": "Difference (prepayment strategy − invest-cash strategy)",
+          "value": 8.507059173023462e+37,
           "format": "currency",
           "emphasis": "positive"
         }
@@ -5489,19 +5537,31 @@
           "emphasis": "positive"
         },
         {
-          "label": "Investment value of the same cash",
+          "label": "Investment value if you invest the available cash",
           "value": 0,
           "format": "currency",
           "emphasis": "neutral"
         },
         {
-          "label": "Loan EMI after prepayment",
+          "label": "Investment value after prepayment and investing released EMI",
+          "value": 0,
+          "format": "currency",
+          "emphasis": "neutral"
+        },
+        {
+          "label": "Original monthly loan payment",
           "value": 0,
           "format": "currency",
           "emphasis": null
         },
         {
-          "label": "Difference (investment value − interest saved)",
+          "label": "Loan payoff after prepayment (months)",
+          "value": 0,
+          "format": "number",
+          "emphasis": null
+        },
+        {
+          "label": "Difference (prepayment strategy − invest-cash strategy)",
           "value": 0,
           "format": "currency",
           "emphasis": "positive"

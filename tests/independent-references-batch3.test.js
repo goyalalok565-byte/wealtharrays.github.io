@@ -67,11 +67,31 @@ function reference(id, v) {
       return [financed, emi, total - financed, total + v.down + fee];
     }
     case 'loan-prepayment-vs-sip': {
-      const p = v.balance, x = Math.min(v.prepay, p), n = Math.round(v.years * 12), r = v.rate / 1200;
-      const oldEmi = pmt(p, v.rate, n), oldInterest = oldEmi * n - p, newP = p - x;
-      const newEmi = pmt(newP, v.rate, n), saved = Math.max(oldInterest - (newEmi * n - newP), 0);
-      const invested = x * Math.pow(1 + v.investmentReturn / 1200, n);
-      return [saved, invested, newEmi, invested - saved];
+      const principal = Math.max(v.balance, 0), cash = Math.max(v.prepay, 0);
+      const periods = Math.max(1, Math.round(Math.max(v.years, 0) * 12));
+      const monthlyLoanRate = Math.max(v.rate, 0) / 1200, monthlyReturn = Math.max(v.investmentReturn, 0) / 1200;
+      const tolerance = Math.max(1e-7, principal * Number.EPSILON * 16), scheduledPayment = pmt(principal, v.rate, periods);
+      let regularBalance = principal, regularInterest = 0;
+      for (let month = 1; month <= periods && regularBalance > tolerance; month++) {
+        const charge = regularBalance * monthlyLoanRate; regularInterest += charge;
+        const due = regularBalance + charge;
+        regularBalance = month === periods || due <= scheduledPayment + tolerance ? 0 : Math.max(0, due - scheduledPayment);
+      }
+      let prepaidBalance = principal - Math.min(cash, principal), prepaidInterest = 0;
+      let payoffMonth = prepaidBalance <= tolerance ? 0 : periods, redirectedPortfolio = Math.max(cash - principal, 0);
+      for (let month = 1; month <= periods; month++) {
+        redirectedPortfolio *= 1 + monthlyReturn;
+        if (prepaidBalance > tolerance) {
+          const charge = prepaidBalance * monthlyLoanRate; prepaidInterest += charge;
+          const due = prepaidBalance + charge;
+          if (month === periods || due <= scheduledPayment + tolerance) {
+            redirectedPortfolio += month === periods ? 0 : Math.max(0, scheduledPayment - due);
+            prepaidBalance = 0; payoffMonth = month;
+          } else prepaidBalance = Math.max(0, due - scheduledPayment);
+        } else redirectedPortfolio += scheduledPayment;
+      }
+      const investCashPortfolio = cash * Math.pow(1 + monthlyReturn, periods);
+      return [Math.max(0, regularInterest - prepaidInterest), investCashPortfolio, redirectedPortfolio, scheduledPayment, payoffMonth, redirectedPortfolio - investCashPortfolio];
     }
     case 'property-calculator': {
       const down = Math.min(v.down, v.price), principal = v.price - down, n = Math.round(v.years * 12);
@@ -184,7 +204,10 @@ const cases = {
   'loan-prepayment-vs-sip': [
     { name: 'default', v: { balance: 3000000, rate: 9, years: 10, prepay: 500000, investmentReturn: 10 } },
     { name: 'boundary-zero', v: { balance: 0, rate: 0, years: 1, prepay: 0, investmentReturn: 0 } },
-    { name: 'large', v: { balance: 1e12, rate: 100, years: 100, prepay: 1e12, investmentReturn: 100 } }
+    { name: 'large', v: { balance: 1e12, rate: 100, years: 100, prepay: 1e12, investmentReturn: 100 } },
+    { name: 'no-prepayment', v: { balance: 1000000, rate: 8, years: 5, prepay: 0, investmentReturn: 12 } },
+    { name: 'zero-rate-full-prepayment', v: { balance: 120000, rate: 0, years: 1, prepay: 120000, investmentReturn: 0 } },
+    { name: 'cash-exceeds-balance', v: { balance: 100000, rate: 12, years: 2, prepay: 150000, investmentReturn: 8 } }
   ],
   'property-calculator': [
     { name: 'default', v: { price: 6000000, down: 1200000, stamp: 5, registration: 1, rate: 8.5, years: 20, other: 100000 } },
@@ -227,6 +250,13 @@ const cases = {
     { name: 'large', v: { rate: 100, multiple: 1000 } }
   ]
 };
+
+test('prepayment comparison keeps the upfront cash and monthly EMI budget equivalent', () => {
+  const noPrepayment = values('loan-prepayment-vs-sip', { balance: 1000000, rate: 8, years: 5, prepay: 0, investmentReturn: 12 });
+  close(noPrepayment[5], 0, 'no-prepayment paths must converge');
+  const fullPrepaymentAtSameRate = values('loan-prepayment-vs-sip', { balance: 120000, rate: 12, years: 2, prepay: 120000, investmentReturn: 12 });
+  close(fullPrepaymentAtSameRate[5], 0, 'full prepayment and upfront investing converge when return equals loan rate');
+});
 
 for (const [id, scenarios] of Object.entries(cases)) {
   test(`independent reference: ${id}`, async t => {
