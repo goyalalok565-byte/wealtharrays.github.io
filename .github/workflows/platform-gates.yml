@@ -60,6 +60,8 @@ jobs:
         run: npm run qa:seo
       - name: Calculator embed offer page contract
         run: npm run qa:embed-offer
+      - name: Budget pay-frequency SEO content contract
+        run: npm run qa:budget-frequency
       - name: Diff check
         run: git diff --check
       - name: Verify literal npm run build
