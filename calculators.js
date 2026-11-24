@@ -1039,15 +1039,16 @@ const CALCULATORS = [
     slug: "budget-calculator",
     title: "50/30/20 Budget Calculator",
     category: "salary",
-    short: "Split take-home pay into needs, wants and savings and compare with what you spend.",
-    desc: "Split monthly take-home pay into needs, wants and savings with the 50/30/20 rule and see how your actual spending compares.",
+    short: "Convert weekly or biweekly take-home pay to a monthly amount, then compare needs, wants and savings targets.",
+    desc: "Use weekly, biweekly or monthly take-home pay: convert it to a monthly amount, then compare 50/30/20 needs, wants and savings targets with actual spending.",
     article: {
       formula: "Target needs = take-home pay × needs percentage. Target wants = take-home pay × wants percentage. Target savings and debt repayment = take-home pay minus the needs and wants targets. Actual savings = take-home pay − actual needs − actual wants. The gap is actual savings minus the target savings amount.",
       exampleInputs: { income: 80000, needsPct: 50, wantsPct: 30, actualNeeds: 45000, actualWants: 25000 },
       faqs: [
         { q: "What counts as a need?", a: "Rent or home-loan EMI, utilities, groceries, transport to work, insurance premiums and minimum debt payments are usually needs. Subscriptions, dining out and travel are usually wants." },
         { q: "Is 50/30/20 right for every income?", a: "It is a starting template, not a rule. In expensive cities needs can take far more than 50%, and some people save well above 20%. Change the percentages to match your situation." },
-        { q: "Should I use gross or take-home pay?", a: "Use take-home pay, the amount that actually reaches your bank account after tax and deductions such as provident fund." }
+        { q: "Should I use gross or take-home pay?", a: "Use take-home pay, the amount that actually reaches your bank account after tax and deductions such as provident fund." },
+        { q: "Can I use weekly or biweekly pay?", a: "Yes. Convert it to an average monthly amount first: weekly net pay × 52 ÷ 12, biweekly net pay × 26 ÷ 12, or twice-monthly net pay × 24 ÷ 12. Then enter monthly spending figures. Do not treat a month as exactly four weeks." }
       ]
     },
     fields: [
