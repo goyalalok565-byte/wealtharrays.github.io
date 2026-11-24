@@ -768,7 +768,14 @@
         "body": "The 50/30/20 split is not suitable for every rent level, family size, debt load or income. You can change the needs and wants shares in the calculator; the remaining share becomes the savings and debt-repayment target. Make sure the percentages you choose reflect a deliberate plan and interpret the output as a comparison, not a grade. If actual spending exceeds income, the model can show a negative savings amount. Review large recurring commitments first and compare more than one realistic scenario."
       }
     ],
-    "article": "/articles/how-to-build-a-realistic-monthly-budget"
+    "article": "/articles/how-to-build-a-realistic-monthly-budget",
+    "references": [
+      {
+        "title": "RBI Financial Awareness Messages (FAME): Budgeting, Saving and Responsible Borrowing",
+        "url": "https://www.rbi.org.in/commonperson/images/FAME202426022024.pdf",
+        "note": "The Reserve Bank of India describes a budget as a plan for future income and expenses and recommends comparing planned and actual expenditure. This reference supports the budgeting workflow; it does not prescribe the 50/30/20 percentages."
+      }
+    ]
   },
   "break-even-calculator": {
     "heading": "What a break-even number tells a small business",
