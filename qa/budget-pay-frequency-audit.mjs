@@ -15,7 +15,10 @@ const required = [
   'Build a monthly budget from real spending',
   'Plan for irregular and annual expenses',
   'Adjust the percentages without losing the comparison',
-  'not a grade'
+  'not a grade',
+  'Sources and further reading',
+  'RBI Financial Awareness Messages (FAME)',
+  'does not prescribe the 50/30/20 percentages'
 ];
 for (const [name, html] of [['source', source], ['dist', built]]) {
   for (const text of required) {
