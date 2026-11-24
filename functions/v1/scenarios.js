@@ -1,11 +1,12 @@
 import { authenticate, ensureProfile } from "./_auth.js";
-import { error, json, CORS_HEADERS } from "./_shared.js";
+import { error, json, CORS_HEADERS, enforceRateLimit } from "./_shared.js";
 import { getEntitlement } from "./_entitlements.js";
 
 export async function onRequestOptions() { return new Response(null, { status: 204, headers: CORS_HEADERS }); }
 
 export async function onRequestGet({ request, env }) {
   const auth = await authenticate(request, env); if (auth.response) return auth.response;
+  const limited = await enforceRateLimit(env, `scenarios:${auth.user.id}`); if (limited) return limited;
   if (!env.DB) return error("DATABASE_NOT_CONFIGURED", "Cloud scenario storage is not configured for this deployment.", 503);
   try {
     await ensureProfile(env, auth.user);
@@ -23,6 +24,7 @@ export async function onRequestGet({ request, env }) {
 
 export async function onRequestPost({ request, env }) {
   const auth = await authenticate(request, env); if (auth.response) return auth.response;
+  const limited = await enforceRateLimit(env, `scenarios:${auth.user.id}`); if (limited) return limited;
   if (!env.DB) return error("DATABASE_NOT_CONFIGURED", "Cloud scenario storage is not configured for this deployment.", 503);
   let raw, body;
   try { raw = await request.text(); } catch { return error("INVALID_BODY", "Could not read request body.", 400); }
@@ -64,6 +66,7 @@ export async function onRequestPost({ request, env }) {
 
 export async function onRequestDelete({ request, env }) {
   const auth = await authenticate(request, env); if (auth.response) return auth.response;
+  const limited = await enforceRateLimit(env, `scenarios:${auth.user.id}`); if (limited) return limited;
   if (!env.DB) return error("DATABASE_NOT_CONFIGURED", "Cloud scenario storage is not configured for this deployment.", 503);
   const id = new URL(request.url).searchParams.get("id");
   if (!id || id.length > 80) return error("INVALID_ID", "Provide a valid scenario id.", 400);

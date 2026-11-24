@@ -1,8 +1,9 @@
 import { authenticate } from "../_auth.js";
-import { error, json } from "../_shared.js";
+import { error, json, enforceRateLimit } from "../_shared.js";
 export async function onRequestOptions() { return new Response(null, { status: 204, headers: { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "POST,OPTIONS", "Access-Control-Allow-Headers": "Content-Type,Authorization" } }); }
 export async function onRequestPost({ request, env }) {
   const auth = await authenticate(request, env); if (auth.response) return auth.response;
+  const limited = await enforceRateLimit(env, `billing-cancel:${auth.user.id}`); if (limited) return limited;
   if (!env.DB || !env.RAZORPAY_KEY_ID || !env.RAZORPAY_KEY_SECRET) return error("BILLING_NOT_CONFIGURED", "Billing and subscription storage are not configured.", 503);
   try {
     const current = await env.DB.prepare("SELECT provider_subscription_id, plan_id, status, cancel_at_period_end FROM subscriptions WHERE user_id = ? ORDER BY updated_at DESC LIMIT 1").bind(auth.user.id).first();
