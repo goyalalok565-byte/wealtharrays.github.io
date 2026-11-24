@@ -107,3 +107,20 @@ export function calculate(model, input) {
   if (results.some(r => !Number.isFinite(r.value))) throw new Error("Calculation exceeded the supported numeric range.");
   return { results, assumptions };
 }
+
+export async function enforceRateLimit(env, key) {
+  if (!env.PUBLIC_API_LIMITER || typeof env.PUBLIC_API_LIMITER.limit !== "function") {
+    return error("RATE_LIMITER_NOT_CONFIGURED", "This operation is temporarily unavailable.", 503);
+  }
+  try {
+    const result = await env.PUBLIC_API_LIMITER.limit({ key });
+    if (result?.success) return null;
+    return json(
+      { error: { code: "RATE_LIMITED", message: "Too many requests. Please try again shortly." } },
+      429,
+      { "Cache-Control": "no-store", "Retry-After": "60" }
+    );
+  } catch {
+    return error("RATE_LIMITER_UNAVAILABLE", "This operation is temporarily unavailable.", 503);
+  }
+}
