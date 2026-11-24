@@ -19,9 +19,9 @@ for (const [name, html] of [['source', source], ['dist', built]]) {
       throw new Error('Budget pay-frequency audit failed in ' + name + ': missing "' + text + '"');
     }
   }
-  const description = html.match(/<meta\\s+name=["']description["']\\s+content=["']([^"']+)["']/i)?.[1] || '';
-  const ogDescription = html.match(/<meta\\s+property=["']og:description["']\\s+content=["']([^"']+)["']/i)?.[1] || '';
-  const twitterDescription = html.match(/<meta\\s+name=["']twitter:description["']\\s+content=["']([^"']+)["']/i)?.[1] || '';
+  const description = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i)?.[1] || '';
+  const ogDescription = html.match(/<meta\s+property=["']og:description["']\s+content=["']([^"']+)["']/i)?.[1] || '';
+  const twitterDescription = html.match(/<meta\s+name=["']twitter:description["']\s+content=["']([^"']+)["']/i)?.[1] || '';
   for (const [label, actual] of [['description', description], ['og:description', ogDescription], ['twitter:description', twitterDescription]]) {
     if (actual !== expectedDescription) {
       throw new Error('Budget pay-frequency audit failed in ' + name + ': ' + label + ' did not match the weekly/biweekly guidance description');
