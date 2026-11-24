@@ -16,5 +16,9 @@ for (const directory of ['.', 'dist']) {
       !html.includes('or a guarantee that a portfolio will last')) {
     throw new Error(directory + ': retirement heuristic limitation is missing');
   }
+  if (!html.includes('Code on Social Security, 2020 took effect on 21 November 2025') ||
+      html.includes('For an employee covered by the Payment of Gratuity Act')) {
+    throw new Error(directory + ': gratuity methodology must reflect the current Social Security Code');
+  }
 }
 console.log('Methodology reference audit PASS: retirement heuristic is complete and source-of-truth note appears once in source and dist.');
