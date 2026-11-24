@@ -57,3 +57,21 @@ jobs:
           EXPECTED_SHA: ${{ env.EXPECTED_SHA }}
           BASE_URL: https://wealtharrays.com
         run: node qa/production-live-verification.mjs
+
+      - name: Verify production API health and D1 binding
+        shell: bash
+        env:
+          BASE_URL: https://wealtharrays.com
+        run: |
+          set -euo pipefail
+          response="$(curl --fail --silent --show-error --max-time 30 "$BASE_URL/v1/health")"
+          printf '%s' "$response" | node --input-type=module -e '
+            let raw = "";
+            for await (const chunk of process.stdin) raw += chunk;
+            const health = JSON.parse(raw);
+            console.log(JSON.stringify(health, null, 2));
+            if (health.dependencies?.d1_database !== "ok") {
+              console.error("Production D1 health check failed.");
+              process.exit(1);
+            }
+          '
