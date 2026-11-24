@@ -139,13 +139,13 @@ Exact production main SHA: `b1610d10e5fe7d389140b20efdce6f63b6ef72e8` (merge com
 | Content quality | 60 | 55/55 value-content checks; independent editorial/financial expert review and depth across all pages remain |
 | Accessibility | 90 | Seven Lighthouse routes scored 100 and static gates pass; manual screen-reader/keyboard review remains |
 | Security | 78 | CodeQL and platform security gates pass; live auth/billing configuration, abuse monitoring and legal privacy review remain |
-| Globalization | 32 | Global structure exists; API exposes 20 models and country-specific engines/localization remain limited |
+| Globalization | 32 | Global structure exists; API exposes 11 models and country-specific engines/localization remain limited |
 | SaaS readiness | 35 | Worker health liveness passes; D1, Supabase and Razorpay end-to-end activation is not verified |
 
 ### Search and monetization evidence
 
 - Google Search Console, 2026-10-24 to 2026-11-20: 38 clicks, 96 impressions, 39.58% CTR and average position 11.88. 29 clicks came from the branded `wealth arrays` query; meaningful non-brand acquisition is not yet established. Search Console showed 16 countries with impressions; India supplied 38 clicks. This is an early baseline, not scale.
-- The API model registry currently contains **20** models, not 55. Do not advertise full 55-model public API coverage.
+- The live API model registry currently contains **11** models, not 55; GET /v1/models is the source of truth. Do not advertise full 55-model public API coverage.
 - `ads.txt` publisher record exists, but AdSense approval, active publisher ad units, fill rate and earnings are not verified. A publisher record alone is not revenue.
 - Razorpay checkout/webhook code exists, but D1, Supabase Auth, Razorpay plans/secrets, test-mode lifecycle, server-enforced paid entitlements and Paddle global seller/payout approval remain owner-side activation tasks.
 - No revenue, global ranking, product-market fit, or number-one status is claimed.
@@ -164,7 +164,7 @@ Exact production main SHA: `b1610d10e5fe7d389140b20efdce6f63b6ef72e8` (merge com
 1. Owner: configure Cloudflare D1 + Worker bindings, Supabase Auth, Razorpay test plans/webhook and secrets directly in GitHub Settings; never share secret values in chat.
 2. Owner: obtain CA/lawyer review for TY 2026-27 tax terminology, assumptions and eligibility language; confirm Paddle India payout and seller approval before global checkout.
 3. Engineering: perform real-device accessibility/performance review, establish field INP/Core Web Vitals and privacy-safe product/conversion analytics.
-4. Engineering: plan Phase 1 activation only after external setup and legal review; expand API beyond 20 models only with adapter equivalence and independent golden vectors.
+4. Engineering: plan Phase 1 activation only after external setup and legal review; expand API beyond 11 models only with adapter equivalence and independent golden vectors.
 
 ## Phase 1 — blocked pending owner activation and legal review
 
