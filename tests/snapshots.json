@@ -7363,13 +7363,13 @@
       },
       "output": [
         {
-          "label": "Estimated gratuity (0 if threshold not met)",
+          "label": "Illustrative gratuity amount (general 5-year rule; exceptions not assessed)",
           "value": 288461.5384615385,
           "format": "currency",
           "emphasis": "positive"
         },
         {
-          "label": "General 5-year threshold met (1 = yes)",
+          "label": "General 5-year threshold met (not a legal eligibility decision)",
           "value": 1,
           "format": "number",
           "emphasis": null
@@ -7386,13 +7386,13 @@
       },
       "output": [
         {
-          "label": "Estimated gratuity (0 if threshold not met)",
+          "label": "Illustrative gratuity amount (general 5-year rule; exceptions not assessed)",
           "value": 0,
           "format": "currency",
           "emphasis": "positive"
         },
         {
-          "label": "General 5-year threshold met (1 = yes)",
+          "label": "General 5-year threshold met (not a legal eligibility decision)",
           "value": 0,
           "format": "number",
           "emphasis": null
@@ -7409,13 +7409,13 @@
       },
       "output": [
         {
-          "label": "Estimated gratuity (0 if threshold not met)",
+          "label": "Illustrative gratuity amount (general 5-year rule; exceptions not assessed)",
           "value": 0,
           "format": "currency",
           "emphasis": "positive"
         },
         {
-          "label": "General 5-year threshold met (1 = yes)",
+          "label": "General 5-year threshold met (not a legal eligibility decision)",
           "value": 0,
           "format": "number",
           "emphasis": null
@@ -7432,13 +7432,13 @@
       },
       "output": [
         {
-          "label": "Estimated gratuity (0 if threshold not met)",
+          "label": "Illustrative gratuity amount (general 5-year rule; exceptions not assessed)",
           "value": 3461538461.5384617,
           "format": "currency",
           "emphasis": "positive"
         },
         {
-          "label": "General 5-year threshold met (1 = yes)",
+          "label": "General 5-year threshold met (not a legal eligibility decision)",
           "value": 1,
           "format": "number",
           "emphasis": null
@@ -7455,13 +7455,13 @@
       },
       "output": [
         {
-          "label": "Estimated gratuity (0 if threshold not met)",
+          "label": "Illustrative gratuity amount (general 5-year rule; exceptions not assessed)",
           "value": 0,
           "format": "currency",
           "emphasis": "positive"
         },
         {
-          "label": "General 5-year threshold met (1 = yes)",
+          "label": "General 5-year threshold met (not a legal eligibility decision)",
           "value": 0,
           "format": "number",
           "emphasis": null
