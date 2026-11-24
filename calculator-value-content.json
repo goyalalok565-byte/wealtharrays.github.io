@@ -751,7 +751,7 @@
   },
   "budget-calculator": {
     "heading": "Use the 50/30/20 budget as a flexible monthly check-in",
-    "description": "Convert weekly, biweekly or twice-monthly take-home pay to an average month, then compare needs, wants and savings with your actual spending.",
+    "description": "Use weekly, biweekly or monthly take-home pay: convert it to a monthly amount, then compare 50/30/20 needs, wants and savings targets with actual spending.",
     "body": "The 50/30/20 split is a simple budgeting starting point: plan around 50% of take-home pay for needs, 30% for wants and 20% for savings or debt repayment. It is a flexible guideline, not a rule that every household can or should meet. The value of this calculator is the gap between a target and your actual monthly spending. Start with net income that reaches your account, then use recent bank or card statements to estimate each category. If essential costs exceed the suggested share, the result is a signal to review the biggest commitments and adjust the targets—not a reason to label necessary spending as a failure.",
     "worked": "Example: with ₹80,000 monthly take-home pay, a 50/30/20 plan sets ₹40,000 for needs, ₹24,000 for wants and ₹16,000 for savings or debt repayment. If actual needs are ₹45,000 and wants are ₹25,000, actual savings are ₹10,000, leaving a ₹6,000 shortfall against the target. The same arithmetic at ₹50,000 income, ₹30,000 needs and ₹15,000 wants leaves ₹5,000, compared with a ₹10,000 target. These are illustrations of the entered assumptions, not recommended spending limits.",
     "sections": [
