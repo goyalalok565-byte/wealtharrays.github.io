@@ -56,6 +56,8 @@ jobs:
         run: node qa/embed-regression.mjs
       - name: Dist integrity
         run: npm run qa:dist
+      - name: Canonical sitemap and URL integrity
+        run: npm run qa:seo
       - name: Diff check
         run: git diff --check
       - name: Verify literal npm run build
@@ -69,3 +71,5 @@ jobs:
           node qa/performance-budget-audit.mjs
       - name: Verify package build output after npm run build
         run: npm run qa:dist
+      - name: Recheck canonical sitemap after final build
+        run: npm run qa:seo
