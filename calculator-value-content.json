@@ -750,21 +750,32 @@
     "article": "/articles/how-inflation-changes-a-retirement-target"
   },
   "budget-calculator": {
-    "heading": "Using the 50/30/20 rule as a starting template",
+    "heading": "Use the 50/30/20 budget as a flexible monthly check-in",
     "description": "Use weekly, biweekly or monthly take-home pay: convert it to a monthly amount, then compare 50/30/20 needs, wants and savings targets with actual spending.",
-    "body": "The 50/30/20 rule divides take-home pay into needs, wants and savings or debt repayment. It is a template for a first conversation about money, not a law. The useful part of this calculator is the comparison: you enter the targets and your real spending, and it shows how far your actual savings are from the target. Begin with honest numbers taken from a bank statement rather than memory. If your needs are well above 50%, look at the biggest items such as rent or an EMI before cutting small expenses. You can change the percentages to a split that fits your city and income.",
-    "worked": "On a take-home pay of ₹80,000 with a 50/30/20 split, the targets are ₹40,000 for needs, ₹24,000 for wants and ₹16,000 for savings and debt repayment. If actual spending is ₹45,000 on needs and ₹25,000 on wants, actual savings are ₹10,000, which is ₹6,000 short of the target. On a ₹50,000 take-home pay with ₹30,000 on needs and ₹15,000 on wants, savings are ₹5,000 against a ₹10,000 target.",
+    "body": "The 50/30/20 split is a simple budgeting starting point: plan around 50% of take-home pay for needs, 30% for wants and 20% for savings or debt repayment. It is a flexible guideline, not a rule that every household can or should meet. The value of this calculator is the gap between a target and your actual monthly spending. Start with net income that reaches your account, then use recent bank or card statements to estimate each category. If essential costs exceed the suggested share, the result is a signal to review the biggest commitments and adjust the targets—not a reason to label necessary spending as a failure.",
+    "worked": "Example: with ₹80,000 monthly take-home pay, a 50/30/20 plan sets ₹40,000 for needs, ₹24,000 for wants and ₹16,000 for savings or debt repayment. If actual needs are ₹45,000 and wants are ₹25,000, actual savings are ₹10,000, leaving a ₹6,000 shortfall against the target. The same arithmetic at ₹50,000 income, ₹30,000 needs and ₹15,000 wants leaves ₹5,000, compared with a ₹10,000 target. These are illustrations of the entered assumptions, not recommended spending limits.",
     "sections": [
       {
-        "heading": "Sort spending into needs and wants honestly",
-        "body": "A need is something you cannot easily avoid, such as rent, utilities, groceries, commuting, insurance and minimum loan payments. A want is something you could pause, such as dining out, subscriptions and travel. Some items sit in between, such as a phone plan, so decide once and stay consistent from month to month. Consistent categories make the comparison across months more useful than any single month's number."
+        "heading": "Build a monthly budget from real spending",
+        "body": "Use take-home income after payroll deductions, not gross salary. Review at least one or two recent months of transactions and classify recurring costs consistently. Housing, basic utilities, groceries, essential transport, insurance and minimum required debt payments are commonly treated as needs; dining out, entertainment and optional subscriptions are commonly wants. Some costs can reasonably fit either category, so choose a consistent method rather than changing labels to make the percentage look better. Compare actual totals with the targets after the month ends."
       },
       {
-        "heading": "When the split does not fit your income",
-        "body": "At a lower income, needs can take most of the pay and a 20% savings target may be unrealistic at first. At a higher income, you may be able to save much more than 20%. Adjust the percentages instead of abandoning the idea, and set an emergency-fund goal early because it protects the savings you build. Treat the result as a monthly check-in, not a judgement."
+        "heading": "Plan for irregular and annual expenses",
+        "body": "A monthly budget can look balanced while annual insurance, school fees, repairs, medical costs or festival travel arrive in a single month. Estimate these less-frequent costs and set aside a monthly amount where possible. Keep emergency savings separate from money already committed to upcoming bills. If income varies, use a conservative normal-month estimate for fixed commitments and review the budget when extra income arrives; avoid treating an unusually strong month as guaranteed income."
+      },
+      {
+        "heading": "Adjust the percentages without losing the comparison",
+        "body": "The 50/30/20 split is not suitable for every rent level, family size, debt load or income. You can change the needs and wants shares in the calculator; the remaining share becomes the savings and debt-repayment target. Make sure the percentages you choose reflect a deliberate plan and interpret the output as a comparison, not a grade. If actual spending exceeds income, the model can show a negative savings amount. Review large recurring commitments first and compare more than one realistic scenario."
       }
     ],
-    "article": "/articles/how-to-build-a-realistic-monthly-budget"
+    "article": "/articles/how-to-build-a-realistic-monthly-budget",
+    "references": [
+      {
+        "title": "RBI Financial Awareness Messages (FAME): Budgeting, Saving and Responsible Borrowing",
+        "url": "https://www.rbi.org.in/commonperson/images/FAME202426022024.pdf",
+        "note": "The Reserve Bank of India describes a budget as a plan for future income and expenses and recommends comparing planned and actual expenditure. This reference supports the budgeting workflow; it does not prescribe the 50/30/20 percentages."
+      }
+    ]
   },
   "break-even-calculator": {
     "heading": "What a break-even number tells a small business",
