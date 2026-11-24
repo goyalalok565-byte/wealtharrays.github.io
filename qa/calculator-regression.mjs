@@ -90,6 +90,26 @@ for (const calc of calculators) {
   for (const row of result) assert(validResultValue(row), `${calc.slug}: zero-boundary non-finite result for ${row.label}; inputs=${JSON.stringify(zeroed)}`);
 }
 
+// Ratios with a zero denominator are mathematically undefined, not 0%.
+// Keep this explicit so a future renderer/runtime refactor cannot silently turn N/A into a plausible percentage.
+const profitMargin = calculators.find(c => c.id === 'profit-margin');
+for (const values of [
+  { revenue: 0, cogs: 0, expenses: 0 },
+  { revenue: 0, cogs: 100, expenses: 20 }
+]) {
+  const rows = profitMargin.compute(values);
+  const gross = rows.find(r => /Gross margin/.test(r.label));
+  const net = rows.find(r => /Net margin/.test(r.label));
+  assert(gross?.value === null && /not defined: revenue is 0/.test(gross.label), 'Profit margin must show gross margin as not defined when revenue is zero');
+  assert(net?.value === null && /not defined: revenue is 0/.test(net.label), 'Profit margin must show net margin as not defined when revenue is zero');
+}
+const roiCalculator = calculators.find(c => c.id === 'roi');
+const zeroCostRoi = roiCalculator.compute({ cost: 0, finalValue: 100, years: 1 });
+const totalRoi = zeroCostRoi.find(r => /Total ROI/.test(r.label));
+const annualizedRoi = zeroCostRoi.find(r => /Annualized ROI/.test(r.label));
+assert(totalRoi?.value === null && /not defined: cost is 0/.test(totalRoi.label), 'ROI must show total ROI as not defined when cost is zero');
+assert(annualizedRoi?.value === null && /not defined: cost is 0/.test(annualizedRoi.label), 'ROI must show annualized ROI as not defined when cost is zero');
+
 assert(!toolsPage.includes('/income-tax-scenario-calculator/'), 'Tools library still points to legacy income-tax route');
 assert(!searchSource.includes('/income-tax-scenario-calculator/'), 'Search catalog still points to legacy income-tax route');
 // Extreme payoff horizons must terminate quickly and must never claim a payoff when a balance remains.
