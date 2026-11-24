@@ -32,9 +32,47 @@ const cases = [
       '₹5 lakh limit per depositor per bank'
     ]
   }
-];
-
-for (const item of cases) {
+  {
+    id: 'ppf-calculator',
+    route: 'ppf-calculator',
+    required: ['National Savings Institute: Public Provident Fund Scheme', 'government-notified PPF scheme rules']
+  },
+  {
+    id: 'ssy-calculator',
+    route: 'ssy-calculator',
+    required: ['National Savings Institute: Sukanya Samriddhi Account Scheme', 'interest rate is notified separately']
+  },
+  {
+    id: 'gst-calculator',
+    route: 'gst-calculator',
+    required: ['CBIC: GST Rates for Goods and Services', 'CBIC: GST Rates FAQs', 'only performs arithmetic on the rate entered']
+  },
+  {
+    id: 'income-tax-planner',
+    route: 'income-tax-planner',
+    required: ['Income Tax Department: Income Tax Calculator User Manual', 'does not reproduce slab-wise tax']
+  },
+  {
+    id: 'gratuity-calculator',
+    route: 'gratuity-calculator',
+    required: ['Ministry of Labour and Employment: Payment of Gratuity Act, 1972', 'fifteen days\' wages']
+  },
+  {
+    id: 'hra-exemption-calculator',
+    route: 'hra-exemption-calculator',
+    required: ['Income Tax Department: New Tax Regime vs Old Tax Regime FAQs', 'does not decide regime eligibility']
+  },
+  {
+    id: 'nps-calculator',
+    route: 'nps-calculator',
+    required: ['PFRDA: NPS All Citizen Model FAQs', 'no assured benefit']
+  },
+  {
+    id: 'epf-calculator',
+    route: 'epf-calculator',
+    required: ['EPFO: Handbook of EPF Scheme, EPS and EDLI', 'reconcile estimates with payslips']
+  },
+];\n\nfor (const item of cases) {
   const entry = content[item.id];
   if (!entry || !Array.isArray(entry.references) || !entry.references.length) {
     throw new Error('Missing official references for ' + item.id);
