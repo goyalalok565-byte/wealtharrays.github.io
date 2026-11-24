@@ -32,6 +32,46 @@ const cases = [
       '₹5 lakh limit per depositor per bank'
     ]
   }
+  {
+    id: 'ppf-calculator',
+    route: 'ppf-calculator',
+    required: ['National Savings Institute: Public Provident Fund Scheme', 'government-notified PPF scheme rules']
+  },
+  {
+    id: 'ssy-calculator',
+    route: 'ssy-calculator',
+    required: ['National Savings Institute: Sukanya Samriddhi Account Scheme', 'interest rate is notified separately']
+  },
+  {
+    id: 'gst-calculator',
+    route: 'gst-calculator',
+    required: ['CBIC: GST Rates for Goods and Services', 'CBIC: GST Rates FAQs', 'only performs arithmetic on the rate entered']
+  },
+  {
+    id: 'income-tax-planner',
+    route: 'income-tax-planner',
+    required: ['Income Tax Department: Income Tax Calculator User Manual', 'does not reproduce slab-wise tax']
+  },
+  {
+    id: 'gratuity-calculator',
+    route: 'gratuity-calculator',
+    required: ['Ministry of Labour and Employment: Labour Codes and current rules', 'Ministry of Labour and Employment: Additional FAQs on Labour Codes (November 2026)', 'Code on Social Security, 2020 took effect from 21 November 2025', 'not a legal entitlement decision']
+  },
+  {
+    id: 'hra-exemption-calculator',
+    route: 'hra-exemption-calculator',
+    required: ['Income Tax Department: New Tax Regime vs Old Tax Regime FAQs', 'does not decide regime eligibility']
+  },
+  {
+    id: 'nps-calculator',
+    route: 'nps-calculator',
+    required: ['PFRDA: NPS All Citizen Model FAQs', 'no assured benefit']
+  },
+  {
+    id: 'epf-calculator',
+    route: 'epf-calculator',
+    required: ['EPFO: Handbook of EPF Scheme, EPS and EDLI', 'reconcile estimates with payslips']
+  },
 ];
 
 for (const item of cases) {
