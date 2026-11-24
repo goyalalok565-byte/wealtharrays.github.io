@@ -66,6 +66,7 @@ export async function onRequestPost({ request, env }) {
 
 export async function onRequestDelete({ request, env }) {
   const auth = await authenticate(request, env); if (auth.response) return auth.response;
+  const limited = await enforceRateLimit(env, `scenarios:${auth.user.id}`); if (limited) return limited;
   if (!env.DB) return error("DATABASE_NOT_CONFIGURED", "Cloud scenario storage is not configured for this deployment.", 503);
   const id = new URL(request.url).searchParams.get("id");
   if (!id || id.length > 80) return error("INVALID_ID", "Provide a valid scenario id.", 400);
