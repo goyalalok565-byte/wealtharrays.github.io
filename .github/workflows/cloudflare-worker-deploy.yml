@@ -8,11 +8,13 @@ permissions:
 
 concurrency:
   group: wealtharrays-cloudflare-worker
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v7
@@ -29,71 +31,36 @@ jobs:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          if [ -n "$CF_API_TOKEN" ] && [ -n "$CF_ACCOUNT_ID" ]; then
-            echo "cloudflare_ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "cloudflare_ready=false" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          if [ -z "$CF_API_TOKEN" ] || [ -z "$CF_ACCOUNT_ID" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID are required in the production environment or repository secrets."
+            exit 1
           fi
+          echo "cloudflare_ready=true" >> "$GITHUB_OUTPUT"
       - name: Install Wrangler
-        if: steps.credentials.outputs.cloudflare_ready == 'true'
         run: npm install --no-save wrangler@4.97.0
       - name: Apply D1 migrations
-        if: steps.credentials.outputs.cloudflare_ready == 'true'
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npx wrangler d1 migrations apply wealtharrays-saas --remote
       - name: Deploy API Worker
-        if: steps.credentials.outputs.cloudflare_ready == 'true'
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npx wrangler deploy
-      - name: Configure optional runtime secrets
-        if: steps.credentials.outputs.cloudflare_ready == 'true'
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          RAZORPAY_KEY_ID: ${{ secrets.RAZORPAY_KEY_ID }}
-          RAZORPAY_KEY_SECRET: ${{ secrets.RAZORPAY_KEY_SECRET }}
-          RAZORPAY_PLAN_MONTHLY: ${{ secrets.RAZORPAY_PLAN_MONTHLY }}
-          RAZORPAY_PLAN_YEARLY: ${{ secrets.RAZORPAY_PLAN_YEARLY }}
-          RAZORPAY_WEBHOOK_SECRET: ${{ secrets.RAZORPAY_WEBHOOK_SECRET }}
-        run: |
-          for name in SUPABASE_URL SUPABASE_ANON_KEY RAZORPAY_KEY_ID RAZORPAY_KEY_SECRET RAZORPAY_PLAN_MONTHLY RAZORPAY_PLAN_YEARLY RAZORPAY_WEBHOOK_SECRET; do
-            value="${!name}"
-            if [ -n "$value" ]; then
-              printf '%s' "$value" | npx wrangler secret put "$name" --name wealtharrays-github-io
-            fi
-          done
-      - name: Report actual deployment readiness
+      - name: Report deployment result
         if: always()
         env:
           CF_READY: ${{ steps.credentials.outputs.cloudflare_ready }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          RAZORPAY_KEY_ID: ${{ secrets.RAZORPAY_KEY_ID }}
-          RAZORPAY_KEY_SECRET: ${{ secrets.RAZORPAY_KEY_SECRET }}
-          RAZORPAY_PLAN_MONTHLY: ${{ secrets.RAZORPAY_PLAN_MONTHLY }}
-          RAZORPAY_PLAN_YEARLY: ${{ secrets.RAZORPAY_PLAN_YEARLY }}
-          RAZORPAY_WEBHOOK_SECRET: ${{ secrets.RAZORPAY_WEBHOOK_SECRET }}
         run: |
           {
-            echo "## Wealth Arrays API deployment readiness"
+            echo "## Wealth Arrays Worker deployment"
             if [ "$CF_READY" = "true" ]; then
-              echo "- Cloudflare Worker + D1 deployment prerequisites: present in wrangler.toml."
+              echo "- Cloudflare credentials were present; inspect preceding migration and deployment steps for their result."
             else
-              echo "- **Worker deployment: NOT performed.**"
-              echo "- Missing: CLOUDFLARE_API_TOKEN and/or CLOUDFLARE_ACCOUNT_ID."
+              echo "- Worker deployment was not performed."
             fi
-            [ -n "$SUPABASE_URL" ] || echo "- Missing runtime config: SUPABASE_URL (account sync unavailable)."
-            [ -n "$SUPABASE_ANON_KEY" ] || echo "- Missing runtime config: SUPABASE_ANON_KEY (account sync unavailable)."
-            [ -n "$RAZORPAY_KEY_ID" ] || echo "- Missing runtime config: RAZORPAY_KEY_ID (billing unavailable)."
-            [ -n "$RAZORPAY_KEY_SECRET" ] || echo "- Missing runtime config: RAZORPAY_KEY_SECRET (billing unavailable)."
-            [ -n "$RAZORPAY_PLAN_MONTHLY" ] || echo "- Missing runtime config: RAZORPAY_PLAN_MONTHLY (monthly plan unavailable)."
-            [ -n "$RAZORPAY_PLAN_YEARLY" ] || echo "- Missing runtime config: RAZORPAY_PLAN_YEARLY (yearly plan unavailable)."
-            [ -n "$RAZORPAY_WEBHOOK_SECRET" ] || echo "- Missing runtime config: RAZORPAY_WEBHOOK_SECRET (webhook verification unavailable)."
-            echo "- This report never prints secret values."
+            echo "- Runtime secrets are managed only by the protected Cloudflare secrets sync workflow."
+            echo "- No secret values are printed."
           } >> "$GITHUB_STEP_SUMMARY"
