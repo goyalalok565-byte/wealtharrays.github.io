@@ -1,20 +1,19 @@
 ﻿# Wealth Arrays Project State
 
-Last updated: 2026-11-23
+Last updated: 2026-11-24
 Repository: `goyalalok565-byte/wealtharrays.github.io`
 Default branch: `main`
-Current phase: Phase 1 AdSense/release verification remediation. Phase 0 engineering gates are passing on production main SHA `21ad5fa5846a8f177b1fa7e4a94461b73c8c9e14`.
-Status: The zero-denominator ROI/profit-margin correction is merged and deployed. Main SHA `21ad5fa5846a8f177b1fa7e4a94461b73c8c9e14` has passing unit, CodeQL, canonical, platform, Worker/Pages deploy, production live verification, homepage browser smoke, and mobile Lighthouse checks. Phase 1 AdSense ownership-verification correction is in branch `phase1/adsense-home-verification-build-fix`; it is not merged or deployed. Google AdSense account approval and live ad serving remain owner/account-side verification items. L1 measurement improvements remain unverified until their PR passes and GA4 ownership/configuration is confirmed. Global leadership, revenue, and search acquisition are not established.
+Current phase: Phase 1 release/measurement verification and zero-budget B2B distribution.
+Production main SHA: `46c7e81549e7d44dfcb16f7b9506292907c6e5e2`.
+Status: Phase 0 engineering gates and production browser checks pass. PR #163 (AdSense verification/security remediation), PR #144 (consent-aware RUM and funnel events), PR #146 (production consent/RUM browser smoke), PR #147 (RUM CSP correction), PR #178 (canonical sitemap CI gate), and PR #179 (B2B calculator embed offer page) are merged. Exact PR #179 CI passed; GitHub Pages build/deploy run `45441221408` succeeded; Cloudflare Worker version `2045` is serving the exact production SHA. Live homepage and B2B landing page metadata match this SHA; sitemap contains 99 URLs; API health and D1 are healthy. 55/55 calculator browser smoke passed. Seven-route mobile Lighthouse median release gate passed (homepage medians: Performance 98, Accessibility 100, Best Practices 92, SEO 92, CLS 0, LCP ~1.93 s, TBT 0 ms). One isolated homepage sample had TBT ~335 ms; median gate passed.
+Owner-side items remain: confirm GA4 property/DebugView event receipt, AdSense account approval and Auto Ads settings, www/non-www host consolidation approval (no DNS/redirect change made), GitHub production required-reviewer protection, Supabase/Razorpay TEST configuration, external authoritative-source review for jurisdiction-sensitive formulas, and actual B2B prospect outreach/customer conversion. Search Console is connected; recent GSC snapshot is limited/delayed and is not a revenue or growth claim. SaaS health currently reports `ready_for_saas=false` because Supabase Auth and Razorpay billing are not configured. No paid spend, live payments, D1 data mutations, DNS/WAF or secret changes were made.
+Historical sections below describe prior snapshots and candidate branches; use this current section as the source of truth where statuses differ.
 
+## Phase 1 release and AdSense verification audit — 2026-11-23 (historical snapshot)
 
-## Phase 1 release and AdSense verification audit — 2026-11-23
-
-- Exact current production source SHA: `21ad5fa5846a8f177b1fa7e4a94461b73c8c9e14`.
-- GitHub Actions on that SHA: Unit Tests, CodeQL, Canonical CI, Platform Gates, Worker deploy, Pages build/deploy, production live verification, homepage search smoke, and mobile Lighthouse all completed successfully.
-- Cloudflare Workers production build check succeeded for that SHA; GitHub Pages deployment check also succeeded.
-- PR #163 is merged. The previous Canonical CI failure is no longer current on main.
-- Phase 1 code correction: use Google's documented `google-adsense-account` meta-tag ownership verification on the homepage, without loading AdSense JavaScript when no ad placement exists. Regression checks cover source and generated `dist/` output. The candidate fix is in `phase1/adsense-home-verification-build-fix`; it is not production code until merged and deployed.
-- Owner-only checks still required: AdSense account/site approval, account-side Auto Ads configuration, and confirmation that the publisher ID belongs to the intended account. Never claim approval or revenue from repository evidence alone.
+- The 2026-11-23 production source snapshot was `21ad5fa5846a8f177b1fa7e4a94461b73c8c9e14`; it has since been superseded by the current SHA above.
+- PR #163 subsequently merged the AdSense ownership-verification remediation. Account-side AdSense approval, Auto Ads settings and publisher-account ownership still require owner confirmation.
+- Never claim AdSense approval, live ad serving or revenue from repository evidence alone.
 
 ## AdSense quality remediation, corrupted header deduplication & E-E-A-T enhancement — 2026-11-23
 
@@ -25,25 +24,14 @@ Status: The zero-denominator ROI/profit-margin correction is merged and deployed
 - Strengthened E-E-A-T signals in `about.html` and `contact.html` (Alok Goyal computational engineering profile, regulatory standards compliance, New Delhi headquarters, categorized inquiry routing and response SLA).
 - Updated `qa/phase45-production-audit.mjs` to permit Google AdSense publisher verification on homepage.
 
-## L1 measurement PR candidate — 2026-11-22
+## L1 measurement and production consent/RUM verification — merged 2026-11-22
 
-Branch: `saas/l1-consent-rum-events` (not merged).
+- PR #144 merged consent-aware CLS/INP/LCP collection and allow-listed SaaS funnel events (`calculator_completed`, `scenario_saved`, `signup`, `upgrade_clicked`).
+- PR #146 merged production browser coverage for consent reject/accept behavior; PR #147 merged the CSP correction for the pinned web-vitals dependency.
+- The 2026-11-24 production browser smoke (run `45429587284`) passed consent/RUM checks alongside calculator and homepage flows.
+- Analytics payload allow-lists exclude financial inputs and personal/account data.
+- Remaining owner verification: confirm the intended GA4 property and inspect DebugView/realtime event receipt. Code and browser loading behavior passing does not prove the owner-side GA4 property is receiving production events.
 
-- Canonical funnel event names now map existing product interactions to `calculator_completed`, `scenario_saved`, `signup`, and `upgrade_clicked`; only allow-listed categorical metadata is sent.
-- Consent-gated Core Web Vitals collection uses GoogleChrome/web-vitals 6.2.3 for CLS, INP and LCP. The current implementation uses the upstream unpkg IIFE CDN and must pass browser network/privacy verification before production reliance.
-- The analytics audit is added to Canonical CI and explicitly rejects financial inputs and personal/account data from the analytics allow-list.
-- The 15-minute API health workflow is being extended with one deduplicated operational alert issue that closes on recovery.
-- RUM values, GA4 event receipt, health alert delivery and live behavior remain unverified until the PR passes CI, merges under the applicable tier policy, and post-merge L1-L3 verification completes.
-
-
-## L1 production RUM smoke candidate — 2026-11-22
-
-Branch: `saas/l1-production-rum-smoke` (not merged).
-
-- Production deployment for L1 merge `bc33ed7c5d8b98f3344e621392002bd89793aab2` passed exact-SHA live verification.
-- Seven-route mobile Lighthouse artifact is recorded in Actions run 45048289283.
-- The production browser smoke is being extended to verify that rejecting consent keeps GA4 and web-vitals unloaded, accepting consent loads both, and emitted Web Vitals contain only metric name/value/rating.
-- This browser verification candidate awaits CI and merge; GA4 DebugView receipt and live user RUM remain unverified until the owner confirms the GA4 property.
 ## L1 RUM CSP correction — 2026-11-22
 
 - PR #146 merged the production consent/RUM smoke workflow.
