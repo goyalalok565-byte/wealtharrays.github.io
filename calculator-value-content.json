@@ -1,7 +1,24 @@
 {
   "sip-calculator": {
     "heading": "How to use SIP scenarios responsibly",
-    "body": "Use this calculator to compare contribution size, time horizon and assumed return rather than to predict a guaranteed investment value. A useful first comparison is to hold the monthly contribution constant and test several return assumptions. Then hold the return assumption constant and change the contribution or time period. This shows which input drives the result. Check the contribution total separately from projected growth so you can see how much of the displayed value comes from your own deposits. The model assumes regular contributions and a stated monthly compounding convention; actual investment products can have fees, taxes, uneven contributions and market returns that vary over time."
+    "body": "Use this calculator to compare contribution size, time horizon and assumed return rather than to predict a guaranteed investment value. A useful first comparison is to hold the monthly contribution constant and test several return assumptions. Then hold the return assumption constant and change the contribution or time period. This shows which input drives the result. Check the contribution total separately from projected growth so you can see how much of the displayed value comes from your own deposits. The model assumes regular contributions and a stated monthly compounding convention; actual investment products can have fees, taxes, uneven contributions and market returns that vary over time.",
+    "references": [
+      {
+        "title": "AMFI: Systematic Investment Plan (SIP)",
+        "url": "https://www.amfiindia.com/investor/become-mf-distributor?zoneName=sip",
+        "note": "AMFI explains SIP as a method of investing a fixed amount periodically in a mutual fund. This is general investor education, not a promise of returns or a recommendation to invest."
+      },
+      {
+        "title": "SEBI Investor: Understanding Mutual Funds",
+        "url": "https://investor.sebi.gov.in/understanding_mf.html",
+        "note": "SEBI's investor education material explains mutual fund basics and risks. SIP instalments do not remove market risk, guarantee returns or protect the invested amount."
+      },
+      {
+        "title": "SEBI Investor: Riskometer",
+        "url": "https://investor.sebi.gov.in/riskometer.html",
+        "note": "SEBI explains the mutual-fund Riskometer as a way to communicate scheme risk. Check the current scheme Riskometer and offer documents; a calculator projection does not assess suitability."
+      }
+    ]
   },
   "compound-interest-calculator": {
     "heading": "What the compound-interest result can and cannot tell you",
@@ -34,12 +51,36 @@
   "fixed-deposit-calculator": {
     "heading": "Fixed-deposit example: ₹1,00,000 for 5 years",
     "body": "Suppose you deposit ₹1,00,000 at 7% annual interest, compounded quarterly, for 5 years. The model gives an estimated maturity value of about ₹1,41,478 before tax. That ₹41,478 is modeled interest, not a guaranteed bank payout: verify the institution's actual rate, compounding convention, TDS treatment, payout option and premature-withdrawal rules before comparing products.",
-    "worked": "With the example inputs above, the calculator starts with ₹1,00,000, applies a 7% annual rate over 5 years with quarterly compounding, and shows roughly ₹1,41,478 as the maturity value. Now compare the same ₹1,00,000 at 6% and 8% to see how sensitive the result is to the rate. For Indian deposits, compare the after-tax outcome too, because the headline maturity value is not necessarily what you keep."
+    "worked": "With the example inputs above, the calculator starts with ₹1,00,000, applies a 7% annual rate over 5 years with quarterly compounding, and shows roughly ₹1,41,478 as the maturity value. Now compare the same ₹1,00,000 at 6% and 8% to see how sensitive the result is to the rate. For Indian deposits, compare the after-tax outcome too, because the headline maturity value is not necessarily what you keep.",
+    "references": [
+      {
+        "title": "Reserve Bank of India: Master Directions on Interest Rate on Deposits",
+        "url": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=13157",
+        "note": "RBI's deposit directions provide the regulatory framework for interest rates on deposits. The calculator's assumed rate and compounding are illustrative; confirm the bank's current product terms, payout choice, premature-closure rules and tax treatment."
+      },
+      {
+        "title": "DICGC: Frequently Asked Questions on Deposit Insurance",
+        "url": "https://www.dicgc.org.in/FAQs",
+        "note": "DICGC explains deposit-insurance coverage and its conditions, including the ₹5 lakh limit per depositor per bank for eligible deposits in the same right and capacity. This is not a guarantee of a particular FD rate or maturity value."
+      }
+    ]
   },
   "recurring-deposit-calculator": {
     "heading": "Recurring-deposit example: ₹5,000 a month for 5 years",
     "body": "Imagine depositing ₹5,000 at the end of every month for 5 years at an assumed 7% annual rate. You contribute ₹3,00,000 in total, and the model estimates roughly ₹3,60,000 before tax, depending on the exact compounding convention. The important comparison is contribution total versus modeled interest, not just the final maturity number.",
-    "worked": "At ₹5,000 per month, 7% and 5 years, the calculator makes 60 monthly deposits totaling ₹3,00,000. Run a second scenario at 5 years but with ₹7,500 per month: the difference comes mainly from your contribution rate. When comparing an actual RD, confirm deposit timing, compounding method, tax treatment and premature-closure rules with the bank."
+    "worked": "At ₹5,000 per month, 7% and 5 years, the calculator makes 60 monthly deposits totaling ₹3,00,000. Run a second scenario at 5 years but with ₹7,500 per month: the difference comes mainly from your contribution rate. When comparing an actual RD, confirm deposit timing, compounding method, tax treatment and premature-closure rules with the bank.",
+    "references": [
+      {
+        "title": "Reserve Bank of India: Master Directions on Interest Rate on Deposits",
+        "url": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=13157",
+        "note": "RBI's deposit directions provide the regulatory framework for interest rates on deposits. The calculator uses a simplified monthly-deposit model; confirm the bank's actual RD calculation, instalment due dates, default charges, premature-closure terms and tax treatment."
+      },
+      {
+        "title": "DICGC: Frequently Asked Questions on Deposit Insurance",
+        "url": "https://www.dicgc.org.in/FAQs",
+        "note": "DICGC explains deposit-insurance coverage and its conditions, including the ₹5 lakh limit per depositor per bank for eligible deposits in the same right and capacity. Coverage is subject to DICGC rules and does not certify the RD calculator's projected maturity amount."
+      }
+    ]
   },
   "lumpsum-calculator": {
     "heading": "Lump-sum example: ₹1,00,000 invested for 10 years",
