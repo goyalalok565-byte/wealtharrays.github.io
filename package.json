@@ -11,6 +11,7 @@
     "qa:platform": "node qa/platform-phase1-20-audit.mjs && node qa/phase1-20-roadmap-audit.mjs && node qa/research-data-audit.mjs && node qa/accessibility-static-audit.mjs && npx --yes terser@5 --compress --mangle --comments '/^ ===== WA CANONICAL MODULE/' --output wa-calculator-runtime.js -- wa-calculator-runtime.js && node qa/performance-budget-audit.mjs",
     "test": "node qa/phase1-entitlement-d1-regression.mjs && node --test tests/*.test.js",
     "test:calculators": "node qa/phase1-entitlement-d1-regression.mjs && node --test tests/*.test.js",
-    "qa:embed-offer": "node qa/calculator-embed-offer-audit.mjs"
+    "qa:embed-offer": "node qa/calculator-embed-offer-audit.mjs",
+    "qa:budget-frequency": "node qa/budget-pay-frequency-audit.mjs"
   }
 }
