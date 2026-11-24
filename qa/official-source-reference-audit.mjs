@@ -31,7 +31,7 @@ const cases = [
       'DICGC: Frequently Asked Questions on Deposit Insurance',
       '₹5 lakh limit per depositor per bank'
     ]
-  }
+  },
   {
     id: 'ppf-calculator',
     route: 'ppf-calculator',
