@@ -134,7 +134,14 @@
   "income-tax-planner": {
     "heading": "Use a concrete tax-planning scenario",
     "body": "For example, suppose annual gross income is ₹12,00,000, estimated deductions are ₹1,50,000, and the assumed effective tax rate is 15%. This simplified model applies the rate to ₹10,50,000 of modeled taxable income. It is useful for comparing assumptions, but actual tax can differ because real tax systems may use slabs, credits, exemptions and jurisdiction-specific rules.",
-    "worked": "With ₹12,00,000 of gross income, ₹1,50,000 of modeled deductions and a 15% assumed effective rate, the calculator estimates ₹10,50,000 of taxable income, ₹1,57,500 of tax and ₹10,42,500 after tax. Change one input at a time to see which assumption drives the result."
+    "worked": "With ₹12,00,000 of gross income, ₹1,50,000 of modeled deductions and a 15% assumed effective rate, the calculator estimates ₹10,50,000 of taxable income, ₹1,57,500 of tax and ₹10,42,500 after tax. Change one input at a time to see which assumption drives the result.",
+    "references": [
+      {
+        "title": "Income Tax Department: Income Tax Calculator User Manual",
+        "url": "https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/income-tax-calculator-um",
+        "note": "The Income Tax Department's official calculator applies the relevant Income-tax Act, Rules and notifications and supports tax-regime comparisons. Wealth Arrays' flat effective-rate planner is intentionally simplified and does not reproduce slab-wise tax, all deductions, credits or an individual's tax liability."
+      }
+    ]
   },
   "home-loan-emi-calculator": {
     "heading": "Home loan EMI: payment, interest and affordability",
@@ -561,7 +568,14 @@
         "body": "PPF has specific rules for contribution limits, account tenure, extension, loans and withdrawals. This calculator does not verify whether each deposit is permitted or determine tax treatment for your circumstances. Refer to the current National Savings Institute or India Post/official government scheme guidance before making a deposit or withdrawal decision."
       }
     ],
-    "article": "/articles/compound-interest-guide"
+    "article": "/articles/compound-interest-guide",
+    "references": [
+      {
+        "title": "National Savings Institute: Public Provident Fund Scheme",
+        "url": "https://www.nsiindia.gov.in/InternalPage.aspx?Id_Pk=169",
+        "note": "The National Savings Institute publishes the government-notified PPF scheme rules, including account, deposit, loan, extension and withdrawal provisions. The calculator's constant-rate projection is only a scenario; notified interest rates and scheme rules can change and this reference does not certify its maturity estimate."
+      }
+    ]
   },
   "epf-calculator": {
     "heading": "EPF projection: employee and employer contributions",
@@ -577,7 +591,14 @@
         "body": "Compare the inputs with monthly payslips and the EPFO passbook, and check whether contribution wages, salary growth and credited interest match your employment terms. Withdrawals, transfers, service breaks, tax treatment and changes in rules are not automatically modelled. For an official balance or claim decision, rely on EPFO records and current official guidance."
       }
     ],
-    "article": "/articles/how-to-stress-test-a-retirement-goal"
+    "article": "/articles/how-to-stress-test-a-retirement-goal",
+    "references": [
+      {
+        "title": "EPFO: Handbook of EPF Scheme, EPS and EDLI",
+        "url": "https://epfindia.gov.in/site_docs/PDFs/EPFO_Rules-Regulations_PDFs/Handbook_EPS1995.pdf",
+        "note": "EPFO's handbook contains the statutory scheme framework for provident-fund, pension and deposit-linked insurance benefits. Employer contribution allocation, wage ceilings, EPS treatment and credited interest can differ from this simplified model; reconcile estimates with payslips and the EPFO passbook."
+      }
+    ]
   },
   "gst-calculator": {
     "heading": "GST arithmetic: exclusive price versus inclusive price",
@@ -593,7 +614,19 @@
         "body": "GST rates depend on the classification of goods or services and applicable notifications. Whether CGST plus SGST or IGST applies depends on the transaction and place of supply. Inputting a rate does not mean that rate is legally correct. Verify the current GST portal guidance or consult a tax professional for invoice, registration and filing questions."
       }
     ],
-    "article": "/articles/how-to-use-financial-calculators"
+    "article": "/articles/how-to-use-financial-calculators",
+    "references": [
+      {
+        "title": "CBIC: GST Rates for Goods and Services",
+        "url": "https://cbic-gst.gov.in/hindi/gst-goods-services-rates.html",
+        "note": "The Central Board of Indirect Taxes and Customs publishes GST rate schedules for goods and services. The legally applicable rate depends on classification, transaction details and current notifications; this calculator only performs arithmetic on the rate entered."
+      },
+      {
+        "title": "CBIC: GST Rates FAQs",
+        "url": "https://cbic-gst.gov.in/gst-rates-faq.html",
+        "note": "CBIC's rate FAQs illustrate that GST treatment can depend on the exact goods or service classification. Do not use a generic calculator to decide HSN/SAC classification, place of supply or invoice compliance."
+      }
+    ]
   },
   "emergency-fund-calculator": {
     "heading": "Emergency fund: choose a target that matches your risks",
@@ -671,7 +704,19 @@
         "body": "Five years of continuous service is a general rule in many covered cases, but legal exceptions can apply, including certain death or disablement situations. Statutory ceilings and amendments may affect the payable amount. This calculator cannot verify service records or current legal interpretation. Consult official labour guidance or a qualified professional for a disputed or high-value claim."
       }
     ],
-    "article": "/articles/how-to-use-financial-calculators"
+    "article": "/articles/how-to-use-financial-calculators",
+    "references": [
+      {
+        "title": "Ministry of Labour and Employment: Payment of Gratuity Act, 1972",
+        "url": "https://www.labour.gov.in/static/uploads/2025/06/23e3be0e31de495acd1698ed85007ec1.pdf",
+        "note": "The Act sets gratuity eligibility and payment provisions for covered employees, including the statutory basis of fifteen days' wages for each completed year or part exceeding six months. Applicability, wage definition, exceptions and statutory limits must be checked for the employee's circumstances; this estimate is not a legal entitlement decision."
+      },
+      {
+        "title": "Ministry of Labour and Employment: Payment of Gratuity (Central) Rules, 1972",
+        "url": "https://www.labour.gov.in/static/uploads/2025/06/261fb00f35711ebaf15076c0a67c2be4.pdf",
+        "note": "The Central Rules provide procedural and administrative detail under the Act. State-specific applicability and later amendments may matter; verify current rules and seek professional advice for disputes or final settlement."
+      }
+    ]
   },
   "hra-exemption-calculator": {
     "heading": "HRA exemption: apply the lowest-of-three method carefully",
@@ -687,7 +732,14 @@
         "body": "Rent receipts, payment records, landlord details and any required declarations may be relevant to an employer or tax filing. Eligibility for HRA treatment depends on the applicable regime and current rules; the calculator does not review documents or determine the complete tax outcome. Confirm current Income Tax Department guidance or consult a tax professional before filing."
       }
     ],
-    "article": "/articles/how-to-use-financial-calculators"
+    "article": "/articles/how-to-use-financial-calculators",
+    "references": [
+      {
+        "title": "Income Tax Department: New Tax Regime vs Old Tax Regime FAQs",
+        "url": "https://www.incometax.gov.in/iec/foportal/help/new-tax-vs-old-tax-regime-faqs",
+        "note": "The Income Tax Department explains how HRA exemption is treated across tax regimes. Eligibility depends on the applicable tax year, law and individual facts; this calculator only estimates the common lowest-of-three amount and does not decide regime eligibility or validate supporting documents."
+      }
+    ]
   },
   "nps-calculator": {
     "heading": "NPS corpus and annuity are separate estimates",
@@ -703,7 +755,19 @@
         "body": "Eligibility, withdrawal conditions, annuity allocation and tax treatment can depend on subscriber type, exit reason and current regulations. This calculator does not decide legal eligibility or process a withdrawal. Confirm the current rules with PFRDA and the official NPS service provider, and compare actual annuity illustrations before making a retirement decision."
       }
     ],
-    "article": "/articles/how-to-stress-test-a-retirement-goal"
+    "article": "/articles/how-to-stress-test-a-retirement-goal",
+    "references": [
+      {
+        "title": "PFRDA: NPS All Citizen Model FAQs",
+        "url": "https://pfrda.org.in/w/faqs/nps-all-citizen-model",
+        "note": "PFRDA explains NPS account features, eligibility, choices and exit-related information, and notes that returns are market-linked with no assured benefit. The calculator's assumed return and annuity rate are scenarios, not a forecast or insurer quote."
+      },
+      {
+        "title": "PFRDA: NPS for All Citizen Models",
+        "url": "https://pfrda.org.in/en/schemes/national-pension-system/nps-for-all-citizen-models",
+        "note": "PFRDA's current scheme overview describes subscriber options and NPS features. Check current regulations and product terms before making contribution, withdrawal or annuity decisions."
+      }
+    ]
   },
   "swp-calculator": {
     "heading": "How to read an SWP result without overestimating your corpus",
@@ -737,7 +801,14 @@
         "body": "Deposit limits, eligibility, the age of the girl child, withdrawal conditions and tax treatment are set by the government and can be revised. This tool does not decide eligibility or model partial withdrawals. Use the official notification, your bank or your post office for the current rate and rules, and use this page to understand how the numbers behave when the rate or the deposit changes."
       }
     ],
-    "article": "/articles/compound-interest-guide"
+    "article": "/articles/compound-interest-guide",
+    "references": [
+      {
+        "title": "National Savings Institute: Sukanya Samriddhi Account Scheme",
+        "url": "https://www.nsiindia.gov.in/InternalPage.aspx?Id_Pk=171",
+        "note": "The National Savings Institute publishes the Sukanya Samriddhi Account Scheme rules, including eligibility, account and maturity provisions. The scheme's interest rate is notified separately and may change; this calculator's constant-rate projection is not an official maturity quote or eligibility determination."
+      }
+    ]
   },
   "rule-of-72-calculator": {
     "heading": "When the Rule of 72 is good enough and when it is not",
