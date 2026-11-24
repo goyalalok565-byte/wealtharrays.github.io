@@ -36,7 +36,7 @@ jobs:
           fi
       - name: Install Wrangler
         if: steps.credentials.outputs.cloudflare_ready == 'true'
-        run: npm install --no-save wrangler@4
+        run: npm install --no-save wrangler@4.97.0
       - name: Apply D1 migrations
         if: steps.credentials.outputs.cloudflare_ready == 'true'
         env:
