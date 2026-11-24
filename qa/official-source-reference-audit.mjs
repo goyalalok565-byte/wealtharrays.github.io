@@ -31,7 +31,7 @@ const cases = [
       'DICGC: Frequently Asked Questions on Deposit Insurance',
       '₹5 lakh limit per depositor per bank'
     ]
-  }
+  },
   {
     id: 'ppf-calculator',
     route: 'ppf-calculator',
@@ -72,7 +72,9 @@ const cases = [
     route: 'epf-calculator',
     required: ['EPFO: Handbook of EPF Scheme, EPS and EDLI', 'reconcile estimates with payslips']
   },
-];\n\nfor (const item of cases) {
+];
+
+for (const item of cases) {
   const entry = content[item.id];
   if (!entry || !Array.isArray(entry.references) || !entry.references.length) {
     throw new Error('Missing official references for ' + item.id);
@@ -101,4 +103,4 @@ const cases = [
   }
 }
 
-console.log('Official source reference audit PASS: SIP, FD and RD source references render in source pages and production dist.');
+console.log('Official source reference audit PASS: official references render across SIP, deposit, tax, savings, GST, gratuity, HRA, NPS and EPF pages in source and production dist.');
