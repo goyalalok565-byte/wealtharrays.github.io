@@ -47,3 +47,8 @@ test("isolated TEST account page points only to TEST API and has billing disable
   assert.match(js, /dataset\.waApiBase/);
   assert.match(js, /if\(TEST_MODE\)\{\$\("account-subscription-card"\)\.hidden=true/);
 });
+
+test("sign-out attempts to revoke the Supabase server session", () => {
+  assert.match(js, /auth\/v1\/logout/);
+  assert.match(js, /server session revocation could not be confirmed/);
+});
