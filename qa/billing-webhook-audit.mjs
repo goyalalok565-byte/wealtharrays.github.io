@@ -91,6 +91,35 @@ assert.match(events.get("evt_payment_failed").payload_json, /pay_1/);
 response = await deliver({ created_at: 1300, event: "payment.refunded", payload: { payment: { entity: { id: "pay_1", subscription_id: "sub_1", status: "refunded", amount: 50000, amount_refunded: 50000, currency: "INR" } } } }, "evt_payment_refunded");
 assert.equal(response.status, 200);
 assert.match(events.get("evt_payment_refunded").payload_json, /50000/);
+// Same-second events converge to the more restrictive state in either delivery order.
+subscriptions.set("sub_1", { id: "row_1", status: "created", current_period_end: null, last_provider_event_at: null });
+response = await deliver({ created_at: 1400, event: "subscription.activated", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_equal_active_first");
+assert.equal(response.status, 200);
+response = await deliver({ created_at: 1400, event: "subscription.cancelled", payload: { subscription: { entity: { id: "sub_1", status: "cancelled" } } } }, "evt_equal_cancelled_second");
+assert.equal(response.status, 200);
+assert.equal(subscriptions.get("sub_1").status, "cancelled");
+
+subscriptions.set("sub_1", { id: "row_1", status: "created", current_period_end: null, last_provider_event_at: null });
+response = await deliver({ created_at: 1500, event: "subscription.cancelled", payload: { subscription: { entity: { id: "sub_1", status: "cancelled" } } } }, "evt_equal_cancelled_first");
+assert.equal(response.status, 200);
+response = await deliver({ created_at: 1500, event: "subscription.activated", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_equal_active_second");
+assert.equal(response.status, 200);
+assert.equal(subscriptions.get("sub_1").status, "cancelled");
+
+subscriptions.set("sub_1", { id: "row_1", status: "created", current_period_end: null, last_provider_event_at: null });
+response = await deliver({ created_at: 1600, event: "subscription.resumed", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_equal_resumed_first");
+assert.equal(response.status, 200);
+response = await deliver({ created_at: 1600, event: "subscription.paused", payload: { subscription: { entity: { id: "sub_1", status: "paused" } } } }, "evt_equal_paused_second");
+assert.equal(response.status, 200);
+assert.equal(subscriptions.get("sub_1").status, "paused");
+
+subscriptions.set("sub_1", { id: "row_1", status: "created", current_period_end: null, last_provider_event_at: null });
+response = await deliver({ created_at: 1700, event: "subscription.paused", payload: { subscription: { entity: { id: "sub_1", status: "paused" } } } }, "evt_equal_paused_first");
+assert.equal(response.status, 200);
+response = await deliver({ created_at: 1700, event: "subscription.resumed", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_equal_resumed_second");
+assert.equal(response.status, 200);
+assert.equal(subscriptions.get("sub_1").status, "paused");
+
 response = await deliver({ created_at: 1400, event: "subscription.activated", payload: { subscription: { entity: { id: "sub_not_linked", status: "active" } } } }, "evt_unlinked");
 assert.equal(response.status, 503);
 assert.equal(events.get("evt_unlinked").processed_at, null);
