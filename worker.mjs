@@ -48,6 +48,10 @@ function methodHandler(route, method) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    if (url.hostname === "www.wealtharrays.com") {
+      url.hostname = "wealtharrays.com";
+      return Response.redirect(url.toString(), 308);
+    }
     if (!url.pathname.startsWith("/v1/")) return env.ASSETS.fetch(request);
     const route = ROUTES.get(url.pathname.replace(/\/$/, ""));
     if (!route) return jsonError("NOT_FOUND", "No API endpoint matches this path.", 404);
