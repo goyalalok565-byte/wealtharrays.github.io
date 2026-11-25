@@ -31,7 +31,7 @@ Read first after any context reset:
 
 Current architecture:
 - 55 browser calculator definitions in `calculators.js`; generated pages and split definitions.
-- Public API model registry contains 20 models, not 55.
+- Live public API model registry contains 11 models, not 55; verified by production GET /v1/models on 2026-11-25.
 - 25 currency codes exist; full locale formatting is not complete.
 - Current UI translation messages cover English and Hindi; the wider language list is not proof of full translation.
 - India Tax Year 2026-27 is the only active country-specific tax engine. Other country metadata is not a tax engine.
@@ -61,10 +61,10 @@ Evidence:
 
 ## Current business readiness — do not overclaim
 
-- Google Search Console, 24 Oct–20 Nov 2026: 38 clicks, 96 impressions, 39.58% CTR and average position 11.88. 29 clicks came from the branded `wealth arrays` query; all 38 clicks were from India. 16 countries generated impressions. This is an early baseline, not global acquisition.
-- AI search visibility is not measured until the GEO project is configured and tracked prompts are added.
+- Google Search Console, 26 Oct–22 Nov 2026 (complete 28-day window): 43 clicks, 137 impressions, 31.39% CTR and average position 14.68. The visible branded `wealth arrays` query contributed 33 clicks (76.7% of site-level clicks); all 43 clicks were from India. Other countries generated impressions but no clicks in this report. This is an early brand-heavy baseline, not global acquisition.
+- AI search tracking is configured with 15 prompts, but the latest 30-day VibeSEO report has 0 answers and 0 measured mentions; fresh checks are unavailable because the account has no remaining checks. Do not claim AI visibility.
 - Content audit: 55/55 calculator pages pass the 650+ word, unique guidance, worked example, FAQ, related-link and schema checks.
-- API coverage: 20/55 calculator models. Expand only with equivalence tests and independent golden vectors.
+- API coverage: 11/55 calculator models. Expand only with adapter-equivalence tests and independent golden vectors.
 - Globalization: India is the only active tax engine; English/Hindi are the current translation message sets; 25 currency codes do not equal complete locale support.
 - Monetization: `ads.txt` exists, but AdSense approval, active ad units, fill rate and earnings are not verified. A publisher record alone does not generate revenue.
 - Razorpay checkout/webhook code exists, but D1, Supabase Auth, Razorpay plans/secrets, test-mode lifecycle and server-enforced Pro entitlements remain owner-side activation tasks. Paddle global seller/payout approval and integration are also pending.
@@ -111,3 +111,9 @@ Do not skip earlier blockers unless the owner explicitly changes priority.
 `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_D1_DATABASE_ID`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_PLAN_MONTHLY`, `RAZORPAY_PLAN_YEARLY`, `RAZORPAY_WEBHOOK_SECRET`.
 
 Never store secret values in this repository or chat.
+
+## Latest analytics verification — 2026-11-25
+
+- GA4, 26 Oct–22 Nov 2026: 42 sessions, 36 active users, 258 page views, 97.62% engagement rate, 399-second average session duration, zero key events/conversions and zero reported revenue. Channels: 35 Direct, 6 AI Assistant, 1 Organic Search. Small sample; not stable growth evidence.
+- GA4 observed `calculator_calculate` (6), `workspace_save` (1), `workspace_calculate` (1), `workspace_delete` (1), `pdf_export` (3), and `report_export` (1). The funnel events `calculator_completed`, `scenario_saved`, `signup`, and `upgrade_clicked` were not observed in this window. Verify DebugView and key-event definitions before claiming funnel tracking.
+- GSC sitemap report: 98 submitted URLs, zero errors/warnings, last downloaded 2026-11-20; the live sitemap contains 99 URLs. Refresh/resubmit it manually in Search Console.

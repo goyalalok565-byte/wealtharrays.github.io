@@ -4,34 +4,53 @@ The repository now contains the application code for browser-first scenarios, an
 
 ## 1. Cloudflare Worker API + D1
 
-The deployment has two distinct pieces: Cloudflare Pages serves the static website from the GitHub repository, while a Wrangler-managed Cloudflare Worker handles /v1/* API requests on the same domain. Do not configure these API routes as Pages Functions; worker.mjs is the API entry point and wrangler.toml is its source of truth.
+Production and TEST are separate deployments:
 
-1. Create a Cloudflare D1 database for Wealth Arrays.
-2. Add these GitHub Actions repository secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, and CLOUDFLARE_D1_DATABASE_ID.
-3. The cloudflare-worker-deploy.yml workflow appends the D1 binding named DB, applies every migration in migrations/ in order, and deploys the Worker when Cloudflare credentials are present.
-4. wrangler.toml declares PUBLIC_API_LIMITER. It limits each client IP to 120 requests per minute per API route for /v1/calculate, /v1/india-tax, and /v1/fx. Cloudflare's Rate Limiting API is approximate and distributed per Cloudflare location; it is an abuse-control layer, not a strict global quota.
-5. The static Cloudflare Pages deployment remains separate. Confirm its production branch and build/output settings match the repository's static-site build; the Worker workflow does not deploy the Pages site.
+- Production: `wealtharrays-github-io`, custom route `wealtharrays.com/v1/*`, production D1 `wealtharrays-saas`. The production deployment workflow applies remote migrations and deploys this Worker. Do not use it for TEST or run it without separate written production-release approval.
+- TEST: `wealtharrays-api-test`, workers.dev only, dedicated D1 `wealtharrays-saas-test`. The isolated config is `wrangler.test.toml`; the manual `.github/workflows/cloudflare-test-deploy.yml` workflow reads only the GitHub `TEST` environment and checks the D1 identity before applying migrations.
+
+The old `cloudflare-secrets-sync.yml` workflow was removed because it read the `production` environment and uploaded TEST credentials to the production Worker. Do not recreate that workflow.
+
+For TEST, add these values only under GitHub Settings → Environments → TEST:
+- Secrets: `TEST_CLOUDFLARE_API_TOKEN`, `TEST_CLOUDFLARE_ACCOUNT_ID`, `TEST_SUPABASE_URL`, `TEST_SUPABASE_ANON_KEY`.
+- Variable: `TEST_D1_DATABASE_ID` for the dedicated TEST database.
+- Razorpay TEST secrets: `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_PLAN_MONTHLY`, `RAZORPAY_PLAN_YEARLY`, `RAZORPAY_WEBHOOK_SECRET`.
+
+The TEST workflow refuses a key that does not start with `rzp_test_`, verifies that the D1 ID maps to `wealtharrays-saas-test` and differs from production, applies migrations to the TEST database only, deploys a Worker with no custom-domain route, uploads runtime secrets to that Worker only, and verifies `/v1/health` plus `/v1/models`.
+
+The TEST base URL after deployment is `https://wealtharrays-api-test.goyalalok565.workers.dev`. The production Worker and D1 are not changed by this workflow. Keep production secrets, DNS, routes, and migrations separate.
+
+The static website remains served by the existing Cloudflare site deployment. The API Worker serves `/v1/*`. The public API rate limiter allows 120 requests per minute per client IP for `/v1/calculate`, `/v1/india-tax`, and `/v1/fx`; Cloudflare rate limiting is approximate and distributed per location, not a strict global quota.
+
 
 ## 2. Supabase authentication
 
-Create a Supabase project, enable email/password authentication, and set the site's account URL as an allowed redirect URL. Add these GitHub Actions repository secrets so the deploy workflow can configure the Worker:
+The current Supabase project is active but has no public application tables and is not yet confirmed as a dedicated TEST project. Use a separate TEST project for the TEST Worker; do not copy production credentials into the TEST environment.
 
-- `SUPABASE_URL`
-- `SUPABASE_ANON_KEY` (the public anon/publishable key only; never use a service-role key in the browser)
+- Add `TEST_SUPABASE_URL` and `TEST_SUPABASE_ANON_KEY` to GitHub `TEST` environment secrets.
+- Use the publishable/anon key only; never use a service-role key in browser or Worker configuration.
+- Enable email/password authentication and allow only the exact TEST redirect URL(s).
+- Verify sign-in, sign-out, expired/invalid token handling and cross-user scenario isolation.
+- The browser-only saved scenarios must continue to work without signup. Cloud sync should happen only after explicit user action.
 
-The browser account page uses Supabase Auth REST endpoints. Server-side scenario APIs verify each access token against Supabase before touching D1. Cloud scenario data is always scoped to the authenticated user ID. The browser-only saved scenarios continue to work without an account.
+The production project/credentials remain separate and should not be enabled in the production Worker until TEST evidence and legal review are complete.
+
 
 ## 3. Razorpay subscriptions
 
-Create the monthly and yearly subscription plans in the Razorpay dashboard and add the following GitHub Actions repository secrets:
+The owner has created monthly and yearly Razorpay TEST plans and confirmed the five Razorpay secrets are saved in the GitHub `TEST` environment. Do not regenerate these keys or recreate the plans unless there is a specific reason.
 
-- `RAZORPAY_KEY_ID`
-- `RAZORPAY_KEY_SECRET`
-- `RAZORPAY_PLAN_MONTHLY`
-- `RAZORPAY_PLAN_YEARLY`
-- `RAZORPAY_WEBHOOK_SECRET`
+TEST-only setup:
+- `RAZORPAY_KEY_ID` must start with `rzp_test_`; the TEST deployment workflow enforces this.
+- TEST webhook endpoint after successful TEST Worker deployment: `https://wealtharrays-api-test.goyalalok565.workers.dev/v1/billing/webhook`.
+- Production-only webhook endpoint: `https://wealtharrays.com/v1/billing/webhook`. Never send TEST events to this production-domain endpoint.
+- Update the Razorpay TEST webhook URL only after the TEST Worker has deployed and `/v1/health` reports `ready_for_saas=true`.
+- Enable the supported subscription lifecycle events: `subscription.authenticated`, `subscription.activated`, `subscription.charged`, `subscription.pending`, `subscription.halted`, `subscription.cancelled`, `subscription.completed`, `subscription.paused`, and `subscription.resumed`; also `payment.failed` where available in the dashboard.
 
-Configure the Razorpay webhook URL as https://wealtharrays.com/v1/billing/webhook and enable subscription.authenticated, subscription.activated, subscription.charged, subscription.pending, subscription.halted, subscription.cancelled, subscription.completed, subscription.paused, subscription.resumed, payment.failed, and payment.refunded. The handler verifies HMAC signatures, uses Razorpay's x-razorpay-event-id for idempotency, rejects stale lifecycle transitions using provider event timestamps, and records safe payment metadata. Payment failures/refunds are recorded but do not independently revoke subscription access; subscription lifecycle events remain authoritative. Use test-mode credentials and test plans before enabling live billing. Prices are intentionally not hardcoded; actual amounts and tax treatment must be set and reviewed in Razorpay.
+The handler verifies HMAC signatures, uses Razorpay's `x-razorpay-event-id` for idempotency, rejects stale lifecycle transitions using provider event timestamps, and records safe payment metadata. Payment failures/refunds are recorded but do not independently revoke subscription access; subscription lifecycle events remain authoritative. Use test-mode credentials and test plans before enabling live billing. Prices are intentionally not hardcoded; actual amounts and tax treatment must be set and reviewed in Razorpay.
+
+Production billing remains disabled until explicit owner approval after full TEST lifecycle proof, CA/legal review and security/privacy sign-off.
+
 
 ## 4. API notes
 

@@ -8,3 +8,6 @@ dist/
 *.bak
 *.old
 *.orig
+
+# Generated isolated TEST Wrangler config contains the TEST D1 identifier.
+.wrangler.test.generated.toml
