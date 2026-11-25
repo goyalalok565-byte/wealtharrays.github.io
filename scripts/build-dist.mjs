@@ -10,7 +10,7 @@ const PUBLIC_ROOT_EXTS = new Set([
   '.ico','.woff','.woff2','.ttf','.eot','.xml','.txt','.webmanifest','.json'
 ]);
 const PUBLIC_ROOT_EXACT = new Set([
-  '_headers','_redirects','ads.txt','robots.txt','sitemap.xml','llms.txt','sw.js','manifest.webmanifest'
+  '_headers','_redirects','ads.txt','robots.txt','sitemap.xml','llms.txt','sw.js','manifest.webmanifest','3a616bed5689402dbe13da9478def0db.txt'
 ]);
 const PUBLIC_DIRS = new Set(['articles','research','calculator-definitions','assets']);
 const EXCLUDE_DIRS = EXCLUDED_DIRECTORY_NAMES;
