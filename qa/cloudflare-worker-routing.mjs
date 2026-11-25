@@ -19,6 +19,14 @@ const env = {
     }
   }
 };
+const wwwPageRedirect = await worker.fetch(new Request("https://www.wealtharrays.com/sip-calculator/?source=qa"), env, {});
+assert.equal(wwwPageRedirect.status, 308);
+assert.equal(wwwPageRedirect.headers.get("Location"), "https://wealtharrays.com/sip-calculator/?source=qa");
+const wwwWebhookRedirect = await worker.fetch(new Request("https://www.wealtharrays.com/v1/billing/webhook", {
+  method: "POST", headers: { "Content-Type": "application/json" }, body: "{}"
+}), env, {});
+assert.equal(wwwWebhookRedirect.status, 308);
+assert.equal(wwwWebhookRedirect.headers.get("Location"), "https://wealtharrays.com/v1/billing/webhook");
 const modelsResponse = await worker.fetch(new Request("https://example.test/v1/models"), env, {});
 assert.equal(modelsResponse.status, 200);
 const modelData = await modelsResponse.json();
