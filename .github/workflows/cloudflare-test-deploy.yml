@@ -160,6 +160,32 @@ jobs:
             console.log("TEST API model discovery passed (" + models.length + " models).");
           '
 
+      - name: Verify TEST auth configuration and cross-origin scenario preflight
+        shell: bash
+        env:
+          TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
+        run: |
+          set -euo pipefail
+          auth_config="$(curl --fail --silent --show-error --max-time 30 https://wealtharrays-api-test.goyalalok565.workers.dev/v1/auth-config)"
+          printf '%s' "$auth_config" | node --input-type=module -e '
+            let raw = "";
+            for await (const chunk of process.stdin) raw += chunk;
+            const config = JSON.parse(raw);
+            if (config.provider !== "supabase" || config.url !== process.env.TEST_SUPABASE_URL || typeof config.anon_key !== "string" || !config.anon_key) {
+              throw new Error("TEST auth-config does not match the dedicated TEST Supabase project.");
+            }
+            console.log("TEST auth-config points to the dedicated TEST Supabase project; key remains masked.");
+          '
+          preflight="$(curl --silent --show-error --max-time 30 -D - -o /dev/null -X OPTIONS \
+            -H 'Origin: https://wealtharrays.com' \
+            -H 'Access-Control-Request-Method: DELETE' \
+            -H 'Access-Control-Request-Headers: authorization,content-type' \
+            https://wealtharrays-api-test.goyalalok565.workers.dev/v1/scenarios)"
+          printf '%s\n' "$preflight" | grep -i '^access-control-allow-origin: \*' >/dev/null
+          printf '%s\n' "$preflight" | grep -i '^access-control-allow-methods: .*DELETE' >/dev/null
+          printf '%s\n' "$preflight" | grep -i '^access-control-allow-headers: .*Authorization' >/dev/null
+          echo "TEST cross-origin scenario DELETE preflight passed."
+          
       - name: Remove generated TEST config
         if: always()
         run: rm -f .wrangler.test.generated.toml
