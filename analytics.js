@@ -1,7 +1,7 @@
 /* Wealth Arrays privacy-first analytics. Never send raw financial input values. */
 (function(root){'use strict';
 const KEY='wa_analytics_consent';
-const ALLOWED=new Set(['calculator_open','calculator_calculate','calculator_error','pdf_export','embed_copy','scenario_run','goal_run','workspace_save','workspace_load','workspace_delete','research_open','report_export','language_change','currency_change','theme_change']);
+const ALLOWED=new Set(['calculator_open','calculator_calculate','calculator_error','pdf_export','embed_copy','scenario_run','goal_run','workspace_save','workspace_load','workspace_delete','research_open','report_export','language_change','currency_change','theme_change','generate_lead']);
 function consent(){try{return localStorage.getItem(KEY)==='granted'}catch(e){return false}}
 function sanitize(meta){
   const out={};
