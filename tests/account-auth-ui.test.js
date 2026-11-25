@@ -34,3 +34,14 @@ test("account JavaScript parses successfully", () => {
   const result = spawnSync(process.execPath, ["--check", new URL("../account.js", import.meta.url).pathname], { encoding: "utf8" });
   assert.equal(result.status, 0, result.stderr || result.stdout);
 });
+
+test("isolated TEST account page points only to TEST API and has billing disabled", async () => {
+  const testHtml = await readFile(new URL("../account-test.html", import.meta.url), "utf8");
+  assert.match(testHtml, /WA_TEST_MODE=true/);
+  assert.match(testHtml, /https:\\/\\/wealtharrays-api-test\\.goyalalok565\\.workers\\.dev/);
+  assert.match(testHtml, /account-test\.html/);
+  assert.doesNotMatch(testHtml, /wa-site-runtime\.js/);
+  assert.match(js, /waSupabaseTestSession/);
+  assert.match(js, /wealtharrays-api-test\.goyalalok565\.workers\.dev/);
+  assert.match(js, /if\(TEST_MODE\)\{\$\("account-subscription-card"\)\.hidden=true/);
+});
