@@ -72,10 +72,12 @@ export async function onRequestPost({ request, env }) {
         "(? = last_provider_event_at AND",
         "CASE ? WHEN 'created' THEN 0 WHEN 'pending' THEN 1 WHEN 'authenticated' THEN 2 WHEN 'active' THEN 3 WHEN 'paused' THEN 4 WHEN 'halted' THEN 5 WHEN 'cancelled' THEN 6 WHEN 'completed' THEN 7 ELSE 0 END >",
         "CASE status WHEN 'created' THEN 0 WHEN 'pending' THEN 1 WHEN 'authenticated' THEN 2 WHEN 'active' THEN 3 WHEN 'paused' THEN 4 WHEN 'halted' THEN 5 WHEN 'cancelled' THEN 6 WHEN 'completed' THEN 7 ELSE 0 END))",
-        "OR (? IS NULL AND last_provider_event_at IS NULL))"
+        "OR (? IS NULL AND last_provider_event_at IS NULL AND",
+        "CASE ? WHEN 'created' THEN 0 WHEN 'pending' THEN 1 WHEN 'authenticated' THEN 2 WHEN 'active' THEN 3 WHEN 'paused' THEN 4 WHEN 'halted' THEN 5 WHEN 'cancelled' THEN 6 WHEN 'completed' THEN 7 ELSE 0 END >",
+        "CASE status WHEN 'created' THEN 0 WHEN 'pending' THEN 1 WHEN 'authenticated' THEN 2 WHEN 'active' THEN 3 WHEN 'paused' THEN 4 WHEN 'halted' THEN 5 WHEN 'cancelled' THEN 6 WHEN 'completed' THEN 7 ELSE 0 END))"
       ].join(" ");
       const updated = await env.DB.prepare(updateSql)
-        .bind(status, currentEnd, eventCreatedAt, eventCreatedAt, subscriptionId, eventCreatedAt, eventCreatedAt, eventCreatedAt, status, eventCreatedAt).run();
+        .bind(status, currentEnd, eventCreatedAt, eventCreatedAt, subscriptionId, eventCreatedAt, eventCreatedAt, eventCreatedAt, status, eventCreatedAt, status).run();
       if (!updated.meta?.changes) {
         const linked = await env.DB.prepare("SELECT id FROM subscriptions WHERE provider = 'razorpay' AND provider_subscription_id = ?")
           .bind(subscriptionId).first();
