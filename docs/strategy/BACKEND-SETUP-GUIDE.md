@@ -15,40 +15,51 @@ The existing root-level [SAAS_SETUP.md](../../SAAS_SETUP.md) is the detailed tec
 
 ## 1. Cloudflare Worker and D1
 
-Owner actions:
-1. Create a dedicated TEST D1 database and record its database ID privately.
-2. Review every file in migrations/ and confirm the migration order and target database before running the deployment workflow.
-3. Create a least-privilege Cloudflare API token limited to the required account, Worker, D1 and deployment operations.
-4. Add these names to the appropriate GitHub Actions environment/repository secret store; values remain private:
-   - CLOUDFLARE_API_TOKEN
-   - CLOUDFLARE_ACCOUNT_ID
-   - CLOUDFLARE_D1_DATABASE_ID
-5. Confirm the Worker route and binding in wrangler.toml. The Worker serves /v1/*; Pages remains a separate static-site deployment.
-6. Deploy only to the TEST environment first. Verify GET /v1/health, GET /v1/models and rate-limit behaviour. Confirm missing bindings fail closed.
+An isolated TEST D1 database named `wealtharrays-saas-test` has been created in the Cloudflare account's APAC region. It is empty and has not had migrations applied. The production database `wealtharrays-saas` is separate and was not modified.
 
-Do not create a production D1 database or run production migrations as part of this checklist.
+The old `cloudflare-secrets-sync.yml` workflow was removed because it read the `production` GitHub environment and uploaded TEST Razorpay credentials to the production Worker `wealtharrays-github-io`. Do not restore or run that workflow.
+
+The replacement `.github/workflows/cloudflare-test-deploy.yml` is manual-only, runs from reviewed `main`, reads only the GitHub `TEST` environment, validates that the supplied D1 ID belongs to `wealtharrays-saas-test`, and deploys only the `wealtharrays-api-test` Worker on workers.dev. It has no custom-domain route and cannot deploy the production Worker.
+
+Before running it, add these values under GitHub Settings → Environments → TEST:
+
+**Environment secrets**
+- `TEST_CLOUDFLARE_API_TOKEN` — a least-privilege Cloudflare token with D1 read/edit and Workers script edit permissions.
+- `TEST_CLOUDFLARE_ACCOUNT_ID`
+- `TEST_SUPABASE_URL` — URL for a dedicated TEST Supabase project.
+- `TEST_SUPABASE_ANON_KEY` — publishable/anon key only; never use a service-role key.
+- The five existing TEST Razorpay secrets: `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_PLAN_MONTHLY`, `RAZORPAY_PLAN_YEARLY`, and `RAZORPAY_WEBHOOK_SECRET`.
+
+**Environment variable**
+- `TEST_D1_DATABASE_ID` — the ID shown for the `wealtharrays-saas-test` database in Cloudflare D1. Keep it in the TEST environment; do not paste it into chat, PRs or public docs.
+
+The workflow renders `wrangler.test.toml` at run time with this ID, applies migrations only to `wealtharrays-saas-test`, deploys the isolated Worker, uploads TEST secrets to that Worker, then checks `/v1/health` and `/v1/models`. It refuses non-`rzp_test_` keys and verifies the TEST database is not the production database.
+
+After a successful deployment, the TEST API base URL is `https://wealtharrays-api-test.goyalalok565.workers.dev`. The TEST Razorpay webhook endpoint is `https://wealtharrays-api-test.goyalalok565.workers.dev/v1/billing/webhook`.
+
+Do not send Razorpay TEST events to `https://wealtharrays.com/v1/billing/webhook`; that is the production-domain endpoint. Change the Razorpay TEST webhook URL to the workers.dev endpoint only after the TEST Worker is deployed and its health check passes. No production Worker, custom domain, DNS record, or production D1 migration is part of this setup.
 
 ## 2. Supabase TEST authentication
 
-1. Create a separate TEST project.
-2. Enable only the intended sign-in method and configure the exact TEST redirect URLs.
-3. Add SUPABASE_URL and SUPABASE_ANON_KEY to the TEST GitHub Actions environment. The anon/publishable key is public by design; never use a service-role key in browser code.
+A Supabase project is connected and currently active, but it is not yet confirmed as a dedicated TEST project. Its public schema currently has no application tables and its security, performance and health advisors returned no lints. Do not reuse it for TEST if it is intended to become the production project.
+
+1. Confirm which Supabase project is dedicated to TEST, or create a separate TEST project in the owner's organization after checking any project cost.
+2. Enable email/password authentication and configure the exact TEST redirect URL(s).
+3. Add `TEST_SUPABASE_URL` and `TEST_SUPABASE_ANON_KEY` to the GitHub `TEST` environment. Never use a service-role key.
 4. Verify sign-in, sign-out, expired session, invalid token, and cross-user scenario isolation.
 5. Confirm local/browser scenarios still work without signup and that cloud sync happens only after an explicit user action.
 
 ## 3. Razorpay TEST mode — no live checkout
 
-1. Create test-mode plans only. Do not create or activate live plans.
-2. Add test-mode values under the TEST environment only:
-   - RAZORPAY_KEY_ID
-   - RAZORPAY_KEY_SECRET
-   - RAZORPAY_PLAN_MONTHLY
-   - RAZORPAY_PLAN_YEARLY
-   - RAZORPAY_WEBHOOK_SECRET
-3. Configure the TEST webhook endpoint and the subscription/payment events documented in SAAS_SETUP.md.
-4. Verify signature rejection, duplicate event idempotency, out-of-order events, retries, cancellation, pause/resume, failed payment and refund.
-5. Confirm server-side entitlement checks—not browser flags—control paid features.
-6. Keep public production checkout disabled. Never switch to live keys or live plans without separate written owner approval after legal/accounting review.
+The owner has created monthly and yearly Razorpay TEST plans and added the five Razorpay values to the GitHub `TEST` environment. Do not regenerate those keys or recreate the plans unless there is a specific reason.
+
+1. Confirm `RAZORPAY_KEY_ID` in the TEST environment starts with `rzp_test_`; the workflow enforces this.
+2. Deploy the isolated TEST Worker using the manual workflow only after the Cloudflare and Supabase TEST values above are present.
+3. After the TEST Worker health check succeeds, update the Razorpay TEST webhook URL to `https://wealtharrays-api-test.goyalalok565.workers.dev/v1/billing/webhook`. Do not send TEST events to the production-domain URL.
+4. Enable the supported subscription lifecycle events documented in `SAAS_SETUP.md`, plus `payment.failed` where available in the Razorpay dashboard.
+5. Verify signature rejection, duplicate event idempotency, out-of-order events, retries, cancellation, pause/resume, failed payment and refund.
+6. Confirm server-side entitlement checks—not browser flags—control paid features.
+7. Keep public production checkout disabled. Never switch to live keys or live plans without separate written owner approval after legal/accounting review.
 
 ## 4. Required TEST evidence before PR #145 or billing work can be considered
 
