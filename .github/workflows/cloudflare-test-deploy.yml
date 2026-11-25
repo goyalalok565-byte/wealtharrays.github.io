@@ -1,0 +1,165 @@
+name: Deploy isolated TEST API Worker
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_test_deploy:
+        description: "Choose yes only to migrate the isolated TEST D1 database and deploy the TEST Worker."
+        required: true
+        type: choice
+        options:
+          - "no"
+          - "yes"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wealtharrays-test-worker
+  cancel-in-progress: false
+
+jobs:
+  deploy-test:
+    if: ${{ github.ref == 'refs/heads/main' && inputs.confirm_test_deploy == 'yes' }}
+    name: Deploy isolated TEST Worker and D1
+    runs-on: ubuntu-latest
+    environment: TEST
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout reviewed main
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Validate TEST-only credentials and Razorpay mode
+        shell: bash
+        env:
+          TEST_CLOUDFLARE_API_TOKEN: ${{ secrets.TEST_CLOUDFLARE_API_TOKEN }}
+          TEST_CLOUDFLARE_ACCOUNT_ID: ${{ secrets.TEST_CLOUDFLARE_ACCOUNT_ID }}
+          TEST_D1_DATABASE_ID: ${{ vars.TEST_D1_DATABASE_ID }}
+          TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
+          TEST_SUPABASE_ANON_KEY: ${{ secrets.TEST_SUPABASE_ANON_KEY }}
+          RAZORPAY_KEY_ID: ${{ secrets.RAZORPAY_KEY_ID }}
+          RAZORPAY_KEY_SECRET: ${{ secrets.RAZORPAY_KEY_SECRET }}
+          RAZORPAY_PLAN_MONTHLY: ${{ secrets.RAZORPAY_PLAN_MONTHLY }}
+          RAZORPAY_PLAN_YEARLY: ${{ secrets.RAZORPAY_PLAN_YEARLY }}
+          RAZORPAY_WEBHOOK_SECRET: ${{ secrets.RAZORPAY_WEBHOOK_SECRET }}
+        run: |
+          set -euo pipefail
+          set +x
+          for name in TEST_CLOUDFLARE_API_TOKEN TEST_CLOUDFLARE_ACCOUNT_ID TEST_D1_DATABASE_ID TEST_SUPABASE_URL TEST_SUPABASE_ANON_KEY RAZORPAY_KEY_ID RAZORPAY_KEY_SECRET RAZORPAY_PLAN_MONTHLY RAZORPAY_PLAN_YEARLY RAZORPAY_WEBHOOK_SECRET; do
+            value="${!name}"
+            if [ -z "$value" ]; then
+              echo "::error::Missing TEST environment value: $name"
+              exit 1
+            fi
+            echo "::add-mask::$value"
+          done
+          case "$RAZORPAY_KEY_ID" in
+            rzp_test_*) echo "Razorpay TEST key prefix verified." ;;
+            *) echo "::error::Refusing deployment: TEST environment must contain an rzp_test_ key."; exit 1 ;;
+          esac
+          case "$TEST_SUPABASE_URL" in
+            https://*.supabase.co) echo "Dedicated Supabase TEST URL format verified." ;;
+            *) echo "::error::TEST_SUPABASE_URL must be an HTTPS Supabase project URL."; exit 1 ;;
+          esac
+          case "$RAZORPAY_PLAN_MONTHLY:$RAZORPAY_PLAN_YEARLY" in
+            plan_*:plan_*) echo "Razorpay TEST plan ID formats verified." ;;
+            *) echo "::error::Razorpay TEST plan IDs must begin with plan_."; exit 1 ;;
+          esac
+
+      - name: Verify TEST D1 identity and production separation
+        env:
+          TEST_CLOUDFLARE_API_TOKEN: ${{ secrets.TEST_CLOUDFLARE_API_TOKEN }}
+          TEST_CLOUDFLARE_ACCOUNT_ID: ${{ secrets.TEST_CLOUDFLARE_ACCOUNT_ID }}
+          TEST_D1_DATABASE_ID: ${{ vars.TEST_D1_DATABASE_ID }}
+        run: node scripts/verify-test-d1-target.mjs
+
+      - name: Build and audit static assets and Worker
+        run: |
+          npm run build
+          node --check worker.mjs
+          node qa/cloudflare-worker-routing.mjs
+
+      - name: Render isolated TEST Wrangler config
+        env:
+          TEST_D1_DATABASE_ID: ${{ vars.TEST_D1_DATABASE_ID }}
+        run: node scripts/render-wrangler-test-config.mjs
+
+      - name: Apply migrations to TEST D1 only
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.TEST_CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.TEST_CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@4.97.0 d1 migrations apply wealtharrays-saas-test --remote --config .wrangler.test.generated.toml
+
+      - name: Deploy TEST Worker to workers.dev only
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.TEST_CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.TEST_CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@4.97.0 deploy --config .wrangler.test.generated.toml
+
+      - name: Upload TEST runtime secrets to TEST Worker only
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.TEST_CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.TEST_CLOUDFLARE_ACCOUNT_ID }}
+          SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.TEST_SUPABASE_ANON_KEY }}
+          RAZORPAY_KEY_ID: ${{ secrets.RAZORPAY_KEY_ID }}
+          RAZORPAY_KEY_SECRET: ${{ secrets.RAZORPAY_KEY_SECRET }}
+          RAZORPAY_PLAN_MONTHLY: ${{ secrets.RAZORPAY_PLAN_MONTHLY }}
+          RAZORPAY_PLAN_YEARLY: ${{ secrets.RAZORPAY_PLAN_YEARLY }}
+          RAZORPAY_WEBHOOK_SECRET: ${{ secrets.RAZORPAY_WEBHOOK_SECRET }}
+        run: |
+          set -euo pipefail
+          set +x
+          umask 077
+          secret_file="$(mktemp)"
+          trap 'rm -f "$secret_file"' EXIT
+          node --input-type=module -e '
+            const names = [
+              "SUPABASE_URL", "SUPABASE_ANON_KEY", "RAZORPAY_KEY_ID",
+              "RAZORPAY_KEY_SECRET", "RAZORPAY_PLAN_MONTHLY",
+              "RAZORPAY_PLAN_YEARLY", "RAZORPAY_WEBHOOK_SECRET"
+            ];
+            const values = Object.fromEntries(names.map((name) => [name, process.env[name]]));
+            process.stdout.write(JSON.stringify(values));
+          ' > "$secret_file"
+          npx --yes wrangler@4.97.0 secret bulk "$secret_file" --config .wrangler.test.generated.toml
+
+      - name: Verify TEST API readiness and model discovery
+        shell: bash
+        run: |
+          set -euo pipefail
+          health="$(curl --fail --silent --show-error --max-time 30 https://wealtharrays-api-test.goyalalok565.workers.dev/v1/health)"
+          printf '%s' "$health" | node --input-type=module -e '
+            let raw = "";
+            for await (const chunk of process.stdin) raw += chunk;
+            const h = JSON.parse(raw);
+            if (h.status !== "ok" || h.ready_for_saas !== true) {
+              console.error("TEST Worker is not SaaS-ready; check sanitized dependency flags.");
+              for (const [key, value] of Object.entries(h.dependencies || {})) console.error(key + "=" + String(value));
+              process.exit(1);
+            }
+            console.log("TEST Worker health and SaaS dependencies are ready.");
+          '
+          models="$(curl --fail --silent --show-error --max-time 30 https://wealtharrays-api-test.goyalalok565.workers.dev/v1/models)"
+          printf '%s' "$models" | node --input-type=module -e '
+            let raw = "";
+            for await (const chunk of process.stdin) raw += chunk;
+            const body = JSON.parse(raw);
+            const models = Array.isArray(body.models) ? body.models : Array.isArray(body.data) ? body.data : [];
+            if (models.length < 1) throw new Error("TEST API model discovery returned no models.");
+            console.log("TEST API model discovery passed (" + models.length + " models).");
+          '
+
+      - name: Remove generated TEST config
+        if: always()
+        run: rm -f .wrangler.test.generated.toml
