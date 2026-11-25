@@ -1,0 +1,36 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
+
+const html = await readFile(new URL("../account.html", import.meta.url), "utf8");
+const js = await readFile(new URL("../account.js", import.meta.url), "utf8");
+
+test("account page offers passwordless email and Google entry points", () => {
+  assert.match(html, /id="account-email"/);
+  assert.match(html, /id="account-send-link"/);
+  assert.match(html, /id="account-google"/);
+  assert.doesNotMatch(html, /id="account-password"/);
+  assert.doesNotMatch(html, /id="account-sign-up"/);
+});
+
+test("email authentication sends a one-time link and allows automatic signup", () => {
+  assert.match(js, /\/auth\/v1\/otp\?redirect_to=/);
+  assert.match(js, /create_user:true/);
+  assert.match(js, /secure sign-in link/i);
+  assert.doesNotMatch(js, /grant_type=password/);
+  assert.doesNotMatch(js, /\/auth\/v1\/signup/);
+});
+
+test("Google OAuth callback is exchanged for a verified Supabase user session", () => {
+  assert.match(js, /searchParams\.set\("provider","google"\)/);
+  assert.match(js, /searchParams\.set\("redirect_to",redirectTo\)/);
+  assert.match(js, /params\.get\("access_token"\)/);
+  assert.match(js, /\/auth\/v1\/user/);
+  assert.match(js, /history\.replaceState/);
+});
+
+test("account JavaScript parses successfully", () => {
+  const result = spawnSync(process.execPath, ["--check", new URL("../account.js", import.meta.url).pathname], { encoding: "utf8" });
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+});
