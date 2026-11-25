@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = relative => fs.readFileSync(path.join(root, relative), 'utf8');
@@ -42,4 +43,31 @@ test('legacy secrets sync workflow that wrote TEST keys to production is removed
 
 test('generated TEST Wrangler config is ignored by git', () => {
   assert.match(read('.gitignore'), /^\.wrangler\.test\.generated\.toml$/m);
+});
+
+test('TEST config renderer substitutes only a valid TEST D1 UUID', () => {
+  const outputPath = path.join(root, '.wrangler.test.generated.toml');
+  const validId = '123e4567-e89b-42d3-a456-426614174000';
+  try {
+    const good = spawnSync(process.execPath, [path.join(root, 'scripts/render-wrangler-test-config.mjs')], {
+      cwd: root,
+      encoding: 'utf8',
+      env: { ...process.env, TEST_D1_DATABASE_ID: validId }
+    });
+    assert.equal(good.status, 0, good.stderr);
+    const rendered = fs.readFileSync(outputPath, 'utf8');
+    assert.match(rendered, new RegExp(validId));
+    assert.doesNotMatch(rendered, /__TEST_D1_DATABASE_ID__/);
+    assert.match(rendered, /database_name = "wealtharrays-saas-test"/);
+
+    const bad = spawnSync(process.execPath, [path.join(root, 'scripts/render-wrangler-test-config.mjs')], {
+      cwd: root,
+      encoding: 'utf8',
+      env: { ...process.env, TEST_D1_DATABASE_ID: 'not-a-uuid' }
+    });
+    assert.notEqual(bad.status, 0);
+    assert.match(bad.stderr, /TEST_D1_DATABASE_ID/);
+  } finally {
+    fs.rmSync(outputPath, { force: true });
+  }
 });
