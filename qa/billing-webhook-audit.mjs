@@ -23,10 +23,14 @@ const db = {
             return { meta: { changes: 1 } };
           }
           if (sql.startsWith("UPDATE subscriptions")) {
-            const [status, currentEnd, eventAt, eventAtForSet, subscriptionId, whereAt, whereAt2] = values;
+            const [status, currentEnd, eventAt, eventAtForSet, subscriptionId, eventAtGuard, eventAtCompare, eventAtTie, targetStatus, nullEventAt] = values;
             const row = subscriptions.get(subscriptionId);
             if (!row) return { meta: { changes: 0 } };
-            const canApply = whereAt !== null ? row.last_provider_event_at === null || row.last_provider_event_at <= whereAt2 : row.last_provider_event_at === null;
+            const priority = value => ({ created: 0, pending: 1, authenticated: 2, active: 3, paused: 4, halted: 5, cancelled: 6, completed: 7 }[value] ?? 0);
+            const canApply = eventAtGuard !== null
+              ? row.last_provider_event_at === null || eventAtGuard > row.last_provider_event_at ||
+                (eventAtTie === row.last_provider_event_at && priority(targetStatus) > priority(row.status))
+              : row.last_provider_event_at === null;
             if (!canApply) return { meta: { changes: 0 } };
             row.status = status;
             row.current_period_end = currentEnd ?? row.current_period_end;
@@ -92,4 +96,4 @@ assert.equal(response.status, 503);
 assert.equal(events.get("evt_unlinked").processed_at, null);
 response = await deliver({ created_at: 1500, event: "subscription.activated", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_bad_signature", true);
 assert.equal(response.status, 401);
-console.log("Razorpay webhook audit PASS: signature, header idempotency, event ordering, retryable unlinked events, payment failure and refund recording.");
+console.log("Razorpay webhook audit PASS: signature, header idempotency, strict event ordering, same-second restrictive-state convergence, retryable unlinked events, payment failure and refund recording.");
