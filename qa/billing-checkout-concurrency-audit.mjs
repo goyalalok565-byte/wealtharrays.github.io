@@ -47,9 +47,9 @@ function makeDb({ failSubscriptionInsertOnce = false } = {}) {
             }
             if (sql.startsWith("INSERT OR IGNORE INTO subscriptions")) {
               if (failInsert) { failInsert = false; throw new Error("simulated D1 insert failure"); }
-              const [, userId, , providerId, plan, status] = values;
-              if (subscriptions.has(providerId)) return { meta: { changes: 0 } };
-              subscriptions.set(providerId, { user_id: userId, plan_id: plan, status });
+              const [, userId, providerSubscriptionId, plan, status] = values;
+              if (subscriptions.has(providerSubscriptionId)) return { meta: { changes: 0 } };
+              subscriptions.set(providerSubscriptionId, { user_id: userId, plan_id: plan, status });
               return { meta: { changes: 1 } };
             }
             throw new Error("Unexpected D1 run: " + sql);
