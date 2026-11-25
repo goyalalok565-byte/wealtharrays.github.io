@@ -38,7 +38,7 @@ test("account JavaScript parses successfully", () => {
 test("isolated TEST account page points only to TEST API and has billing disabled", async () => {
   const testHtml = await readFile(new URL("../account-test.html", import.meta.url), "utf8");
   assert.match(testHtml, /WA_TEST_MODE=true/);
-  assert.match(testHtml, /https:\\/\\/wealtharrays-api-test\\.goyalalok565\\.workers\\.dev/);
+  assert.ok(testHtml.includes("https://wealtharrays-api-test.goyalalok565.workers.dev"));
   assert.match(testHtml, /account-test\.html/);
   assert.doesNotMatch(testHtml, /wa-site-runtime\.js/);
   assert.match(js, /waSupabaseTestSession/);
