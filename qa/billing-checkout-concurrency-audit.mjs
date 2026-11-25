@@ -3,7 +3,7 @@ import fs from "node:fs";
 
 const source = fs.readFileSync("functions/v1/billing/checkout.js", "utf8")
   .replace(/^import \{ authenticate, ensureProfile \} from "\.\.\/\_auth\.js";\n/, "const authenticate = async () => ({ user: { id: 'user_1', email: 'test@example.invalid' } }); const ensureProfile = async () => {};\n")
-  .replace(/^import \{ error, json, enforceRateLimit \} from "\.\.\/\_shared\.js";\n/, [
+  .replace(/^import \{ error, json, enforceRateLimit \} from "\.\.\/\_shared\.js";\n/m, [
     'const json = (data, status = 200, extra = {}) => new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json", ...extra } });',
     'const error = (code, message, status = 400, details) => json({ error: { code, message, ...(details ? { details } : {}) } }, status, { "Cache-Control": "no-store" });',
     'const enforceRateLimit = async () => null;'
