@@ -1,8 +1,8 @@
 (function(){
 "use strict";
 const $=id=>document.getElementById(id);
-const TEST_MODE=window.WA_TEST_MODE===true;
-const API_BASE=String(window.WA_API_BASE||"").replace(/\/$/,"");
+const TEST_MODE=document.body?.dataset.waTestMode==="true";
+const API_BASE=String(document.body?.dataset.waApiBase||"").replace(/\/$/,"");
 const SESSION_KEY=TEST_MODE?"waSupabaseTestSession":"waSupabaseSession";
 let config=null, session=null;
 const readSession=()=>{try{return JSON.parse(localStorage.getItem(SESSION_KEY)||"null")}catch{return null}};
