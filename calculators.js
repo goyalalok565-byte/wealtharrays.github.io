@@ -290,10 +290,10 @@ const CALCULATORS = [
   {
     id: "profit-margin",
     slug: "profit-margin-calculator",
-    title: "Profit Margin",
+    title: "Profit Margin Calculator",
     category: "business",
-    short: "Find gross and net margin from revenue and costs.",
-    desc: "Calculate gross margin (revenue minus cost of goods) and net margin (after all expenses) as percentages of revenue.",
+    short: "Calculate gross and net profit margins from revenue and costs.",
+    desc: "Calculate gross and net profit margin from revenue, cost of goods sold and operating expenses. See the formulas, a worked example and margin vs markup.",
     article: {
       formula: "Gross margin = (Revenue − Cost of goods sold) ÷ Revenue × 100. Net margin = (Revenue − Cost of goods sold − Other expenses) ÷ Revenue × 100.",
       exampleInputs: { revenue: 50000, cogs: 28000, expenses: 9000 },
