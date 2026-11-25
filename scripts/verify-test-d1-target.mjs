@@ -10,6 +10,7 @@ const endpoint = new URL(`https://api.cloudflare.com/client/v4/accounts/${encode
 endpoint.searchParams.set('per_page', '100');
 
 const response = await fetch(endpoint, {
+  method: 'GET',
   headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
 });
 if (!response.ok) {
