@@ -71,3 +71,12 @@ test('TEST config renderer substitutes only a valid TEST D1 UUID', () => {
     fs.rmSync(outputPath, { force: true });
   }
 });
+
+test('TEST D1 verifier is read-only and distinguishes TEST from production', () => {
+  const verifier = read('scripts/verify-test-d1-target.mjs');
+  assert.match(verifier, /method:\s*'GET'/);
+  assert.match(verifier, /wealtharrays-saas-test/);
+  assert.match(verifier, /wealtharrays-saas/);
+  assert.doesNotMatch(verifier, /method:\s*'POST'/);
+  assert.doesNotMatch(verifier, /wrangler\s+d1\s+migrations\s+apply/);
+});
