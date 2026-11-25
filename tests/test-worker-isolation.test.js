@@ -80,3 +80,11 @@ test('TEST D1 verifier is read-only and distinguishes TEST from production', () 
   assert.doesNotMatch(verifier, /method:\s*'POST'/);
   assert.doesNotMatch(verifier, /wrangler\s+d1\s+migrations\s+apply/);
 });
+
+test('SaaS setup keeps TEST webhook delivery off the production domain', () => {
+  const setup = read('SAAS_SETUP.md');
+  assert.match(setup, /Production only: https:\/\/wealtharrays\.com\/v1\/billing\/webhook/);
+  assert.match(setup, /TEST only, after the isolated TEST Worker has been deployed/);
+  assert.match(setup, /https:\/\/wealtharrays-api-test\.goyalalok565\.workers\.dev\/v1\/billing\/webhook/);
+  assert.match(setup, /Never send Razorpay TEST events to the production-domain endpoint/);
+});
