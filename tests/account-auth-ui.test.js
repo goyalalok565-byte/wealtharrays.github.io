@@ -44,6 +44,6 @@ test("isolated TEST account page points only to TEST API and has billing disable
   const headers = await readFile(new URL("../_headers", import.meta.url), "utf8");
   assert.match(headers, /\/account-test\.html[\s\S]*connect-src[^\\n]*wealtharrays-api-test\.goyalalok565\.workers\.dev/);
   assert.match(js, /waSupabaseTestSession/);
-  assert.match(js, /data-wa-api-base/);
+  assert.match(js, /dataset\.waApiBase/);
   assert.match(js, /if\(TEST_MODE\)\{\$\("account-subscription-card"\)\.hidden=true/);
 });
