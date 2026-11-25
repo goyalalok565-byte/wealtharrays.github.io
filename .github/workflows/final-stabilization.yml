@@ -81,6 +81,8 @@ jobs:
           node qa/report-reproducibility-audit.mjs
           node qa/india-tax-module-audit.mjs
           node qa/phase1-20-roadmap-audit.mjs
+          node qa/billing-checkout-concurrency-audit.mjs
+          node qa/billing-webhook-audit.mjs
           node scripts/site-integrity.mjs
           node scripts/launch-readiness.mjs
           node scripts/phase10-qa.mjs

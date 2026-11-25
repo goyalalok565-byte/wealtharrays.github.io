@@ -23,10 +23,14 @@ const db = {
             return { meta: { changes: 1 } };
           }
           if (sql.startsWith("UPDATE subscriptions")) {
-            const [status, currentEnd, eventAt, eventAtForSet, subscriptionId, whereAt, whereAt2] = values;
+            const [status, currentEnd, eventAt, eventAtForSet, subscriptionId, eventAtGuard, eventAtCompare, eventAtTie, targetStatus, nullEventAt, targetStatusWithoutTimestamp] = values;
             const row = subscriptions.get(subscriptionId);
             if (!row) return { meta: { changes: 0 } };
-            const canApply = whereAt !== null ? row.last_provider_event_at === null || row.last_provider_event_at <= whereAt2 : row.last_provider_event_at === null;
+            const priority = value => ({ created: 0, pending: 1, authenticated: 2, active: 3, paused: 4, halted: 5, cancelled: 6, completed: 7 }[value] ?? 0);
+            const canApply = eventAtGuard !== null
+              ? row.last_provider_event_at === null || eventAtGuard > row.last_provider_event_at ||
+                (eventAtTie === row.last_provider_event_at && priority(targetStatus) > priority(row.status))
+              : row.last_provider_event_at === null && priority(targetStatusWithoutTimestamp) > priority(row.status);
             if (!canApply) return { meta: { changes: 0 } };
             row.status = status;
             row.current_period_end = currentEnd ?? row.current_period_end;
@@ -87,9 +91,53 @@ assert.match(events.get("evt_payment_failed").payload_json, /pay_1/);
 response = await deliver({ created_at: 1300, event: "payment.refunded", payload: { payment: { entity: { id: "pay_1", subscription_id: "sub_1", status: "refunded", amount: 50000, amount_refunded: 50000, currency: "INR" } } } }, "evt_payment_refunded");
 assert.equal(response.status, 200);
 assert.match(events.get("evt_payment_refunded").payload_json, /50000/);
+// Same-second events converge to the more restrictive state in either delivery order.
+subscriptions.set("sub_1", { id: "row_1", status: "created", current_period_end: null, last_provider_event_at: null });
+response = await deliver({ created_at: 1400, event: "subscription.activated", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_equal_active_first");
+assert.equal(response.status, 200);
+response = await deliver({ created_at: 1400, event: "subscription.cancelled", payload: { subscription: { entity: { id: "sub_1", status: "cancelled" } } } }, "evt_equal_cancelled_second");
+assert.equal(response.status, 200);
+assert.equal(subscriptions.get("sub_1").status, "cancelled");
+
+subscriptions.set("sub_1", { id: "row_1", status: "created", current_period_end: null, last_provider_event_at: null });
+response = await deliver({ created_at: 1500, event: "subscription.cancelled", payload: { subscription: { entity: { id: "sub_1", status: "cancelled" } } } }, "evt_equal_cancelled_first");
+assert.equal(response.status, 200);
+response = await deliver({ created_at: 1500, event: "subscription.activated", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_equal_active_second");
+assert.equal(response.status, 200);
+assert.equal(subscriptions.get("sub_1").status, "cancelled");
+
+subscriptions.set("sub_1", { id: "row_1", status: "created", current_period_end: null, last_provider_event_at: null });
+response = await deliver({ created_at: 1600, event: "subscription.resumed", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_equal_resumed_first");
+assert.equal(response.status, 200);
+response = await deliver({ created_at: 1600, event: "subscription.paused", payload: { subscription: { entity: { id: "sub_1", status: "paused" } } } }, "evt_equal_paused_second");
+assert.equal(response.status, 200);
+assert.equal(subscriptions.get("sub_1").status, "paused");
+
+subscriptions.set("sub_1", { id: "row_1", status: "created", current_period_end: null, last_provider_event_at: null });
+response = await deliver({ created_at: 1700, event: "subscription.paused", payload: { subscription: { entity: { id: "sub_1", status: "paused" } } } }, "evt_equal_paused_first");
+assert.equal(response.status, 200);
+response = await deliver({ created_at: 1700, event: "subscription.resumed", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_equal_resumed_second");
+assert.equal(response.status, 200);
+assert.equal(subscriptions.get("sub_1").status, "paused");
+
+// Missing provider timestamps are also treated as ambiguous, not delivery-ordered.
+subscriptions.set("sub_1", { id: "row_1", status: "created", current_period_end: null, last_provider_event_at: null });
+response = await deliver({ event: "subscription.cancelled", payload: { subscription: { entity: { id: "sub_1", status: "cancelled" } } } }, "evt_null_cancelled_first");
+assert.equal(response.status, 200);
+response = await deliver({ event: "subscription.activated", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_null_active_second");
+assert.equal(response.status, 200);
+assert.equal(subscriptions.get("sub_1").status, "cancelled");
+
+subscriptions.set("sub_1", { id: "row_1", status: "created", current_period_end: null, last_provider_event_at: null });
+response = await deliver({ event: "subscription.activated", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_null_active_first");
+assert.equal(response.status, 200);
+response = await deliver({ event: "subscription.cancelled", payload: { subscription: { entity: { id: "sub_1", status: "cancelled" } } } }, "evt_null_cancelled_second");
+assert.equal(response.status, 200);
+assert.equal(subscriptions.get("sub_1").status, "cancelled");
+
 response = await deliver({ created_at: 1400, event: "subscription.activated", payload: { subscription: { entity: { id: "sub_not_linked", status: "active" } } } }, "evt_unlinked");
 assert.equal(response.status, 503);
 assert.equal(events.get("evt_unlinked").processed_at, null);
 response = await deliver({ created_at: 1500, event: "subscription.activated", payload: { subscription: { entity: { id: "sub_1", status: "active" } } } }, "evt_bad_signature", true);
 assert.equal(response.status, 401);
-console.log("Razorpay webhook audit PASS: signature, header idempotency, event ordering, retryable unlinked events, payment failure and refund recording.");
+console.log("Razorpay webhook audit PASS: signature, header idempotency, strict event ordering, same-second restrictive-state convergence, retryable unlinked events, payment failure and refund recording.");
