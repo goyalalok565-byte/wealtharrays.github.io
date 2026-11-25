@@ -67,11 +67,15 @@ export async function onRequestPost({ request, env }) {
         "last_provider_event_at = CASE WHEN ? IS NULL THEN last_provider_event_at ELSE ? END,",
         "updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')",
         "WHERE provider = 'razorpay' AND provider_subscription_id = ?",
-        "AND ((? IS NOT NULL AND (last_provider_event_at IS NULL OR last_provider_event_at <= ?))",
+        "AND (",
+        "(? IS NOT NULL AND (last_provider_event_at IS NULL OR ? > last_provider_event_at OR",
+        "(? = last_provider_event_at AND",
+        "CASE ? WHEN 'created' THEN 0 WHEN 'pending' THEN 1 WHEN 'authenticated' THEN 2 WHEN 'active' THEN 3 WHEN 'paused' THEN 4 WHEN 'halted' THEN 5 WHEN 'cancelled' THEN 6 WHEN 'completed' THEN 7 ELSE 0 END >",
+        "CASE status WHEN 'created' THEN 0 WHEN 'pending' THEN 1 WHEN 'authenticated' THEN 2 WHEN 'active' THEN 3 WHEN 'paused' THEN 4 WHEN 'halted' THEN 5 WHEN 'cancelled' THEN 6 WHEN 'completed' THEN 7 ELSE 0 END))",
         "OR (? IS NULL AND last_provider_event_at IS NULL))"
       ].join(" ");
       const updated = await env.DB.prepare(updateSql)
-        .bind(status, currentEnd, eventCreatedAt, eventCreatedAt, subscriptionId, eventCreatedAt, eventCreatedAt, eventCreatedAt).run();
+        .bind(status, currentEnd, eventCreatedAt, eventCreatedAt, subscriptionId, eventCreatedAt, eventCreatedAt, eventCreatedAt, status, eventCreatedAt).run();
       if (!updated.meta?.changes) {
         const linked = await env.DB.prepare("SELECT id FROM subscriptions WHERE provider = 'razorpay' AND provider_subscription_id = ?")
           .bind(subscriptionId).first();
@@ -80,8 +84,6 @@ export async function onRequestPost({ request, env }) {
     }
     await env.DB.prepare("UPDATE billing_events SET processed_at = strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE provider = 'razorpay' AND provider_event_id = ? AND processed_at IS NULL")
       .bind(eventId).run();
-    // payment.failed and payment.refunded are recorded with safe payment metadata.
-    // Subscription lifecycle events remain authoritative for subscription entitlement.
     return json({ received: true }, 200, { "Cache-Control": "no-store" });
   } catch {
     return error("WEBHOOK_STORAGE_ERROR", "Could not record or process the billing event.", 500);
