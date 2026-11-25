@@ -48,18 +48,24 @@
 </section>
 
 <section aria-labelledby="live-demo">
-<h2 id="live-demo">Live demo: business break-even calculator</h2>
-<p>Try the embedded calculator. Change the fixed costs, price and variable cost to see how the break-even estimate responds.</p>
-<div style="border:1px solid var(--border,#e2e8f0);border-radius:16px;overflow:hidden;background:var(--surface,#fff);">
-<iframe src="https://wealtharrays.com/widget/?calc=break-even" title="Wealth Arrays break-even calculator demo" width="100%" height="760" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" style="display:block;width:100%;border:0;background:transparent;"></iframe>
+<h2 id="live-demo">Explore the live calculator widget</h2>
+<p>Choose from the current browser calculator catalogue, preview the actual widget, and copy an iframe snippet for the selected calculator. This is the standard hosted widget—not a mock-up.</p>
+<div class="embed-builder" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;padding:1rem;border:1px solid var(--border,#e2e8f0);border-radius:14px;margin:1rem 0;background:var(--surface,#fff);">
+<div><label for="wa-embed-search"><strong>Find a calculator</strong></label><input id="wa-embed-search" type="search" placeholder="Search calculators" autocomplete="off" style="display:block;width:100%;margin-top:.4rem;padding:.7rem;border:1px solid var(--border,#cbd5e1);border-radius:9px;background:var(--surface,#fff);color:inherit;"></div>
+<div><label for="wa-embed-category"><strong>Category</strong></label><select id="wa-embed-category" style="display:block;width:100%;margin-top:.4rem;padding:.7rem;border:1px solid var(--border,#cbd5e1);border-radius:9px;background:var(--surface,#fff);color:inherit;"><option value="all">All categories</option></select></div>
+<div><label for="wa-embed-calculator"><strong>Calculator to preview</strong></label><select id="wa-embed-calculator" style="display:block;width:100%;margin-top:.4rem;padding:.7rem;border:1px solid var(--border,#cbd5e1);border-radius:9px;background:var(--surface,#fff);color:inherit;"></select></div>
 </div>
-<p class="muted-note">The demo uses the standard Wealth Arrays widget and calculator assumptions. It is illustrative, not a custom client deployment or a guarantee of business results.</p>
+<p id="wa-embed-description" aria-live="polite" class="muted-note">Loading the current calculator catalogue…</p>
+<div style="border:1px solid var(--border,#e2e8f0);border-radius:16px;overflow:hidden;background:var(--surface,#fff);">
+<iframe id="wa-embed-preview" src="https://wealtharrays.com/widget/?calc=break-even" title="Wealth Arrays calculator widget preview" width="100%" height="760" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" style="display:block;width:100%;border:0;background:transparent;"></iframe>
+</div>
+<p class="muted-note">The widget runs the selected calculator in the visitor's browser. Check its fit on your own mobile and desktop page before publishing. The preview does not imply API access, custom branding or a service-level agreement.</p>
 </section>
 
 <section aria-labelledby="install">
 <h2 id="install">Example embed code</h2>
 <p>For the break-even demo, add this iframe where you want the calculator to appear. Replace <code>break-even</code> with a supported calculator ID to preview another tool.</p>
-<pre style="overflow:auto;padding:1rem;border:1px solid var(--border,#e2e8f0);border-radius:12px;background:var(--surface,#fff);"><code>&lt;iframe
+<pre style="overflow:auto;padding:1rem;border:1px solid var(--border,#e2e8f0);border-radius:12px;background:var(--surface,#fff);"><code id="wa-embed-code">&lt;iframe
   src="https://wealtharrays.com/widget/?calc=break-even"
   title="Break-even calculator"
   width="100%"
@@ -68,7 +74,8 @@
   referrerpolicy="strict-origin-when-cross-origin"
   style="border:0;width:100%;"&gt;
 &lt;/iframe&gt;</code></pre>
-<p>Test the embed on your own mobile and desktop layouts before publishing. The height may need adjustment to fit your page design.</p>
+<p><button class="button" type="button" id="wa-embed-copy">Copy embed code</button> <span id="wa-embed-copy-status" role="status" aria-live="polite"></span></p>
+<p>Change the calculator above and copy its matching snippet. Test the embed on your own mobile and desktop layouts before publishing it; adjust the height if your page needs more room.</p>
 </section>
 
 <section aria-labelledby="scope">
@@ -113,6 +120,8 @@
 <nav class="footer-nav-box" aria-label="Company and legal pages"><a class="footer-link" href="/privacy">Privacy Policy</a><a class="footer-link" href="/terms">Terms</a><a class="footer-link" href="/disclaimer">Disclaimer</a><a class="footer-link" href="/methodology">Methodology</a><a class="footer-link" href="/contact">Contact</a></nav>
 <div class="footer-bottom"><span>© 2026 Wealth Arrays</span><span>Questions: <a href="mailto:goyalalok565@gmail.com">goyalalok565@gmail.com</a></span></div>
 </div></footer>
+<script src="/calculators.js" defer></script>
+<script src="/calculator-embeds.js?v=20261125-1" defer></script>
 <script src="/wa-site-runtime.js?v=eb25344f7977-20261026-currency-top25-rank1" defer></script>
 <script src="/sales-tracking.js?v=20261125-1" defer></script>
 </body></html>
