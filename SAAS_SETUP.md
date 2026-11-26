@@ -23,6 +23,14 @@ The TEST base URL after deployment is `https://wealtharrays-api-test.goyalalok56
 The static website remains served by the existing Cloudflare site deployment. The API Worker serves `/v1/*`. The public API rate limiter allows 120 requests per minute per client IP for `/v1/calculate`, `/v1/india-tax`, and `/v1/fx`; Cloudflare rate limiting is approximate and distributed per location, not a strict global quota.
 
 
+### Request verification (Turnstile)
+
+- Create a Cloudflare Turnstile widget in Managed mode and allow the relevant site hostnames.
+- Set `TURNSTILE_SITE_KEY` as a Worker variable and `TURNSTILE_SECRET_KEY` as a Worker secret. Never commit or expose the secret.
+- Configure Supabase Auth → Settings → Authentication → Bot and Abuse Protection → CAPTCHA with Cloudflare Turnstile and the same secret key. The email magic-link request sends the token in Supabase's `gotrue_meta_security.captcha_token` field.
+- Account writes (scenario save/delete, checkout, cancellation) are independently verified by the Worker through Cloudflare Siteverify. A configured browser widget without Siteverify is not complete.
+- Keep TEST and Production widgets/keys isolated. Confirm `turnstile` and `write_api_rate_limiter` both report `configured` in the relevant Worker health endpoint before enabling paid account actions.
+
 ## 2. Supabase authentication
 
 The current Supabase project is active but has no public application tables and is not yet confirmed as a dedicated TEST project. Use a separate TEST project for the TEST Worker; do not copy production credentials into the TEST environment.
