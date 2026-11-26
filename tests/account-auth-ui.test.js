@@ -63,7 +63,12 @@ test("isolated TEST account page points only to TEST API and has billing disable
   assert.doesNotMatch(js, /account-subscription-card"\)\.hidden=true/);
 });
 
-test("production account page also loads the fail-closed Turnstile helper", async () => {\n  const productionHtml = await readFile(new URL("../account.html", import.meta.url), "utf8");\n  assert.match(productionHtml, /wa-turnstile\\.js/);\n});\n\ntest("sign-out attempts to revoke the Supabase server session", () => {
+test("production account page also loads the fail-closed Turnstile helper", async () => {
+  const productionHtml = await readFile(new URL("../account.html", import.meta.url), "utf8");
+  assert.match(productionHtml, /wa-turnstile\.js/);
+});
+
+test("sign-out attempts to revoke the Supabase server session", () => {
   assert.match(js, /auth\/v1\/logout/);
   assert.match(js, /server session revocation could not be confirmed/);
 });
