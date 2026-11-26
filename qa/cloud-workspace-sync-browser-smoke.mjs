@@ -15,6 +15,16 @@ await context.addInitScript(()=>{
 const page=await context.newPage();
 const errors=[];
 page.on('pageerror',error=>errors.push(String(error)));
+await page.addInitScript(() => {
+  window.turnstile = {
+    render(_container, options) { window.__waTurnstileOptions = options; return "browser-test-widget"; },
+    reset() {},
+    execute() { Promise.resolve().then(() => window.__waTurnstileOptions.callback("browser-test-turnstile-token")); }
+  };
+});
+await page.route('**/v1/security-config',route=>route.fulfill({
+  status:200,contentType:'application/json',body:JSON.stringify({configured:true,site_key:'browser-test-site-key'})
+}));
 
 async function dismissConsent(){
   const dialog=page.locator('#wa-consent, [role="dialog"][aria-label*="Privacy" i]').first();
