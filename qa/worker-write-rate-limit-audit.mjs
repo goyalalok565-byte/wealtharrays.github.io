@@ -55,4 +55,51 @@ const trailingSlash = await worker.fetch(new Request("https://example.test/v1/sc
 assert.equal(trailingSlash.status, 401, "A trailing-slash write route should reach authentication after rate limiting");
 assert.deepEqual(trailingSlashCalls, ["/v1/scenarios:DELETE:203.0.113.11"]);
 
-console.log("Worker write rate-limit audit PASS: throttling, fail-closed configuration/outage, GET exemption, and trailing-slash routes.");
+
+const originalFetch = globalThis.fetch;
+let siteverifyCalls = 0;
+globalThis.fetch = async (url, options) => {
+  if (String(url) === "https://challenges.cloudflare.com/turnstile/v0/siteverify") {
+    siteverifyCalls++;
+    const form = new URLSearchParams(options.body);
+    assert.equal(form.get("secret"), "test-turnstile-secret");
+    assert.equal(form.get("response"), "valid-test-token");
+    return Response.json({ success: true });
+  }
+  if (String(url).endsWith("/auth/v1/user")) return new Response(JSON.stringify({ message: "invalid token" }), { status: 401 });
+  throw new Error("Unexpected fetch in test: " + url);
+};
+try {
+  const turnstileEnv = {
+    TURNSTILE_SECRET_KEY: "test-turnstile-secret",
+    WRITE_API_LIMITER: { async limit() { return { success: true }; } },
+    SUPABASE_URL: "https://project.supabase.co",
+    SUPABASE_ANON_KEY: "public-test-anon-key",
+    ASSETS: { fetch() { return new Response("asset"); } }
+  };
+  const noToken = await worker.fetch(new Request("https://example.test/v1/scenarios", {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ calculator_id: "sip", inputs: {} })
+  }), turnstileEnv, {});
+  assert.equal(noToken.status, 403);
+  assert.equal((await noToken.json()).error.code, "TURNSTILE_REQUIRED");
+  assert.equal(siteverifyCalls, 0, "Missing tokens must not be sent to Siteverify");
+
+  const validToken = await worker.fetch(new Request("https://example.test/v1/scenarios", {
+    method: "POST", headers: { "Content-Type": "application/json", "cf-turnstile-response": "valid-test-token" },
+    body: JSON.stringify({ calculator_id: "sip", inputs: {} })
+  }), turnstileEnv, {});
+  assert.equal(validToken.status, 401, "A valid Turnstile token should pass verification before auth is checked");
+  assert.equal(siteverifyCalls, 1);
+  assert.match(validToken.headers.get("Access-Control-Allow-Headers"), /cf-turnstile-response/i);
+
+  const missingSecret = await worker.fetch(new Request("https://example.test/v1/billing/checkout", {
+    method: "POST", headers: { "Content-Type": "application/json", "cf-turnstile-response": "valid-test-token" },
+    body: JSON.stringify({ plan: "monthly" })
+  }), { WRITE_API_LIMITER: { async limit() { return { success: true }; } } }, {});
+  assert.equal(missingSecret.status, 503);
+  assert.equal((await missingSecret.json()).error.code, "TURNSTILE_NOT_CONFIGURED");
+} finally {
+  globalThis.fetch = originalFetch;
+}
+
+console.log("Worker write security audit PASS: edge throttling, fail-closed limiter, Turnstile Siteverify, missing-token/secret handling, and CORS.");
