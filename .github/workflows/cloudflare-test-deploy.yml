@@ -51,10 +51,12 @@ jobs:
           RAZORPAY_PLAN_MONTHLY: ${{ secrets.RAZORPAY_PLAN_MONTHLY }}
           RAZORPAY_PLAN_YEARLY: ${{ secrets.RAZORPAY_PLAN_YEARLY }}
           RAZORPAY_WEBHOOK_SECRET: ${{ secrets.RAZORPAY_WEBHOOK_SECRET }}
+          TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
+          TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY }}
         run: |
           set -euo pipefail
           set +x
-          for name in TEST_CLOUDFLARE_API_TOKEN TEST_CLOUDFLARE_ACCOUNT_ID TEST_D1_DATABASE_ID TEST_SUPABASE_URL TEST_SUPABASE_ANON_KEY RAZORPAY_KEY_ID RAZORPAY_KEY_SECRET RAZORPAY_PLAN_MONTHLY RAZORPAY_PLAN_YEARLY RAZORPAY_WEBHOOK_SECRET; do
+          for name in TEST_CLOUDFLARE_API_TOKEN TEST_CLOUDFLARE_ACCOUNT_ID TEST_D1_DATABASE_ID TEST_SUPABASE_URL TEST_SUPABASE_ANON_KEY RAZORPAY_KEY_ID RAZORPAY_KEY_SECRET RAZORPAY_PLAN_MONTHLY RAZORPAY_PLAN_YEARLY RAZORPAY_WEBHOOK_SECRET TURNSTILE_SECRET_KEY TURNSTILE_SITE_KEY; do
             value="${!name}"
             if [ -z "$value" ]; then
               echo "::error::Missing TEST environment value: $name"
@@ -117,6 +119,8 @@ jobs:
           RAZORPAY_PLAN_MONTHLY: ${{ secrets.RAZORPAY_PLAN_MONTHLY }}
           RAZORPAY_PLAN_YEARLY: ${{ secrets.RAZORPAY_PLAN_YEARLY }}
           RAZORPAY_WEBHOOK_SECRET: ${{ secrets.RAZORPAY_WEBHOOK_SECRET }}
+          TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
+          TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY }}
         run: |
           set -euo pipefail
           set +x
@@ -127,7 +131,8 @@ jobs:
             const names = [
               "SUPABASE_URL", "SUPABASE_ANON_KEY", "RAZORPAY_KEY_ID",
               "RAZORPAY_KEY_SECRET", "RAZORPAY_PLAN_MONTHLY",
-              "RAZORPAY_PLAN_YEARLY", "RAZORPAY_WEBHOOK_SECRET"
+              "RAZORPAY_PLAN_YEARLY", "RAZORPAY_WEBHOOK_SECRET",
+              "TURNSTILE_SECRET_KEY", "TURNSTILE_SITE_KEY"
             ];
             const values = Object.fromEntries(names.map((name) => [name, process.env[name]]));
             process.stdout.write(JSON.stringify(values));

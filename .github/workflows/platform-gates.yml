@@ -32,6 +32,8 @@ jobs:
         run: node --check worker.mjs
       - name: Production deployment safety regression
         run: node qa/production-deploy-safety-audit.mjs
+      - name: TEST deployment Turnstile secret forwarding regression
+        run: node qa/test-deploy-turnstile-audit.mjs
       - name: Service worker privacy and auth CSP regression
         run: node qa/service-worker-privacy-audit.mjs
       - name: Privacy policy consistency audit
