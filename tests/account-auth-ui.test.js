@@ -42,8 +42,8 @@ test("isolated TEST account page points only to TEST API and has billing disable
   assert.match(testHtml, /account-test\.html/);
   assert.match(testHtml, /wa-site-runtime\.js/, "TEST account must load the shared Turnstile runtime");
   const headers = await readFile(new URL("../_headers", import.meta.url), "utf8");
-  assert.match(headers, /\/account-test\.html[\s\S]*connect-src[^\\n]*wealtharrays-api-test\.goyalalok565\.workers\.dev/);
-  assert.match(headers, /\/account-test[\s\S]*connect-src[^\\n]*challenges\.cloudflare\.com[^\\n]*wealtharrays-api-test\.goyalalok565\.workers\.dev/);
+  assert.match(headers, /\/account-test\.html[\s\S]*connect-src[^\r\n]*wealtharrays-api-test\.goyalalok565\.workers\.dev/);
+  assert.match(headers, /\/account-test[\s\S]*connect-src[^\r\n]*challenges\.cloudflare\.com[^\r\n]*wealtharrays-api-test\.goyalalok565\.workers\.dev/);
   assert.match(js, /waSupabaseTestSession/);
   assert.match(js, /dataset\.waApiBase/);
   assert.match(js, /fetch\(API_BASE\+"\/v1\/billing\/config"/);
