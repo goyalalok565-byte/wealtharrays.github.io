@@ -10,6 +10,7 @@
   let widgetHost = null;
   let issuedToken = false;
   let pending = null;
+  let requesting = false;
 
   function loadConfig() {
     if (!configPromise) {
@@ -101,7 +102,9 @@
   }
 
   async function getToken() {
-    if (pending) throw new Error("Verification is already in progress. Please wait.");
+    if (pending || requesting) throw new Error("Verification is already in progress. Please wait.");
+    requesting = true;
+    try {
     const hostname = window.location.hostname.toLowerCase();
     if (hostname !== "wealtharrays.com" && hostname !== "www.wealtharrays.com") {
       throw new Error("Verification is unavailable on this hostname.");
@@ -129,6 +132,9 @@
         reject(new Error("Cloudflare verification could not start. Please try again."));
       }
     });
+    } finally {
+      requesting = false;
+    }
   }
 
   window.WATurnstile = Object.freeze({ getToken });
