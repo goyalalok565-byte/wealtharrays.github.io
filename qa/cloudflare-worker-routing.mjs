@@ -59,6 +59,18 @@ assert.equal(healthData.ready_for_saas, true);
 assert.equal(JSON.stringify(healthData).includes("test-secret-must-not-leak"), false);
 assert.equal(JSON.stringify(healthData).includes("public-anon-test-value"), false);
 assert.equal(JSON.stringify(healthData).includes("turnstile-secret-must-not-leak"), false);\nassert.equal(JSON.stringify(healthData).includes("turnstile-secret-must-not-leak"), false);
+const incompleteSecurity = await worker.fetch(new Request("https://example.test/v1/health"), {
+  ...env,
+  TURNSTILE_SITE_KEY: undefined,
+  TURNSTILE_SECRET_KEY: undefined,
+  WRITE_API_LIMITER: undefined
+}, {});
+assert.equal(incompleteSecurity.status, 200);
+const incompleteSecurityData = await incompleteSecurity.json();
+assert.equal(incompleteSecurityData.ready_for_saas, false);
+assert.equal(incompleteSecurityData.dependencies.turnstile, "not_configured");
+assert.equal(incompleteSecurityData.dependencies.write_api_rate_limiter, "not_configured");
+
 const unhealthy = await worker.fetch(new Request("https://example.test/v1/health"), {
   ...env,
   DB: { prepare() { return { async first() { throw new Error("database offline"); } }; } }
