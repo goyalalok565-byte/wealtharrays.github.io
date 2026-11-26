@@ -54,7 +54,9 @@ async function verifyTurnstile(request, env) {
       body: form
     });
     const result = await response.json().catch(() => ({}));
-    if (!response.ok || result.success !== true) return jsonError("TURNSTILE_FAILED", "Request verification failed. Please try again.", 403);
+    const hostname = String(result.hostname || "").toLowerCase();
+    const allowedHostnames = new Set(["wealtharrays.com", "www.wealtharrays.com"]);
+    if (!response.ok || result.success !== true || !allowedHostnames.has(hostname) || result.action !== "wealth_arrays_action") return jsonError("TURNSTILE_FAILED", "Request verification failed. Please try again.", 403);
     return null;
   } catch {
     return jsonError("TURNSTILE_UNAVAILABLE", "Request verification is temporarily unavailable.", 503);
