@@ -179,12 +179,12 @@ jobs:
           preflight="$(curl --silent --show-error --max-time 30 -D - -o /dev/null -X OPTIONS \
             -H 'Origin: https://wealtharrays.com' \
             -H 'Access-Control-Request-Method: DELETE' \
-            -H 'Access-Control-Request-Headers: authorization,content-type' \
+            -H 'Access-Control-Request-Headers: authorization,content-type,cf-turnstile-response' \
             https://wealtharrays-api-test.goyalalok565.workers.dev/v1/scenarios)"
           printf '%s\n' "$preflight" | grep -i '^access-control-allow-origin: \*' >/dev/null
           printf '%s\n' "$preflight" | grep -i '^access-control-allow-methods: .*DELETE' >/dev/null
           printf '%s\n' "$preflight" | grep -i '^access-control-allow-headers: .*Authorization' >/dev/null
-          echo "TEST cross-origin scenario DELETE preflight passed."
+          echo "TEST cross-origin scenario DELETE + Turnstile preflight passed."
           
       - name: Remove generated TEST config
         if: always()
