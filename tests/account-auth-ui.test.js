@@ -46,7 +46,11 @@ test("isolated TEST account page points only to TEST API and has billing disable
   assert.match(headers, /\/account-test[\s\S]*connect-src[^\\n]*wealtharrays-api-test\.goyalalok565\.workers\.dev/);
   assert.match(js, /waSupabaseTestSession/);
   assert.match(js, /dataset\.waApiBase/);
-  assert.match(js, /fetch\(API_BASE\+"\/v1\/billing\/config"/);\n  assert.match(js, /\$\("account-upgrade-monthly"\)\.disabled=!billing\.plans\?\.monthly/);\n  assert.match(js, /\$\("account-upgrade-yearly"\)\.disabled=!billing\.plans\?\.yearly/);\n  assert.match(js, /Isolated TEST account and TEST billing are configured/);\n  assert.doesNotMatch(js, /account-subscription-card"\)\.hidden=true/);
+  assert.match(js, /fetch\(API_BASE\+"\/v1\/billing\/config"/);
+  assert.match(js, /\$\("account-upgrade-monthly"\)\.disabled=!billing\.plans\?\.monthly/);
+  assert.match(js, /\$\("account-upgrade-yearly"\)\.disabled=!billing\.plans\?\.yearly/);
+  assert.match(js, /Isolated TEST account and TEST billing are configured/);
+  assert.doesNotMatch(js, /account-subscription-card"\)\.hidden=true/);
 });
 
 test("sign-out attempts to revoke the Supabase server session", () => {
