@@ -84,8 +84,55 @@
   window.addEventListener('appinstalled',function(){installEvent=null;window.__WA_INSTALL_PROMPT__=null;const box=document.getElementById('wa-install');if(box)box.remove();set('waInstallDismissedV2',String(Date.now()))});
   function registerServiceWorker(){if(!('serviceWorker' in navigator)||!window.isSecureContext)return;const start=()=>navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(()=>{});if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start()}
   function styles(){if(document.getElementById('wa-core-css'))return;const style=document.createElement('style');style.id='wa-core-css';style.textContent='.tool-search-shell{position:relative!important;z-index:100!important;overflow:visible!important}.tool-search-shell input{position:relative!important;z-index:101!important}#tool-search-results{position:absolute!important;left:0!important;right:0!important;top:calc(100% + 8px)!important;z-index:2147483647!important;background:var(--surface,#fff)!important;border:1px solid var(--line,#e2e6ed)!important;border-radius:14px!important;overflow:hidden!important;box-shadow:0 18px 50px rgba(0,0,0,.16)!important}.wa-search-suggestion{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px;padding:13px 15px;text-decoration:none!important;color:inherit!important;background:var(--surface,#fff)!important;border-bottom:1px solid var(--line,#e2e6ed)!important}.wa-search-suggestion span{display:grid;gap:2px;min-width:0}.wa-search-suggestion small{color:var(--muted,#667085);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wa-search-suggestion>b{flex:none}.tool-search-empty{padding:14px;color:var(--muted,#667085);font-size:11px}.tool-card[data-wa-category],.home-tool-card[data-wa-category],.ledger-row[data-wa-category]{position:relative!important;box-sizing:border-box!important;background:var(--surface)!important;border-left:1.5px solid var(--line)!important;border-right:1.5px solid var(--line)!important;border-bottom:1.5px solid var(--line)!important;border-top:3.5px solid var(--wa-card-accent)!important;border-radius:18px!important;box-shadow:0 6px 20px rgba(16,24,40,.06)!important;overflow:hidden}#tool-search-results{max-height:min(55vh,520px);overflow-y:auto!important;-webkit-overflow-scrolling:touch}.ledger-hero:has(#tool-search){overflow:visible!important}.hero-copy:has(#tool-search),.search-bar:has(#tool-search){overflow:visible!important}';document.head.appendChild(style)}
+  function setupTurnstile(){
+    let configPromise=null,scriptPromise=null,widgetId=null,container=null,siteKey=null,pending=null;
+    function apiBase(){
+      const configured=document.body&&document.body.dataset.waApiBase;
+      const base=new URL(configured||window.location.origin,window.location.origin);
+      if(base.origin!==window.location.origin&&base.hostname!=="wealtharrays-api-test.goyalalok565.workers.dev")throw new Error("Invalid account API origin for request verification.");
+      return base.origin;
+    }
+    async function getConfig(){
+      if(!configPromise)configPromise=fetch(apiBase()+"/v1/security-config",{cache:"no-store"}).then(async response=>{
+        if(!response.ok)throw new Error("Request verification is not configured yet. Please contact support.");
+        const data=await response.json();
+        if(!data.site_key)throw new Error("Request verification is not configured yet. Please contact support.");
+        siteKey=data.site_key;return data;
+      }).catch(error=>{configPromise=null;throw error});
+      return configPromise;
+    }
+    async function loadScript(){
+      if(window.turnstile)return;
+      if(!scriptPromise)scriptPromise=new Promise((resolve,reject)=>{
+        const existing=document.querySelector("script[data-wa-turnstile]");
+        const script=existing||document.createElement("script");
+        script.async=true;script.defer=true;script.dataset.waTurnstile="1";
+        script.src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+        script.onload=()=>window.turnstile?resolve():reject(new Error("Request verification could not start."));
+        script.onerror=()=>{scriptPromise=null;script.remove();reject(new Error("Request verification is temporarily unavailable."))};
+        if(!existing)document.head.appendChild(script);
+      });
+      await scriptPromise;
+    }
+    window.WATurnstile={async getToken(){
+      await getConfig();await loadScript();
+      if(!container){container=document.createElement("div");container.setAttribute("aria-hidden","true");container.style.cssText="position:fixed;left:-10000px;top:0;width:1px;height:1px;overflow:hidden";document.body.appendChild(container);}
+      if(widgetId===null)widgetId=window.turnstile.render(container,{
+        sitekey:siteKey,execution:"execute",appearance:"interaction-only",
+        callback:token=>{const current=pending;pending=null;if(current)current.resolve(token)},
+        "error-callback":()=>{const current=pending;pending=null;if(current)current.reject(new Error("Request verification failed. Please try again."))},
+        "expired-callback":()=>{const current=pending;pending=null;if(current)current.reject(new Error("Request verification expired. Please try again."))}
+      });
+      if(pending)throw new Error("A request verification is already in progress.");
+      return new Promise((resolve,reject)=>{
+        pending={resolve,reject};
+        try{window.turnstile.reset(widgetId);window.turnstile.execute(widgetId)}
+        catch(error){pending=null;reject(error)}
+      });
+    }};
+  }
   function runSafe(name,fn){try{fn()}catch(error){try{console.error('[Wealth Arrays]',name,error)}catch(_){}}}
   function installPromptInit(){return}
-  function init(){[['styles',styles],['theme',setupTheme],['currency',applyCurrency],['categories',applyCategories],['search',calculatorSearch],['related',addRelatedAndTrust],['footer',renderFooter],['analytics',analytics],['consent',consentDialog],['serviceWorker',registerServiceWorker],['install',installPromptInit]].forEach(task=>runSafe(task[0],task[1]));setTimeout(calculatorSearch,250);setTimeout(calculatorSearch,1000);window.addEventListener('load',calculatorSearch,{once:true});window.addEventListener('pageshow',calculatorSearch)}
+  function init(){[['turnstile',setupTurnstile],['styles',styles],['theme',setupTheme],['currency',applyCurrency],['categories',applyCategories],['search',calculatorSearch],['related',addRelatedAndTrust],['footer',renderFooter],['analytics',analytics],['consent',consentDialog],['serviceWorker',registerServiceWorker],['install',installPromptInit]].forEach(task=>runSafe(task[0],task[1]));setTimeout(calculatorSearch,250);setTimeout(calculatorSearch,1000);window.addEventListener('load',calculatorSearch,{once:true});window.addEventListener('pageshow',calculatorSearch)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>runSafe('init',init),{once:true});else runSafe('init',init);
 })();
