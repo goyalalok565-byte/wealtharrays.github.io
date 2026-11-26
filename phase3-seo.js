@@ -92,8 +92,8 @@
   addMeta('robots', 'index,follow'); addMeta('author', 'Wealth Arrays'); addMeta('publisher', 'Wealth Arrays');
   addMeta('og:site_name', 'Wealth Arrays', true); addMeta('og:type', path.startsWith('/articles/') ? 'article' : 'website', true);
   addMeta('og:title', document.title, true); addMeta('og:description', document.querySelector('meta[name="description"]')?.content || '', true);
-  addMeta('og:url', location.href.split('#')[0], true); addMeta('og:image', `${C}/og-card.svg`, true);
-  addMeta('twitter:card', 'summary_large_image'); addMeta('twitter:title', document.title); addMeta('twitter:description', document.querySelector('meta[name="description"]')?.content || ''); addMeta('twitter:image', `${C}/og-card.svg`);
+  addMeta('og:url', location.href.split('#')[0], true); addMeta('og:image', `${C}/og-image.png`, true);
+  addMeta('twitter:card', 'summary_large_image'); addMeta('twitter:title', document.title); addMeta('twitter:description', document.querySelector('meta[name="description"]')?.content || ''); addMeta('twitter:image', `${C}/og-image.png`);
 
   if (id) {
     renderCluster('Related calculators and guides', clusters[id] || []);
