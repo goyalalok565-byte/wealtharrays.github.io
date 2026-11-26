@@ -165,6 +165,29 @@ jobs:
             console.log("TEST API model discovery passed (" + models.length + " models).");
           '
 
+      - name: Verify TEST Turnstile public config and secret isolation
+        shell: bash
+        env:
+          TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY }}
+          TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
+        run: |
+          set -euo pipefail
+          security_config="$(curl --fail --silent --show-error --max-time 30 https://wealtharrays-api-test.goyalalok565.workers.dev/v1/security-config)"
+          printf '%s' "$security_config" | node --input-type=module -e '
+            let raw = "";
+            for await (const chunk of process.stdin) raw += chunk;
+            const config = JSON.parse(raw);
+            const siteKey = process.env.TURNSTILE_SITE_KEY;
+            const secretKey = process.env.TURNSTILE_SECRET_KEY;
+            if (config.configured !== true || config.site_key !== siteKey || !siteKey) {
+              throw new Error("TEST security-config does not expose the configured public Turnstile site key.");
+            }
+            if (!secretKey || raw.includes(secretKey) || Object.hasOwn(config, "secret_key")) {
+              throw new Error("TEST security-config exposed or failed to isolate the Turnstile secret.");
+            }
+            console.log("TEST Turnstile public site key verified; secret remains private.");
+          '
+
       - name: Verify TEST auth configuration and cross-origin scenario preflight
         shell: bash
         env:
