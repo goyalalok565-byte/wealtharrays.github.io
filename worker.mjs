@@ -68,17 +68,13 @@ export default {
         const ip = request.headers.get("cf-connecting-ip") || "local";
         const decision = await limiter.limit({ key: routePath + ":" + request.method + ":" + ip });
         if (!decision?.success) {
-      } catch {
-        return jsonError("WRITE_API_RATE_LIMITER_UNAVAILABLE", "The write API is temporarily unavailable.", 503);
-      }
-    }
           return new Response(JSON.stringify({ error: { code: "RATE_LIMITED", message: "Too many requests. Please wait before trying again." } }), {
             status: 429,
             headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", "Retry-After": "60", ...CORS }
           });
         }
       } catch {
-        return jsonError("WRITE_RATE_LIMITER_UNAVAILABLE", "The write API is temporarily unavailable.", 503);
+        return jsonError("WRITE_API_RATE_LIMITER_UNAVAILABLE", "The write API is temporarily unavailable.", 503);
       }
     }
     const rateLimitedPaths = new Set(["/v1/calculate", "/v1/india-tax", "/v1/fx"]);
