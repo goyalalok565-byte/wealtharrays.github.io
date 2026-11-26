@@ -22,7 +22,7 @@ const missing = await worker.fetch(new Request("https://example.test/v1/billing/
   body: JSON.stringify({ plan: "monthly" })
 }), { ASSETS: { fetch() { return new Response("asset"); } } }, {});
 assert.equal(missing.status, 503);
-assert.equal((await missing.json()).error.code, "WRITE_API_RATE_LIMITER_NOT_CONFIGURED");
+assert.equal((await missing.json()).error.code, "WRITE_RATE_LIMITER_NOT_CONFIGURED");
 
 const failed = await worker.fetch(new Request("https://example.test/v1/billing/cancel", {
   method: "POST",
