@@ -44,3 +44,14 @@ const readOnly = await worker.fetch(new Request("https://example.test/v1/scenari
 assert.equal(readOnly.status, 401, "GET scenario reads should proceed to authentication without consuming the write limiter");
 
 console.log("Worker write rate-limit audit PASS: throttling, fail-closed configuration/outage, and GET exemption.");
+
+const trailingSlashCalls = [];
+const trailingSlash = await worker.fetch(new Request("https://example.test/v1/scenarios/", {
+  method: "DELETE",
+  headers: { "cf-connecting-ip": "203.0.113.11" }
+}), {
+  WRITE_API_LIMITER: { async limit(input) { trailingSlashCalls.push(input.key); return { success: true }; } },
+  ASSETS: { fetch() { return new Response("asset"); } }
+}, {});
+assert.equal(trailingSlash.status, 401, "A trailing-slash write route should reach authentication after rate limiting");
+assert.deepEqual(trailingSlashCalls, ["/v1/scenarios:DELETE:203.0.113.11"]);
