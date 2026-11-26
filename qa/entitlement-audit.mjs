@@ -11,7 +11,7 @@ assert.deepEqual(mod.resolveEntitlement(null), {
   tier: "free", active: false, plan_id: null, cloud_scenario_limit: 3,
   features: { cloud_scenario_sync: true, cross_device_scenarios: true, expanded_scenario_library: false }
 });
-assert.equal(mod.resolveEntitlement({ status: "active", plan_id: "monthly" }).tier, "pro");
+assert.equal(mod.resolveEntitlement({ status: "active", plan_id: "monthly" }).tier, "free"); // Missing paid-through date must fail closed.
 assert.equal(mod.resolveEntitlement({ status: "active", plan_id: "yearly", current_period_end: "2027-01-01T00:00:00.000Z" }, Date.parse("2026-11-18T00:00:00.000Z")).tier, "pro");
 assert.equal(mod.resolveEntitlement({ status: "active", plan_id: "yearly", current_period_end: "2026-11-17T00:00:00.000Z" }, Date.parse("2026-11-18T00:00:00.000Z")).tier, "free");
 assert.equal(mod.resolveEntitlement({ status: "cancelled", plan_id: "monthly" }).tier, "free");
