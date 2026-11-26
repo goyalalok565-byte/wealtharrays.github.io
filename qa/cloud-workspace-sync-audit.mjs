@@ -6,7 +6,7 @@ assert.match(helper,/refresh_token/);
 assert.match(helper,/Authorization:"Bearer "\+token/);
 assert.match(helper,/method:"POST"/);
 assert.match(helper,/method:"GET"/);
-assert.match(helper,/calculator_id/);
+assert.match(helper,/calculator_id/);\nassert.match(helper,/window\\.WATurnstile\\.getToken/);\nassert.match(helper,/cf-turnstile-response/);
 for(const [html,js,save,load,kind] of [
  ["scenario-lab.html","scenario-lab.js","sl-cloud-save","sl-cloud-load","scenario-lab"],
  ["goal-planner.html","goal-planner.js","gp-cloud-save","gp-cloud-load","goal-planner"],
@@ -22,7 +22,7 @@ for(const [html,js,save,load,kind] of [
  assert.ok(script.includes("cloud_scenario_load"),js+" missing load analytics event");
 }
 const account=fs.readFileSync("account.html","utf8");
-assert.match(account,/Scenario Lab, Goal Planner or Financial Workspace/);
+assert.match(account,/Cloud-saved scenarios/);\nconst accountJs=fs.readFileSync("account.js","utf8");\nassert.match(accountJs,/captcha_token:await window\\.WATurnstile\\.getToken\\(\\)/);\nassert.match(accountJs,/cf-turnstile-response/);
 const browserSmoke=fs.readFileSync("qa/cloud-workspace-sync-browser-smoke.mjs","utf8");
 for(const path of ["/scenario-lab.html","/goal-planner.html","/financial-workspace.html"])assert.ok(browserSmoke.includes(path),"browser smoke missing "+path);
 const workflow=fs.readFileSync(".github/workflows/platform-gates.yml","utf8");
