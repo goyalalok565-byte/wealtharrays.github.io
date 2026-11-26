@@ -57,6 +57,18 @@ assert.equal((await trailingSlash.json()).error.code, "TURNSTILE_NOT_CONFIGURED"
 assert.deepEqual(trailingSlashCalls, ["/v1/scenarios:DELETE:203.0.113.11"]);
 
 
+const scenarioPreflight = await worker.fetch(new Request("https://example.test/v1/scenarios", {
+  method: "OPTIONS", headers: { Origin: "https://wealtharrays.com", "Access-Control-Request-Headers": "authorization,content-type,cf-turnstile-response" }
+}), {}, {});
+assert.equal(scenarioPreflight.status, 204);
+assert.match(scenarioPreflight.headers.get("Access-Control-Allow-Headers"), /cf-turnstile-response/i);
+
+const checkoutPreflight = await worker.fetch(new Request("https://example.test/v1/billing/checkout", {
+  method: "OPTIONS", headers: { Origin: "https://wealtharrays.com", "Access-Control-Request-Headers": "authorization,content-type,cf-turnstile-response" }
+}), {}, {});
+assert.equal(checkoutPreflight.status, 204);
+assert.match(checkoutPreflight.headers.get("Access-Control-Allow-Headers"), /cf-turnstile-response/i);
+
 const originalFetch = globalThis.fetch;
 let siteverifyCalls = 0;
 globalThis.fetch = async (url, options) => {
