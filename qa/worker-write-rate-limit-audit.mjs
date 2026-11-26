@@ -52,7 +52,8 @@ const trailingSlash = await worker.fetch(new Request("https://example.test/v1/sc
   WRITE_API_LIMITER: { async limit(input) { trailingSlashCalls.push(input.key); return { success: true }; } },
   ASSETS: { fetch() { return new Response("asset"); } }
 }, {});
-assert.equal(trailingSlash.status, 401, "A trailing-slash write route should reach authentication after rate limiting");
+assert.equal(trailingSlash.status, 503, "A trailing-slash write route must still fail closed when Turnstile is not configured");
+assert.equal((await trailingSlash.json()).error.code, "TURNSTILE_NOT_CONFIGURED");
 assert.deepEqual(trailingSlashCalls, ["/v1/scenarios:DELETE:203.0.113.11"]);
 
 
