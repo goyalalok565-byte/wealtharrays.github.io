@@ -77,7 +77,8 @@ globalThis.fetch = async (url, options) => {
     const form = new URLSearchParams(options.body);
     assert.equal(form.get("secret"), "test-turnstile-secret");
     assert.equal(form.get("response"), "valid-test-token");
-    return Response.json({ success: true });
+    if (form.get("response") === "network-test-token") throw new Error("simulated Siteverify outage");
+    return Response.json({ success: form.get("response") === "valid-test-token" });
   }
   if (String(url).endsWith("/auth/v1/user")) return new Response(JSON.stringify({ message: "invalid token" }), { status: 401 });
   throw new Error("Unexpected fetch in test: " + url);
@@ -104,6 +105,20 @@ try {
   assert.equal(validToken.status, 401, "A valid Turnstile token should pass verification before auth is checked");
   assert.equal(siteverifyCalls, 1);
   assert.match(validToken.headers.get("Access-Control-Allow-Headers"), /cf-turnstile-response/i);
+
+  const invalidToken = await worker.fetch(new Request("https://example.test/v1/scenarios", {
+    method: "POST", headers: { "Content-Type": "application/json", "cf-turnstile-response": "invalid-test-token" },
+    body: JSON.stringify({ calculator_id: "sip", inputs: {} })
+  }), turnstileEnv, {});
+  assert.equal(invalidToken.status, 403);
+  assert.equal((await invalidToken.json()).error.code, "TURNSTILE_FAILED");
+
+  const siteverifyOutage = await worker.fetch(new Request("https://example.test/v1/scenarios", {
+    method: "POST", headers: { "Content-Type": "application/json", "cf-turnstile-response": "network-test-token" },
+    body: JSON.stringify({ calculator_id: "sip", inputs: {} })
+  }), turnstileEnv, {});
+  assert.equal(siteverifyOutage.status, 503);
+  assert.equal((await siteverifyOutage.json()).error.code, "TURNSTILE_UNAVAILABLE");
 
   const missingSecret = await worker.fetch(new Request("https://example.test/v1/billing/checkout", {
     method: "POST", headers: { "Content-Type": "application/json", "cf-turnstile-response": "valid-test-token" },
