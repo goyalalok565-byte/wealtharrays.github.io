@@ -121,7 +121,7 @@
         sitekey:siteKey,execution:"execute",appearance:"interaction-only",
         callback:token=>{const current=pending;pending=null;if(current)current.resolve(token)},
         "error-callback":()=>{const current=pending;pending=null;if(current)current.reject(new Error("Request verification failed. Please try again."))},
-        "expired-callback":()=>{const current=pending;pending=null;if(current)current.reject(new Error("Request verification expired. Please try again."))}
+        "expired-callback":()=>{const current=pending;pending=null;if(current)current.reject(new Error("Request verification expired. Please try again."))},\n        "timeout-callback":()=>{const current=pending;pending=null;if(current)current.reject(new Error("Request verification timed out. Please try again."))}
       });
       if(pending)throw new Error("A request verification is already in progress.");
       return new Promise((resolve,reject)=>{
