@@ -3,6 +3,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import vm from 'node:vm';
+import { buildReceiptEvidence } from './receipt-evidence.mjs';
 
 const root=process.cwd();
 const siteSources=['wa-core.js','site-runtime.js','final-polish.js','theme-fix.js','phase3-seo.js','phase4-premium.js','calculator-search.js'];
@@ -64,11 +65,11 @@ function bundle(sources,label){
 
 fs.writeFileSync(path.join(root,'wa-site-runtime.js'),bundle(siteSources,'site'),'utf8');
 fs.writeFileSync(path.join(root,'wa-home-runtime.js'),bundle(homeSources,'home'),'utf8');
-fs.writeFileSync(path.join(root,'wa-calculator-runtime.js'),bundle(calcSources,'calculator'),'utf8');
-
 const source=fs.readFileSync(path.join(root,'calculators.js'),'utf8');
 const calculatorContext={console};vm.createContext(calculatorContext);vm.runInContext(source+'\n;globalThis.__WA_CALCULATORS__=CALCULATORS;',calculatorContext,{filename:'calculators.js'});
 const calculatorRuntimeDefinitions=calculatorContext.__WA_CALCULATORS__;
+const receiptEvidence=buildReceiptEvidence(calculatorRuntimeDefinitions,buildSha);
+fs.writeFileSync(path.join(root,'wa-calculator-runtime.js'),bundle(calcSources,'calculator')+`\n;window.WA_RECEIPT_EVIDENCE=${JSON.stringify(receiptEvidence)};\n`,'utf8');
 const start=source.indexOf('const CALCULATORS = [');
 const end=source.indexOf('\n];',start);
 if(start<0||end<0)throw new Error('CALCULATORS definition list not found');

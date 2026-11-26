@@ -300,3 +300,17 @@ CI scope: strict seven-route Lighthouse runs on PR C (performance branch), manua
 - Cross-checked all 55 slugs against homepage links, tools directory, calculator search, `llms.txt`, and methodology page: **55/55 present in each**.
 - The earlier "55 definitions vs 54 sitemap calculator URLs" statement was a counting error from a partial calculator-directory-only count and is superseded by this explicit audit. No missing calculator route is currently evidenced.
 - This was a read-only source audit, not a post-merge production deployment/live-browser verification.
+
+
+## Verified Receipt rollout — Batch 1 candidate (2026-11-23)
+
+Branch: `feature/verified-receipts-batch1`; PR pending CI/review.
+
+- Adds a result-adjacent accessible “How this was calculated” disclosure for SIP, mortgage EMI, compound interest, SWP and rent-vs-buy.
+- Receipt includes the formula summary, user-entered input values/units, explicit model assumptions, model version, build identifier, source status (“No jurisdictional rule used” for these pure-math models), model-specific independent test evidence, canonical JSON and a SHA-256 calculation fingerprint.
+- Independent vectors are separately implemented from the calculator formulas and executed during the production build. Current manifest count is one named vector per initial model; it is not the repository-wide 244 test count. A failed/missing vector makes the build fail closed.
+- Error reporting is a mailto with calculator/model/build metadata only; no inputs or outputs are attached. No new analytics events or server calls are added by the receipt UI.
+- UI is a candidate only until CI, browser smoke, keyboard/a11y, privacy/network checks and the required Lighthouse gate pass. Production deployment/live behaviour is UNVERIFIED.
+- Hash is an integrity fingerprint, not a digital signature, external audit or guarantee of future results.
+
+- Strict seven-route Lighthouse release gate is being explicitly run on the `phase0/pr-c-receipt-batch1` PR because the default feature-branch workflow intentionally skips Lighthouse outside the designated release-gate branch prefixes. This does not represent a production performance result.
