@@ -5,6 +5,9 @@ const assetCalls = [];
 let limiterCalls = 0;
 let allowRateLimitedRequest = true;
 const env = {
+  // Non-production fixtures: exercise the public security-config response without real secrets.
+  TURNSTILE_SITE_KEY: "public-turnstile-site-key",
+  TURNSTILE_SECRET_KEY: "turnstile-secret-must-not-leak",
   PUBLIC_API_LIMITER: {
     async limit({ key }) {
       limiterCalls++;
