@@ -116,7 +116,7 @@
     }
     window.WATurnstile={async getToken(){
       await getConfig();await loadScript();
-      if(!container){container=document.createElement("div");container.setAttribute("aria-hidden","true");container.style.cssText="position:fixed;left:-10000px;top:0;width:1px;height:1px;overflow:hidden";document.body.appendChild(container);}
+      if(!container){container=document.createElement("div");container.className="wa-turnstile-challenge";container.setAttribute("aria-label","Security verification");container.style.cssText="position:fixed;left:16px;bottom:16px;width:300px;min-height:65px;z-index:2147483647";document.body.appendChild(container);}
       if(widgetId===null)widgetId=window.turnstile.render(container,{
         sitekey:siteKey,execution:"execute",appearance:"interaction-only",
         callback:token=>{const current=pending;pending=null;if(current)current.resolve(token)},
