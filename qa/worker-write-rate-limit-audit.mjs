@@ -76,7 +76,7 @@ globalThis.fetch = async (url, options) => {
     siteverifyCalls++;
     const form = new URLSearchParams(options.body);
     assert.equal(form.get("secret"), "test-turnstile-secret");
-    assert.equal(form.get("response"), "valid-test-token");
+    assert.ok(form.get("response"));
     if (form.get("response") === "network-test-token") throw new Error("simulated Siteverify outage");
     return Response.json({ success: form.get("response") === "valid-test-token" });
   }
