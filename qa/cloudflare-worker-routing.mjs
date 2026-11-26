@@ -40,7 +40,7 @@ const healthResponse = await worker.fetch(new Request("https://example.test/v1/h
   RAZORPAY_KEY_SECRET: "test-secret-must-not-leak",
   RAZORPAY_PLAN_MONTHLY: "plan_monthly",
   RAZORPAY_PLAN_YEARLY: "plan_yearly",
-  RAZORPAY_WEBHOOK_SECRET: "webhook-secret-must-not-leak"
+  RAZORPAY_WEBHOOK_SECRET: "webhook-secret-must-not-leak",\n  TURNSTILE_SITE_KEY: "public-turnstile-site-key",\n  TURNSTILE_SECRET_KEY: "turnstile-secret-must-not-leak",\n  WRITE_API_LIMITER: { async limit() { return { success: true }; } }
 }, {});
 assert.equal(healthResponse.status, 200);
 const healthData = await healthResponse.json();
@@ -50,9 +50,9 @@ assert.equal(healthData.version, "1.0.0");
 assert.equal(healthData.dependencies.d1_database, "ok");
 assert.equal(healthData.dependencies.supabase_auth, "configured");
 assert.equal(healthData.dependencies.razorpay_billing, "configured");
-assert.equal(healthData.ready_for_saas, true);
+assert.equal(healthData.dependencies.turnstile, "configured");\nassert.equal(healthData.dependencies.write_api_rate_limiter, "configured");\nassert.equal(healthData.ready_for_saas, true);
 assert.equal(JSON.stringify(healthData).includes("test-secret-must-not-leak"), false);
-assert.equal(JSON.stringify(healthData).includes("public-anon-test-value"), false);
+assert.equal(JSON.stringify(healthData).includes("public-anon-test-value"), false);\nassert.equal(JSON.stringify(healthData).includes("turnstile-secret-must-not-leak"), false);
 const unhealthy = await worker.fetch(new Request("https://example.test/v1/health"), {
   ...env,
   DB: { prepare() { return { async first() { throw new Error("database offline"); } }; } }
@@ -79,7 +79,7 @@ const missingLimiter = await worker.fetch(new Request("https://example.test/v1/c
   body: JSON.stringify({ model: "sip", inputs: { monthly: 5000, annualRate: 10, years: 10 } })
 }), { ASSETS: env.ASSETS }, {});
 assert.equal(missingLimiter.status, 503, "Public calculation API must fail closed if rate limiting is unconfigured");
-const authConfig = await worker.fetch(new Request("https://example.test/v1/auth-config"), env, {});
+const securityConfig = await worker.fetch(new Request("https://example.test/v1/security-config"), env, {});\nassert.equal(securityConfig.status, 200);\nconst securityData = await securityConfig.json();\nassert.equal(securityData.configured, true);\nassert.equal(securityData.site_key, "public-turnstile-site-key");\nassert.equal(JSON.stringify(securityData).includes("turnstile-secret-must-not-leak"), false);\nconst authConfig = await worker.fetch(new Request("https://example.test/v1/auth-config"), env, {});
 assert.equal(authConfig.status, 503, "Account config must fail closed until credentials are set");
 const unknown = await worker.fetch(new Request("https://example.test/v1/does-not-exist"), env, {});
 assert.equal(unknown.status, 404);
