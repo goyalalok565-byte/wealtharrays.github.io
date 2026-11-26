@@ -27,6 +27,8 @@ jobs:
           node-version: 24
       - name: Run unit tests
         run: npm test
+      - name: Verify partial and full refund entitlement policy
+        run: node qa/billing-refund-policy-audit.mjs
       - name: Verify wired calculator content drafts
         run: node qa/content-draft-audit.mjs
       - name: Build production static preview
