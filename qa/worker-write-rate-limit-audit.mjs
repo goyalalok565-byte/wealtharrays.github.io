@@ -78,7 +78,7 @@ globalThis.fetch = async (url, options) => {
     assert.equal(form.get("secret"), "test-turnstile-secret");
     assert.ok(form.get("response"));
     if (form.get("response") === "network-test-token") throw new Error("simulated Siteverify outage");
-    return Response.json({ success: form.get("response") === "valid-test-token" });
+    return Response.json({ success: form.get("response") === "valid-test-token", hostname: "wealtharrays.com", action: "wealth_arrays_action" });
   }
   if (String(url).endsWith("/auth/v1/user")) return new Response(JSON.stringify({ message: "invalid token" }), { status: 401 });
   throw new Error("Unexpected fetch in test: " + url);
