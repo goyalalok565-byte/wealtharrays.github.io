@@ -15,6 +15,11 @@ name = "PUBLIC_API_LIMITER"
 namespace_id = "2026112502"
 simple = { limit = 120, period = 60 }
 
+[[ratelimits]]
+name = "WRITE_API_LIMITER"
+namespace_id = "2026112503"
+simple = { limit = 20, period = 60 }
+
 [[d1_databases]]
 binding = "DB"
 database_name = "wealtharrays-saas-test"
