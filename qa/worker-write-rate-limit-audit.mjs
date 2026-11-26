@@ -78,7 +78,7 @@ globalThis.fetch = async (url, options) => {
     assert.equal(form.get("secret"), "test-turnstile-secret");
     assert.ok(form.get("response"));
     if (form.get("response") === "network-test-token") throw new Error("simulated Siteverify outage");
-    return Response.json({ success: form.get("response") === "valid-test-token", hostname: "wealtharrays.com", action: "wealth_arrays_action" });
+    return Response.json({ success: form.get("response") !== "invalid-test-token", hostname: form.get("response") === "wrong-host-token" ? "evil.example" : "wealtharrays.com", action: "wealth_arrays_action" });
   }
   if (String(url).endsWith("/auth/v1/user")) return new Response(JSON.stringify({ message: "invalid token" }), { status: 401 });
   throw new Error("Unexpected fetch in test: " + url);
@@ -112,6 +112,13 @@ try {
   }), turnstileEnv, {});
   assert.equal(invalidToken.status, 403);
   assert.equal((await invalidToken.json()).error.code, "TURNSTILE_FAILED");
+
+  const wrongHostname = await worker.fetch(new Request("https://example.test/v1/scenarios", {
+    method: "POST", headers: { "Content-Type": "application/json", "cf-turnstile-response": "wrong-host-token" },
+    body: JSON.stringify({ calculator_id: "sip", inputs: {} })
+  }), turnstileEnv, {});
+  assert.equal(wrongHostname.status, 403);
+  assert.equal((await wrongHostname.json()).error.code, "TURNSTILE_FAILED");
 
   const siteverifyOutage = await worker.fetch(new Request("https://example.test/v1/scenarios", {
     method: "POST", headers: { "Content-Type": "application/json", "cf-turnstile-response": "network-test-token" },
