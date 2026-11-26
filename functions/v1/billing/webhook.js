@@ -40,15 +40,23 @@ export async function onRequestPost({ request, env }) {
   const payment = event.payload?.payment?.entity || null;
   const subscriptionId = subscription?.id || payment?.subscription_id || null;
   const eventCreatedAt = Number.isSafeInteger(event.created_at) && event.created_at > 0 ? event.created_at : null;
+  // Razorpay amounts are integer minor units (for INR, paise). Missing/invalid amounts
+  // are deliberately not treated as a full refund.
+  const refundAmount = Number.isSafeInteger(payment?.amount_refunded) ? payment.amount_refunded : null;
+  const paymentAmount = Number.isSafeInteger(payment?.amount) ? payment.amount : null;
+  const isFullRefund = event.event === "payment.refunded" &&
+    paymentAmount !== null && paymentAmount > 0 &&
+    refundAmount !== null && refundAmount >= paymentAmount;
   const safePayload = JSON.stringify({
     subscription_id: subscriptionId,
     subscription_status: subscription?.status || null,
     current_end: subscription?.current_end || null,
     payment_id: payment?.id || null,
     payment_status: payment?.status || null,
-    payment_amount: Number.isFinite(payment?.amount) ? payment.amount : null,
+    payment_amount: paymentAmount,
     payment_currency: payment?.currency || null,
-    payment_amount_refunded: Number.isFinite(payment?.amount_refunded) ? payment.amount_refunded : null
+    payment_amount_refunded: refundAmount,
+    payment_refund_is_full: isFullRefund
   });
   try {
     const inserted = await env.DB.prepare("INSERT OR IGNORE INTO billing_events (id, provider, provider_event_id, event_type, payload_json, processed_at) VALUES (?, 'razorpay', ?, ?, ?, NULL)")
@@ -66,7 +74,7 @@ export async function onRequestPost({ request, env }) {
         "SET status = ?, current_period_end = COALESCE(?, current_period_end),",
         "last_provider_event_at = CASE WHEN ? IS NULL THEN last_provider_event_at ELSE ? END,",
         "updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')",
-        "WHERE provider = 'razorpay' AND provider_subscription_id = ?",
+        "WHERE provider = 'razorpay' AND provider_subscription_id = ? AND status <> 'refunded'",
         "AND (",
         "(? IS NOT NULL AND (last_provider_event_at IS NULL OR ? > last_provider_event_at OR",
         "(? = last_provider_event_at AND",
@@ -82,6 +90,22 @@ export async function onRequestPost({ request, env }) {
         const linked = await env.DB.prepare("SELECT id FROM subscriptions WHERE provider = 'razorpay' AND provider_subscription_id = ?")
           .bind(subscriptionId).first();
         if (!linked) return error("SUBSCRIPTION_NOT_LINKED", "The subscription event is valid but its local subscription record is not available yet.", 503);
+      }
+    }
+    if (event.event === "payment.refunded" && isFullRefund) {
+      if (!subscriptionId) return error("SUBSCRIPTION_NOT_LINKED", "The full refund could not be linked to a subscription.", 503);
+      const revoked = await env.DB.prepare([
+        "UPDATE subscriptions",
+        "SET status = 'refunded', cancel_at_period_end = 0,",
+        "last_provider_event_at = CASE WHEN ? IS NULL THEN last_provider_event_at WHEN last_provider_event_at IS NULL OR last_provider_event_at < ? THEN ? ELSE last_provider_event_at END,",
+        "updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')",
+        "WHERE provider = 'razorpay' AND provider_subscription_id = ? AND status <> 'refunded'"
+      ].join(" "))
+        .bind(eventCreatedAt, eventCreatedAt, eventCreatedAt, subscriptionId).run();
+      if (!revoked.meta?.changes) {
+        const linked = await env.DB.prepare("SELECT id FROM subscriptions WHERE provider = 'razorpay' AND provider_subscription_id = ?")
+          .bind(subscriptionId).first();
+        if (!linked) return error("SUBSCRIPTION_NOT_LINKED", "The full refund is valid but its subscription record is not available yet.", 503);
       }
     }
     await env.DB.prepare("UPDATE billing_events SET processed_at = strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE provider = 'razorpay' AND provider_event_id = ? AND processed_at IS NULL")
