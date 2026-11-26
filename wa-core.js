@@ -118,7 +118,7 @@
       await getConfig();await loadScript();
       if(!container){container=document.createElement("div");container.className="wa-turnstile-challenge";container.setAttribute("aria-label","Security verification");container.style.cssText="position:fixed;left:16px;bottom:16px;width:300px;min-height:65px;z-index:2147483647";document.body.appendChild(container);}
       if(widgetId===null)widgetId=window.turnstile.render(container,{
-        sitekey:siteKey,execution:"execute",appearance:"interaction-only",
+        sitekey:siteKey,action:"wealth_arrays_action",execution:"execute",appearance:"interaction-only",
         callback:token=>{const current=pending;pending=null;if(current)current.resolve(token)},
         "error-callback":()=>{const current=pending;pending=null;if(current)current.reject(new Error("Request verification failed. Please try again."))},
         "expired-callback":()=>{const current=pending;pending=null;if(current)current.reject(new Error("Request verification expired. Please try again."))},
