@@ -2,7 +2,7 @@ import { authenticate, ensureProfile } from "../_auth.js";
 import { error, json, enforceRateLimit } from "../_shared.js";
 
 export async function onRequestOptions() {
-  return new Response(null, { status: 204, headers: { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "POST,OPTIONS", "Access-Control-Allow-Headers": "Content-Type,Authorization" } });
+  return new Response(null, { status: 204, headers: { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "POST,OPTIONS", "Access-Control-Allow-Headers": "Content-Type,Authorization,cf-turnstile-response" } });
 }
 
 const PROVIDER_URL = "https://api.razorpay.com/v1/subscriptions";
