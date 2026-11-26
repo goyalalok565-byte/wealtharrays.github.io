@@ -43,7 +43,7 @@ const healthResponse = await worker.fetch(new Request("https://example.test/v1/h
   RAZORPAY_WEBHOOK_SECRET: "webhook-secret-must-not-leak",
   TURNSTILE_SITE_KEY: "public-turnstile-site-key",
   TURNSTILE_SECRET_KEY: "turnstile-secret-must-not-leak",
-  WRITE_API_LIMITER: { async limit() { return { success: true }; } },\n  TURNSTILE_SITE_KEY: "public-turnstile-site-key",\n  TURNSTILE_SECRET_KEY: "turnstile-secret-must-not-leak",\n  WRITE_API_LIMITER: { async limit() { return { success: true }; } }
+  WRITE_API_LIMITER: { async limit() { return { success: true }; } }
 }, {});
 assert.equal(healthResponse.status, 200);
 const healthData = await healthResponse.json();
@@ -53,12 +53,12 @@ assert.equal(healthData.version, "1.0.0");
 assert.equal(healthData.dependencies.d1_database, "ok");
 assert.equal(healthData.dependencies.supabase_auth, "configured");
 assert.equal(healthData.dependencies.razorpay_billing, "configured");
-assert.equal(healthData.dependencies.turnstile, "configured");\nassert.equal(healthData.dependencies.write_api_rate_limiter, "configured");\nassert.equal(healthData.dependencies.turnstile, "configured");
+assert.equal(healthData.dependencies.turnstile, "configured");
 assert.equal(healthData.dependencies.write_api_rate_limiter, "configured");
 assert.equal(healthData.ready_for_saas, true);
 assert.equal(JSON.stringify(healthData).includes("test-secret-must-not-leak"), false);
 assert.equal(JSON.stringify(healthData).includes("public-anon-test-value"), false);
-assert.equal(JSON.stringify(healthData).includes("turnstile-secret-must-not-leak"), false);\nassert.equal(JSON.stringify(healthData).includes("turnstile-secret-must-not-leak"), false);
+assert.equal(JSON.stringify(healthData).includes("turnstile-secret-must-not-leak"), false);
 const incompleteSecurity = await worker.fetch(new Request("https://example.test/v1/health"), {
   ...env,
   TURNSTILE_SITE_KEY: undefined,
