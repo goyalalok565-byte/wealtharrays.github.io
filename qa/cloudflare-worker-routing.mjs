@@ -85,7 +85,7 @@ const missingLimiter = await worker.fetch(new Request("https://example.test/v1/c
   body: JSON.stringify({ model: "sip", inputs: { monthly: 5000, annualRate: 10, years: 10 } })
 }), { ASSETS: env.ASSETS }, {});
 assert.equal(missingLimiter.status, 503, "Public calculation API must fail closed if rate limiting is unconfigured");
-const securityConfig = await worker.fetch(new Request("https://example.test/v1/security-config"), env, {});\nassert.equal(securityConfig.status, 200);\nconst securityData = await securityConfig.json();\nassert.equal(securityData.configured, true);\nassert.equal(securityData.site_key, "public-turnstile-site-key");\nassert.equal(JSON.stringify(securityData).includes("turnstile-secret-must-not-leak"), false);\nconst securityConfig = await worker.fetch(new Request("https://example.test/v1/security-config"), env, {});
+const securityConfig = await worker.fetch(new Request("https://example.test/v1/security-config"), env, {});
 assert.equal(securityConfig.status, 200);
 const securityData = await securityConfig.json();
 assert.equal(securityData.configured, true);
