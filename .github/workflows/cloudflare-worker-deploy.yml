@@ -2,6 +2,15 @@ name: Deploy Wealth Arrays API Worker
 
 on:
   workflow_dispatch:
+    inputs:
+      confirm_production_deploy:
+        description: 'Type yes to authorize the production D1 migration and Worker deployment'
+        required: true
+        type: choice
+        options:
+          - no
+          - yes
+        default: no
 
 permissions:
   contents: read
@@ -16,6 +25,16 @@ jobs:
     environment: production
     timeout-minutes: 15
     steps:
+      - name: Require explicit production deployment confirmation
+        env:
+          CONFIRM_PRODUCTION_DEPLOY: ${{ inputs.confirm_production_deploy }}
+        run: |
+          set -euo pipefail
+          if [ "$CONFIRM_PRODUCTION_DEPLOY" != "yes" ]; then
+            echo "::error::Production deployment stopped. Set confirm_production_deploy=yes only after the release and D1 migration are approved."
+            exit 1
+          fi
+          echo "Explicit production deployment confirmation received."
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v7
         with:
@@ -39,6 +58,14 @@ jobs:
           echo "cloudflare_ready=true" >> "$GITHUB_OUTPUT"
       - name: Install Wrangler
         run: npm install --no-save wrangler@4.97.0
+      - name: Verify D1 Time Travel recovery is available
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          npx wrangler d1 time-travel info wealtharrays-saas
+          echo "D1 Time Travel recovery information retrieved before migration."
       - name: Apply D1 migrations
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

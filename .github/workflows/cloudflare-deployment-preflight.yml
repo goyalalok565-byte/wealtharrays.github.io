@@ -52,7 +52,8 @@ jobs:
           test -s migrations/0001_saas.sql
           test -s migrations/0002_billing_webhook_order.sql
           test -s migrations/0003_subscription_cancel_flag.sql
-          echo "Build, routing audit, and all three expected migration files passed."
+          test -s migrations/0004_billing_checkout_lock.sql
+          echo "Build, routing audit, and all four expected migration files passed."
 
       - name: Report optional runtime configuration
         env:
