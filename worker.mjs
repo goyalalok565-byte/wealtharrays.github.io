@@ -56,6 +56,26 @@ export default {
     const route = ROUTES.get(url.pathname.replace(/\/$/, ""));
     if (!route) return jsonError("NOT_FOUND", "No API endpoint matches this path.", 404);
     const handler = methodHandler(route, request.method.toUpperCase());
+    const writeRateLimitedPaths = new Set(["/v1/scenarios", "/v1/billing/checkout", "/v1/billing/cancel"]);
+    const isWriteRequest = request.method === "POST" || (url.pathname.replace(/\\/$/, "") === "/v1/scenarios" && request.method === "DELETE");
+    if (handler && isWriteRequest && writeRateLimitedPaths.has(url.pathname.replace(/\\/$/, ""))) {
+      const limiter = env.WRITE_API_LIMITER;
+      if (!limiter || typeof limiter.limit !== "function") {
+        return jsonError("WRITE_RATE_LIMITER_NOT_CONFIGURED", "The write API is temporarily unavailable.", 503);
+      }
+      try {
+        const ip = request.headers.get("cf-connecting-ip") || "local";
+        const decision = await limiter.limit({ key: url.pathname.replace(/\\/$/, "") + ":" + request.method + ":" + ip });
+        if (!decision?.success) {
+          return new Response(JSON.stringify({ error: { code: "RATE_LIMITED", message: "Too many requests. Please wait before trying again." } }), {
+            status: 429,
+            headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", "Retry-After": "60", ...CORS }
+          });
+        }
+      } catch {
+        return jsonError("WRITE_RATE_LIMITER_UNAVAILABLE", "The write API is temporarily unavailable.", 503);
+      }
+    }
     const rateLimitedPaths = new Set(["/v1/calculate", "/v1/india-tax", "/v1/fx"]);
     if (handler && request.method !== "OPTIONS" && rateLimitedPaths.has(url.pathname.replace(/\/$/, ""))) {
       const limiter = env.PUBLIC_API_LIMITER;
