@@ -184,7 +184,7 @@ jobs:
           printf '%s\n' "$preflight" | grep -i '^access-control-allow-origin: \*' >/dev/null
           printf '%s\n' "$preflight" | grep -i '^access-control-allow-methods: .*DELETE' >/dev/null
           printf '%s\n' "$preflight" | grep -i '^access-control-allow-headers: .*Authorization' >/dev/null
-          printf '%s\\n' "$preflight" | grep -i '^access-control-allow-headers: .*cf-turnstile-response' >/dev/null
+          printf '%s\n' "$preflight" | grep -i '^access-control-allow-headers: .*cf-turnstile-response' >/dev/null
           echo "TEST cross-origin scenario DELETE + Turnstile preflight passed."
           
       - name: Remove generated TEST config
