@@ -5,6 +5,7 @@ import { spawnSync } from "node:child_process";
 
 const html = await readFile(new URL("../account.html", import.meta.url), "utf8");
 const js = await readFile(new URL("../account.js", import.meta.url), "utf8");
+const turnstile = await readFile(new URL("../wa-turnstile.js", import.meta.url), "utf8");
 
 test("account page offers passwordless email and Google entry points", () => {
   assert.match(html, /id="account-email"/);
@@ -40,10 +41,19 @@ test("isolated TEST account page points only to TEST API and has billing disable
   assert.match(testHtml, /data-wa-test-mode="true"/);
   assert.match(testHtml, /data-wa-api-base="https:\/\/wealtharrays-api-test\.goyalalok565\.workers\.dev"/);
   assert.match(testHtml, /account-test\.html/);
-  assert.match(testHtml, /wa-site-runtime\.js/, "TEST account must load the shared Turnstile runtime");
+  assert.match(testHtml, /wa-site-runtime\.js/, "TEST account must load the shared site runtime");
+  assert.match(testHtml, /wa-turnstile\.js/, "TEST account must load the browser Turnstile helper");
   const headers = await readFile(new URL("../_headers", import.meta.url), "utf8");
   assert.match(headers, /\/account-test\.html[\s\S]*connect-src[^\r\n]*wealtharrays-api-test\.goyalalok565\.workers\.dev/);
   assert.match(headers, /\/account-test[\s\S]*connect-src[^\r\n]*challenges\.cloudflare\.com[^\r\n]*wealtharrays-api-test\.goyalalok565\.workers\.dev/);
+  assert.match(js, /window\.WATurnstile\.getToken\(\)/, "auth and writes must obtain a fresh verification token");
+  assert.match(turnstile, /appearance: "interaction-only"/);
+  assert.match(turnstile, /execution: "execute"/);
+  assert.match(turnstile, /wealth_arrays_action/);
+  assert.match(turnstile, /\/v1\/security-config/);
+  assert.match(turnstile, /config\.configured !== true/);
+  assert.match(turnstile, /window\.WATurnstile = Object\.freeze\(\{ getToken \}\)/);
+  assert.doesNotMatch(turnstile, /TURNSTILE_SECRET_KEY|secret_key/i);
   assert.match(js, /waSupabaseTestSession/);
   assert.match(js, /dataset\.waApiBase/);
   assert.match(js, /fetch\(API_BASE\+"\/v1\/billing\/config"/);
